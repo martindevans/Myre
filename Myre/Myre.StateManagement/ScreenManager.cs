@@ -21,6 +21,14 @@ namespace Myre.StateManagement
 
         public TransitionType TransitionType { get; set; }
 
+        public int StackCount
+        {
+            get
+            {
+                return screenStack.Count;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScreenManager"/> class.
         /// </summary>
