@@ -24,7 +24,7 @@ namespace Myre.Entities.Events
             public void Execute()
             {
                 for (int i = 0; i < Event.listeners.Count; i++)
-                    Event.listeners[i].HandleEvent(Data);
+                    Event.listeners[i].HandleEvent(Data, Event.Scope);
             }
 
             public void Recycle()
@@ -59,6 +59,8 @@ namespace Myre.Entities.Events
         }
 
         private EventService service;
+        private object scope;
+        private Event<Data> global;
         private List<IEventListener<Data>> listeners;
 
         /// <summary>
@@ -67,9 +69,16 @@ namespace Myre.Entities.Events
         /// <value>The service.</value>
         public EventService Service { get { return service; } }
 
-        internal Event(EventService service)
+        /// <summary>
+        /// Gets the scope object for this event.
+        /// </summary>
+        public object Scope { get { return scope; } }
+
+        internal Event(EventService service, object scope = null, Event<Data> globalScoped = null)
         {
             this.service = service;
+            this.scope = scope;
+            this.global = globalScoped;
             this.listeners = new List<IEventListener<Data>>();
         }
 
@@ -98,8 +107,16 @@ namespace Myre.Entities.Events
         /// <param name="data">The data.</param>
         public void Send(Data data)
         {
+            Send(data, this);
+
+            if (global != null)
+                Send(data, global);
+        }
+
+        private void Send(Data data, Event<Data> channel)
+        {
             Invocation invocation = Invocation.Get();
-            invocation.Event = this;
+            invocation.Event = channel;
             invocation.Data = data;
 
             service.Queue(invocation);
