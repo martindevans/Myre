@@ -6,6 +6,14 @@ using System.Text;
 namespace Myre.Entities.Events
 {
     /// <summary>
+    /// A delegate for handling events through the Event.Sent handler.
+    /// </summary>
+    /// <typeparam name="T">The type of event data sent.</typeparam>
+    /// <param name="data">The event data sent.</param>
+    /// <param name="scope">The scope of the transmitted event.</param>
+    public delegate void MyreEventHandler<T>(T data, object scope);
+
+    /// <summary>
     /// A class which represents an event for a specified data type.
     /// Instances of this type can be used to send events to listeners which have registered with this event.
     /// </summary>
@@ -25,6 +33,8 @@ namespace Myre.Entities.Events
             {
                 for (int i = 0; i < Event.listeners.Count; i++)
                     Event.listeners[i].HandleEvent(Data, Event.Scope);
+
+                Event.TriggerEvent(Data);
             }
 
             public void Recycle()
@@ -62,6 +72,11 @@ namespace Myre.Entities.Events
         private object scope;
         private Event<Data> global;
         private List<IEventListener<Data>> listeners;
+
+        /// <summary>
+        /// Occurs when data is sent along this event instance.
+        /// </summary>
+        public event MyreEventHandler<Data> Sent;
 
         /// <summary>
         /// Gets the service.
@@ -120,6 +135,12 @@ namespace Myre.Entities.Events
             invocation.Data = data;
 
             service.Queue(invocation);
+        }
+
+        private void TriggerEvent(Data data)
+        {
+            if (Sent != null)
+                Sent(data, Scope);
         }
     }
 }
