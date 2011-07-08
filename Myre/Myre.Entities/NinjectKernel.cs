@@ -39,6 +39,19 @@ namespace Myre.Entities
         /// <param name="bindServiceContainer">if set to <c>true</c> binds game.Services.</param>
         public static void BindGame(Game game, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true)
         {
+            BindGame(game, Instance, bindGraphicsDevice, bindContentManager, bindServiceContainer);
+        }
+
+        /// <summary>
+        /// Binds the game into the kernel.
+        /// </summary>
+        /// <param name="game">The game.</param>
+        /// <param name="kernel">The kernel to bind into.</param>
+        /// <param name="bindGraphicsDevice">if set to <c>true</c> binds game.GraphicsDevice.</param>
+        /// <param name="bindContentManager">if set to <c>true</c> binds game.Content.</param>
+        /// <param name="bindServiceContainer">if set to <c>true</c> binds game.Services.</param>
+        public static void BindGame(Game game, IKernel kernel, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true)
+        {
             // bind the game to a singleton instance
             var thisType = game.GetType();
             kernel.Bind(thisType).ToConstant(game);
