@@ -219,6 +219,11 @@ namespace Myre.Entities
                 if (item.IsReady)
                     item.Shutdown();
             }
+
+            foreach (var item in Properties)
+            {
+                item.Clear();
+            }
         }
 
         /// <summary>

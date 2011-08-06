@@ -20,6 +20,9 @@ namespace Myre.Entities
 
         event PropertyChangedDelegate PropertyChanged;
 
+        /// <summary>
+        /// Set the value to the default value and remove all events from PropertyChanged
+        /// </summary>
         void Clear();
     }
 
@@ -65,6 +68,14 @@ namespace Myre.Entities
 
         void IProperty.Clear()
         {
+            if (propertyChanged != null)
+                foreach (var item in propertyChanged.GetInvocationList())
+                    propertyChanged -= (PropertyChangedDelegate)item;
+
+            if (PropertyChanged != null)
+                foreach (var item in PropertyChanged.GetInvocationList())
+                    PropertyChanged -= (PropertyChangedDelegate<T>)item;
+
             value = default(T);
         }
 

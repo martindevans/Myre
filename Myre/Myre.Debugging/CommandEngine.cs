@@ -54,7 +54,7 @@ namespace Myre.Debugging
             var types = assembly.GetTypes();
             foreach (var type in types)
             {
-                // find static properties with the CommandAttribute, add them to the options dictionary
+                //// find static properties with the CommandAttribute, add them to the options dictionary
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Static);
                 foreach (var property in properties)
                 {
