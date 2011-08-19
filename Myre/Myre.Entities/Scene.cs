@@ -55,16 +55,8 @@ namespace Myre.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="Scene"/> class.
         /// </summary>
-        public Scene()
-            : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Scene"/> class.
-        /// </summary>
         /// <param name="kernel">The kernel used to instantiate services and behaviours. <c>null</c> for NinjectKernel.Instance.</param>
-        public Scene(IKernel kernel)
+        public Scene(IKernel kernel = null)
         {
             this.services = new ServiceContainer();
             this.managers = new BehaviourManagerContainer();
