@@ -43,7 +43,7 @@ namespace Myre.Entities
                 this.entity = entity;
             }
 
-            public Property<T> CreateProperty<T>(string name, T value = default(T))
+            public Property<T> CreateProperty<T>(Enum name, T value = default(T))
             {
                 CheckFrozen();
 
@@ -66,7 +66,7 @@ namespace Myre.Entities
         }
 
 
-        private Dictionary<string, IProperty> properties;
+        private Dictionary<Enum, IProperty> properties;
         private Dictionary<Type, Behaviour[]> behaviours;
 
         private List<IProperty> propertiesList;
@@ -111,7 +111,7 @@ namespace Myre.Entities
             this.Behaviours = new ReadOnlyCollection<Behaviour>(behavioursList);
 
             // add properties
-            this.properties = new Dictionary<string, IProperty>();
+            this.properties = new Dictionary<Enum, IProperty>();
             foreach (var item in Properties)
                 this.properties.Add(item.Name, item);
 
@@ -244,7 +244,7 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="name">The name of the propery.</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public IProperty GetProperty(string name)
+        public IProperty GetProperty(Enum name)
         {
             IProperty property = null;
             properties.TryGetValue(name, out property);
@@ -257,7 +257,7 @@ namespace Myre.Entities
         /// <typeparam name="T">The data type this property contains.</typeparam>
         /// <param name="name">The name of the propery.</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public Property<T> GetProperty<T>(string name)
+        public Property<T> GetProperty<T>(Enum name)
         {
             return GetProperty(name) as Property<T>;
         }
