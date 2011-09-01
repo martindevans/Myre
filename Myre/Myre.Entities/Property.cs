@@ -7,28 +7,50 @@ using System.Runtime.InteropServices;
 
 namespace Myre.Entities
 {
-    public delegate void PropertyChangedDelegate(IProperty property);
-    public delegate void PropertyChangedDelegate<T>(Property<T> property);
+    public delegate void PropertyChangedDelegate<T>(Property<T> property, T oldValue, T newValue);
 
+    /// <summary>
+    /// Base class for generically typed properties
+    /// </summary>
     public interface IProperty
     {
+        /// <summary>
+        /// The name of this property
+        /// </summary>
         Enum Name { get; }
 
+        /// <summary>
+        /// The current value of this property
+        /// </summary>
         object Value { get; set; }
 
+        /// <summary>
+        /// The type this property contains
+        /// </summary>
         Type Type { get; }
 
-        event PropertyChangedDelegate PropertyChanged;
-
+        /// <summary>
+        /// Set this property to default values
+        /// </summary>
         void Clear();
     }
 
+    /// <summary>
+    /// A generically typed property
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public sealed class Property<T>
         : IProperty
     {
+        /// <summary>
+        /// The name of this instance
+        /// </summary>
         public Enum Name { get; private set; }
 
         private T value;
+        /// <summary>
+        /// The value of this property
+        /// </summary>
         public T Value
         {
             get
@@ -37,25 +59,21 @@ namespace Myre.Entities
             }
             set
             {
+                var oldValue = this.value;
                 this.value = value;
-                OnValueChanged();
+                OnValueChanged(oldValue);
             }
         }
 
-        private event PropertyChangedDelegate propertyChanged;
-
+        /// <summary>
+        /// Called after the value of this property is changed
+        /// </summary>
         public event PropertyChangedDelegate<T> PropertyChanged;
 
         object IProperty.Value
         {
             get { return Value; }
             set { Value = (T)value; }
-        }
-
-        event PropertyChangedDelegate IProperty.PropertyChanged
-        {
-            add { propertyChanged += value; }
-            remove { propertyChanged -= value; }
         }
 
         Type IProperty.Type
@@ -65,6 +83,10 @@ namespace Myre.Entities
 
         void IProperty.Clear()
         {
+            if (PropertyChanged != null)
+                foreach (var item in PropertyChanged.GetInvocationList())
+                    PropertyChanged -= (PropertyChangedDelegate<T>)item;
+
             value = default(T);
         }
 
@@ -74,13 +96,10 @@ namespace Myre.Entities
             this.value = default(T);
         }
 
-        private void OnValueChanged()
+        private void OnValueChanged(T oldValue)
         {
             if (PropertyChanged != null)
-                PropertyChanged(this);
-
-            if (propertyChanged != null)
-                propertyChanged(this);
+                PropertyChanged(this, oldValue, Value);
         }
 
         public override string ToString()
