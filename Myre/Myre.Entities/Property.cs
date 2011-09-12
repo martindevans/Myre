@@ -17,7 +17,7 @@ namespace Myre.Entities
         /// <summary>
         /// The name of this property
         /// </summary>
-        Enum Name { get; }
+        String Name { get; }
 
         /// <summary>
         /// The current value of this property
@@ -45,7 +45,7 @@ namespace Myre.Entities
         /// <summary>
         /// The name of this instance
         /// </summary>
-        public Enum Name { get; private set; }
+        public String Name { get; private set; }
 
         private T value;
         /// <summary>
@@ -90,7 +90,7 @@ namespace Myre.Entities
             value = default(T);
         }
 
-        public Property(Enum name)
+        public Property(String name)
         {
             this.Name = name;
             this.value = default(T);
