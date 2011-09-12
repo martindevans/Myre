@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Myre.Entities
 {
-    public delegate void PropertyChangedDelegate<T>(Property<T> property, T oldValue, T newValue);
+    public delegate void PropertySetDelegate<T>(Property<T> property, T oldValue, T newValue);
 
     /// <summary>
     /// Base class for generically typed properties
@@ -61,14 +61,14 @@ namespace Myre.Entities
             {
                 var oldValue = this.value;
                 this.value = value;
-                OnValueChanged(oldValue);
+                OnValueSet(oldValue);
             }
         }
 
         /// <summary>
         /// Called after the value of this property is changed
         /// </summary>
-        public event PropertyChangedDelegate<T> PropertyChanged;
+        public event PropertySetDelegate<T> PropertySet;
 
         object IProperty.Value
         {
@@ -83,9 +83,9 @@ namespace Myre.Entities
 
         void IProperty.Clear()
         {
-            if (PropertyChanged != null)
-                foreach (var item in PropertyChanged.GetInvocationList())
-                    PropertyChanged -= (PropertyChangedDelegate<T>)item;
+            if (PropertySet != null)
+                foreach (var item in PropertySet.GetInvocationList())
+                    PropertySet -= (PropertySetDelegate<T>)item;
 
             value = default(T);
         }
@@ -96,10 +96,10 @@ namespace Myre.Entities
             this.value = default(T);
         }
 
-        private void OnValueChanged(T oldValue)
+        private void OnValueSet(T oldValue)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, oldValue, Value);
+            if (PropertySet != null)
+                PropertySet(this, oldValue, Value);
         }
 
         public override string ToString()
