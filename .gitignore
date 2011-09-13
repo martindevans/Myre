@@ -1,6 +1,4 @@
-
 *.suo
-/Documentation
 /Myre/Myre/obj
 /Myre/Myre/bin
 /Myre/Myre.Debugging/obj
