@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="Collections\BinaryTree.cs" />
+    <Compile Include="Collections\BloomFilter.cs" />
     <Compile Include="Collections\Box.cs" />
     <Compile Include="Collections\Hashset.cs">
       <SubType>Code</SubType>
