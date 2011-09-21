@@ -249,13 +249,13 @@ namespace Myre.Entities
         /// <param name="elapsedTime">The number of seconds which have elapsed since the previous frame.</param>
         public void Update(float elapsedTime)
         {
+            services.Update(elapsedTime);
+
             for (int i = entities.Count - 1; i >= 0; i--)
             {
                 if (entities[i].IsDisposed)
                     Remove(entities[i]);
             }
-
-            services.Update(elapsedTime);
         }
 
         /// <summary>

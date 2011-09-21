@@ -29,6 +29,10 @@ namespace Myre.Entities.Events
             public Data Data;
             public Event<Data> Event;
 
+#if DEBUG
+            public System.Diagnostics.StackTrace Stack;
+#endif
+
             public void Execute()
             {
                 for (int i = 0; i < Event.listeners.Count; i++)
@@ -133,6 +137,9 @@ namespace Myre.Entities.Events
             Invocation invocation = Invocation.Get();
             invocation.Event = channel;
             invocation.Data = data;
+#if DEBUG
+            invocation.Stack = new System.Diagnostics.StackTrace();
+#endif
 
             service.Queue(invocation);
         }
