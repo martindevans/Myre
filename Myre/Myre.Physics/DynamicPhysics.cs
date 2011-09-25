@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Myre.Entities.Behaviours;
 using Ninject;
 using Myre.Entities.Services;
+using Myre.Collections;
 
 namespace Myre.Physics
 {
@@ -101,7 +102,7 @@ namespace Myre.Physics
             get { return mass.Value == float.PositiveInfinity && inertiaTensor.Value == float.PositiveInfinity; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION);
             this.rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION);
@@ -119,10 +120,10 @@ namespace Myre.Physics
             base.CreateProperties(context);
         }
 
-        public override void Initialise()
+        public override void Initialise(INamedDataProvider initialisationData)
         {
-            timeTillSleep = 5;            
-            base.Initialise();
+            timeTillSleep = 5;
+            base.Initialise(initialisationData);
         }
 
         public Vector2 GetVelocityAtOffset(Vector2 worldOffset)

@@ -11,6 +11,7 @@ using Myre.Extensions;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using Myre.Collections;
 
 namespace Myre.Entities
 {

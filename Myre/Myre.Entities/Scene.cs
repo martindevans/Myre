@@ -8,6 +8,7 @@ using Ninject.Parameters;
 using Myre.Entities.Behaviours;
 using Myre;
 using System.Collections.ObjectModel;
+using Myre.Collections;
 
 namespace Myre.Entities
 {
@@ -71,13 +72,13 @@ namespace Myre.Entities
         /// Adds the specified entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public void Add(Entity entity)
+        public void Add(Entity entity, INamedDataProvider initialisationData = null)
         {
             if (entity.Scene != null)
                 throw new InvalidOperationException("Cannot add an entity to a scene if it is in a scene already");
 
             entity.Scene = this;
-            entity.Initialise();
+            entity.Initialise(initialisationData);
 
             foreach (var behaviour in entity.Behaviours)
             {

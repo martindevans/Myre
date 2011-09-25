@@ -84,6 +84,7 @@
     <Compile Include="Collections\Hashset.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Collections\INamedDataProvider.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />

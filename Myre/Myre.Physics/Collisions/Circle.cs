@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Myre.Entities;
+using Myre.Collections;
 
 namespace Myre.Physics.Collisions
 {
@@ -43,7 +44,7 @@ namespace Myre.Physics.Collisions
             vertices = new Vector2[2];
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             var prefix = Name != null ? Name + "_" : string.Empty;
             radius = context.CreateProperty<float>(prefix + "radius");
@@ -57,13 +58,13 @@ namespace Myre.Physics.Collisions
             base.CreateProperties(context);
         }
 
-        public override void Initialise()
+        public override void Initialise(INamedDataProvider initialisationData)
         {
             var transform = Owner.GetBehaviour<Transform>();
             if (transform != null)
                 transform.CalculateTransform();
             
-            base.Initialise();
+            base.Initialise(initialisationData);
         }
 
         private void UpdateBounds()

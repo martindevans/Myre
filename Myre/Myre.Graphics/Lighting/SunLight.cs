@@ -47,7 +47,7 @@ namespace Myre.Graphics.Lighting
             set { shadowResolution.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.colour = context.CreateProperty<Vector3>("colour");
             this.direction = context.CreateProperty<Vector3>("direction");

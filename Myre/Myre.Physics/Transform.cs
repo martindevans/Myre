@@ -44,7 +44,7 @@ namespace Myre.Physics
             set { inverseTransform.Value = value; }
         }
         
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION);
             this.rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION);

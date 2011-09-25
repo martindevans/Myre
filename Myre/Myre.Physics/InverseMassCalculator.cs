@@ -13,7 +13,7 @@ namespace Myre.Physics
         public const String MASS = PhysicsProperties.MASS;
         public const String INVERSE_MASS = PhysicsProperties.INVERSE_MASS;
 
-        public override void CreateProperties(Entities.Entity.InitialisationContext context)
+        public override void CreateProperties(Entities.Entity.ConstructionContext context)
         {
             Property<float> mass = context.CreateProperty<float>(MASS);
             Property<float> invMass = context.CreateProperty<float>(INVERSE_MASS);

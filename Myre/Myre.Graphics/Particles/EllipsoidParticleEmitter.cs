@@ -80,7 +80,7 @@ namespace Myre.Graphics.Particles
             this.random = new Random();
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.position = context.CreateProperty<Vector3>("position");
 
