@@ -66,12 +66,7 @@ namespace Myre.Entities
             }
         }
 
-<<<<<<< HEAD
-
         private Dictionary<String, IProperty> properties;
-=======
-        private Dictionary<string, IProperty> properties;
->>>>>>> efc812adbad18678929cd7b565d84eea959213b1
         private Dictionary<Type, Behaviour[]> behaviours;
 
         private List<IProperty> propertiesList;

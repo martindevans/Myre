@@ -88,10 +88,6 @@ namespace Myre.Entities
         {
             if (PropertySet != null)
                 foreach (var item in PropertySet.GetInvocationList())
-                    PropertySet -= (PropertySetDelegate)item;
-
-            if (PropertySet != null)
-                foreach (var item in PropertySet.GetInvocationList())
                     PropertySet -= (PropertySetDelegate<T>)item;
 
             value = default(T);
