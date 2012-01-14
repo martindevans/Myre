@@ -1,4 +1,4 @@
-
+*.cachefile
 *.suo
 /Documentation
 /Myre/Myre/obj
@@ -13,6 +13,8 @@
 /Myre/Myre.Graphics/bin
 /Myre/Myre.Graphics.Pipeline/obj
 /Myre/Myre.Graphics.Pipeline/bin
+/Myre/Myre.Graphics.Content/obj
+/Myre/Myre.Graphics.Content/bin
 /Myre/Myre.Physics/obj
 /Myre/Myre.Physics/bin
 /Myre/Myre.StateManagement/obj
