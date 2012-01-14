@@ -50,6 +50,8 @@ namespace Myre.UI.Controls
         public Menu(Control parent)
             : base(parent)
         {
+            SelectedOptionIndex = -1;
+
             ChildAdded += c =>
             {
                 if (IsFocused && SelectedOption == null)
@@ -84,7 +86,7 @@ namespace Myre.UI.Controls
 
         /// <summary>
         /// Binds menu navigation to the up and down keys.
-        /// Override this to implement different behavier.
+        /// Override this to implement different behaviour.
         /// </summary>
         private void BindGestures()
         {

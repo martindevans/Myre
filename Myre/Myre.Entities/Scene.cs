@@ -8,6 +8,7 @@ using Ninject.Parameters;
 using Myre.Entities.Behaviours;
 using Myre;
 using System.Collections.ObjectModel;
+using Myre.Collections;
 
 namespace Myre.Entities
 {
@@ -55,16 +56,8 @@ namespace Myre.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="Scene"/> class.
         /// </summary>
-        public Scene()
-            : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Scene"/> class.
-        /// </summary>
         /// <param name="kernel">The kernel used to instantiate services and behaviours. <c>null</c> for NinjectKernel.Instance.</param>
-        public Scene(IKernel kernel)
+        public Scene(IKernel kernel = null)
         {
             this.services = new ServiceContainer();
             this.managers = new BehaviourManagerContainer();
@@ -79,13 +72,13 @@ namespace Myre.Entities
         /// Adds the specified entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public void Add(Entity entity)
+        public void Add(Entity entity, INamedDataProvider initialisationData = null)
         {
             if (entity.Scene != null)
                 throw new InvalidOperationException("Cannot add an entity to a scene if it is in a scene already");
 
             entity.Scene = this;
-            entity.Initialise();
+            entity.Initialise(initialisationData);
 
             foreach (var behaviour in entity.Behaviours)
             {
@@ -257,13 +250,13 @@ namespace Myre.Entities
         /// <param name="elapsedTime">The number of seconds which have elapsed since the previous frame.</param>
         public void Update(float elapsedTime)
         {
+            services.Update(elapsedTime);
+
             for (int i = entities.Count - 1; i >= 0; i--)
             {
                 if (entities[i].IsDisposed)
                     Remove(entities[i]);
             }
-
-            services.Update(elapsedTime);
         }
 
         /// <summary>

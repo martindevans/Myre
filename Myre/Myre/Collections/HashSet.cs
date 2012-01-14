@@ -6,7 +6,33 @@ using System.Collections;
 
 namespace Myre.Collections
 {
-    #if XBOX
+    #if WINDOWS
+    public class HashSet<T>
+        : System.Collections.Generic.HashSet<T>
+    {
+        #region Constructors
+        public HashSet()
+            : base()
+        {
+        }
+
+        public HashSet(IEnumerable<T> collection)
+            : base(collection)
+        {
+        }
+
+        public HashSet(IEqualityComparer<T> comparer)
+            : base(comparer)
+        {
+        }
+
+        public HashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
+            : base(collection, comparer)
+        {
+        }
+        #endregion
+    }
+    #else
     //todo: Make the compact framework hashset a proper hashset instead of a list in disguise
     public class HashSet<T>
          : ICollection<T>, IEnumerable<T>
@@ -42,13 +68,13 @@ namespace Myre.Collections
         public HashSet()
         {
             set = new List<T>();
-            Comparer = (IEqualityComparer<T>)Comparer<T>.Default;
+            Comparer = (IEqualityComparer<T>)EqualityComparer<T>.Default;
         }
 
         public HashSet(IEnumerable<T> collection)
         {
             set = new List<T>(collection);
-            Comparer = (IEqualityComparer<T>)Comparer<T>.Default;
+            Comparer = (IEqualityComparer<T>)EqualityComparer<T>.Default;
         }
 
         public HashSet(IEqualityComparer<T> comparer)

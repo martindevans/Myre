@@ -38,7 +38,7 @@ namespace Myre.Graphics.Lighting
             set { up.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.skyColour = context.CreateProperty<Vector3>("sky_colour");
             this.groundColour = context.CreateProperty<Vector3>("ground_colour");

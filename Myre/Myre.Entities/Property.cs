@@ -32,6 +32,9 @@ namespace Myre.Entities
         /// <summary>
         /// Set this property to default values
         /// </summary>
+        /// <summary>
+        /// Set the value to the default value and remove all events from PropertyChanged
+        /// </summary>
         void Clear();
     }
 
@@ -85,6 +88,10 @@ namespace Myre.Entities
         {
             if (PropertySet != null)
                 foreach (var item in PropertySet.GetInvocationList())
+                    PropertySet -= (PropertySetDelegate)item;
+
+            if (PropertySet != null)
+                foreach (var item in PropertySet.GetInvocationList())
                     PropertySet -= (PropertySetDelegate<T>)item;
 
             value = default(T);
@@ -104,6 +111,8 @@ namespace Myre.Entities
 
         public override string ToString()
         {
+            if (Value == null)
+                return "null";
             return Value.ToString();
         }
     }

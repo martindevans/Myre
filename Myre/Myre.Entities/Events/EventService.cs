@@ -19,7 +19,7 @@ namespace Myre.Entities.Events
     public interface IEventService
         : IService
     {
-        Event<T> GetEvent<T>();
+        Event<T> GetEvent<T>(object scope = null);
     }
 
     /// <summary>
@@ -28,7 +28,13 @@ namespace Myre.Entities.Events
     public class EventService
         : Service, IEventService
     {
-        private Dictionary<Type, object> events;
+        class Events
+        {
+            public object GlobalScope;
+            public Dictionary<object, object> LocalScopes = new Dictionary<object, object>();
+        }
+
+        private Dictionary<Type, Events> events;
         private Queue<IEventInvocation> waitingEvents;
         private Queue<IEventInvocation> executingEvents;
         private SpinLock spinLock;
@@ -38,7 +44,7 @@ namespace Myre.Entities.Events
         /// </summary>
         public EventService()
         {
-            events = new Dictionary<Type, object>();
+            events = new Dictionary<Type, Events>();
             waitingEvents = new Queue<IEventInvocation>();
             executingEvents = new Queue<IEventInvocation>();
         }
@@ -48,18 +54,31 @@ namespace Myre.Entities.Events
         /// </summary>
         /// <typeparam name="T">The type of data this event sends.</typeparam>
         /// <returns></returns>
-        public Event<T> GetEvent<T>()
+        public Event<T> GetEvent<T>(object scope = null)
         {
             var type = typeof(T);
-            object e = null;
 
+            Events e;
             if (!events.TryGetValue(type, out e))
             {
-                e = new Event<T>(this);
+                e = new Events();
+                e.GlobalScope = new Event<T>(this);
                 events[type] = e;
             }
 
-            return e as Event<T>;
+            object instance = null;
+            if (scope == null)
+                instance = e.GlobalScope;
+            else
+            {
+                if (!e.LocalScopes.TryGetValue(scope, out instance))
+                {
+                    instance = new Event<T>(this, scope, e.GlobalScope as Event<T>);
+                    e.LocalScopes[scope] = instance;
+                }
+            }
+
+            return instance as Event<T>;
         }
 
         /// <summary>

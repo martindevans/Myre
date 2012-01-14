@@ -37,7 +37,7 @@ namespace Myre.Graphics.Lighting
             set { gammaCorrect.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.texture = context.CreateProperty<TextureCube>("texture");
             this.brightness = context.CreateProperty<float>("brightness");

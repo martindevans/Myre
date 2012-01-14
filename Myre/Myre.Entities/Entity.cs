@@ -9,6 +9,7 @@ using Myre;
 using Myre.Extensions;
 using Ninject;
 using Ninject.Parameters;
+using Myre.Collections;
 
 namespace Myre.Entities
 {
@@ -33,12 +34,12 @@ namespace Myre.Entities
     public class Entity
         : IDisposableObject, IRecycleable
     {
-        public sealed class InitialisationContext
+        public sealed class ConstructionContext
         {
             private Entity entity;
             internal bool frozen;
 
-            internal InitialisationContext(Entity entity)
+            internal ConstructionContext(Entity entity)
             {
                 this.entity = entity;
             }
@@ -65,14 +66,18 @@ namespace Myre.Entities
             }
         }
 
+<<<<<<< HEAD
 
         private Dictionary<String, IProperty> properties;
+=======
+        private Dictionary<string, IProperty> properties;
+>>>>>>> efc812adbad18678929cd7b565d84eea959213b1
         private Dictionary<Type, Behaviour[]> behaviours;
 
         private List<IProperty> propertiesList;
         private List<Behaviour> behavioursList;
 
-        private InitialisationContext initialisationContext;
+        private ConstructionContext constructionContext;
 
         public EntityVersion Version { get; private set; }
 
@@ -129,7 +134,7 @@ namespace Myre.Entities
                 this.behaviours.Add(item.Key, item.Value.ToArray());
 
             // create initialisation context
-            this.initialisationContext = new InitialisationContext(this);
+            this.constructionContext = new ConstructionContext(this);
 
             // allow behaviours to add their own properties
             CreateProperties();
@@ -161,14 +166,14 @@ namespace Myre.Entities
 
         private void CreateProperties()
         {
-            initialisationContext.frozen = false;
+            constructionContext.frozen = false;
 
             foreach (var item in Behaviours)
             {
-                item.CreateProperties(initialisationContext);
+                item.CreateProperties(constructionContext);
             }
 
-            initialisationContext.frozen = true;
+            constructionContext.frozen = true;
         }
 
         /// <summary>
@@ -200,12 +205,12 @@ namespace Myre.Entities
         /// <summary>
         /// Initialises this instance.
         /// </summary>
-        internal void Initialise()
+        internal void Initialise(INamedDataProvider initialisationData = null)
         {
             foreach (var item in Behaviours)
             {
                 if (!item.IsReady)
-                    item.Initialise();
+                    item.Initialise(initialisationData);
             }
         }
 
@@ -218,6 +223,11 @@ namespace Myre.Entities
             {
                 if (item.IsReady)
                     item.Shutdown();
+            }
+
+            foreach (var item in Properties)
+            {
+                item.Clear();
             }
         }
 

@@ -31,9 +31,9 @@ namespace Myre.UI.Controls
         public Color Highlight { get; set; }
 
         /// <summary>
-        /// Gets or sets the justfication.
+        /// Gets or sets the justification.
         /// </summary>
-        /// <value>The justfication.</value>
+        /// <value>The justification.</value>
         public override Justification Justification
         {
             get { return Label.Justification; }
@@ -70,7 +70,7 @@ namespace Myre.UI.Controls
         /// <param name="gameTime">The current game time.</param>
         public override void Update(GameTime gameTime)
         {
-            var c = IsFocused || ((Parent == null || !Parent.IsFocused) && IsWarm) ? Highlight : Colour;
+            var c = IsFocused || IsWarm ? Highlight : Colour;
             Label.Colour = c;
             SetSize((int)Label.TextSize.X, (int)Label.TextSize.Y);
             base.Update(gameTime);

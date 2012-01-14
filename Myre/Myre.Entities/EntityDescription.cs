@@ -11,6 +11,7 @@ using Myre.Extensions;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using Myre.Collections;
 
 namespace Myre.Entities
 {
@@ -102,9 +103,9 @@ namespace Myre.Entities
         /// Initializes a new instance of the <see cref="EntityDescription"/> class.
         /// </summary>
         /// <param name="kernel">The kernel.</param>
-        public EntityDescription(IKernel kernel)
+        public EntityDescription(IKernel kernel = null)
         {
-            this.kernel = kernel;
+            this.kernel = kernel ?? NinjectKernel.Instance;
             this.behaviours = new List<BehaviourData>();
             this.properties = new List<PropertyData>();
             this.pool = new Queue<Entity>();

@@ -6,6 +6,7 @@ using Myre.Entities;
 using Microsoft.Xna.Framework;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
+using Myre.Collections;
 
 namespace Myre.Physics.Dynamics.Constraints
 {
@@ -24,7 +25,7 @@ namespace Myre.Physics.Dynamics.Constraints
             acceleration.Value -= velocity.Value * damping * inverseMass.Value;
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             velocity = context.CreateProperty<Vector3>("velocity");
             acceleration = context.CreateProperty<Vector3>("acceleration");
@@ -33,13 +34,13 @@ namespace Myre.Physics.Dynamics.Constraints
             base.CreateProperties(context);
         }
 
-        public override void Initialise()
+        public override void Initialise(INamedDataProvider initialisationData)
         {
             if (Owner.GetBehaviour<InverseMassCalculator>() == null)
                 throw new InvalidOperationException("Inverse mass calculator must be attached");
             damping = Owner.GetProperty<float>("damping");
 
-            base.Initialise();
+            base.Initialise(initialisationData);
         }
 
         public class Manager

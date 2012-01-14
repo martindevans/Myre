@@ -5,6 +5,7 @@ using System.Text;
 using Myre.Entities.Behaviours;
 using Myre.Entities;
 using Microsoft.Xna.Framework;
+using Myre.Collections;
 
 namespace Myre.Physics.Constraints
 {
@@ -18,7 +19,7 @@ namespace Myre.Physics.Constraints
         private Property<float> strength;
         private Property<float> damping;
 
-        public override void CreateProperties(Myre.Entities.Entity.InitialisationContext context)
+        public override void CreateProperties(Myre.Entities.Entity.ConstructionContext context)
         {
             if (body == null)
                 throw new Exception("VelocityConstraint requires that the entity contain a DynamicPhysics behaviour.");
@@ -30,11 +31,11 @@ namespace Myre.Physics.Constraints
             base.CreateProperties(context);
         }
 
-        public override void Initialise()
+        public override void Initialise(INamedDataProvider initialisationData)
         {
             this.body = Owner.GetBehaviour<DynamicPhysics>();
 
-            base.Initialise();
+            base.Initialise(initialisationData);
         }
 
         public class Manager

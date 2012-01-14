@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.ObjectModel;
 using Myre.Entities.Behaviours;
 using Myre.Entities;
+using Myre.Collections;
 
 namespace Myre.Physics.Collisions
 {
@@ -61,7 +62,7 @@ namespace Myre.Physics.Collisions
             CollidingWith = new ReadOnlyCollection<Geometry>(collidingWith);
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             frictionCoefficient = context.CreateProperty<float>("friction_coefficient");
             restitutionCoefficient = context.CreateProperty<float>("restitution_coefficient");
@@ -73,12 +74,12 @@ namespace Myre.Physics.Collisions
             base.CreateProperties(context);
         }
 
-        public override void Initialise()
+        public override void Initialise(INamedDataProvider initialisationData)
         {
             Body = Owner.GetBehaviour<DynamicPhysics>();
 
             wasSleeping = sleeping.Value;
-            base.Initialise();
+            base.Initialise(initialisationData);
         }
 
         private void ValidateRestitution(Property<float> restitution)

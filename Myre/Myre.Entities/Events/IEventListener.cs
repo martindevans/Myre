@@ -11,6 +11,6 @@ namespace Myre.Entities.Events
     /// <typeparam name="EventData">The type of the event data.</typeparam>
     public interface IEventListener<EventData>
     {
-        void HandleEvent(EventData data);
+        void HandleEvent(EventData data, object scope);
     }
 }

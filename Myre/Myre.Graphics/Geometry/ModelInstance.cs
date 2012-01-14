@@ -38,7 +38,7 @@ namespace Myre.Graphics.Geometry
             set { isStatic.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.model = context.CreateProperty<ModelData>("model");
             this.transform = context.CreateProperty<Matrix>("transform");

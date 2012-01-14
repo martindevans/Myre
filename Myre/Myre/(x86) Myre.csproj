@@ -85,6 +85,8 @@
     <Compile Include="Collections\Hashset.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Collections\INamedDataProvider.cs" />
+    <Compile Include="Collections\NamedBoxCollection.cs" />
     <Compile Include="Collections\ISettingsCollection.cs" />
     <Compile Include="Collections\MinMaxHeap.cs" />
     <Compile Include="Collections\Pool.cs" />
