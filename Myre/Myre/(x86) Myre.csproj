@@ -86,6 +86,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Collections\ISettingsCollection.cs" />
+    <Compile Include="Collections\MinMaxHeap.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />

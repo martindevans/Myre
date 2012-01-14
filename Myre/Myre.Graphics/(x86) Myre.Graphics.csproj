@@ -181,6 +181,7 @@
     <EmbeddedResource Include="XboxResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>XboxResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
