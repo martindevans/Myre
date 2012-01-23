@@ -21,6 +21,10 @@
 /Myre/Myre.StateManagement/bin
 /Myre/Myre.UI/obj
 /Myre/Myre.UI/bin
+/Myre/Myre.Serialisation/bin
+/Myre/Myre.Serialisation/obj
+/Testing/Myre.Serialisation.Tests/bin
+/Testing/Myre.Serialisation.Tests/obj
 /Testing/GraphicsTests/GraphicsTests/obj
 /Testing/GraphicsTests/GraphicsTests/bin
 /Testing/GraphicsTests/GraphicsTestsContent/obj
