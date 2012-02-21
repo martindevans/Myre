@@ -88,11 +88,13 @@ namespace Myre.Collections
         /// <param name="key">The key.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value at the specified key, or null if the existing box contains a different value type.</returns>
-        public Box<T> Get<T>(Key key, T defaultValue = default(T))
+        public Box<T> Get<T>(Key key, T defaultValue = default(T), bool create = true)
         {
             IBox box;
             if (values.TryGetValue(key, out box))
                 return box as Box<T>;
+            else if (!create)
+                return null;
             else
             {
                 var value = new Box<T>();

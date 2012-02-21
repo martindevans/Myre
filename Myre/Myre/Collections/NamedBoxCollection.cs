@@ -8,9 +8,9 @@ namespace Myre.Collections
     public class NamedBoxCollection
         :BoxedValueStore<string>, INamedDataProvider
     {
-        public Box<T> Get<T>(string name)
+        public Box<T> Get<T>(string name, bool create = true)
         {
-            return base.Get<T>(name);
+            return base.Get<T>(name, default(T), create);
         }
     }
 }

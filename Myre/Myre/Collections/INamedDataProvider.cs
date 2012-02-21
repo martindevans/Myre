@@ -7,6 +7,6 @@ namespace Myre.Collections
 {
     public interface INamedDataProvider
     {
-        Box<T> Get<T>(string name);
+        Box<T> Get<T>(string name, bool create = true);
     }
 }

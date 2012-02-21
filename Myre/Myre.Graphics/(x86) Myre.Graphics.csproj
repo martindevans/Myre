@@ -127,7 +127,7 @@
     <Compile Include="Materials\MaterialReader.cs" />
     <Compile Include="Particles\EllipsoidParticleEmitter.cs" />
     <Compile Include="Particles\ParticleEmitter.cs" />
-    <Compile Include="Particles\ParticlePhase.cs" />
+    <Compile Include="Particles\ParticleComponent.cs" />
     <Compile Include="Particles\ParticleSystem.cs" />
     <Compile Include="Particles\ParticleSystemDescription.cs" />
     <Compile Include="Particles\ParticleVertex.cs" />
