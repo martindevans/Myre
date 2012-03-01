@@ -77,7 +77,7 @@ namespace Myre.Collections
         /// Initializes a new instance of the <see cref="MinMaxHeap&lt;T&gt;"/> class.
         /// </summary>
         /// <param name="comparer">The comparer to use</param>
-        public MinMaxHeap(Comparer<T> comparer)
+        public MinMaxHeap(IComparer<T> comparer)
             : this(comparer, 0)
         {
         }
@@ -87,7 +87,7 @@ namespace Myre.Collections
         /// </summary>
         /// <param name="comparer">The comparer to use</param>
         /// <param name="capacity">The initial capacity of the heap</param>
-        public MinMaxHeap(Comparer<T> comparer, int capacity)
+        public MinMaxHeap(IComparer<T> comparer, int capacity)
         {
             this.comparer = comparer;
             heap = new List<T>(capacity);
@@ -98,7 +98,7 @@ namespace Myre.Collections
         /// </summary>
         /// <param name="comparer">The comparer to use</param>
         /// <param name="initialItems">The initial items to put into the heap</param>
-        public MinMaxHeap(Comparer<T> comparer, IEnumerable<T> initialItems)
+        public MinMaxHeap(IComparer<T> comparer, IEnumerable<T> initialItems)
             : this(comparer)
         {
             AddMany(initialItems);
