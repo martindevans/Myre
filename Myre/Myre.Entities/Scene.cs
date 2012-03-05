@@ -43,6 +43,11 @@ namespace Myre.Entities
         public IEnumerable<IService> Services { get { return services; } }
 
         /// <summary>
+        /// A collection of diagnostic data about service execution time
+        /// </summary>
+        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes { get { return services.ExecutionTimes; } }
+
+        /// <summary>
         /// Gets the managers.
         /// </summary>
         /// <value>The managers.</value>

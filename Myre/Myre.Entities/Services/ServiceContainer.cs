@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Myre.Extensions;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Myre.Entities.Services
 {
@@ -19,6 +21,10 @@ namespace Myre.Entities.Services
         private Comparison<IService> updateOrder;
         private Comparison<IService> drawOrder;
 
+        Stopwatch timer = new Stopwatch();
+        private List<KeyValuePair<IService, TimeSpan>> executionTimes;
+        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ExecutionTimes;
+
         public IService this[Type type]
         {
             get { return dictionary[type]; }
@@ -30,6 +36,9 @@ namespace Myre.Entities.Services
             update = new List<IService>();
             draw = new List<IService>();
             buffer = new List<IService>();
+
+            executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
+            ExecutionTimes = new ReadOnlyCollection<KeyValuePair<IService, TimeSpan>>(executionTimes);
 
             updateOrder = (a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder);
             drawOrder = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
@@ -82,8 +91,16 @@ namespace Myre.Entities.Services
         {
             UpdateLists();
             update.InsertionSort(updateOrder);
+
+            executionTimes.Clear();
+
             for (int i = 0; i < update.Count; i++)
+            {
+                timer.Restart();
                 update[i].Update(elapsedTime);
+                timer.Stop();
+                executionTimes.Add(new KeyValuePair<IService, TimeSpan>(update[i], timer.Elapsed));
+            }
         }
 
         public void Draw()
