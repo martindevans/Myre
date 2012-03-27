@@ -95,6 +95,7 @@ namespace Myre.Graphics
         {
 #if WINDOWS
             var targets = device.GetRenderTargets();
+#endif
 
 #if PROFILE
             Statistic.Get("Graphics.Primitives").Value = 0;
