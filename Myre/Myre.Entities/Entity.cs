@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using Myre.Entities.Behaviours;
 using System.Collections.ObjectModel;
-using Myre;
-using Myre.Extensions;
-using Ninject;
-using Ninject.Parameters;
+using System.Diagnostics;
+using System.Linq;
 using Myre.Collections;
+using Myre.Entities.Behaviours;
 
 namespace Myre.Entities
 {
@@ -36,24 +31,24 @@ namespace Myre.Entities
     {
         public sealed class ConstructionContext
         {
-            private Entity entity;
-            internal bool frozen;
+            private readonly Entity _entity;
+            internal bool Frozen;
 
             internal ConstructionContext(Entity entity)
             {
-                this.entity = entity;
+                _entity = entity;
             }
 
             public Property<T> CreateProperty<T>(String name, T value = default(T))
             {
                 CheckFrozen();
 
-                var property = entity.GetProperty<T>(name);
+                var property = _entity.GetProperty<T>(name);
                 if (property == null)
                 {
                     property = new Property<T>(name);
                     property.Value = value;
-                    entity.AddProperty(property);
+                    _entity.AddProperty(property);
                 }
 
                 return property;
@@ -61,18 +56,18 @@ namespace Myre.Entities
 
             private void CheckFrozen()
             {
-                if (frozen)
+                if (Frozen)
                     throw new InvalidOperationException("Entity initialisation contexts can only be used during initialisation.");
             }
         }
 
-        private Dictionary<String, IProperty> properties;
-        private Dictionary<Type, Behaviour[]> behaviours;
+        private readonly Dictionary<String, IProperty> _properties;
+        private readonly Dictionary<Type, Behaviour[]> _behaviours;
 
-        private List<IProperty> propertiesList;
-        private List<Behaviour> behavioursList;
+        private readonly List<IProperty> _propertiesList;
+        private readonly List<Behaviour> _behavioursList;
 
-        private ConstructionContext constructionContext;
+        private readonly ConstructionContext _constructionContext;
 
         public EntityVersion Version { get; private set; }
 
@@ -102,18 +97,18 @@ namespace Myre.Entities
 
         internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
         {
-            this.Version = version;
+            Version = version;
 
             // create public read-only collections
-            this.propertiesList = new List<IProperty>(properties);
-            this.behavioursList = new List<Behaviour>(behaviours);
-            this.Properties = new ReadOnlyCollection<IProperty>(propertiesList);
-            this.Behaviours = new ReadOnlyCollection<Behaviour>(behavioursList);
+            _propertiesList = new List<IProperty>(properties);
+            _behavioursList = new List<Behaviour>(behaviours);
+            Properties = new ReadOnlyCollection<IProperty>(_propertiesList);
+            Behaviours = new ReadOnlyCollection<Behaviour>(_behavioursList);
 
             // add properties
-            this.properties = new Dictionary<String, IProperty>();
+            _properties = new Dictionary<String, IProperty>();
             foreach (var item in Properties)
-                this.properties.Add(item.Name, item);
+                _properties.Add(item.Name, item);
 
             // sort behaviours by their type
             var catagorised = new Dictionary<Type, List<Behaviour>>();
@@ -124,12 +119,12 @@ namespace Myre.Entities
             }
 
             // add behaviours
-            this.behaviours = new Dictionary<Type, Behaviour[]>();
+            _behaviours = new Dictionary<Type, Behaviour[]>();
             foreach (var item in catagorised)
-                this.behaviours.Add(item.Key, item.Value.ToArray());
+                _behaviours.Add(item.Key, item.Value.ToArray());
 
             // create initialisation context
-            this.constructionContext = new ConstructionContext(this);
+            _constructionContext = new ConstructionContext(this);
 
             // allow behaviours to add their own properties
             CreateProperties();
@@ -138,11 +133,13 @@ namespace Myre.Entities
         private void CatagoriseBehaviour(Dictionary<Type, List<Behaviour>> catagorised, Behaviour behaviour)
         {
             Type type = behaviour.GetType();
+            Debug.Assert(type != null);
             do
             {
                 LazyGetCategoryList(type, catagorised).Add(behaviour);
 
                 type = type.BaseType;
+                Debug.Assert(type != null, "type != null");
             }
             while (type != typeof(Behaviour).BaseType);
         }
@@ -161,14 +158,14 @@ namespace Myre.Entities
 
         private void CreateProperties()
         {
-            constructionContext.frozen = false;
+            _constructionContext.Frozen = false;
 
             foreach (var item in Behaviours)
             {
-                item.CreateProperties(constructionContext);
+                item.CreateProperties(_constructionContext);
             }
 
-            constructionContext.frozen = true;
+            _constructionContext.Frozen = true;
         }
 
         /// <summary>
@@ -240,8 +237,8 @@ namespace Myre.Entities
 
         internal void AddProperty(IProperty property)
         {
-            properties.Add(property.Name, property);
-            propertiesList.Add(property);
+            _properties.Add(property.Name, property);
+            _propertiesList.Add(property);
         }
 
         /// <summary>
@@ -251,8 +248,8 @@ namespace Myre.Entities
         /// <returns>The property with the specified name and data type.</returns>
         public IProperty GetProperty(String name)
         {
-            IProperty property = null;
-            properties.TryGetValue(name, out property);
+            IProperty property;
+            _properties.TryGetValue(name, out property);
             return property;
         }
 
@@ -276,7 +273,7 @@ namespace Myre.Entities
         public Behaviour GetBehaviour(Type type, string name = null)
         {
             Behaviour[] array;
-            if (behaviours.TryGetValue(type, out array))
+            if (_behaviours.TryGetValue(type, out array))
             {
                 foreach (var item in array)
                 {
@@ -295,8 +292,8 @@ namespace Myre.Entities
         /// <returns></returns>
         public Behaviour[] GetBehaviours(Type type)
         {
-            Behaviour[] array = null;
-            behaviours.TryGetValue(type, out array);
+            Behaviour[] array;
+            _behaviours.TryGetValue(type, out array);
 
             return array;
         }
