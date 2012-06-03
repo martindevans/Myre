@@ -10,6 +10,7 @@ namespace Myre.StateManagement
     /// 
     /// </summary>
     public abstract class Screen
+        :IDisposable
     {
         TransitionState transitionState = TransitionState.Hidden;
 
@@ -129,6 +130,10 @@ namespace Myre.StateManagement
         /// Called when the screen state changes to hidden.
         /// </summary>
         protected virtual void OnHidden()
+        {
+        }
+
+        public virtual void Dispose()
         {
         }
     }

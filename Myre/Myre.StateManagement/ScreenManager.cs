@@ -102,7 +102,11 @@ namespace Myre.StateManagement
                 UpdateTransition(screen, gameTime);
 
                 if (screen.TransitionProgress == 0)
+                {
                     screen.TransitionState = TransitionState.Hidden;
+                    if (!screenStack.Contains(screen))
+                        screen.Dispose();
+                }
                 else
                     screensAreTransitioningOff = true;
             }
