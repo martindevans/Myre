@@ -41,7 +41,7 @@ namespace GraphicsTests
             this.device = device;
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             material = new Material(content.Load<Effect>("Basic"), null);
             quad = new Quad(device);

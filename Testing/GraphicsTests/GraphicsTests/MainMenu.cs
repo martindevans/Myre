@@ -73,7 +73,7 @@ namespace GraphicsTests
             menu.Arrange(Justification.Left);
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             game.DisplayUI = true;
             player.Focus(menu);

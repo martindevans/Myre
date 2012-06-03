@@ -128,7 +128,7 @@ namespace GraphicsTests.Tests
             this.device = device;
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             scene = kernel.Get<TestScene>();
 

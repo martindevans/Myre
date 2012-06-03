@@ -32,7 +32,7 @@ namespace GraphicsTests
             this.device = device;
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             material = content.Load<Material>("Red");
             quad = new Quad(device);

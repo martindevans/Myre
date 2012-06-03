@@ -54,7 +54,7 @@ namespace GraphicsTests.Tests
             //videoTrack = videoGroup.AddTrack();
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             scene = kernel.Get<TestScene>();
 
@@ -94,11 +94,6 @@ namespace GraphicsTests.Tests
             //var game = kernel.Get<TestGame>();
             game.DisplayUI = true;
             //game.IsFixedTimeStep = true;
-        }
-
-        public override void OnHidden()
-        {
-            base.OnHidden();
         }
 
         public override void Update(GameTime gameTime)

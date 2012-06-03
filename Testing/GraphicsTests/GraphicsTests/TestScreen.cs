@@ -46,7 +46,7 @@ namespace GraphicsTests
             title.SetPoint(Points.Top, Int2D.Zero);
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             actor.Focus(UI.Root);
 
@@ -73,7 +73,7 @@ namespace GraphicsTests
             base.Draw(gameTime);
         }
 
-        public override void OnHidden()
+        protected override void OnHidden()
         {
             base.OnHidden();
             content.Unload();

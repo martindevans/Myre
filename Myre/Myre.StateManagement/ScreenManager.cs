@@ -81,6 +81,8 @@ namespace Myre.StateManagement
             {
                 var newScreen = screenStack.Peek();
                 newScreen.TransitionState = TransitionState.On;
+                if (!screens.Contains(newScreen))
+                    screens.Add(newScreen);
             }
             
             return oldScreen;
