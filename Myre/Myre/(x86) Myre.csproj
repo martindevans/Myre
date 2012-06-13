@@ -80,10 +80,15 @@
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="Collections\BinaryTree.cs" />
+    <Compile Include="Collections\BloomFilter.cs" />
     <Compile Include="Collections\Box.cs" />
     <Compile Include="Collections\Hashset.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Collections\INamedDataProvider.cs" />
+    <Compile Include="Collections\NamedBoxCollection.cs" />
+    <Compile Include="Collections\ISettingsCollection.cs" />
+    <Compile Include="Collections\MinMaxHeap.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
@@ -93,6 +98,7 @@
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\GameTimeExtensions.cs" />
     <Compile Include="Extensions\GraphicsDeviceExtensions.cs" />
+    <Compile Include="Extensions\IDictionaryExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IEnumeratorExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />

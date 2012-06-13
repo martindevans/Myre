@@ -28,7 +28,7 @@ namespace Myre.Graphics
             set { viewport.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.camera = context.CreateProperty<Camera>("camera");
             this.viewport = context.CreateProperty<Viewport>("viewport");

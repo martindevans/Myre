@@ -127,7 +127,7 @@ namespace GraphicsTests
             this.device = device;
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             scene = new Scene(kernel);
             

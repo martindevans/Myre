@@ -132,10 +132,6 @@
       <Project>{FC3D8E34-3333-42FB-9B47-3A273B1B50D8}</Project>
       <Name>%28x86%29 Myre.Graphics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Myre\Myre.Physics\%28x86%29 Myre.Physics.csproj">
-      <Project>{DF7B71E5-B8C9-4919-A15D-F1187556A909}</Project>
-      <Name>%28x86%29 Myre.Physics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Myre\Myre.StateManagement\%28x86%29 Myre.StateManagement.csproj">
       <Project>{630AEBBC-AF42-4700-A24F-F4B6FF8172F1}</Project>
       <Name>%28x86%29 Myre.StateManagement</Name>

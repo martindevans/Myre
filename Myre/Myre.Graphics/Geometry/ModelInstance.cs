@@ -38,7 +38,7 @@ namespace Myre.Graphics.Geometry
             set { isStatic.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             this.model = context.CreateProperty<ModelData>("model");
             this.transform = context.CreateProperty<Matrix>("transform");
@@ -252,7 +252,16 @@ namespace Myre.Graphics.Geometry
                     {
                         pass.Apply();
 
-                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.VertexCount, 0, mesh.TriangleCount);
+                        //Loop through mesh, drawing as many primitives as possible per batch
+                        int maxPrimitives = device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
+                        int primitives = mesh.IndexBuffer.IndexCount / 3;
+                        while (primitives > 0)
+                        {
+                            int primitiveCount = Math.Min(primitives, maxPrimitives);
+                            primitives -= primitiveCount;
+
+                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.VertexCount, 0, primitiveCount);
+                        }
 
 #if PROFILE
                         polysDrawnStat.Value += mesh.TriangleCount;

@@ -127,7 +127,7 @@
     <Compile Include="Materials\MaterialReader.cs" />
     <Compile Include="Particles\EllipsoidParticleEmitter.cs" />
     <Compile Include="Particles\ParticleEmitter.cs" />
-    <Compile Include="Particles\ParticlePhase.cs" />
+    <Compile Include="Particles\ParticleComponent.cs" />
     <Compile Include="Particles\ParticleSystem.cs" />
     <Compile Include="Particles\ParticleSystemDescription.cs" />
     <Compile Include="Particles\ParticleVertex.cs" />
@@ -148,11 +148,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>x86Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="XboxResources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>XboxResources.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Myre.Debugging\%28x86%29 Myre.Debugging.csproj">
@@ -163,11 +158,6 @@
       <Project>{5CDABE8C-7C9C-4163-8C85-FEA731088239}</Project>
       <Name>%28x86%29 Myre.Entities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Myre.Graphics.Content\Myre.Graphics.Content.contentproj">
-      <Project>{EC58850F-3960-426A-BE7D-7DFB67CB00A8}</Project>
-      <Name>Myre.Graphics.Content</Name>
-      <XnaReferenceType>Content</XnaReferenceType>
-    </ProjectReference>
     <ProjectReference Include="..\Myre\%28x86%29 Myre.csproj">
       <Project>{FDB5A9D8-9266-4F7B-BDE7-D4E720F5B45F}</Project>
       <Name>%28x86%29 Myre</Name>
@@ -177,10 +167,7 @@
     <EmbeddedResource Include="x86Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>x86Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="XboxResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>XboxResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -35,5 +35,6 @@ namespace Myre.Debugging
         public CommandAttribute Attribute { get; set; }
         public PropertyInfo Property { get; set; }
         public object Target { get; set; }
+        public Action SetEvent;
     }
 }

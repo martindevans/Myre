@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using Myre.Collections;
 
 namespace Myre.Entities.Behaviours
 {
@@ -71,7 +72,7 @@ namespace Myre.Entities.Behaviours
         /// Here the behaviour should do any setup needed to put the behaviour into its' initial state, including getting optional properties from the entity which may have been created by other behaviours, and register to any services.
         /// Initialise is called before the behaviour is added to the manager.
         /// </remarks>
-        public virtual void Initialise()
+        public virtual void Initialise(INamedDataProvider initialisationData = null)
         {
             this.IsReady = true;
         }
@@ -87,7 +88,7 @@ namespace Myre.Entities.Behaviours
         /// Here the behaviour should create any properties required by this behaviour to function.
         /// Create properties is called before Initialise.
         /// </remarks>
-        public virtual void CreateProperties(Entity.InitialisationContext context)
+        public virtual void CreateProperties(Entity.ConstructionContext context)
         {
 
         }

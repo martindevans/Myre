@@ -76,8 +76,8 @@ namespace Myre.Graphics.Deferred
             var settings = renderer.Settings;
             //settings.Add("ssao_enabled", "Determines if Screen Space Ambient Occlusion is enabled.", true);
             //settings.Add("ssao_halfres", "Determines if SSAO will run at full of half screen resolution.", true);
-            settings.Add("ssao_radius", "SSAO sample radius", 6f);
-            settings.Add("ssao_intensity", "SSAO intensity", 20f);
+            settings.Add("ssao_radius", "SSAO sample radius", 1f);
+            settings.Add("ssao_intensity", "SSAO intensity", 2.5f);
             settings.Add("ssao_scale", "Scales distance between occluders and occludee.", 1f);
             //settings.Add("ssao_detailradius", "SSAO sample radius", 2.3f);
             //settings.Add("ssao_detailintensity", "SSAO intensity", 15f);

@@ -103,10 +103,6 @@
       <Project>{F40925B3-500A-41C8-ABF8-78D6759C7F4A}</Project>
       <Name>(360) Myre.Graphics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Myre\Myre.Physics\(360) Myre.Physics.csproj">
-      <Project>{F47B81C7-36F7-4DD5-9437-EDEE749E8A30}</Project>
-      <Name>(360) Myre.Physics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Myre\Myre.StateManagement\(360) Myre.StateManagement.csproj">
       <Project>{518A150F-DB32-4106-9A57-D7A2FA2A6F1B}</Project>
       <Name>(360) Myre.StateManagement</Name>

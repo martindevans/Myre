@@ -40,7 +40,7 @@ namespace Myre.Graphics.Lighting
             set { range.Value = value; }
         }
 
-        public override void CreateProperties(Entity.InitialisationContext context)
+        public override void CreateProperties(Entity.ConstructionContext context)
         {
             colour = context.CreateProperty<Vector3>("colour");
             position = context.CreateProperty<Vector3>("position");

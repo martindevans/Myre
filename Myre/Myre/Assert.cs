@@ -9,6 +9,13 @@ namespace Myre
     public static class Assert
     {
         [Conditional("DEBUG")]
+        public static void IsTrue(bool value, string message)
+        {
+            if (!value)
+                throw new Exception(message);
+        }
+
+        [Conditional("DEBUG")]
         public static void ArgumentNotNull(string name, object value)
         {
             if (value == null)

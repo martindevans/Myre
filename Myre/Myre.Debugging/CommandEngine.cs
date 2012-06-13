@@ -54,7 +54,7 @@ namespace Myre.Debugging
             var types = assembly.GetTypes();
             foreach (var type in types)
             {
-                // find static properties with the CommandAttribute, add them to the options dictionary
+                //// find static properties with the CommandAttribute, add them to the options dictionary
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Static);
                 foreach (var property in properties)
                 {
@@ -209,7 +209,7 @@ namespace Myre.Debugging
         /// <param name="target">The object containing the property.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="optionName">Name of the option.</param>
-        public void AddOption(object target, string propertyName, string optionName, string description = null)
+        public void AddOption(object target, string propertyName, string optionName, string description = null, Action onSet = null)
         {
             if (target == null)
                 throw new ArgumentNullException("target");
@@ -229,7 +229,8 @@ namespace Myre.Debugging
             {
                 Property = property,
                 Attribute = new CommandAttribute() { Name = optionName },
-                Target = target
+                Target = target,
+                SetEvent = onSet
             });
 
             help.Add(optionName, new CommandHelpInfo()
@@ -410,13 +411,15 @@ namespace Myre.Debugging
                 var optionName = command.Substring(0, equals).Trim();
                 if (options.ContainsKey(optionName))
                 {
-                    var option = options[optionName].Property;
-                    if (option.CanWrite)
+                    var option = options[optionName];
+                    if (option.Property.CanWrite)
                     {
                         var value = RunExpression(command.Substring(equals + 1));
                         try
                         {
-                            option.SetValue(options[optionName].Target, value, null);
+                            option.Property.SetValue(options[optionName].Target, value, null);
+                            if (option.SetEvent != null)
+                                option.SetEvent();
                         }
                         catch (Exception e)
                         {

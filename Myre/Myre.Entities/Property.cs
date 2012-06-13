@@ -32,6 +32,9 @@ namespace Myre.Entities
         /// <summary>
         /// Set this property to default values
         /// </summary>
+        /// <summary>
+        /// Set the value to the default value and remove all events from PropertyChanged
+        /// </summary>
         void Clear();
     }
 
@@ -104,6 +107,8 @@ namespace Myre.Entities
 
         public override string ToString()
         {
+            if (Value == null)
+                return "null";
             return Value.ToString();
         }
     }

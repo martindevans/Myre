@@ -21,6 +21,14 @@ namespace Myre.StateManagement
 
         public TransitionType TransitionType { get; set; }
 
+        public int StackCount
+        {
+            get
+            {
+                return screenStack.Count;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScreenManager"/> class.
         /// </summary>
@@ -73,6 +81,8 @@ namespace Myre.StateManagement
             {
                 var newScreen = screenStack.Peek();
                 newScreen.TransitionState = TransitionState.On;
+                if (!screens.Contains(newScreen))
+                    screens.Add(newScreen);
             }
             
             return oldScreen;
@@ -92,7 +102,11 @@ namespace Myre.StateManagement
                 UpdateTransition(screen, gameTime);
 
                 if (screen.TransitionProgress == 0)
+                {
                     screen.TransitionState = TransitionState.Hidden;
+                    if (!screenStack.Contains(screen))
+                        screen.Dispose();
+                }
                 else
                     screensAreTransitioningOff = true;
             }

@@ -67,5 +67,20 @@ namespace Myre.Extensions
                 list[i + 1] = key;
             }
         }
+
+        /// <summary>
+        /// Remove all elements in the list which match the given predicate
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="predicate"></param>
+        public static void RemoveAll<T>(this IList<T> list, Predicate<T> predicate)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (predicate.Invoke(list[i]))
+                    list.RemoveAt(i);
+            }
+        }
     }
 }

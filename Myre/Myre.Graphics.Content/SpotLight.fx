@@ -86,8 +86,8 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 		float3 V = normalize(CameraPosition - viewPosition);
 		float3 R = normalize(reflect(-L, normal));
 
-		float NdL = max(dot(normal, L), 0);
-		float RdV = max(dot(R, V), 0);
+		float NdL = max(dot(normal, L), 0.00001);
+		float RdV = max(dot(R, V), 0.00001);
 
 		float3 light = Colour * attenuation;
 

@@ -10,8 +10,9 @@ namespace Myre.StateManagement
     /// 
     /// </summary>
     public abstract class Screen
+        :IDisposable
     {
-        TransitionState transitionState;
+        TransitionState transitionState = TransitionState.Hidden;
 
         /// <summary>
         /// Gets the <see cref="ScreenManager"/> which this screen was last pushed onto.
@@ -82,28 +83,57 @@ namespace Myre.StateManagement
             get { return transitionState; }
             internal set
             {
-                if (transitionState != value)
+                if (transitionState == value)
+                    return;
+
+                transitionState = value;
+                switch (transitionState)
                 {
-                    transitionState = value;
-                    if (transitionState == TransitionState.Hidden)
+                    case TransitionState.Hidden:
                         OnHidden();
-                    else
+                        break;
+                    case TransitionState.On:
+                        BeginTransitionOn();
+                        break;
+                    case TransitionState.Off:
+                        BeginTransitionOff();
+                        break;
+                    case TransitionState.Shown:
                         OnShown();
+                        break;
                 }
             }
         }
 
         /// <summary>
-        /// Called when the screen becomes visible.
+        /// Called when the screen begins transitioning on
         /// </summary>
-        public virtual void OnShown()
+        protected virtual void BeginTransitionOn()
         {
         }
 
         /// <summary>
-        /// Called when the screen becomes hidden.
+        /// Called when the screen begins transitioning off
         /// </summary>
-        public virtual void OnHidden()
+        protected virtual void BeginTransitionOff()
+        {
+        }
+
+        /// <summary>
+        /// Called when the screen state changes to visible.
+        /// </summary>
+        protected virtual void OnShown()
+        {
+        }
+
+        /// <summary>
+        /// Called when the screen state changes to hidden.
+        /// </summary>
+        protected virtual void OnHidden()
+        {
+        }
+
+        public virtual void Dispose()
         {
         }
     }

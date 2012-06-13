@@ -6,6 +6,14 @@ using System.Text;
 namespace Myre.Entities.Events
 {
     /// <summary>
+    /// A delegate for handling events through the Event.Sent handler.
+    /// </summary>
+    /// <typeparam name="T">The type of event data sent.</typeparam>
+    /// <param name="data">The event data sent.</param>
+    /// <param name="scope">The scope of the transmitted event.</param>
+    public delegate void MyreEventHandler<T>(T data, object scope);
+
+    /// <summary>
     /// A class which represents an event for a specified data type.
     /// Instances of this type can be used to send events to listeners which have registered with this event.
     /// </summary>
@@ -21,10 +29,16 @@ namespace Myre.Entities.Events
             public Data Data;
             public Event<Data> Event;
 
+#if DEBUG
+            public System.Diagnostics.StackTrace Stack;
+#endif
+
             public void Execute()
             {
                 for (int i = 0; i < Event.listeners.Count; i++)
-                    Event.listeners[i].HandleEvent(Data);
+                    Event.listeners[i].HandleEvent(Data, Event.Scope);
+
+                Event.TriggerEvent(Data);
             }
 
             public void Recycle()
@@ -59,7 +73,14 @@ namespace Myre.Entities.Events
         }
 
         private EventService service;
+        private object scope;
+        private Event<Data> global;
         private List<IEventListener<Data>> listeners;
+
+        /// <summary>
+        /// Occurs when data is sent along this event instance.
+        /// </summary>
+        public event MyreEventHandler<Data> Sent;
 
         /// <summary>
         /// Gets the service.
@@ -67,9 +88,16 @@ namespace Myre.Entities.Events
         /// <value>The service.</value>
         public EventService Service { get { return service; } }
 
-        internal Event(EventService service)
+        /// <summary>
+        /// Gets the scope object for this event.
+        /// </summary>
+        public object Scope { get { return scope; } }
+
+        internal Event(EventService service, object scope = null, Event<Data> globalScoped = null)
         {
             this.service = service;
+            this.scope = scope;
+            this.global = globalScoped;
             this.listeners = new List<IEventListener<Data>>();
         }
 
@@ -98,11 +126,28 @@ namespace Myre.Entities.Events
         /// <param name="data">The data.</param>
         public void Send(Data data)
         {
+            Send(data, this);
+
+            if (global != null)
+                Send(data, global);
+        }
+
+        private void Send(Data data, Event<Data> channel)
+        {
             Invocation invocation = Invocation.Get();
-            invocation.Event = this;
+            invocation.Event = channel;
             invocation.Data = data;
+#if DEBUG
+            invocation.Stack = new System.Diagnostics.StackTrace();
+#endif
 
             service.Queue(invocation);
+        }
+
+        private void TriggerEvent(Data data)
+        {
+            if (Sent != null)
+                Sent(data, Scope);
         }
     }
 }

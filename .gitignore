@@ -1,4 +1,7 @@
+*.cachefile
 *.suo
+*.user
+/Documentation
 /Myre/Myre/obj
 /Myre/Myre/bin
 /Myre/Myre.Debugging/obj
@@ -11,18 +14,26 @@
 /Myre/Myre.Graphics/bin
 /Myre/Myre.Graphics.Pipeline/obj
 /Myre/Myre.Graphics.Pipeline/bin
+/Myre/Myre.Graphics.Content/obj
+/Myre/Myre.Graphics.Content/bin
 /Myre/Myre.Physics/obj
 /Myre/Myre.Physics/bin
 /Myre/Myre.StateManagement/obj
 /Myre/Myre.StateManagement/bin
 /Myre/Myre.UI/obj
 /Myre/Myre.UI/bin
+/Myre/Myre.Serialisation/bin
+/Myre/Myre.Serialisation/obj
+/Testing/Myre.Serialisation.Tests/bin
+/Testing/Myre.Serialisation.Tests/obj
 /Testing/GraphicsTests/GraphicsTests/obj
 /Testing/GraphicsTests/GraphicsTests/bin
 /Testing/GraphicsTests/GraphicsTestsContent/obj
 /Testing/GraphicsTests/GraphicsTestsContent/bin
 /Testing/Myre.Entities.Tests/bin
 /Testing/Myre.Entities.Tests/obj
+/Testing/TestResults
+_Resharper.*
 /Testing/TestResults
 /Documentation/Book of Myre.aux
 /Documentation/Book of Myre.log

@@ -126,7 +126,7 @@ namespace GraphicsTests.Tests
                 new KeyReleased(Keys.L));
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             scene = kernel.Get<TestScene>();
 

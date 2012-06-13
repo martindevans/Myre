@@ -30,7 +30,7 @@ namespace GraphicsTests.Tests
             this.device = device;
         }
 
-        public override void OnShown()
+        protected override void BeginTransitionOn()
         {
             if (scene != null)
                 return;
