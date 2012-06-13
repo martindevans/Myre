@@ -1,5 +1,6 @@
 *.cachefile
 *.suo
+*.user
 /Documentation
 /Myre/Myre/obj
 /Myre/Myre/bin
@@ -32,3 +33,4 @@
 /Testing/Myre.Entities.Tests/bin
 /Testing/Myre.Entities.Tests/obj
 /Testing/TestResults
+_Resharper.*
