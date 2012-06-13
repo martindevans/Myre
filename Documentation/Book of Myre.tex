@@ -27,16 +27,17 @@ If you want to commit code to the Myre project that's great! The end of the book
 \section{Introduction}
 Myre is a software framework for C\#, it is designed to make building games in XNA quick and easy. Myre is split into several parts, each part provides some distinct functionality and you may pick and choose the different parts of Myre to include in your game as you wish.
 \subsection{Myre}
+This is the core Myre project and is required by all other parts of Myre. This project contains Interfaces, extension method and collections used by other parts of the system which you may find useful yourself.
 \subsection{Myre.StateManagement}
+This is a basic state management system for a game. States are modelled as a stack to represent moving into submenus and back again. This project also includes a game launcher, which replaces the standard XNA Main method with a more robust method which catches exceptions and presents them to the user in a friendly way in release builds.
 \subsection{Myre.Entities}
+This is a full scene graph for a game. Behaviour of game entities is written in composable units of code which can then be added to entities, the scene provides ways to manage behaviours and to run services on the scene such as renderers and network synchronisation.
 \subsection{Myre.UI}
 \subsection{Myre.Debugging}
 \subsection{Myre.Debugging.UI}
 \subsection{Myre.Graphics}
 \subsection{Myre.Graphics.Content}
 \subsection{Myre.Graphics.Pipeline}
-\subsection{Myre.Physics}
-\subsection{Myre.Serialisation}
 
 \section{User Reference}
 \subsection{Myre}
