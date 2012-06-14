@@ -81,6 +81,7 @@
     <Compile Include="Behaviours\BehaviourManager.cs" />
     <Compile Include="Behaviours\BehaviourManagerContainer.cs" />
     <Compile Include="Behaviours\DefaultManagerAttribute.cs" />
+    <Compile Include="Behaviours\ProcessBehaviour.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="EntityDescription.cs" />
     <Compile Include="Events\Event.cs" />
