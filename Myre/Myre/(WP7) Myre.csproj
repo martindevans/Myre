@@ -58,6 +58,7 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Collections\BinaryTree.cs" />
     <Compile Include="Collections\Box.cs" />
+    <Compile Include="Collections\INamedDataProvider.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />

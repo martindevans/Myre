@@ -42,10 +42,12 @@ namespace Myre.Entities
         /// <value>The services.</value>
         public IEnumerable<IService> Services { get { return services; } }
 
+#if WINDOWS
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
         public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes { get { return services.ExecutionTimes; } }
+#endif
 
         /// <summary>
         /// Gets the managers.

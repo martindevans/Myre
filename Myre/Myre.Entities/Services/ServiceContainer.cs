@@ -21,9 +21,11 @@ namespace Myre.Entities.Services
         private Comparison<IService> updateOrder;
         private Comparison<IService> drawOrder;
 
+#if WINDOWS
         Stopwatch timer = new Stopwatch();
         private List<KeyValuePair<IService, TimeSpan>> executionTimes;
         public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ExecutionTimes;
+#endif
 
         public IService this[Type type]
         {
@@ -37,8 +39,10 @@ namespace Myre.Entities.Services
             draw = new List<IService>();
             buffer = new List<IService>();
 
+#if WINDOWS
             executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
             ExecutionTimes = new ReadOnlyCollection<KeyValuePair<IService, TimeSpan>>(executionTimes);
+#endif
 
             updateOrder = (a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder);
             drawOrder = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
@@ -92,14 +96,20 @@ namespace Myre.Entities.Services
             UpdateLists();
             update.InsertionSort(updateOrder);
 
+#if WINDOWS
             executionTimes.Clear();
+#endif
 
             for (int i = 0; i < update.Count; i++)
             {
+#if WINDOWS
                 timer.Restart();
+#endif
                 update[i].Update(elapsedTime);
+#if WINDOWS
                 timer.Stop();
                 executionTimes.Add(new KeyValuePair<IService, TimeSpan>(update[i], timer.Elapsed));
+#endif
             }
         }
 
