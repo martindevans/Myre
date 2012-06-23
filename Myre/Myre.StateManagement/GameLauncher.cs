@@ -17,17 +17,22 @@ namespace Myre.StateManagement
 
         public static void Run<T>() where T : Game, new()
         {
+            Run<T>(new T());
+        }
+
+        public static void Run<T>(T instance) where T : Game
+        {
             if (Debugger.IsAttached)
             {
-                using (var g = new T())
-                    g.Run();
+                using (instance)
+                    instance.Run();
             }
             else
             {
                 try
                 {
-                    using (var g = new T())
-                        g.Run();
+                    using (instance)
+                        instance.Run();
                 }
                 catch (Exception e)
                 {
