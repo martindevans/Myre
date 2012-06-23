@@ -64,7 +64,7 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 	float3 R = normalize(reflect(-L, normal));
 
 	float NdL = max(dot(normal, L), 0);
-	float RdV = max(dot(R, V), 0);
+	float RdV = max(dot(R, V), 0.00001f);
 
 	float3 light = Colour * attenuation;
 	return float4(NdL * light * (diffuse + specularIntensity * pow(RdV, specularPower)), 1);
