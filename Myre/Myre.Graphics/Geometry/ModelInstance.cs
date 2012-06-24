@@ -179,32 +179,6 @@ namespace Myre.Graphics.Geometry
                 buffer.Clear();
             }
 
-            public void Query(IList<Entity> results, BoundingVolume volume, bool detailedCheck = false)
-            {
-                buffer.Clear();
-                QueryVisible(volume, buffer, detailedCheck);
-                foreach (var item in buffer)
-                    results.Add(item.Instance.Owner);
-            }
-
-            public void Query(IList<Entity> results, Ray ray, bool detailedCheck = false)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Query(IList<ICullable> results, BoundingVolume volume, bool detailedCheck = false)
-            {
-                buffer.Clear();
-                QueryVisible(volume, buffer, detailedCheck);
-                foreach (var item in buffer)
-                    results.Add(item);
-            }
-
-            public void Query(IList<ICullable> results, Ray ray, bool detailedCheck = false)
-            {
-                throw new NotImplementedException();
-            }
-
             private void QueryVisible(BoundingVolume volume, List<MeshInstance> instances, bool detailedCheck = false)
             {
                 if (detailedCheck)
@@ -255,12 +229,15 @@ namespace Myre.Graphics.Geometry
                         //Loop through mesh, drawing as many primitives as possible per batch
                         int maxPrimitives = device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
                         int primitives = mesh.IndexBuffer.IndexCount / 3;
+                        int offset = 0;
                         while (primitives > 0)
                         {
                             int primitiveCount = Math.Min(primitives, maxPrimitives);
                             primitives -= primitiveCount;
 
-                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, mesh.VertexCount, 0, primitiveCount);
+                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, 0, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
+
+                            offset += primitiveCount;
                         }
 
 #if PROFILE

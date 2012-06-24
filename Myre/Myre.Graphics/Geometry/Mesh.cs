@@ -18,6 +18,8 @@ namespace Myre.Graphics.Geometry
         public IndexBuffer IndexBuffer { get; set; }
         public Dictionary<string, Material> Materials { get; set; }
         public BoundingSphere BoundingSphere { get; set; }
+        public int StartIndex { get; set; }
+        public int BaseVertex { get; set; }
         //public ModelBone ParentBone { get; set; }
     }
 
