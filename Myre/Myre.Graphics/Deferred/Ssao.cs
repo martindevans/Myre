@@ -23,23 +23,22 @@ namespace Myre.Graphics.Deferred
         {
             this.ssaoMaterial = new Material(Content.Load<Effect>("SSAO"));
             this.ssaoBlurMaterial = new Material(Content.Load<Effect>("BlurSSAO"));
-            this.ssaoMaterial.Parameters["Random"].SetValue(GenerateRandomNormals(device, 4, 4));//content.Load<Texture2D>("randomnormals"));
+            Random rand = new Random();
+            this.ssaoMaterial.Parameters["Random"].SetValue(GenerateRandomNormals(device, 4, 4, rand));//content.Load<Texture2D>("randomnormals"));
             this.ssaoMaterial.Parameters["RandomResolution"].SetValue(4);
-            this.ssaoMaterial.Parameters["Samples"].SetValue(GenerateRandomSamplePositions(16));
+            this.ssaoMaterial.Parameters["Samples"].SetValue(GenerateRandomSamplePositions(16, rand));
             this.gaussian = new Gaussian(device);
             this.quad = new Quad(device);
         }
 
-        private Texture2D GenerateRandomNormals(GraphicsDevice device, int width, int height)
+        private Texture2D GenerateRandomNormals(GraphicsDevice device, int width, int height, Random rand)
         {
-            Random rand = new Random();
-
             Color[] colours = new Color[width * height];
             for (int i = 0; i < colours.Length; i++)
             {
                 var vector = new Vector2(
-                    (float)rand.NextDouble() * 2 - 1,
-                    (float)rand.NextDouble() * 2 - 1);
+                    (float)rand.NextDouble(),
+                    (float)rand.NextDouble());
 
                 Vector2.Normalize(ref vector, out vector);
 
@@ -52,14 +51,13 @@ namespace Myre.Graphics.Deferred
             return texture;
         }
 
-        private Vector2[] GenerateRandomSamplePositions(int numSamples)
+        private Vector2[] GenerateRandomSamplePositions(int numSamples, Random rand)
         {
-            Random rand = new Random();
             Vector2[] samples = new Vector2[numSamples];
 
             for (int i = 0; i < numSamples; i++)
             {
-                var angle = rand.NextDouble();
+                var angle = rand.NextDouble() * MathHelper.TwoPi;
                 var vector = new Vector2((float)Math.Sin(angle), (float)Math.Cos(angle));
 
                 var length = i / (float)numSamples;

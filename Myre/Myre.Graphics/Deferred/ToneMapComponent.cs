@@ -120,6 +120,8 @@ namespace Myre.Graphics.Deferred
             adaptLuminance.Parameters["Texture"].SetValue(averageLuminance);
             adaptLuminance.Parameters["PreviousAdaption"].SetValue(adaptedLuminance[previous]);
             quad.Draw(adaptLuminance, renderer.Data);
+
+            RenderTargetManager.RecycleTarget(averageLuminance);
         }
 
         private void Bloom(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
