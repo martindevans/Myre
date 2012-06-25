@@ -214,6 +214,8 @@ namespace Myre.Graphics.Geometry
                 var worldView = metadata.Get<Matrix>("worldview");
                 var worldViewProjection = metadata.Get<Matrix>("worldviewprojection");
 
+                int maxPrimitives = device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
+
                 for (int i = 0; i < visibleInstances.Count; i++)
                 {
                     var instance = visibleInstances[i];
@@ -227,15 +229,17 @@ namespace Myre.Graphics.Geometry
                         pass.Apply();
 
                         //Loop through mesh, drawing as many primitives as possible per batch
-                        int maxPrimitives = device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
-                        int primitives = mesh.IndexBuffer.IndexCount / 3;
+                        if (mesh.TriangleCount == 0 || mesh.VertexCount == 0)
+                            continue;
+
+                        int primitives = mesh.TriangleCount;
                         int offset = 0;
                         while (primitives > 0)
                         {
                             int primitiveCount = Math.Min(primitives, maxPrimitives);
                             primitives -= primitiveCount;
 
-                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, 0, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
+                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, mesh.MinVertexIndex, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
 
                             offset += primitiveCount;
                         }

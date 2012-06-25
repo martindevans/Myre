@@ -20,6 +20,7 @@ namespace Myre.Graphics.Geometry
         public BoundingSphere BoundingSphere { get; set; }
         public int StartIndex { get; set; }
         public int BaseVertex { get; set; }
+        public int MinVertexIndex { get; set; }
         //public ModelBone ParentBone { get; set; }
     }
 
