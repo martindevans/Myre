@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {

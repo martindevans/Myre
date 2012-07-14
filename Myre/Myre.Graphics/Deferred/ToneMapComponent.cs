@@ -29,7 +29,7 @@ namespace Myre.Graphics.Deferred
         RenderTarget2D averageLuminance;
         float[] textureData = new float[1];
         int current = 0;
-        int previous = 1;
+        int previous = -1;
 
         public RenderTarget2D AdaptedLuminance
         {
@@ -52,10 +52,6 @@ namespace Myre.Graphics.Deferred
             adaptedLuminance = new RenderTarget2D[2];
             adaptedLuminance[0] = new RenderTarget2D(device, 1, 1, false, SurfaceFormat.Single, DepthFormat.None);
             adaptedLuminance[1] = new RenderTarget2D(device, 1, 1, false, SurfaceFormat.Single, DepthFormat.None);
-
-            device.SetRenderTarget(adaptedLuminance[previous]);
-            device.Clear(Color.Transparent);
-            device.SetRenderTarget(null);
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
@@ -96,6 +92,14 @@ namespace Myre.Graphics.Deferred
 
         private void CalculateLuminance(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
         {
+            if (previous == -1)
+            {
+                previous = 1;
+                device.SetRenderTarget(adaptedLuminance[previous]);
+                device.Clear(Color.Transparent);
+                device.SetRenderTarget(null);
+            }
+
             var tmp = previous;
             previous = current;
             current = tmp;

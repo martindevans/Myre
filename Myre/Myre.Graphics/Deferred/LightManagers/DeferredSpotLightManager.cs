@@ -175,6 +175,9 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             foreach (var light in lights)
             {
+                if (!light.Light.Active)
+                    continue;
+
                 light.Light.Direction = Vector3.Normalize(light.Light.Direction);
 
                 //var luminance = Math.Max(light.Colour.X, Math.Max(light.Colour.Y, light.Colour.Z));

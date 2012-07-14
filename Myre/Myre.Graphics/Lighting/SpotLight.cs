@@ -25,9 +25,16 @@ namespace Myre.Graphics.Lighting
         private Property<float> range;
         private Property<Texture2D> mask;
         private Property<int> shadowResolution;
+        private Property<bool> active;
         private RenderTarget2D shadowMap;
         private Matrix view;
         private Matrix projection;
+
+        public bool Active
+        {
+            get { return active.Value; }
+            set { active.Value = value; }
+        }
 
         public Vector3 Colour
         {
@@ -80,6 +87,7 @@ namespace Myre.Graphics.Lighting
             this.range = context.CreateProperty<float>("range");
             this.mask = context.CreateProperty<Texture2D>("mask");
             this.shadowResolution = context.CreateProperty<int>("shadow_resolution");
+            this.active = context.CreateProperty<bool>("spotlight_active", true);
 
             base.CreateProperties(context);
         }

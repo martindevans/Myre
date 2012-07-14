@@ -169,7 +169,7 @@ namespace Myre.Debugging
         /// <param name="item">The item.</param>
         public void WriteLine(object item)
         {
-            log.WriteLine(item.ToString());
+            log.WriteLine((item ?? "null").ToString());
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Myre.Debugging
         /// <param name="item">The item.</param>
         public void Write(object item)
         {
-            log.Write(item.ToString());
+            log.Write((item ?? "null").ToString());
         }
 
         protected void BindGestures()
