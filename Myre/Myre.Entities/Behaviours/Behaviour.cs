@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Myre.Collections;
 
 namespace Myre.Entities.Behaviours
@@ -47,7 +43,7 @@ namespace Myre.Entities.Behaviours
         /// <summary>
         /// Initializes a new instance of the <see cref="Behaviour"/> class.
         /// </summary>
-        public Behaviour()
+        protected Behaviour()
             : this(null)
         {
         }
@@ -56,15 +52,15 @@ namespace Myre.Entities.Behaviours
         /// Initializes a new instance of the <see cref="Behaviour"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        public Behaviour(string name)
+        protected Behaviour(string name)
         {
-            this.Name = name;
+            Name = name;
         }
 
         /// <summary>
         /// Initialises this instance.
         /// </summary>
-        /// <param name="context">
+        /// <param name="initialisationData">
         /// Initialisation context. This object can be used to query properties and behaviours.
         /// </param>
         /// <remarks>
@@ -72,9 +68,9 @@ namespace Myre.Entities.Behaviours
         /// Here the behaviour should do any setup needed to put the behaviour into its' initial state, including getting optional properties from the entity which may have been created by other behaviours, and register to any services.
         /// Initialise is called before the behaviour is added to the manager.
         /// </remarks>
-        public virtual void Initialise(INamedDataProvider initialisationData = null)
+        public virtual void Initialise(INamedDataProvider initialisationData)
         {
-            this.IsReady = true;
+            IsReady = true;
         }
 
         /// <summary>
@@ -102,7 +98,7 @@ namespace Myre.Entities.Behaviours
         /// </remarks>
         public virtual void Shutdown()
         {
-            this.IsReady = false;
+            IsReady = false;
         }
     }
 }

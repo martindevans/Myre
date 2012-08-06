@@ -197,7 +197,7 @@ namespace Myre.Entities
         /// <summary>
         /// Initialises this instance.
         /// </summary>
-        internal void Initialise(INamedDataProvider initialisationData = null)
+        internal void Initialise(INamedDataProvider initialisationData)
         {
             foreach (var item in Behaviours)
             {
