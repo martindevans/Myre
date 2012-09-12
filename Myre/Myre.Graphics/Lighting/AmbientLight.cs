@@ -1,50 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Myre.Entities;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics.Materials;
-using Ninject;
-using Myre.Graphics.PostProcessing;
+using Myre.Entities.Behaviours;
+using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Lighting
 {
     public class AmbientLight
         : Behaviour
     {
-        private Property<Vector3> skyColour;
-        private Property<Vector3> groundColour;
-        private Property<Vector3> up;
+        private const string SKY_COLOUR_NAME = "sky_colour";
+        private const string GROUND_COLOUR_NAME = "ground_colour";
+        private const string UP_NAME = "up";
+
+        private Property<Vector3> _skyColour;
+        private Property<Vector3> _groundColour;
+        private Property<Vector3> _up;
 
         public Vector3 SkyColour
         {
-            get { return skyColour.Value; }
-            set { skyColour.Value = value; }
+            get { return _skyColour.Value; }
+            set { _skyColour.Value = value; }
         }
 
         public Vector3 GroundColour
         {
-            get { return groundColour.Value; }
-            set { groundColour.Value = value; }
+            get { return _groundColour.Value; }
+            set { _groundColour.Value = value; }
         }
 
         public Vector3 Up
         {
-            get { return up.Value; }
-            set { up.Value = value; }
+            get { return _up.Value; }
+            set { _up.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.skyColour = context.CreateProperty<Vector3>("sky_colour");
-            this.groundColour = context.CreateProperty<Vector3>("ground_colour");
-            this.up = context.CreateProperty<Vector3>("up");
+            _skyColour = context.CreateProperty<Vector3>(SKY_COLOUR_NAME);
+            _groundColour = context.CreateProperty<Vector3>(GROUND_COLOUR_NAME);
+            _up = context.CreateProperty<Vector3>(UP_NAME);
 
             base.CreateProperties(context);
+        }
+
+        public override void Initialise(Collections.INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue(SKY_COLOUR_NAME, _skyColour);
+            initialisationData.TryCopyValue(GROUND_COLOUR_NAME, _groundColour);
+            initialisationData.TryCopyValue(UP_NAME, _up);
         }
     }
 }

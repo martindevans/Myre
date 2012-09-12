@@ -58,6 +58,11 @@ namespace Myre.Graphics.Deferred.LightManagers
             };
         }
 
+        public override void Add(PointLight behaviour)
+        {
+            base.Add(behaviour);
+        }
+
         public void Prepare(Renderer renderer)
         {
             touchesNearPlane.Clear();

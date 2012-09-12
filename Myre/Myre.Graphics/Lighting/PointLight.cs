@@ -1,52 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Myre.Entities;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics.Materials;
-using Ninject;
-using Myre.Graphics.Geometry;
-using System.Diagnostics;
-using Myre.Debugging.Statistics;
+using Myre.Entities.Behaviours;
+using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Lighting
 {
     public class PointLight
         : Behaviour
     {
-        private Property<Vector3> colour;
-        private Property<Vector3> position;
-        private Property<float> range;
+        private const string COLOUR_NAME = "colour";
+        private const string POSITION_NAME = "position";
+        private const string RANGE_NAME = "range";
+
+        private Property<Vector3> _colour;
+        private Property<Vector3> _position;
+        private Property<float> _range;
 
         public Vector3 Colour
         {
-            get { return colour.Value; }
-            set { colour.Value = value; }
+            get { return _colour.Value; }
+            set { _colour.Value = value; }
         }
 
         public Vector3 Position
         {
-            get { return position.Value; }
-            set { position.Value = value; }
+            get { return _position.Value; }
+            set { _position.Value = value; }
         }
 
         public float Range
         {
-            get { return range.Value; }
-            set { range.Value = value; }
+            get { return _range.Value; }
+            set { _range.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            colour = context.CreateProperty<Vector3>("colour");
-            position = context.CreateProperty<Vector3>("position");
-            range = context.CreateProperty<float>("range");
+            _colour = context.CreateProperty<Vector3>(COLOUR_NAME);
+            _position = context.CreateProperty<Vector3>(POSITION_NAME);
+            _range = context.CreateProperty<float>(RANGE_NAME);
             
             base.CreateProperties(context);
+        }
+
+        public override void Initialise(Collections.INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue(COLOUR_NAME, _colour);
+            initialisationData.TryCopyValue(POSITION_NAME, _position);
+            initialisationData.TryCopyValue(RANGE_NAME, _range);
         }
     }
 }
