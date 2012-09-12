@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Reflection;
 using Myre.Entities.Behaviours;
 using Ninject;
 using Ninject.Parameters;
-using System.Xml.Linq;
-using Myre;
-using Myre.Extensions;
-using System.IO;
-using System.Collections.ObjectModel;
-using System.Reflection;
-using Myre.Collections;
 
 namespace Myre.Entities
 {
@@ -20,9 +14,16 @@ namespace Myre.Entities
     /// </summary>
     public struct PropertyData
     {
-        public string Name;
-        public Type DataType;
-        public object InitialValue;
+        public readonly string Name;
+        public readonly Type DataType;
+        public readonly object InitialValue;
+
+        public PropertyData(string name, Type dataType, object initialValue)
+        {
+            Name = name;
+            DataType = dataType;
+            InitialValue = initialValue;
+        }
 
         public override int GetHashCode()
         {
@@ -39,9 +40,9 @@ namespace Myre.Entities
 
         public bool Equals(PropertyData data)
         {
-            return this.Name == data.Name
-                && this.DataType == data.DataType
-                && this.InitialValue == data.InitialValue;
+            return Name == data.Name
+                && DataType == data.DataType
+                && InitialValue == data.InitialValue;
         }
     }
 
@@ -50,9 +51,16 @@ namespace Myre.Entities
     /// </summary>
     public struct BehaviourData
     {
-        public string Name;
-        public Type Type;
-        public Func<String, Behaviour> Factory;
+        public readonly string Name;
+        public readonly Type Type;
+        public readonly Func<String, Behaviour> Factory;
+
+        public BehaviourData(string name, Type type, Func<String, Behaviour> factory)
+        {
+            Name = name;
+            Type = type;
+            Factory = factory;
+        }
 
         public override int GetHashCode()
         {
@@ -69,8 +77,8 @@ namespace Myre.Entities
 
         public bool Equals(BehaviourData data)
         {
-            return this.Name == data.Name
-                && this.Type == data.Type;
+            return Name == data.Name
+                && Type == data.Type;
         }
     }
 
@@ -82,11 +90,11 @@ namespace Myre.Entities
         private static readonly Dictionary<Type, ConstructorInfo> propertyConstructors = new Dictionary<Type, ConstructorInfo>();
         private static readonly Type genericType = Type.GetType("Myre.Entities.Property`1");
 
-        private IKernel kernel;
-        private List<BehaviourData> behaviours;
-        private List<PropertyData> properties;
+        private readonly IKernel kernel;
+        private readonly List<BehaviourData> behaviours;
+        private readonly List<PropertyData> properties;
 
-        private Queue<Entity> pool;
+        private readonly Queue<Entity> pool;
         private uint version;
 
         /// <summary>
@@ -108,12 +116,12 @@ namespace Myre.Entities
         public EntityDescription(IKernel kernel = null)
         {
             this.kernel = kernel ?? NinjectKernel.Instance;
-            this.behaviours = new List<BehaviourData>();
-            this.properties = new List<PropertyData>();
-            this.pool = new Queue<Entity>();
+            behaviours = new List<BehaviourData>();
+            properties = new List<PropertyData>();
+            pool = new Queue<Entity>();
 
-            this.Behaviours = new ReadOnlyCollection<BehaviourData>(behaviours);
-            this.Properties = new ReadOnlyCollection<PropertyData>(properties);
+            Behaviours = new ReadOnlyCollection<BehaviourData>(behaviours);
+            Properties = new ReadOnlyCollection<PropertyData>(properties);
         }
 
         /// <summary>
@@ -129,7 +137,7 @@ namespace Myre.Entities
         /// <summary>
         /// Adds all the properties and behaviours from the specified entity description.
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param name="description">The entity description to copy from</param>
         public void AddFrom(EntityDescription description)
         {
             foreach (var item in description.Behaviours)
@@ -165,7 +173,7 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(Type type, string name = null)
         {
-            return AddBehaviour(new BehaviourData() { Type = type, Name = name });
+            return AddBehaviour(new BehaviourData(name, type, null));
         }
 
         /// <summary>
@@ -190,12 +198,7 @@ namespace Myre.Entities
         public bool AddBehaviour<T>(Func<String, T> create, string name = null)
             where T : Behaviour
         {
-            return AddBehaviour(new BehaviourData()
-            {
-                Name = name,
-                Type = typeof(T),
-                Factory = (a) => create(a),
-            });
+            return AddBehaviour(new BehaviourData(name, typeof(T), create));
         }
 
         /// <summary>
@@ -262,14 +265,7 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddProperty(Type dataType, string name, object initialValue)
         {
-            var data = new PropertyData()
-            {
-                Name = name,
-                DataType = dataType,
-                InitialValue = initialValue
-            };
-
-            return AddProperty(data);
+            return AddProperty(new PropertyData(name, dataType, initialValue));
         }
 
         /// <summary>
@@ -386,7 +382,9 @@ namespace Myre.Entities
                 propertyConstructors.Add(property.DataType, constructor);
             }
 
+            Assert.ArgumentNotNull("constructor", constructor);
             IProperty prop = constructor.Invoke(new object[] { property.Name }) as IProperty;
+            Assert.ArgumentNotNull("property", prop);
             prop.Value = property.InitialValue;
 
             return prop;
