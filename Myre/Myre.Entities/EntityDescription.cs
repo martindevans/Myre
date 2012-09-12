@@ -22,6 +22,7 @@ namespace Myre.Entities
     {
         public string Name;
         public Type DataType;
+        public object InitialValue;
 
         public override int GetHashCode()
         {
@@ -39,7 +40,8 @@ namespace Myre.Entities
         public bool Equals(PropertyData data)
         {
             return this.Name == data.Name
-                && this.DataType == data.DataType;
+                && this.DataType == data.DataType
+                && this.InitialValue == data.InitialValue;
         }
     }
 
@@ -240,6 +242,7 @@ namespace Myre.Entities
         {
             Assert.ArgumentNotNull("property.Name", property.Name);
             Assert.ArgumentNotNull("property.DataType", property.DataType);
+            Assert.IsTrue(property.InitialValue == null || property.InitialValue.GetType().IsInstanceOfType(property.DataType), "Cannot cast initial value to type of property");
 
             if (properties.Contains(property))
                 return false;
@@ -256,14 +259,14 @@ namespace Myre.Entities
         /// <param name="dataType">Type of the data.</param>
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
-        /// <param name="copyBehaviour">The copy behaviour.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty(Type dataType, string name)
+        public bool AddProperty(Type dataType, string name, object initialValue)
         {
             var data = new PropertyData()
             {
                 Name = name,
-                DataType = dataType
+                DataType = dataType,
+                InitialValue = initialValue
             };
 
             return AddProperty(data);
@@ -275,11 +278,10 @@ namespace Myre.Entities
         /// <typeparam name="T"></typeparam>
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
-        /// <param name="copyBehaviour">The copy behaviour.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty<T>(string name)
+        public bool AddProperty<T>(string name, T initialValue = default(T))
         {
-            return AddProperty(typeof(T), name);
+            return AddProperty(typeof(T), name, initialValue);
         }
 
         /// <summary>
@@ -337,7 +339,17 @@ namespace Myre.Entities
         {
             var entity = pool.Dequeue();
             foreach (IProperty item in entity.Properties)
+            {
                 item.Clear();
+                foreach (var p in properties)
+                {
+                    if (p.Name == item.Name && p.DataType == item.Type)
+                    {
+                        item.Value = p.InitialValue;
+                        break;
+                    }
+                }
+            }
 
             return entity;
         }
@@ -355,7 +367,7 @@ namespace Myre.Entities
         private IEnumerable<IProperty> CreateProperties()
         {
             foreach (var item in properties)
-                yield return CreatePropertyInstance(kernel, item);
+                yield return CreatePropertyInstance(item);
         }
 
         private IEnumerable<Behaviour> CreateBehaviours()
@@ -364,7 +376,7 @@ namespace Myre.Entities
                 yield return CreateBehaviourInstance(kernel, item);
         }
 
-        private IProperty CreatePropertyInstance(IKernel kernel, PropertyData property)
+        private IProperty CreatePropertyInstance(PropertyData property)
         {
             ConstructorInfo constructor;
             if (!propertyConstructors.TryGetValue(property.DataType, out constructor))
@@ -374,7 +386,10 @@ namespace Myre.Entities
                 propertyConstructors.Add(property.DataType, constructor);
             }
 
-            return constructor.Invoke(new[] { property.Name }) as IProperty;
+            IProperty prop = constructor.Invoke(new object[] { property.Name }) as IProperty;
+            prop.Value = property.InitialValue;
+
+            return prop;
         }
 
         private Behaviour CreateBehaviourInstance(IKernel kernel, BehaviourData behaviour)
