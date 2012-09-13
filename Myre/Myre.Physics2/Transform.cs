@@ -1,0 +1,104 @@
+﻿using Microsoft.Xna.Framework;
+using Myre.Entities;
+using Myre.Entities.Behaviours;
+using Myre.Entities.Services;
+
+namespace Myre.Physics2
+{
+    [DefaultManager(typeof(Manager))]
+    public class Transform
+        : Behaviour
+    {
+        private Property<Vector2> _position;
+        private Property<float> _rotation;
+        private Property<Matrix> _transform;
+        private Property<Matrix> _inverseTransform;
+        private bool _isDirty;
+
+        public Vector2 Position
+        {
+            get { return _position.Value; }
+            set { _position.Value = value; }
+        }
+
+        public float Rotation
+        {
+            get { return _rotation.Value; }
+            set { _rotation.Value = value; }
+        }
+
+        public Matrix TransformMatrix
+        {
+            get { return _transform.Value; }
+            set { _transform.Value = value; }
+        }
+
+        public Matrix InverseTransformMatrix
+        {
+            get { return _inverseTransform.Value; }
+            set { _inverseTransform.Value = value; }
+        }
+        
+        public override void CreateProperties(Entity.ConstructionContext context)
+        {
+            _position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION);
+            _rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION);
+            _transform = context.CreateProperty<Matrix>("transform");
+            _inverseTransform = context.CreateProperty<Matrix>("inverse_transform");
+
+            _position.PropertySet += (p, o, n) => _isDirty = true;
+            _rotation.PropertySet += (p, o, n) => _isDirty = true;
+            
+            base.CreateProperties(context);
+        }
+
+        public Vector2 ToWorldCoordinates(Vector2 point)
+        {
+            return Vector2.Transform(point, _transform.Value);
+        }
+
+        public Vector2 ToLocalCoordinates(Vector2 point)
+        {
+            return Vector2.Transform(point, _inverseTransform.Value);
+        }
+
+        public void CalculateTransform()
+        {
+            if (!_isDirty)
+                return;
+
+            var pos = new Vector3(_position.Value, 0);
+            var rot = _rotation.Value;
+
+            Matrix temp1, temp2;
+            Matrix.CreateRotationZ(rot, out temp1);
+            Matrix.CreateTranslation(ref pos, out temp2);
+            Matrix.Multiply(ref temp1, ref temp2, out temp1);
+            Matrix.Invert(ref temp1, out temp2);
+
+            _transform.Value = temp1;
+            _inverseTransform.Value = temp2;
+            _isDirty = false;
+        }
+
+        class Manager
+            : BehaviourManager<Transform>, IProcess
+        {
+            public bool IsComplete
+            {
+                get { return false; }
+            }
+
+            public Manager(Scene scene)
+            {
+                scene.GetService<ProcessService>().Add(this);
+            }
+
+            public void Update(float time)
+            {
+                for (int i = 0; i < Behaviours.Count; i++)
+                    Behaviours[i].CalculateTransform();
+            }
+        }
+    }
+}
