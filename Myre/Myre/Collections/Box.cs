@@ -38,6 +38,7 @@ namespace Myre.Collections
     /// </summary>
     /// <typeparam name="Key">The type of the Key.</typeparam>
     public class BoxedValueStore<Key>
+        :IEnumerable<KeyValuePair<Key, IBox>>
     {
         private Dictionary<Key, IBox> values;
 
@@ -90,19 +91,31 @@ namespace Myre.Collections
         /// <returns>The value at the specified key, or null if the existing box contains a different value type.</returns>
         public Box<T> Get<T>(Key key, T defaultValue = default(T), bool create = true)
         {
-            IBox box;
-            if (values.TryGetValue(key, out box))
-                return box as Box<T>;
+            IBox box = Get(key);
+            if (box != null)
+                return (Box<T>)box;
             else if (!create)
                 return null;
             else
             {
-                var value = new Box<T>();
-                value.Value = defaultValue;
+                var value = new Box<T> { Value = defaultValue };
 
                 values[key] = value;
                 return value;
             }
+        }
+
+        /// <summary>
+        /// Get an untyped box (if it already exists)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public IBox Get(Key key)
+        {
+            IBox box;
+            if (values.TryGetValue(key, out box))
+                return box;
+            return null;
         }
 
         /// <summary>
@@ -120,6 +133,16 @@ namespace Myre.Collections
 
             box.Value = value;
             return box;
+        }
+
+        public IEnumerator<KeyValuePair<Key, IBox>> GetEnumerator()
+        {
+            return values.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
