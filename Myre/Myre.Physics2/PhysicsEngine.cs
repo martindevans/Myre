@@ -36,11 +36,11 @@ namespace Myre.Physics2
     public class PhysicsEngine
         : Service
     {
-        private readonly ReadOnlyCollection<IForceProvider> _forceProviders;
-        private readonly ReadOnlyCollection<IIntegrator> _integrators;
-        private readonly ReadOnlyCollection<IActivityManager> _activityManagers;
-        private readonly ReadOnlyCollection<ICollisionResolver> _collisionResolvers;
-        private readonly ReadOnlyCollection<IForceApplier> _forceAppliers;
+        private ReadOnlyCollection<IForceProvider> _forceProviders;
+        private ReadOnlyCollection<IIntegrator> _integrators;
+        private ReadOnlyCollection<IActivityManager> _activityManagers;
+        private ReadOnlyCollection<ICollisionResolver> _collisionResolvers;
+        private ReadOnlyCollection<IForceApplier> _forceAppliers;
 
         private Box<float> _allowedPenetration;
         private Box<float> _biasFactor;
@@ -78,8 +78,10 @@ namespace Myre.Physics2
             set { _angularVelocitySleepThreshold.Value = value; }
         }
 
-        public PhysicsEngine(Scene scene)
+        public override void Initialise(Scene scene)
         {
+            base.Initialise(scene);
+
             _forceProviders = scene.FindManagers<IForceProvider>();
             _integrators = scene.FindManagers<IIntegrator>();
             _activityManagers = scene.FindManagers<IActivityManager>();

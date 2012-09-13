@@ -98,8 +98,8 @@ namespace Myre.Physics2
         {
             _position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION);
             _rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION);
-            _mass = context.CreateProperty<float>(PhysicsProperties.MASS);
-            _inertiaTensor = context.CreateProperty<float>(PhysicsProperties.INERTIA_TENSOR);
+            _mass = context.CreateProperty<float>(PhysicsProperties.MASS, 1);
+            _inertiaTensor = context.CreateProperty<float>(PhysicsProperties.INERTIA_TENSOR, 1);
             _linearVelocity = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_VELOCITY);
             _angularVelocity = context.CreateProperty<float>(PhysicsProperties.ANGULAR_VELOCITY);
             _linearVelocityBias = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_VELOCITY_BIAS);
@@ -204,17 +204,6 @@ namespace Myre.Physics2
         class Manager
             : BehaviourManager<DynamicPhysics>, IActivityManager, IIntegrator, IForceApplier
         {
-            public void Update()
-            {
-                for (int i = 0; i < Behaviours.Count; i++)
-                {
-                    var body = Behaviours[i];
-
-                    body._linearAcceleration.Value = body._force / body.Mass;
-                    body._angularAcceleration.Value = body._torque / body.InertiaTensor;
-                }
-            }
-
             public void UpdateActivityStatus(float time, float linearThreshold, float angularThreshold)
             {
                 for (int i = 0; i < Behaviours.Count; i++)
