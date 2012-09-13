@@ -245,7 +245,12 @@ namespace Myre.Entities
         {
             Assert.ArgumentNotNull("property.Name", property.Name);
             Assert.ArgumentNotNull("property.DataType", property.DataType);
-            Assert.IsTrue(property.InitialValue == null || property.InitialValue.GetType().IsInstanceOfType(property.DataType), "Cannot cast initial value to type of property");
+
+            if (property.InitialValue != null)
+            {
+                var initialType = property.InitialValue.GetType();
+                Assert.IsTrue(property.DataType.IsAssignableFrom(initialType), "Cannot cast initial value to type of property");
+            }
 
             if (properties.Contains(property))
                 return false;
