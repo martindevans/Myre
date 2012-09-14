@@ -5,9 +5,9 @@ using Myre.Entities.Services;
 
 namespace Myre.Physics2
 {
-    [DefaultManager(typeof(Manager))]
+    [DefaultManager(typeof(Manager<Transform>))]
     public class Transform
-        : Behaviour
+        : ProcessBehaviour
     {
         private Property<Vector2> _position;
         private Property<float> _rotation;
@@ -81,24 +81,9 @@ namespace Myre.Physics2
             _isDirty = false;
         }
 
-        class Manager
-            : BehaviourManager<Transform>, IProcess
+        protected override void Update(float elapsedTime)
         {
-            public bool IsComplete
-            {
-                get { return false; }
-            }
-
-            public Manager(Scene scene)
-            {
-                scene.GetService<ProcessService>().Add(this);
-            }
-
-            public void Update(float time)
-            {
-                for (int i = 0; i < Behaviours.Count; i++)
-                    Behaviours[i].CalculateTransform();
-            }
+            CalculateTransform();
         }
     }
 }

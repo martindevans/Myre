@@ -169,6 +169,11 @@ namespace Myre.Physics2
             ApplyImpulseAtOffset(ref impulse, ref r);
         }
 
+        public void ApplyImpulseAtOffset(Vector2 impulse, Vector2 worldOffset)
+        {
+            ApplyImpulseAtOffset(ref impulse, ref worldOffset);
+        }
+
         public void ApplyImpulseAtOffset(ref Vector2 impulse, ref Vector2 worldOffset)
         {
             Vector2 l = _linearVelocity.Value;

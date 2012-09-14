@@ -35,7 +35,7 @@ namespace Myre.Physics2.Collisions
                 for (int i = _collisions.Count - 1; i >= 0; i--)
                 {
                     var collision = _collisions[i];
-                    if (collision.GeometryA == geom || collision.GeometryB == geom)
+                    if (collision.A == geom || collision.B == geom)
                     {
                         collision.Dispose();
                         _collisions.RemoveAt(i);
@@ -93,11 +93,11 @@ namespace Myre.Physics2.Collisions
 
                 if (collision.Contacts.Count > 0)
                 {
-                    if (!collision.GeometryB.Body.IsStatic && !collision.GeometryB.Body.Sleeping)
-                        collision.GeometryA.Body.Sleeping = false;
+                    if (!collision.B.Body.IsStatic && !collision.B.Body.Sleeping)
+                        collision.A.Body.Sleeping = false;
 
-                    if (!collision.GeometryA.Body.IsStatic && !collision.GeometryA.Body.Sleeping)
-                        collision.GeometryB.Body.Sleeping = false;
+                    if (!collision.A.Body.IsStatic && !collision.A.Body.Sleeping)
+                        collision.B.Body.Sleeping = false;
                 }
 
                 //DynamicPhysics activatedBody;

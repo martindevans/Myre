@@ -37,25 +37,25 @@ namespace Myre.Physics2.Collisions
 
         public Vector2 Position;
         public readonly ContactID ID;
-        internal float MassNormal;
-        internal float MassTangent;
-        internal float NormalVelocityBias;
-        internal float BounceVelocity;
-        internal float NormalImpulse;
-        internal float TangentImpulse;
-        internal float NormalImpulseBias;
+        internal float massNormal;
+        internal float massTangent;
+        internal float normalVelocityBias;
+        internal float bounceVelocity;
+        internal float normalImpulse;
+        internal float tangentImpulse;
+        internal float normalImpulseBias;
 
         public Contact(Vector2 position, Geometry geometry, int feature)
         {
             Position = position;
             ID = new ContactID(geometry, feature);
-            MassNormal = 0;
-            MassTangent = 0;
-            NormalVelocityBias = 0;
-            BounceVelocity = 0;
-            NormalImpulse = 0;
-            TangentImpulse = 0;
-            NormalImpulseBias = 0;
+            massNormal = 0;
+            massTangent = 0;
+            normalVelocityBias = 0;
+            bounceVelocity = 0;
+            normalImpulse = 0;
+            tangentImpulse = 0;
+            normalImpulseBias = 0;
         }
 
         public override bool Equals(object obj)
