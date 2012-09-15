@@ -52,6 +52,13 @@ namespace Myre.Physics2
             base.CreateProperties(context);
         }
 
+        public override void Initialise(Collections.INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            _isDirty = true;
+        }
+
         public Vector2 ToWorldCoordinates(Vector2 point)
         {
             return Vector2.Transform(point, _transform.Value);
