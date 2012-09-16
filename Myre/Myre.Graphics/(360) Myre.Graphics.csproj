@@ -200,6 +200,7 @@
     <None Include="bin\Xbox 360\Debug\Myre.Graphics.Content\SpotLight.xnb" />
     <None Include="bin\Xbox 360\Debug\Myre.Graphics.Content\SSAO.xnb" />
     <None Include="bin\Xbox 360\Debug\Myre.Graphics.Content\ToneMap.xnb" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
