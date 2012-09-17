@@ -6,7 +6,7 @@ using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 
-namespace Myre.Physics2.Collisions
+namespace Myre.Physics2D.Collisions
 {
     /// <summary>
     /// Represents a piece of geometry which can be used for collision detection.

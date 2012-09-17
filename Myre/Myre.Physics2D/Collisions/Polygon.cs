@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 
-namespace Myre.Physics2.Collisions
+namespace Myre.Physics2D.Collisions
 {
     public class Polygon
         : Geometry

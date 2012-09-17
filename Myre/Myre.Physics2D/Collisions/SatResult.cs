@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace Myre.Physics2.Collisions
+namespace Myre.Physics2D.Collisions
 {
     public struct SatResult
     {

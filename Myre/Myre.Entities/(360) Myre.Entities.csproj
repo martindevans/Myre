@@ -60,6 +60,7 @@
     <Compile Include="Behaviours\BehaviourManager.cs" />
     <Compile Include="Behaviours\BehaviourManagerContainer.cs" />
     <Compile Include="Behaviours\DefaultManagerAttribute.cs" />
+    <Compile Include="Behaviours\ProcessBehaviour.cs" />
     <Compile Include="Entity.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -67,6 +68,7 @@
     <Compile Include="Events\Event.cs" />
     <Compile Include="Events\EventService.cs" />
     <Compile Include="Events\IEventListener.cs" />
+    <Compile Include="Extensions\INamedDataProviderExtensions.cs" />
     <Compile Include="NinjectKernel.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -4,7 +4,7 @@ using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Services;
 
-namespace Myre.Physics2
+namespace Myre.Physics2D
 {
     public interface IForceProvider
     {

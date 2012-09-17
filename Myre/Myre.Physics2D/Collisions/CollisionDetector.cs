@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Myre.Physics2.Collisions
+namespace Myre.Physics2D.Collisions
 {
     public class CollisionDetector
     {

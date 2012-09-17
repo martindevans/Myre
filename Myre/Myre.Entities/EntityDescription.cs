@@ -188,6 +188,7 @@ namespace Myre.Entities
             return AddBehaviour(typeof(T), name);
         }
 
+#if WINDOWS
         /// <summary>
         /// Adds the behaviour, provided that such a behaviour does not already exist.
         /// </summary>
@@ -195,11 +196,11 @@ namespace Myre.Entities
         /// <param name="create">A factory function which creates an instance of this behaviour</param>
         /// <param name="name">the name.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour<T>(Func<String, T> create, string name = null)
-            where T : Behaviour
+        public bool AddBehaviour<T>(Func<String, T> create, string name = null) where T : Behaviour
         {
             return AddBehaviour(new BehaviourData(name, typeof(T), create));
         }
+#endif
 
         /// <summary>
         /// Removes the behaviour.

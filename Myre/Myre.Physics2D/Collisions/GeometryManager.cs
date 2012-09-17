@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Physics2;
+using Myre.Physics2D;
 
-namespace Myre.Physics2.Collisions
+namespace Myre.Physics2D.Collisions
 {
     [DefaultManager(typeof(Manager))]
     public partial class Geometry

@@ -3,7 +3,7 @@ using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 
-namespace Myre.Physics2
+namespace Myre.Physics2D
 {
     [DefaultManager(typeof(Manager<Transform>))]
     public class Transform

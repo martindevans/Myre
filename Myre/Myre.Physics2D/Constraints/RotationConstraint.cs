@@ -2,9 +2,9 @@
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Physics2;
+using Myre.Physics2D;
 
-namespace Myre.Physics2.Constraints
+namespace Myre.Physics2D.Constraints
 {
     [DefaultManager(typeof(Manager))]
     public class RotationConstraint

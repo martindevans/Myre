@@ -1,20 +1,18 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Physics2;
+using Myre.Physics2D;
 
-namespace Myre.Physics2.Constraints
+namespace Myre.Physics2D.Constraints
 {
     [DefaultManager(typeof(Manager))]
-    public class LinearVelocityConstraint
+    public class AngularVelocityConstraint
         : Behaviour
     {
         private DynamicPhysics _body;
 
-        private Property<Vector2> _axis;
-        private Property<Vector2> _targetVelocity;
+        private Property<float> _targetVelocity;
         private Property<float> _strength;
         private Property<float> _damping;
 
@@ -23,10 +21,9 @@ namespace Myre.Physics2.Constraints
             if (_body == null)
                 throw new Exception("VelocityConstraint requires that the entity contain a DynamicPhysics behaviour.");
 
-            _targetVelocity = context.CreateProperty<Vector2>("target_linear_velocity");
-            _strength = context.CreateProperty<float>("linear_velocity_constraint_strength");
-            _damping = context.CreateProperty<float>("linear_velocity_constraint_damping");
-            _axis = context.CreateProperty<Vector2>("linear_velocity_constraint_axis");
+            _targetVelocity = context.CreateProperty<float>("target_angular_velocity");
+            _strength = context.CreateProperty<float>("angular_velocity_constraint_strength");
+            _damping = context.CreateProperty<float>("angular_velocity_constraint_damping");
 
             base.CreateProperties(context);
         }
@@ -39,7 +36,7 @@ namespace Myre.Physics2.Constraints
         }
 
         class Manager
-            : BehaviourManager<LinearVelocityConstraint>, IForceProvider
+            : BehaviourManager<AngularVelocityConstraint>, IForceProvider
         {
             public void Update(float elapsedTime)
             {
@@ -48,14 +45,10 @@ namespace Myre.Physics2.Constraints
                     var constraint = Behaviours[i];
                     var body = constraint._body;
 
-                    var force = (constraint._targetVelocity.Value - body.LinearVelocity) * constraint._strength.Value;
-                    force -= body.LinearAcceleration * constraint._damping.Value;
-
-                    var axis = constraint._axis.Value;
-                    if (axis != Vector2.Zero)
-                        force = axis * Vector2.Dot(axis, force);
-
-                    body.ApplyForce(force);
+                    var torque = (constraint._targetVelocity.Value - body.AngularVelocity) * constraint._strength.Value;
+                    torque -= body.AngularAcceleration * constraint._damping.Value;
+                    
+                    body.ApplyTorque(torque);
                 }
             }
         }

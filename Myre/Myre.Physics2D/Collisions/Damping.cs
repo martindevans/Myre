@@ -5,7 +5,7 @@ using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 
-namespace Myre.Physics2.Dynamics.Constraints
+namespace Myre.Physics2D.Dynamics.Constraints
 {
     [DefaultManager(typeof(Manager))]
     public class Damping

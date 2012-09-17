@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Myre.Extensions;
 
-namespace Myre.Physics2.Collisions
+namespace Myre.Physics2D.Collisions
 {
     public class Collision
     {

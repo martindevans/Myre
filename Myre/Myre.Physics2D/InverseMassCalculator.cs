@@ -5,7 +5,7 @@ using System.Text;
 using Myre.Entities.Behaviours;
 using Myre.Entities;
 
-namespace Myre.Physics2
+namespace Myre.Physics2D
 {
     public class InverseMassCalculator
         :Behaviour
