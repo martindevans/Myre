@@ -88,6 +88,7 @@ namespace Myre.Collections
         /// <typeparam name="T">The type of value stored at the key.</typeparam>
         /// <param name="key">The key.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="create">Indicates if the box should be created if it is not found.</param>
         /// <returns>The value at the specified key, or null if the existing box contains a different value type.</returns>
         public Box<T> Get<T>(Key key, T defaultValue = default(T), bool create = true)
         {

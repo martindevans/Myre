@@ -1,4 +1,5 @@
-﻿using Myre.Collections;
+﻿using System;
+using Myre.Collections;
 
 namespace Myre.Entities.Extensions
 {
@@ -14,10 +15,15 @@ namespace Myre.Entities.Extensions
         /// <returns>true, if the copy happened, otherwise false</returns>
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string name, Property<T> property)
         {
+            return TryCopyValue<T>(dataProvider, name, v => property.Value = v);
+        }
+
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string name, Action<T> action)
+        {
             var box = dataProvider.Get<T>(name, false);
             if (box != null)
             {
-                property.Value = box.Value;
+                action(box.Value);
                 return true;
             }
 
