@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
+using Myre.Entities.Extensions;
 using Myre.Entities.Behaviours;
 
 namespace Myre.Physics2D.Collisions
@@ -17,6 +18,7 @@ namespace Myre.Physics2D.Collisions
         private Property<float> _frictionCoefficient;
         private Property<float> _restitutionCoefficient;
         private Property<bool> _sleeping;
+        private Property<CollisionGroup> _group;
         private bool _wasSleeping;
 
         internal readonly List<Geometry> collidingWith;
@@ -45,6 +47,14 @@ namespace Myre.Physics2D.Collisions
         }
 
         /// <summary>
+        /// Collision Group
+        /// </summary>
+        public CollisionGroup Group
+        {
+            get { return _group.Value; }
+        }
+
+        /// <summary>
         /// Gets an axis aligned bounding box for this geometry.
         /// </summary>
         public abstract BoundingBox Bounds { get; }
@@ -65,6 +75,7 @@ namespace Myre.Physics2D.Collisions
             _frictionCoefficient = context.CreateProperty<float>("friction_coefficient");
             _restitutionCoefficient = context.CreateProperty<float>("restitution_coefficient");
             _sleeping = context.CreateProperty<bool>("sleeping");
+            _group = context.CreateProperty<CollisionGroup>("collision_group");
 
             _restitutionCoefficient.PropertySet += ValidateRestitution;
             _sleeping.PropertySet += WakeUp;
@@ -75,6 +86,8 @@ namespace Myre.Physics2D.Collisions
         public override void Initialise(INamedDataProvider initialisationData)
         {
             Body = Owner.GetBehaviour<DynamicPhysics>();
+
+            initialisationData.TryCopyValue("collision_group", _group);
 
             _wasSleeping = _sleeping.Value;
             base.Initialise(initialisationData);

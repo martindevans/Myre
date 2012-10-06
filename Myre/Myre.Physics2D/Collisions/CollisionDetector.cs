@@ -72,6 +72,9 @@ namespace Myre.Physics2D.Collisions
                     if (a.Body.Sleeping && b.Body.Sleeping)
                         continue;
 
+                    if (a.Group != null && b.Group != null && a.Group.Ignores(b.Group))
+                        continue;
+
                     if (a.Bounds.Intersects(b.Bounds))
                     {
                         if (!a.collidingWith.Contains(b))
