@@ -7,32 +7,33 @@ namespace Myre.StateManagement
 {
     public static class GameLauncher
     {
-#if WINDOWS
-        static readonly List<Action<Exception>> _exceptionActions = new List<Action<Exception>>();
-        public static void AddExceptionAction(Action<Exception> action)
-        {
-            _exceptionActions.Add(action);
-        }
-#endif
-
         public static void Run<T>() where T : Game, new()
         {
-            Run<T>(new T());
+            Run(new T());
         }
 
-        public static void Run<T>(T instance) where T : Game
+        public static void Run(Game instance)
+        {
+            Run(new GameWrapper(instance));
+        }
+
+        public static void Run(ILaunchable launchable
+#if WINDOWS
+            , params Action<Exception>[] exceptionHandlers
+#endif
+            )
         {
             if (Debugger.IsAttached)
             {
-                using (instance)
-                    instance.Run();
+                using (launchable)
+                    launchable.Run();
             }
             else
             {
                 try
                 {
-                    using (instance)
-                        instance.Run();
+                    using (launchable)
+                        launchable.Run();
                 }
                 catch (Exception e)
                 {
@@ -40,7 +41,7 @@ namespace Myre.StateManagement
                     using (var g = new ExceptionGame(e))
                         g.Run();
 #else
-                    foreach (Action<Exception> t in _exceptionActions)
+                    foreach (Action<Exception> t in exceptionHandlers)
                     {
                         t(e);
                     }
@@ -48,5 +49,32 @@ namespace Myre.StateManagement
                 }
             }
         }
+
+        private class GameWrapper
+            :ILaunchable
+        {
+            private readonly Game _game;
+
+            public GameWrapper(Game game)
+            {
+                _game = game;
+            }
+
+            public void Run()
+            {
+                _game.Run();
+            }
+
+            public void Dispose()
+            {
+                _game.Dispose();
+            }
+        }
+    }
+
+    public interface ILaunchable
+            : IDisposable
+    {
+        void Run();
     }
 }
