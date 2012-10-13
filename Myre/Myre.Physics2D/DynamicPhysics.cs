@@ -3,6 +3,8 @@ using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Entities.Events;
+using Myre.Physics2D.Collisions;
 
 namespace Myre.Physics2D
 {
@@ -22,6 +24,8 @@ namespace Myre.Physics2D
         private Property<float> _angularVelocityBias;
         private Property<float> _angularAcceleration;
         private Property<Vector2> _linearAcceleration;
+
+        private Event<CollisionImpulseApplied> collisonImpulseEvent;
 
         private Vector2 _force;
         private float _torque;
@@ -113,6 +117,8 @@ namespace Myre.Physics2D
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
+            collisonImpulseEvent = Owner.Scene.GetService<EventService>().GetEvent<CollisionImpulseApplied>();
+
             _timeTillSleep = 5;
             base.Initialise(initialisationData);
         }
@@ -170,6 +176,12 @@ namespace Myre.Physics2D
 
         public void ApplyImpulseAtOffset(Vector2 impulse, Vector2 worldOffset)
         {
+            ApplyImpulseAtOffset(ref impulse, ref worldOffset);
+        }
+
+        internal void CollisionImpulse(Geometry geometry, Geometry other, ref Vector2 impulse, ref Vector2 worldOffset)
+        {
+            collisonImpulseEvent.Send(new CollisionImpulseApplied(geometry, other, impulse));
             ApplyImpulseAtOffset(ref impulse, ref worldOffset);
         }
 

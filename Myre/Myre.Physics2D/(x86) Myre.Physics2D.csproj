@@ -77,6 +77,7 @@
     <Compile Include="Collisions\Circle.cs" />
     <Compile Include="Collisions\Collision.cs" />
     <Compile Include="Collisions\CollisionDetector.cs" />
+    <Compile Include="Collisions\CollisionImpulseApplied.cs" />
     <Compile Include="Collisions\CollisionGroup.cs" />
     <Compile Include="Collisions\Contact.cs" />
     <Compile Include="Collisions\ContactTester.cs" />

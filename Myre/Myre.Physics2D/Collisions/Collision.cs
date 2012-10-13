@@ -257,10 +257,10 @@ namespace Myre.Physics2D.Collisions
                 Vector2.Multiply(ref tangent, contact.tangentImpulse, out vec2);
                 Vector2.Add(ref vec1, ref vec2, out impulse);
 
-                b.Body.ApplyImpulseAtOffset(ref impulse, ref r2);
+                b.Body.CollisionImpulse(b, a, ref impulse, ref r2);
 
                 Vector2.Multiply(ref impulse, -1, out impulse);
-                a.Body.ApplyImpulseAtOffset(ref impulse, ref r1);
+                a.Body.CollisionImpulse(b, a, ref impulse, ref r2);
 
                 contact.normalImpulseBias = 0;
 
