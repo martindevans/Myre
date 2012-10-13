@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
+using Microsoft.Xna.Framework;
 
 namespace Myre.Entities
 {
@@ -39,19 +40,24 @@ namespace Myre.Entities
                 _entity = entity;
             }
 
-            public Property<T> CreateProperty<T>(String name, T value = default(T))
+            public T CreateProperty<T, U>(String name = "", U value = default(U)) where T : Property<U>, new()
             {
                 CheckFrozen();
 
-                var property = _entity.GetProperty<T>(name);
+                var property = _entity.GetProperty<T, U>(name);
                 if (property == null)
                 {
-                    property = new Property<T>(name);
+                    property = new T() { Name = name };
                     property.Value = value;
-                    _entity.AddProperty(property);
+                    _entity.AddProperty<T, U>(property);
                 }
 
                 return property;
+            }
+            
+            public Property<T> CreateProperty<T>(String name, T value = default(T))
+            {
+                return CreateProperty<Property<T>, T>(name, value);
             }
 
             private void CheckFrozen()
@@ -61,10 +67,10 @@ namespace Myre.Entities
             }
         }
 
-        private readonly Dictionary<String, IProperty> _properties;
+        private readonly Dictionary<KeyValuePair<String, Type>, Property> _properties;
         private readonly Dictionary<Type, Behaviour[]> _behaviours;
 
-        private readonly List<IProperty> _propertiesList;
+        private readonly List<Property> _propertiesList;
         private readonly List<Behaviour> _behavioursList;
 
         private readonly ConstructionContext _constructionContext;
@@ -87,7 +93,7 @@ namespace Myre.Entities
         /// Gets the properties this entity contains.
         /// </summary>
         /// <value>The properties.</value>
-        public ReadOnlyCollection<IProperty> Properties { get; private set; }
+        public ReadOnlyCollection<Property> Properties { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -95,20 +101,20 @@ namespace Myre.Entities
         /// <value></value>
         public bool IsDisposed { get; private set; }
 
-        internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
+        internal Entity(IEnumerable<Property> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
         {
             Version = version;
 
             // create public read-only collections
-            _propertiesList = new List<IProperty>(properties);
+            _propertiesList = new List<Property>(properties);
             _behavioursList = new List<Behaviour>(behaviours);
-            Properties = new ReadOnlyCollection<IProperty>(_propertiesList);
+            Properties = new ReadOnlyCollection<Property>(_propertiesList);
             Behaviours = new ReadOnlyCollection<Behaviour>(_behavioursList);
 
             // add properties
-            _properties = new Dictionary<String, IProperty>();
+            _properties = new Dictionary<KeyValuePair<String, Type>, Property>();
             foreach (var item in Properties)
-                _properties.Add(item.Name, item);
+                _properties.Add(new KeyValuePair<String, Type>(item.Name, item.GetType()), item);
 
             // sort behaviours by their type
             var catagorised = new Dictionary<Type, List<Behaviour>>();
@@ -235,22 +241,49 @@ namespace Myre.Entities
                 Version.Creator.Recycle(this);
         }
 
-        internal void AddProperty(IProperty property)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="property"></param>
+        internal void AddProperty<T>(BaseProperty<T> property)
         {
-            _properties.Add(property.Name, property);
-            _propertiesList.Add(property);
+            AddProperty(property.Name, typeof(T), property);
         }
 
         /// <summary>
-        /// Gets the property with the specified name.
+        /// Add a property which derives from 
         /// </summary>
-        /// <param name="name">The name of the propery.</param>
-        /// <returns>The property with the specified name and data type.</returns>
-        public IProperty GetProperty(String name)
+        /// <remarks>
+        /// This looks identical to <see cref="AddProperty{T}"/>, but with a minor subtlety.
+        /// <see cref="AddProperty{T}"/> adds it under the (name, typeof(T)) key value pair,
+        /// whereas this method adds it under the type of property derived from IProperty.
+        /// For example, if Position derives from Property{Vector2}, it should be added
+        /// under the key (name, Position) instead of (name, Vector2).
+        /// </remarks>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="property"></param>
+        internal void AddProperty<T, U>(T property) where T : BaseProperty<U>
         {
-            IProperty property;
-            _properties.TryGetValue(name, out property);
-            return property;
+            AddProperty(property.Name, typeof(T), property);    
+        }
+
+        /// <summary>
+        /// Add a property with a specific name/type key pair.
+        /// </summary>
+        /// <param name="name">Name of the property</param>
+        /// <param name="type">Type of the property</param>
+        /// <param name="property">The property</param>
+        internal void AddProperty(String name, Type type, Property property)
+        {
+            _properties.Add(new KeyValuePair<String, Type>(name, type), property);
+            _propertiesList.Add(property);
+        }
+
+        public T GetProperty<T, U>(String name = "") where T : BaseProperty<U>
+        {
+            return GetProperty(name, typeof(T)) as T;
         }
 
         /// <summary>
@@ -261,7 +294,14 @@ namespace Myre.Entities
         /// <returns>The property with the specified name and data type.</returns>
         public Property<T> GetProperty<T>(String name)
         {
-            return GetProperty(name) as Property<T>;
+            return GetProperty(name, typeof(Property<T>)) as Property<T>;
+        }
+
+        internal Property GetProperty(String name, Type type)
+        {
+            Property property;
+            _properties.TryGetValue(new KeyValuePair<String, Type>(name, type), out property);
+            return property;
         }
 
         /// <summary>

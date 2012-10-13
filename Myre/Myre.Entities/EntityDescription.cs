@@ -15,19 +15,21 @@ namespace Myre.Entities
     public struct PropertyData
     {
         public readonly string Name;
+        public readonly Type PropertyType;
         public readonly Type DataType;
         public readonly object InitialValue;
 
-        public PropertyData(string name, Type dataType, object initialValue)
+        public PropertyData(string name, Type propertyType, Type dataType, object initialValue)
         {
             Name = name;
+            PropertyType = propertyType;
             DataType = dataType;
             InitialValue = initialValue;
         }
 
         public override int GetHashCode()
         {
-            return DataType.GetHashCode();
+            return PropertyType.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -41,7 +43,7 @@ namespace Myre.Entities
         public bool Equals(PropertyData data)
         {
             return Name == data.Name
-                && DataType == data.DataType
+                && PropertyType == data.PropertyType
                 && InitialValue == data.InitialValue;
         }
     }
@@ -87,9 +89,6 @@ namespace Myre.Entities
     /// </summary>
     public class EntityDescription
     {
-        private static readonly Dictionary<Type, ConstructorInfo> propertyConstructors = new Dictionary<Type, ConstructorInfo>();
-        private static readonly Type genericType = Type.GetType("Myre.Entities.Property`1");
-
         private readonly IKernel kernel;
         private readonly List<BehaviourData> behaviours;
         private readonly List<PropertyData> properties;
@@ -242,10 +241,10 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="property">The property.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty(PropertyData property)
+        private bool AddProperty(PropertyData property)
         {
             Assert.ArgumentNotNull("property.Name", property.Name);
-            Assert.ArgumentNotNull("property.DataType", property.DataType);
+            Assert.ArgumentNotNull("property.PropertyType", property.PropertyType);
 
             if (property.InitialValue != null)
             {
@@ -265,17 +264,17 @@ namespace Myre.Entities
         /// <summary>
         /// Adds the property, provided that such a behaviour does not already exist.
         /// </summary>
-        /// <param name="dataType">Type of the data.</param>
+        /// <param name="propertyType">Type of the data.</param>
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty(Type dataType, string name, object initialValue)
+        public bool AddProperty(Type propertyType, Type dataType, string name, object initialValue)
         {
-            return AddProperty(new PropertyData(name, dataType, initialValue));
+            return AddProperty(new PropertyData(name, propertyType, dataType, initialValue));
         }
 
         /// <summary>
-        /// Adds the property, provided that such a behaviour does not already exist.
+        /// Adds the property, provided that such a property does not already exist.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="name">The name.</param>
@@ -283,7 +282,19 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddProperty<T>(string name, T initialValue = default(T))
         {
-            return AddProperty(typeof(T), name, initialValue);
+            return AddProperty(typeof(Property<T>), typeof(T), name, initialValue);
+        }
+
+        /// <summary>
+        /// Adds the property, provided that such a property does not already exist.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name">The name.</param>
+        /// <param name="initialValue">The initial value.</param>
+        /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
+        public bool AddProperty<T, U>(string name, U initialValue = default(U)) where T : Property<U>
+        {
+            return AddProperty(typeof(Property<T>), typeof(T), name, initialValue);
         }
 
         /// <summary>
@@ -340,14 +351,14 @@ namespace Myre.Entities
         private Entity InitialisePooledEntity()
         {
             var entity = pool.Dequeue();
-            foreach (IProperty item in entity.Properties)
+            foreach (Property item in entity.Properties)
             {
                 item.Clear();
                 foreach (var p in properties)
                 {
-                    if (p.Name == item.Name && p.DataType == item.Type)
+                    if (p.Name == item.Name && p.PropertyType == item.GetType())
                     {
-                        item.Value = p.InitialValue;
+                        item.SetBoxedValue(p.InitialValue);
                         break;
                     }
                 }
@@ -366,7 +377,7 @@ namespace Myre.Entities
             pool.Clear();
         }
 
-        private IEnumerable<IProperty> CreateProperties()
+        private IEnumerable<Property> CreateProperties()
         {
             foreach (var item in properties)
                 yield return CreatePropertyInstance(item);
@@ -378,22 +389,16 @@ namespace Myre.Entities
                 yield return CreateBehaviourInstance(kernel, item);
         }
 
-        private IProperty CreatePropertyInstance(PropertyData property)
+        private Property CreatePropertyInstance(PropertyData property)
         {
-            ConstructorInfo constructor;
-            if (!propertyConstructors.TryGetValue(property.DataType, out constructor))
-            {
-                var type = genericType.MakeGenericType(property.DataType);
-                constructor = type.GetConstructor(new Type[] { typeof(string) });
-                propertyConstructors.Add(property.DataType, constructor);
-            }
+            Property instance;
 
-            Assert.ArgumentNotNull("constructor", constructor);
-            IProperty prop = constructor.Invoke(new object[] { property.Name }) as IProperty;
-            Assert.ArgumentNotNull("property", prop);
-            prop.Value = property.InitialValue;
+            instance = kernel.Get(property.PropertyType) as Property;
 
-            return prop;
+            instance.SetBoxedValue(property.InitialValue);
+            instance.Name = property.Name;
+            
+            return instance;
         }
 
         private Behaviour CreateBehaviourInstance(IKernel kernel, BehaviourData behaviour)

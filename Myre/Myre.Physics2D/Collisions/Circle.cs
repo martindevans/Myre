@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
+using System;
 
 namespace Myre.Physics2D.Collisions
 {
@@ -46,7 +47,7 @@ namespace Myre.Physics2D.Collisions
             _radius = context.CreateProperty<float>(prefix + "radius");
             _centre = context.CreateProperty<Vector2>(prefix + "centre");
             _transform = context.CreateProperty<Matrix>("transform", Matrix.Identity);
-            
+
             _radius.PropertySet += (p, o, n) => UpdateBounds();
             _centre.PropertySet += (p, o, n) => UpdateBounds();
             _transform.PropertySet += (p, o, n) => UpdateBounds();

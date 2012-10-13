@@ -12,22 +12,19 @@ namespace Myre.Entities
     /// <summary>
     /// Base class for generically typed properties
     /// </summary>
-    public interface IProperty
+    public abstract class Property
     {
         /// <summary>
         /// The name of this property
         /// </summary>
-        String Name { get; }
+        public abstract String Name { get; internal set; }
 
-        /// <summary>
-        /// The current value of this property
-        /// </summary>
-        object Value { get; set; }
+        internal abstract void SetBoxedValue(object box);
 
         /// <summary>
         /// The type this property contains
         /// </summary>
-        Type Type { get; }
+        public abstract Type Type { get; }
 
         /// <summary>
         /// Set this property to default values
@@ -35,20 +32,24 @@ namespace Myre.Entities
         /// <summary>
         /// Set the value to the default value and remove all events from PropertyChanged
         /// </summary>
-        void Clear();
+        public abstract void Clear();
+    }
+
+    public abstract class BaseProperty<T> : Property
+    {
     }
 
     /// <summary>
     /// A generically typed property
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class Property<T>
-        : IProperty
+    public class Property<T>
+        : BaseProperty<T>
     {
         /// <summary>
         /// The name of this instance
         /// </summary>
-        public String Name { get; private set; }
+        public override String Name { get; internal set; }
 
         private T value;
         /// <summary>
@@ -68,23 +69,22 @@ namespace Myre.Entities
             }
         }
 
+        internal override void SetBoxedValue(object box)
+        {
+            Value = (T)box;
+        }
+
         /// <summary>
         /// Called after the value of this property is changed
         /// </summary>
         public event PropertySetDelegate<T> PropertySet;
 
-        object IProperty.Value
-        {
-            get { return Value; }
-            set { Value = (T)value; }
-        }
-
-        Type IProperty.Type
+        public override Type Type
         {
             get { return typeof(T); }
         }
 
-        void IProperty.Clear()
+        public override void Clear()
         {
             if (PropertySet != null)
                 foreach (var item in PropertySet.GetInvocationList())
@@ -93,9 +93,8 @@ namespace Myre.Entities
             value = default(T);
         }
 
-        public Property(String name)
+        public Property()
         {
-            this.Name = name;
             this.value = default(T);
         }
 
