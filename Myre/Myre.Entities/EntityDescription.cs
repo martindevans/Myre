@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Reflection;
+using System.Linq;
 using Myre.Entities.Behaviours;
 using Ninject;
 using Ninject.Parameters;
@@ -89,12 +88,12 @@ namespace Myre.Entities
     /// </summary>
     public class EntityDescription
     {
-        private readonly IKernel kernel;
-        private readonly List<BehaviourData> behaviours;
-        private readonly List<PropertyData> properties;
+        private readonly IKernel _kernel;
+        private readonly List<BehaviourData> _behaviours;
+        private readonly List<PropertyData> _properties;
 
-        private readonly Queue<Entity> pool;
-        private uint version;
+        private readonly Queue<Entity> _pool;
+        private uint _version;
 
         /// <summary>
         /// Gets a list of behaviours in this instance.
@@ -114,13 +113,13 @@ namespace Myre.Entities
         /// <param name="kernel">The kernel.</param>
         public EntityDescription(IKernel kernel = null)
         {
-            this.kernel = kernel ?? NinjectKernel.Instance;
-            behaviours = new List<BehaviourData>();
-            properties = new List<PropertyData>();
-            pool = new Queue<Entity>();
+            _kernel = kernel ?? NinjectKernel.Instance;
+            _behaviours = new List<BehaviourData>();
+            _properties = new List<PropertyData>();
+            _pool = new Queue<Entity>();
 
-            Behaviours = new ReadOnlyCollection<BehaviourData>(behaviours);
-            Properties = new ReadOnlyCollection<PropertyData>(properties);
+            Behaviours = new ReadOnlyCollection<BehaviourData>(_behaviours);
+            Properties = new ReadOnlyCollection<PropertyData>(_properties);
         }
 
         /// <summary>
@@ -128,8 +127,8 @@ namespace Myre.Entities
         /// </summary>
         public virtual void Reset()
         {
-            behaviours.Clear();
-            properties.Clear();
+            _behaviours.Clear();
+            _properties.Clear();
             IncrementVersion();
         }
 
@@ -155,10 +154,10 @@ namespace Myre.Entities
         {
             Assert.ArgumentNotNull("behaviour.Type", behaviour.Type);
 
-            if (behaviours.Contains(behaviour))
+            if (_behaviours.Contains(behaviour))
                 return false;
 
-            behaviours.Add(behaviour);
+            _behaviours.Add(behaviour);
             IncrementVersion();
 
             return true;
@@ -201,40 +200,6 @@ namespace Myre.Entities
         }
 #endif
 
-        /// <summary>
-        /// Removes the behaviour.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public bool RemoveBehaviour(Type type, string name = null)
-        {
-            for (int i = 0; i < behaviours.Count; i++)
-            {
-                var item = behaviours[i];
-                if (item.Type == type && (name == null || item.Name == name))
-                {
-                    behaviours.RemoveAt(i);
-                    IncrementVersion();
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Removes the behaviour.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public bool RemoveBehaviour<T>(string name = null)
-            where T : Behaviour
-        {
-            return RemoveBehaviour(typeof(T), name);
-        }
-
         #region properties
         /// <summary>
         /// Adds the property, provided that such a property does not already exist.
@@ -252,10 +217,10 @@ namespace Myre.Entities
                 Assert.IsTrue(property.DataType.IsAssignableFrom(initialType), "Cannot cast initial value to type of property");
             }
 
-            if (properties.Contains(property))
+            if (_properties.Contains(property))
                 return false;
 
-            properties.Add(property);
+            _properties.Add(property);
             IncrementVersion();
 
             return true;
@@ -264,57 +229,39 @@ namespace Myre.Entities
         /// <summary>
         /// Adds the property, provided that such a behaviour does not already exist.
         /// </summary>
-        /// <param name="propertyType">Type of the data.</param>
+        /// <param name="propertyType">Type of the property.</param>
+        /// <param name="dataType">Type of the data</param>
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty(Type propertyType, Type dataType, string name, object initialValue)
+        private bool AddProperty(Type propertyType, Type dataType, string name, object initialValue)
         {
             return AddProperty(new PropertyData(name, propertyType, dataType, initialValue));
         }
 
         /// <summary>
-        /// Adds the property, provided that such a property does not already exist.
+        /// Adds the property, provided that such a property does not already exist. Using the default Property&lt;T&gt; implementation
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TData">The type of the data in this property</typeparam>
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty<T>(string name, T initialValue = default(T))
+        public bool AddProperty<TData>(string name, TData initialValue = default(TData))
         {
-            return AddProperty(typeof(Property<T>), typeof(T), name, initialValue);
+            return AddProperty(typeof(DefaultProperty<TData>), typeof(TData), name, initialValue);
         }
 
         /// <summary>
         /// Adds the property, provided that such a property does not already exist.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TProperty">The type of this property</typeparam>
+        /// <typeparam name="TData">The type of the data in this property</typeparam>
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty<T, U>(string name, U initialValue = default(U)) where T : Property<U>
+        public bool AddProperty<TProperty, TData>(string name = null, TData initialValue = default(TData)) where TProperty : Property<TData>
         {
-            return AddProperty(typeof(Property<T>), typeof(T), name, initialValue);
-        }
-
-        /// <summary>
-        /// Removes the property.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public bool RemoveProperty(string name)
-        {
-            for (int i = 0; i < properties.Count; i++)
-            {
-                if (properties[i].Name == name)
-                {
-                    properties.RemoveAt(i);
-                    IncrementVersion();
-                    return true;
-                }
-            }
-
-            return false;
+            return AddProperty(typeof(TProperty), typeof(TData), name, initialValue);
         }
         #endregion
 
@@ -326,10 +273,10 @@ namespace Myre.Entities
         {
             Entity e;
 
-            if (pool.Count > 0)
+            if (_pool.Count > 0)
                 e = InitialisePooledEntity();
             else
-                e = new Entity(CreateProperties(), CreateBehaviours(), new EntityVersion(this, version));
+                e = new Entity(CreateProperties(), CreateBehaviours(), new EntityVersion(this, _version));
 
             return e;
         }
@@ -339,22 +286,22 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns><c>true</c> if the entity was recycled; else <c>false</c>.</returns>
-        public virtual bool Recycle(Entity entity)
+        protected internal virtual bool Recycle(Entity entity)
         {
-            if (entity.Version.Creator != this || entity.Version.Version != version)
+            if (entity.Version.Creator != this || entity.Version.Version != _version)
                 return false;
 
-            pool.Enqueue(entity);
+            _pool.Enqueue(entity);
             return true;
         }
 
         private Entity InitialisePooledEntity()
         {
-            var entity = pool.Dequeue();
-            foreach (Property item in entity.Properties)
+            var entity = _pool.Dequeue();
+            foreach (BaseUntypedProperty item in entity.Properties)
             {
                 item.Clear();
-                foreach (var p in properties)
+                foreach (var p in _properties)
                 {
                     if (p.Name == item.Name && p.PropertyType == item.GetType())
                     {
@@ -371,29 +318,25 @@ namespace Myre.Entities
         {
             unchecked
             {
-                version++;
+                _version++;
             }
 
-            pool.Clear();
+            _pool.Clear();
         }
 
-        private IEnumerable<Property> CreateProperties()
+        private IEnumerable<BaseUntypedProperty> CreateProperties()
         {
-            foreach (var item in properties)
-                yield return CreatePropertyInstance(item);
+            return _properties.Select(CreatePropertyInstance);
         }
 
         private IEnumerable<Behaviour> CreateBehaviours()
         {
-            foreach (var item in behaviours)
-                yield return CreateBehaviourInstance(kernel, item);
+            return _behaviours.Select(CreateBehaviourInstance);
         }
 
-        private Property CreatePropertyInstance(PropertyData property)
+        private BaseUntypedProperty CreatePropertyInstance(PropertyData property)
         {
-            Property instance;
-
-            instance = kernel.Get(property.PropertyType) as Property;
+            BaseUntypedProperty instance = _kernel.Get(property.PropertyType) as BaseUntypedProperty;
 
             instance.SetBoxedValue(property.InitialValue);
             instance.Name = property.Name;
@@ -401,14 +344,14 @@ namespace Myre.Entities
             return instance;
         }
 
-        private Behaviour CreateBehaviourInstance(IKernel kernel, BehaviourData behaviour)
+        private Behaviour CreateBehaviourInstance(BehaviourData behaviour)
         {
             Behaviour instance;
 
             if (behaviour.Factory != null)
                 instance = behaviour.Factory(behaviour.Name);
             else
-                instance = kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name)) as Behaviour;
+                instance = _kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name)) as Behaviour;
 
             instance.Name = behaviour.Name;
             return instance;

@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Entities
 {
@@ -27,7 +26,7 @@ namespace Myre.Entities
     /// <summary>
     /// A class which represents a collection of related properties and behaviours.
     /// </summary>
-    public class Entity
+    public sealed class Entity
         : IDisposableObject, IRecycleable
     {
         public sealed class ConstructionContext
@@ -40,24 +39,30 @@ namespace Myre.Entities
                 _entity = entity;
             }
 
-            public T CreateProperty<T, U>(String name = "", U value = default(U)) where T : Property<U>, new()
+            public TProperty CreateProperty<TProperty, TData>(String name = null, TData value = default(TData)) where TProperty : Property<TData>, new()
             {
                 CheckFrozen();
 
-                var property = _entity.GetProperty<T, U>(name);
+                var property = _entity.GetProperty<TProperty, TData>(name);
                 if (property == null)
                 {
-                    property = new T() { Name = name };
-                    property.Value = value;
-                    _entity.AddProperty<T, U>(property);
+                    property = new TProperty { Name = name, Value = value };
+                    _entity.AddProperty<TProperty, TData>(property);
                 }
 
                 return property;
             }
             
-            public Property<T> CreateProperty<T>(String name, T value = default(T))
+            /// <summary>
+            /// Create a new property on this entity with the default property type
+            /// </summary>
+            /// <typeparam name="TProperty">Type of the data in this property</typeparam>
+            /// <param name="name">name of this property</param>
+            /// <param name="value">default value for this property</param>
+            /// <returns></returns>
+            public Property<TProperty> CreateProperty<TProperty>(String name, TProperty value = default(TProperty))
             {
-                return CreateProperty<Property<T>, T>(name, value);
+                return CreateProperty<DefaultProperty<TProperty>, TProperty>(name, value);
             }
 
             private void CheckFrozen()
@@ -67,10 +72,10 @@ namespace Myre.Entities
             }
         }
 
-        private readonly Dictionary<KeyValuePair<String, Type>, Property> _properties;
+        private readonly Dictionary<KeyValuePair<String, Type>, BaseUntypedProperty> _properties;
         private readonly Dictionary<Type, Behaviour[]> _behaviours;
 
-        private readonly List<Property> _propertiesList;
+        private readonly List<BaseUntypedProperty> _propertiesList;
         private readonly List<Behaviour> _behavioursList;
 
         private readonly ConstructionContext _constructionContext;
@@ -93,7 +98,7 @@ namespace Myre.Entities
         /// Gets the properties this entity contains.
         /// </summary>
         /// <value>The properties.</value>
-        public ReadOnlyCollection<Property> Properties { get; private set; }
+        public ReadOnlyCollection<BaseUntypedProperty> Properties { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -101,18 +106,18 @@ namespace Myre.Entities
         /// <value></value>
         public bool IsDisposed { get; private set; }
 
-        internal Entity(IEnumerable<Property> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
+        internal Entity(IEnumerable<BaseUntypedProperty> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
         {
             Version = version;
 
             // create public read-only collections
-            _propertiesList = new List<Property>(properties);
+            _propertiesList = new List<BaseUntypedProperty>(properties);
             _behavioursList = new List<Behaviour>(behaviours);
-            Properties = new ReadOnlyCollection<Property>(_propertiesList);
+            Properties = new ReadOnlyCollection<BaseUntypedProperty>(_propertiesList);
             Behaviours = new ReadOnlyCollection<Behaviour>(_behavioursList);
 
             // add properties
-            _properties = new Dictionary<KeyValuePair<String, Type>, Property>();
+            _properties = new Dictionary<KeyValuePair<String, Type>, BaseUntypedProperty>();
             foreach (var item in Properties)
                 _properties.Add(new KeyValuePair<String, Type>(item.Name, item.GetType()), item);
 
@@ -195,7 +200,7 @@ namespace Myre.Entities
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="disposeManagedResources"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposeManagedResources)
+        private void Dispose(bool disposeManagedResources)
         {
             IsDisposed = true;
         }
@@ -242,48 +247,38 @@ namespace Myre.Entities
         }
 
         /// <summary>
-        /// 
+        /// Add a property with a given implementing type
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TProperty"></typeparam>
+        /// <typeparam name="TData"></typeparam>
         /// <param name="property"></param>
-        internal void AddProperty<T>(BaseProperty<T> property)
+        private void AddProperty<TProperty, TData>(TProperty property) where TProperty : Property<TData>
         {
-            AddProperty(property.Name, typeof(T), property);
+            AddProperty(property.Name, typeof(TProperty), property);    
         }
 
         /// <summary>
-        /// Add a property which derives from 
-        /// </summary>
-        /// <remarks>
-        /// This looks identical to <see cref="AddProperty{T}"/>, but with a minor subtlety.
-        /// <see cref="AddProperty{T}"/> adds it under the (name, typeof(T)) key value pair,
-        /// whereas this method adds it under the type of property derived from IProperty.
-        /// For example, if Position derives from Property{Vector2}, it should be added
-        /// under the key (name, Position) instead of (name, Vector2).
-        /// </remarks>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="U"></typeparam>
-        /// <param name="property"></param>
-        internal void AddProperty<T, U>(T property) where T : BaseProperty<U>
-        {
-            AddProperty(property.Name, typeof(T), property);    
-        }
-
-        /// <summary>
-        /// Add a property with a specific name/type key pair.
+        /// Add a property with a specific name/type pair.
         /// </summary>
         /// <param name="name">Name of the property</param>
-        /// <param name="type">Type of the property</param>
-        /// <param name="property">The property</param>
-        internal void AddProperty(String name, Type type, Property property)
+        /// <param name="propertyType">Type of the property</param>
+        /// <param name="property">The property instance</param>
+        private void AddProperty(String name, Type propertyType, BaseUntypedProperty property)
         {
-            _properties.Add(new KeyValuePair<String, Type>(name, type), property);
+            _properties.Add(new KeyValuePair<String, Type>(name, propertyType), property);
             _propertiesList.Add(property);
         }
 
-        public T GetProperty<T, U>(String name = "") where T : BaseProperty<U>
+        /// <summary>
+        /// Get a property with a specific implementing type and contained data type
+        /// </summary>
+        /// <typeparam name="TProperty">Type of the property</typeparam>
+        /// <typeparam name="TData">Type of the data</typeparam>
+        /// <param name="name">The name of this property</param>
+        /// <returns>A property</returns>
+        public TProperty GetProperty<TProperty, TData>(String name = null) where TProperty : Property<TData>
         {
-            return GetProperty(name, typeof(T)) as T;
+            return GetProperty(name, typeof(TProperty)) as TProperty;
         }
 
         /// <summary>
@@ -294,13 +289,19 @@ namespace Myre.Entities
         /// <returns>The property with the specified name and data type.</returns>
         public Property<T> GetProperty<T>(String name)
         {
-            return GetProperty(name, typeof(Property<T>)) as Property<T>;
+            return GetProperty(name, typeof(DefaultProperty<T>)) as Property<T>;
         }
 
-        internal Property GetProperty(String name, Type type)
+        /// <summary>
+        /// Get a property of a specific type
+        /// </summary>
+        /// <param name="name">Name of the property</param>
+        /// <param name="propertyType">type of the property (*not* the data contained within)</param>
+        /// <returns>The property with the specified name and type</returns>
+        private BaseUntypedProperty GetProperty(String name, Type propertyType)
         {
-            Property property;
-            _properties.TryGetValue(new KeyValuePair<String, Type>(name, type), out property);
+            BaseUntypedProperty property;
+            _properties.TryGetValue(new KeyValuePair<String, Type>(name, propertyType), out property);
             return property;
         }
 

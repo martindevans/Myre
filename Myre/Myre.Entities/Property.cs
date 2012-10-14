@@ -1,30 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace Myre.Entities
 {
     public delegate void PropertySetDelegate<T>(Property<T> property, T oldValue, T newValue);
 
     /// <summary>
-    /// Base class for generically typed properties
+    /// Base class for generically typed properties. Do not directly implement this class, instead use Property&lt;TData&gt;
     /// </summary>
-    public abstract class Property
+    public abstract class BaseUntypedProperty
     {
         /// <summary>
         /// The name of this property
         /// </summary>
         public abstract String Name { get; internal set; }
 
+        /// <summary>
+        /// Convert a boxed object into a value for this property and assign it. Throw a cast exception if box cannot be converted
+        /// </summary>
+        /// <param name="box"></param>
         internal abstract void SetBoxedValue(object box);
 
         /// <summary>
         /// The type this property contains
         /// </summary>
-        public abstract Type Type { get; }
+        public abstract Type DataType { get; }
 
         /// <summary>
         /// Set this property to default values
@@ -35,78 +34,93 @@ namespace Myre.Entities
         public abstract void Clear();
     }
 
-    public abstract class BaseProperty<T> : Property
-    {
-    }
-
     /// <summary>
-    /// A generically typed property
+    /// Base class for all properties
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Property<T>
-        : BaseProperty<T>
+    /// <typeparam name="TData">The type of the data contained within this property</typeparam>
+    public abstract class Property<TData> : BaseUntypedProperty
     {
-        /// <summary>
-        /// The name of this instance
-        /// </summary>
-        public override String Name { get; internal set; }
-
-        private T value;
-        /// <summary>
-        /// The value of this property
-        /// </summary>
-        public T Value
-        {
-            get
-            {
-                return value;
-            }
-            set
-            {
-                var oldValue = this.value;
-                this.value = value;
-                OnValueSet(oldValue);
-            }
-        }
+        public abstract TData Value { get; set; }
 
         internal override void SetBoxedValue(object box)
         {
-            Value = (T)box;
+            Value = (TData)box;
+        }
+
+        /// <summary>
+        /// The type of the data contained within this property
+        /// </summary>
+        public override Type DataType
+        {
+            get { return typeof(TData); }
         }
 
         /// <summary>
         /// Called after the value of this property is changed
         /// </summary>
-        public event PropertySetDelegate<T> PropertySet;
+        public event PropertySetDelegate<TData> PropertySet;
 
-        public override Type Type
+        /// <summary>
+        /// Trigger the property set event
+        /// </summary>
+        /// <param name="oldValue"></param>
+        /// <param name="newValue"></param>
+        protected void TriggerPropertySet(TData oldValue, TData newValue)
         {
-            get { return typeof(T); }
+            if (PropertySet != null)
+                PropertySet(this, oldValue, newValue);
         }
 
         public override void Clear()
         {
             if (PropertySet != null)
                 foreach (var item in PropertySet.GetInvocationList())
-                    PropertySet -= (PropertySetDelegate<T>)item;
+                    PropertySet -= (PropertySetDelegate<TData>)item;
 
-            value = default(T);
+            Value = default(TData);
+        }
+    }
+
+    /// <summary>
+    /// A generically typed property
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class DefaultProperty<T>
+        : Property<T>
+    {
+        /// <summary>
+        /// The name of this instance
+        /// </summary>
+        public override String Name { get; internal set; }
+
+        private T _value;
+        /// <summary>
+        /// The value of this property
+        /// </summary>
+        public override T Value
+        {
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                var oldValue = _value;
+                _value = value;
+                TriggerPropertySet(oldValue, value);
+            }
         }
 
-        public Property()
+        public DefaultProperty()
         {
-            this.value = default(T);
-        }
-
-        private void OnValueSet(T oldValue)
-        {
-            if (PropertySet != null)
-                PropertySet(this, oldValue, Value);
+            _value = default(T);
         }
 
         public override string ToString()
         {
+// ReSharper disable CompareNonConstrainedGenericWithNull
             if (Value == null)
+// ReSharper restore CompareNonConstrainedGenericWithNull
                 return "null";
             return Value.ToString();
         }
