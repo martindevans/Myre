@@ -11,6 +11,7 @@ using Myre.Graphics.Materials;
 using Ninject;
 using Myre.Graphics.Geometry;
 using Myre.Debugging;
+using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Lighting
 {
@@ -20,14 +21,6 @@ namespace Myre.Graphics.Lighting
         private Property<Vector3> colour;
         private Property<Vector3> direction;
         private Property<int> shadowResolution;
-        private RenderTarget2D shadowMap;
-        //private Matrix[] shadowViewMatrices = new Matrix[4];
-        //private Matrix[] shadowProjectionMatrices = new Matrix[4];
-        //private float[] farClip = new float[4];
-        private Matrix view;
-        private Matrix projection;
-        private float farClip;
-        private Vector4 nearPlane;
 
         public Vector3 Colour
         {
@@ -49,11 +42,20 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.colour = context.CreateProperty<Vector3>("colour");
-            this.direction = context.CreateProperty<Vector3>("direction");
-            this.shadowResolution = context.CreateProperty<int>("shadow_resolution");
+            colour = context.CreateProperty<Vector3>("colour");
+            direction = context.CreateProperty<Vector3>("direction");
+            shadowResolution = context.CreateProperty<int>("shadow_resolution");
 
             base.CreateProperties(context);
+        }
+
+        public override void Initialise(Collections.INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue("colour", colour);
+            initialisationData.TryCopyValue("direction", direction);
+            initialisationData.TryCopyValue("shadow_resolution", shadowResolution);
         }
     }
 }

@@ -55,7 +55,33 @@ namespace Myre.Graphics.Deferred.LightManagers
             shadowView = shadowCameraEntity.Create().GetBehaviour<View>();
             shadowView.Camera = new Camera();
         }
-        
+
+        public override void Add(SunLight behaviour)
+        {
+            lights.Add(new LightData()
+            {
+                Light = behaviour,
+            });
+
+            base.Add(behaviour);
+        }
+
+        public override bool Remove(SunLight behaviour)
+        {
+            if (base.Remove(behaviour))
+            {
+                for (int i = 0; i < lights.Count; i++)
+                {
+                    if (lights[i].Light == behaviour)
+                    {
+                        lights.RemoveAt(i);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public void Draw(Renderer renderer)
         {
             foreach (var light in lights)
