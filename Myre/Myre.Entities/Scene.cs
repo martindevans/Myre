@@ -142,7 +142,7 @@ namespace Myre.Entities
                         behaviour.CurrentManager.Handler.Remove(behaviour);
                 }
 
-                bool removeNow = entity.Shutdown(!entity.BehavioursShutdown);
+                bool removeNow = entity.Shutdown();
 
                 if (removeNow)
                 {

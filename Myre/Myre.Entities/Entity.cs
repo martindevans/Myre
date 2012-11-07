@@ -95,6 +95,8 @@ namespace Myre.Entities
         /// <value></value>
         public bool IsDisposed { get; private set; }
 
+        private INamedDataProvider _shutdownData;
+
         /// <summary>
         /// Gets a value indicating whether behaviours have already been shutdown
         /// </summary>
@@ -185,9 +187,15 @@ namespace Myre.Entities
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
+        public void Dispose(INamedDataProvider shutdownData)
+        {
+            _shutdownData = shutdownData;
+            Dispose(false);
+        }
+
         public void Dispose()
         {
-            Dispose(false);
+            Dispose(null);
         }
 
         /// <summary>
@@ -206,6 +214,7 @@ namespace Myre.Entities
         {
             BehavioursShutdown = false;
             IsDisposed = false;
+            _shutdownData = null;
 
             foreach (var item in Behaviours)
             {
@@ -217,21 +226,21 @@ namespace Myre.Entities
         /// <summary>
         /// Shuts down this instance.
         /// </summary>
-        internal bool Shutdown(bool behaviours)
+        internal bool Shutdown()
         {
-            delayPropertyShutdown = false;
+            _delayPropertyShutdown = false;
 
-            if (behaviours)
+            if (!BehavioursShutdown)
             {
                 foreach (var item in Behaviours)
                 {
                     if (item.IsReady)
-                        item.Shutdown();
+                        item.Shutdown(_shutdownData);
                 }
                 BehavioursShutdown = true;
             }
 
-            if (!delayPropertyShutdown)
+            if (!_delayPropertyShutdown)
             {
                 foreach (var item in Properties)
                 {
@@ -239,13 +248,13 @@ namespace Myre.Entities
                 }
             }
 
-            return !delayPropertyShutdown;
+            return !_delayPropertyShutdown;
         }
 
-        bool delayPropertyShutdown = false;
+        bool _delayPropertyShutdown = false;
         public void DelayPropertyShutdown()
         {
-            delayPropertyShutdown = true;
+            _delayPropertyShutdown = true;
         }
 
         /// <summary>

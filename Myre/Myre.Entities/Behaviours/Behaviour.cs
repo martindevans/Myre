@@ -96,7 +96,7 @@ namespace Myre.Entities.Behaviours
         /// Initialise/Shutdown may be called multiple times, as the instance is recycled.
         /// Shutdown is called after the behaviour has been removed from the manager.
         /// </remarks>
-        public virtual void Shutdown()
+        public virtual void Shutdown(INamedDataProvider shutdownData)
         {
             IsReady = false;
         }
