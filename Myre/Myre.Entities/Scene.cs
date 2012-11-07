@@ -131,11 +131,10 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns><c>true</c> if the entity was removed; else <c>false</c>.</returns>
-        public bool Remove(Entity entity)
+        internal void Remove(Entity entity)
         {
-            var removed = entities.Remove(entity);
-
-            if (removed)
+            var index = entities.IndexOf(entity);
+            if (index != -1)
             {
                 foreach (var behaviour in entity.Behaviours)
                 {
@@ -143,11 +142,14 @@ namespace Myre.Entities
                         behaviour.CurrentManager.Handler.Remove(behaviour);
                 }
 
-                entity.Scene = null;
-                entity.Shutdown();
-            }
+                bool removeNow = entity.Shutdown(!entity.BehavioursShutdown);
 
-            return removed;
+                if (removeNow)
+                {
+                    entity.Scene = null;
+                    entities.RemoveAt(index);
+                }
+            }
         }
 
         /// <summary>

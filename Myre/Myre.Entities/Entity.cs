@@ -95,6 +95,11 @@ namespace Myre.Entities
         /// <value></value>
         public bool IsDisposed { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether behaviours have already been shutdown
+        /// </summary>
+        internal bool BehavioursShutdown { get; private set; }
+
         internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
         {
             Version = version;
@@ -199,6 +204,9 @@ namespace Myre.Entities
         /// </summary>
         internal void Initialise(INamedDataProvider initialisationData)
         {
+            BehavioursShutdown = false;
+            IsDisposed = false;
+
             foreach (var item in Behaviours)
             {
                 if (!item.IsReady)
@@ -209,18 +217,35 @@ namespace Myre.Entities
         /// <summary>
         /// Shuts down this instance.
         /// </summary>
-        internal void Shutdown()
+        internal bool Shutdown(bool behaviours)
         {
-            foreach (var item in Behaviours)
+            delayPropertyShutdown = false;
+
+            if (behaviours)
             {
-                if (item.IsReady)
-                    item.Shutdown();
+                foreach (var item in Behaviours)
+                {
+                    if (item.IsReady)
+                        item.Shutdown();
+                }
+                BehavioursShutdown = true;
             }
 
-            foreach (var item in Properties)
+            if (!delayPropertyShutdown)
             {
-                item.Clear();
+                foreach (var item in Properties)
+                {
+                    item.Clear();
+                }
             }
+
+            return !delayPropertyShutdown;
+        }
+
+        bool delayPropertyShutdown = false;
+        public void DelayPropertyShutdown()
+        {
+            delayPropertyShutdown = true;
         }
 
         /// <summary>
