@@ -226,11 +226,11 @@ namespace Myre.Graphics.Geometry
 
                     foreach (var pass in data.Material.Begin(metadata))
                     {
-                        pass.Apply();
-
                         //Loop through mesh, drawing as many primitives as possible per batch
                         if (mesh.TriangleCount == 0 || mesh.VertexCount == 0)
                             continue;
+
+                        pass.Apply();
 
                         int primitives = mesh.TriangleCount;
                         int offset = 0;

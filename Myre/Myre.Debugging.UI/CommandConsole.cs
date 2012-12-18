@@ -53,6 +53,7 @@ namespace Myre.Debugging
         /// Initializes a new instance of the <see cref="CommandConsole"/> class.
         /// </summary>
         /// <param name="game">The game.</param>
+        /// <param name="font">The font.</param>
         public CommandConsole(Game game, SpriteFont font)
             : this(game, font, Assembly.GetCallingAssembly())
         {
@@ -61,7 +62,9 @@ namespace Myre.Debugging
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandConsole"/> class.
         /// </summary>
+        /// <param name="font"></param>
         /// <param name="parent"></param>
+        /// <param name="game"></param>
         public CommandConsole(Game game, SpriteFont font, Control parent)
             : this(game, font, parent, Assembly.GetCallingAssembly())
         {
@@ -71,6 +74,7 @@ namespace Myre.Debugging
         /// Initializes a new instance of the <see cref="CommandConsole"/> class.
         /// </summary>
         /// <param name="game">The game.</param>
+        /// <param name="font"></param>
         /// <param name="assemblies">The assemblies containing commands and options to add to this <see cref="CommandConsole"/> instance.</param>
         public CommandConsole(Game game, SpriteFont font, params Assembly[] assemblies)
             : this(game, font, CreateUserInterface(game), assemblies)
@@ -105,7 +109,7 @@ namespace Myre.Debugging
             background = new Texture2D(game.GraphicsDevice, 1, 1);
             background.SetData(new Color[] { Color.Black });
 
-            textBox = new TextBox(this, game, font, "Command Console", "Enter you command");
+            textBox = new TextBox(this, game, font, "Command Console", "Enter your command");
             textBox.SetPoint(Points.Bottom, 0, -3);
             textBox.SetPoint(Points.Left, 3, 0);
             textBox.SetPoint(Points.Right, -3, 0);

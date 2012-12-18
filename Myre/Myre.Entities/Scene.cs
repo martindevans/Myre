@@ -6,6 +6,7 @@ using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Ninject;
+using Ninject.Planning.Bindings;
 
 namespace Myre.Entities
 {
@@ -69,7 +70,7 @@ namespace Myre.Entities
             Kernel = kernel ?? NinjectKernel.Instance; //new ChildKernel(kernel ?? NinjectKernel.Instance);
             Entities = new ReadOnlyCollection<Entity>(entities);
 
-            //this.Kernel.Bind<Scene>().ToConstant(this);
+            Kernel.Bind<Scene>().ToConstant(this);
         }
 
         /// <summary>
@@ -302,16 +303,16 @@ namespace Myre.Entities
 
             if (disposeManagedResources)
             {
+                Kernel.Unbind<Scene>();
+
                 entities.Clear();
 
                 foreach (var manager in managers)
                     manager.Dispose();
-
                 managers.Clear();
 
                 foreach (var service in services)
                     service.Dispose();
-
                 services.Clear();
             }
         }

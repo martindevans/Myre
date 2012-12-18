@@ -20,6 +20,9 @@ namespace Myre.Entities.Extensions
 
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string name, Action<T> action)
         {
+            if (dataProvider == null)
+                return false;
+
             var box = dataProvider.Get<T>(name, false);
             if (box != null)
             {

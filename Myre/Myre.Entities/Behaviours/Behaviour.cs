@@ -74,6 +74,13 @@ namespace Myre.Entities.Behaviours
         }
 
         /// <summary>
+        /// Indicates that this instance has all been initialised
+        /// </summary>
+        protected internal virtual void Initialised()
+        {
+        }
+
+        /// <summary>
         /// Initialises this instance.
         /// </summary>
         /// <param name="context">

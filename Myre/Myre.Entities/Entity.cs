@@ -221,6 +221,11 @@ namespace Myre.Entities
                 if (!item.IsReady)
                     item.Initialise(initialisationData);
             }
+
+            foreach (var item in Behaviours)
+            {
+                item.Initialised();
+            }
         }
 
         /// <summary>

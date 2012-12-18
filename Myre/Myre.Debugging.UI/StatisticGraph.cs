@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.UI.Text;
+using Myre.UI;
 using Myre.UI.Controls;
+using Myre.UI.Text;
 
 namespace Myre.Debugging.Statistics
 {

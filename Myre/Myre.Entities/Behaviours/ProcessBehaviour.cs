@@ -35,6 +35,11 @@ namespace Myre.Entities.Behaviours
 
             void IProcess.Update(float elapsedTime)
             {
+                Update(elapsedTime);
+            }
+
+            protected virtual void Update(float elapsedTime)
+            {
                 foreach (var item in Behaviours)
                 {
                     if (item.Owner != null && !item.Owner.IsDisposed)
