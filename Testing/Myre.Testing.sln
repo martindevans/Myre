@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Serialisation.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "(x86) Myre.Serialisation", "..\Myre\Myre.Serialisation\(x86) Myre.Serialisation.csproj", "{73911D37-4250-40BD-8F15-20824D586319}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Tests", "Myre.Tests\Myre.Tests.csproj", "{523C09C2-B475-4CCC-9CCE-C19B54E4C829}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Myre.Testing.vsmdi
@@ -450,6 +452,24 @@ Global
 		{73911D37-4250-40BD-8F15-20824D586319}.Release|x86.ActiveCfg = Release|x86
 		{73911D37-4250-40BD-8F15-20824D586319}.Release|x86.Build.0 = Release|x86
 		{73911D37-4250-40BD-8F15-20824D586319}.Release|Xbox 360.ActiveCfg = Release|x86
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Xbox 360.ActiveCfg = Debug|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Profile|Any CPU.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Profile|Any CPU.Build.0 = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Profile|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Profile|Mixed Platforms.Build.0 = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Profile|x86.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Profile|Xbox 360.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|x86.ActiveCfg = Release|Any CPU
+		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Xbox 360.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

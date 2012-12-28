@@ -66,6 +66,8 @@ namespace Myre.Graphics.Geometry
 
                 public BoundingSphere Bounds { get; private set; }
 
+                public Matrix WorldView;
+
                 public void UpdateBounds()
                 {
                     Bounds = Mesh.BoundingSphere.Transform(Instance.Transform);
@@ -165,6 +167,11 @@ namespace Myre.Graphics.Geometry
                 foreach (var item in buffer)
                     item.IsVisible = true & !item.Instance.IsInvisible;
 
+                var view = metadata.Get<Matrix>("view");
+                CalculateWorldViews(meshes, ref view.Value);    //Calculate WorldView for all mesh instances
+
+                DepthSortMeshes(meshes);                        //Sort batches by first item in batch
+
                 foreach (var mesh in meshes)
                 {
                     foreach (var instance in mesh.Instances)
@@ -183,6 +190,32 @@ namespace Myre.Graphics.Geometry
                 foreach (var item in buffer)
                     item.IsVisible = false;
                 buffer.Clear();
+            }
+
+            private void DepthSortMeshes(List<MeshRenderData> meshes)
+            {
+                meshes.Sort(RenderDataComparator);
+            }
+
+            private int RenderDataComparator(MeshRenderData a, MeshRenderData b)
+            {
+                if (a.Instances.Count > 0 && b.Instances.Count > 0)
+                    return CompareWorldViews(ref a.Instances[0].WorldView, ref b.Instances[0].WorldView);
+                return a.Instances.Count.CompareTo(b.Instances.Count);
+            }
+
+            private void CalculateWorldViews(List<MeshRenderData> batches, ref Matrix view)
+            {
+                for (int b = 0; b < batches.Count; b++)
+                {
+                    var instances = batches[b].Instances;
+                    for (int i = 0; i < instances.Count; i++)
+                    {
+                        var instance = instances[i];
+                        Matrix world = instance.Instance.Transform;
+                        Matrix.Multiply(ref world, ref view, out instance.WorldView);
+                    }
+                }
             }
 
             private void QueryVisible(BoundingVolume volume, List<MeshInstance> instances)
@@ -212,10 +245,11 @@ namespace Myre.Graphics.Geometry
                 device.Indices = mesh.IndexBuffer;
 
                 var world = metadata.Get<Matrix>("world");
-                var view = metadata.Get<Matrix>("view");
                 var projection = metadata.Get<Matrix>("projection");
                 var worldView = metadata.Get<Matrix>("worldview");
                 var worldViewProjection = metadata.Get<Matrix>("worldviewprojection");
+
+                DepthSortInstances(visibleInstances);
 
                 int maxPrimitives = device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
 
@@ -224,7 +258,7 @@ namespace Myre.Graphics.Geometry
                     var instance = visibleInstances[i];
 
                     world.Value = instance.Instance.Transform;
-                    Matrix.Multiply(ref world.Value, ref view.Value, out worldView.Value);
+                    worldView.Value = instance.WorldView;
                     Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
 
                     foreach (var pass in data.Material.Begin(metadata))
@@ -253,6 +287,23 @@ namespace Myre.Graphics.Geometry
 #endif
                     }
                 }
+            }
+
+            private void DepthSortInstances(List<MeshInstance> instances)
+            {
+                if (instances.Count > 1)
+                    instances.Sort(InstanceComparator);
+            }
+
+            private int InstanceComparator(MeshInstance a, MeshInstance b)
+            {
+                return CompareWorldViews(ref a.WorldView, ref b.WorldView);
+            }
+
+            public static int CompareWorldViews(ref Matrix worldViewA, ref Matrix worldViewB)
+            {
+                //Negated, because XNA uses a negative Z space
+                return -worldViewA.Translation.Z.CompareTo(worldViewB.Translation.Z);
             }
 
             private List<MeshInstance> GetInstanceList(Mesh mesh)
