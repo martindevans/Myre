@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Myre.Entities;
-using Myre.Collections;
 using Microsoft.Xna.Framework;
-using Myre.Graphics.Materials;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Collections;
 using Myre.Debugging.Statistics;
+using Myre.Entities;
+using Myre.Entities.Behaviours;
+using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Geometry
 {
@@ -19,6 +17,7 @@ namespace Myre.Graphics.Geometry
         private Property<ModelData> model;
         private Property<Matrix> transform;
         private Property<bool> isStatic;
+        private Property<bool> isHidden;
 
         public ModelData Model
         {
@@ -38,11 +37,18 @@ namespace Myre.Graphics.Geometry
             set { isStatic.Value = value; }
         }
 
+        public bool IsInvisible
+        {
+            get { return isHidden.Value; }
+            set { isHidden.Value = value; }
+        }
+
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.model = context.CreateProperty<ModelData>("model");
-            this.transform = context.CreateProperty<Matrix>("transform");
-            this.isStatic = context.CreateProperty<bool>("is_static");
+            model = context.CreateProperty<ModelData>("model");
+            transform = context.CreateProperty<Matrix>("transform");
+            isStatic = context.CreateProperty<bool>("is_static");
+            isHidden = context.CreateProperty<bool>("is_invisible");
 
             base.CreateProperties(context);
         }
@@ -74,36 +80,36 @@ namespace Myre.Graphics.Geometry
             }
 
 #if PROFILE
-            private static Statistic polysDrawnStat = Statistic.Get("Graphics.Primitives");
-            private static Statistic drawsStat = Statistic.Get("Graphics.Draws");
+            private static readonly Statistic polysDrawnStat = Statistic.Get("Graphics.Primitives");
+            private static readonly Statistic drawsStat = Statistic.Get("Graphics.Draws");
 #endif
 
-            private GraphicsDevice device;
-            private Pool<MeshInstance> meshInstancePool;
-            private Dictionary<Mesh, List<MeshInstance>> instances;
-            private Dictionary<string, List<MeshRenderData>> phases;
-            private List<MeshInstance> dynamicMeshInstances;
+            private readonly GraphicsDevice device;
+            private readonly Pool<MeshInstance> meshInstancePool;
+            private readonly Dictionary<Mesh, List<MeshInstance>> instances;
+            private readonly Dictionary<string, List<MeshRenderData>> phases;
+            private readonly List<MeshInstance> dynamicMeshInstances;
             private List<MeshInstance> staticMeshInstances;
-            private List<MeshInstance> buffer;
-            private List<MeshInstance> visibleInstances;
-            private List<ICullable> cullableBuffer;
-            private BoundingVolume bounds;
-            private Octree octree;
+            private readonly List<MeshInstance> buffer;
+            private readonly List<MeshInstance> visibleInstances;
+            private readonly List<ICullable> cullableBuffer;
+            private readonly BoundingVolume bounds;
+            private readonly Octree octree;
 
             public Manager(
                 GraphicsDevice device)
             {
                 this.device = device;
-                this.meshInstancePool = new Pool<MeshInstance>();
-                this.instances = new Dictionary<Mesh, List<MeshInstance>>();
-                this.phases = new Dictionary<string, List<MeshRenderData>>();
-                this.dynamicMeshInstances = new List<MeshInstance>();
-                this.staticMeshInstances = new List<MeshInstance>();
-                this.buffer = new List<MeshInstance>();
-                this.visibleInstances = new List<MeshInstance>();
-                this.cullableBuffer = new List<ICullable>();
-                this.bounds = new BoundingVolume();
-                this.octree = new Octree();
+                meshInstancePool = new Pool<MeshInstance>();
+                instances = new Dictionary<Mesh, List<MeshInstance>>();
+                phases = new Dictionary<string, List<MeshRenderData>>();
+                dynamicMeshInstances = new List<MeshInstance>();
+                staticMeshInstances = new List<MeshInstance>();
+                buffer = new List<MeshInstance>();
+                visibleInstances = new List<MeshInstance>();
+                cullableBuffer = new List<ICullable>();
+                bounds = new BoundingVolume();
+                octree = new Octree();
             }
 
             public override void Add(ModelInstance behaviour)
@@ -157,7 +163,7 @@ namespace Myre.Graphics.Geometry
                 QueryVisible(bounds, buffer);
 
                 foreach (var item in buffer)
-                    item.IsVisible = true;
+                    item.IsVisible = true & !item.Instance.IsInvisible;
 
                 foreach (var mesh in meshes)
                 {
@@ -179,16 +185,13 @@ namespace Myre.Graphics.Geometry
                 buffer.Clear();
             }
 
-            private void QueryVisible(BoundingVolume volume, List<MeshInstance> instances, bool detailedCheck = false)
+            private void QueryVisible(BoundingVolume volume, List<MeshInstance> instances)
             {
-                if (detailedCheck)
-                    throw new NotImplementedException();
-
                 cullableBuffer.Clear();
                 octree.Query(cullableBuffer, volume);
                 foreach (var item in cullableBuffer)
                 {
-                    var instance = item as MeshInstance;
+                    var instance = (MeshInstance)item;
                     instance.UpdateBounds();
                     if (volume.Intersects(instance.Bounds))
                         instances.Add(item as MeshInstance);
