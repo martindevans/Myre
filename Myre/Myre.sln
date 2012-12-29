@@ -60,6 +60,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "(360) Myre.Physics2", "Myre.Physics2D\(360) Myre.Physics2.csproj", "{F47B81C7-36F7-4DD5-9437-EDEE749E8A30}"
 EndProject
 Global
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = baae5246-fe01-4f58-b258-9992ddf2bf95
+	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Myre.vsmdi
 	EndGlobalSection

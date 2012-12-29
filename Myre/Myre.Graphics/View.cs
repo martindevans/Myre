@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Myre.Entities;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Myre.Entities;
+using Myre.Entities.Behaviours;
 
 namespace Myre.Graphics
 {
@@ -30,24 +27,11 @@ namespace Myre.Graphics
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.camera = context.CreateProperty<Camera>("camera");
-            this.viewport = context.CreateProperty<Viewport>("viewport");
+            camera = context.CreateProperty<Camera>("camera");
+            viewport = context.CreateProperty<Viewport>("viewport");
 
             base.CreateProperties(context);
         }
-
-        /*
-        public Property<Camera> Camera { get; private set; }
-        public Property<Viewport> Viewport { get; private set; }
-
-        public View(
-            Property<Camera> camera,
-            Property<Viewport> viewport)
-        {
-            this.Camera = camera;
-            this.Viewport = viewport;
-        }
-        */
 
         public void SetMetadata(RendererMetadata metadata)
         {

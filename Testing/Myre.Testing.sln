@@ -53,6 +53,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Tests", "Myre.Tests\Myre.Tests.csproj", "{523C09C2-B475-4CCC-9CCE-C19B54E4C829}"
 EndProject
 Global
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 20c0e23c-715a-46d9-b3da-81a12e264c29
+	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Myre.Testing.vsmdi
 	EndGlobalSection
