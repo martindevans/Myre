@@ -1,16 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Geometry
 {
-    public class ModelData
+    public sealed class ModelData
+        :IDisposable
     {
         public Mesh[] Meshes { get; set; }
         //public ModelBone[] Skeleton { get; set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (Meshes != null)
+                        foreach (var mesh in Meshes)
+                            mesh.Dispose();
+                    Meshes = null;
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~ModelData()
+        {
+            Dispose(false);
+        }
     }
 
     public class ModelReader : ContentTypeReader<ModelData>

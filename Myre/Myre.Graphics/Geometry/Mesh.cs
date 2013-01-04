@@ -10,6 +10,7 @@ using Myre.Graphics.Materials;
 namespace Myre.Graphics.Geometry
 {
     public class Mesh
+        :IDisposable
     {
         public string Name { get; set; }
         public int TriangleCount { get; set; }
@@ -22,6 +23,37 @@ namespace Myre.Graphics.Geometry
         public int BaseVertex { get; set; }
         public int MinVertexIndex { get; set; }
         //public ModelBone ParentBone { get; set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (VertexBuffer != null)
+                        VertexBuffer.Dispose();
+                    VertexBuffer = null;
+
+                    if (IndexBuffer != null)
+                        IndexBuffer.Dispose();
+                    IndexBuffer = null;
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~Mesh()
+        {
+            Dispose(false);
+        }
     }
 
     public class MeshReader : ContentTypeReader<Mesh>

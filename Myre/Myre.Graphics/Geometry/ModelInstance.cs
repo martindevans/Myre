@@ -17,7 +17,7 @@ namespace Myre.Graphics.Geometry
         private Property<ModelData> model;
         private Property<Matrix> transform;
         private Property<bool> isStatic;
-        private Property<bool> isHidden;
+        private Property<bool> isInvisible;
 
         public ModelData Model
         {
@@ -39,16 +39,18 @@ namespace Myre.Graphics.Geometry
 
         public bool IsInvisible
         {
-            get { return isHidden.Value; }
-            set { isHidden.Value = value; }
+            get { return isInvisible.Value; }
+            set { isInvisible.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            model = context.CreateProperty<ModelData>("model");
-            transform = context.CreateProperty<Matrix>("transform");
-            isStatic = context.CreateProperty<bool>("is_static");
-            isHidden = context.CreateProperty<bool>("is_invisible");
+            var append = (Name == null ? "" : "_" + Name);
+
+            model = context.CreateProperty<ModelData>("model" + append);
+            transform = context.CreateProperty<Matrix>("transform" + append);
+            isStatic = context.CreateProperty<bool>("is_static" + append);
+            isInvisible = context.CreateProperty<bool>("is_invisible" + append);
 
             base.CreateProperties(context);
         }

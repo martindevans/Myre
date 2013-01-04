@@ -9,6 +9,8 @@ namespace Myre.Entities
 {
     public delegate void PropertySetDelegate<T>(Property<T> property, T oldValue, T newValue);
 
+    public delegate void PropertySetDelegate(IProperty property, object oldValue, object newValue);
+
     /// <summary>
     /// Base class for generically typed properties
     /// </summary>
@@ -36,6 +38,11 @@ namespace Myre.Entities
         /// Set the value to the default value and remove all events from PropertyChanged
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// Event triggered whenever the property value changes
+        /// </summary>
+        event PropertySetDelegate PropertySet;
     }
 
     /// <summary>
@@ -103,6 +110,8 @@ namespace Myre.Entities
         {
             if (PropertySet != null)
                 PropertySet(this, oldValue, Value);
+            if (_propertySet != null)
+                _propertySet(this, oldValue, Value);
         }
 
         public override string ToString()
@@ -110,6 +119,13 @@ namespace Myre.Entities
             if (Value == null)
                 return "null";
             return Value.ToString();
+        }
+
+        private event PropertySetDelegate _propertySet;
+        event PropertySetDelegate IProperty.PropertySet
+        {
+            add { _propertySet += value; }
+            remove { _propertySet -= value; }
         }
     }
 }
