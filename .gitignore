@@ -33,4 +33,6 @@
 /Testing/Myre.Entities.Tests/bin
 /Testing/Myre.Entities.Tests/obj
 /Testing/TestResults
+/Testing/Myre.Tests/bin
+/Testing/Myre.Tests/obj
 _Resharper.*
