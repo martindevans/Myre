@@ -14,12 +14,12 @@ namespace Myre.Graphics.Geometry
     public class ModelInstance
         : Behaviour
     {
-        private Property<ModelData> model;
+        private Property<IModelData> model;
         private Property<Matrix> transform;
         private Property<bool> isStatic;
         private Property<bool> isInvisible;
 
-        public ModelData Model
+        public IModelData Model
         {
             get { return model.Value; }
             set { model.Value = value; }
@@ -43,16 +43,66 @@ namespace Myre.Graphics.Geometry
             set { isInvisible.Value = value; }
         }
 
+        internal event Action<ModelInstance> ModelDataChanged;
+        internal event Action<ModelInstance, IEnumerable<Mesh>> ModelMeshesAdded;
+        internal event Action<ModelInstance, IEnumerable<Mesh>> ModelMeshesRemoved;
+
+        private void MeshesAdded(IModelData data, IEnumerable<Mesh> meshes)
+        {
+            ModelMeshesAdded(this, meshes);
+        }
+
+        private void MeshesRemoved(IModelData data, IEnumerable<Mesh> meshes)
+        {
+            ModelMeshesRemoved(this, meshes);
+        }
+
+        private void HookEvents(IModelData data)
+        {
+            if (data == null)
+                return;
+            data.MeshesAdded += MeshesAdded;
+            data.MeshesRemoved += MeshesRemoved;
+        }
+
+        private void UnhookEvents(IModelData data)
+        {
+            if (data == null)
+                return;
+            data.MeshesAdded -= MeshesAdded;
+            data.MeshesRemoved -= MeshesRemoved;
+        }
+
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             var append = (Name == null ? "" : "_" + Name);
 
-            model = context.CreateProperty<ModelData>("model" + append);
+            model = context.CreateProperty<IModelData>("model" + append);
             transform = context.CreateProperty<Matrix>("transform" + append);
             isStatic = context.CreateProperty<bool>("is_static" + append);
             isInvisible = context.CreateProperty<bool>("is_invisible" + append);
 
             base.CreateProperties(context);
+        }
+
+        public override void Initialise(INamedDataProvider initialisationData)
+        {
+            HookEvents(model.Value);
+            model.PropertySet += (p, o, n) =>
+            {
+                UnhookEvents(o);
+                HookEvents(n);
+                ModelDataChanged(this);
+            };
+
+            base.Initialise(initialisationData);
+        }
+
+        public override void Shutdown(INamedDataProvider shutdownData)
+        {
+            UnhookEvents(model.Value);
+
+            base.Shutdown(shutdownData);
         }
 
 
@@ -118,39 +168,67 @@ namespace Myre.Graphics.Geometry
 
             public override void Add(ModelInstance behaviour)
             {
-                foreach (var mesh in behaviour.Model.Meshes)
-                {
-                    var instance = meshInstancePool.Get();
-                    instance.Mesh = mesh;
-                    instance.Instance = behaviour;
-                    instance.IsVisible = false;
-                    
-                    GetInstanceList(mesh).Add(instance);
-                    dynamicMeshInstances.Add(instance);
-                    //instance.UpdateBounds();
-                    //octree.Add(instance);
-                }
+                MeshesAdded(behaviour, behaviour.Model.Meshes);
+                behaviour.ModelDataChanged += Changed;
+                behaviour.ModelMeshesAdded += MeshesAdded;
+                behaviour.ModelMeshesAdded += MeshesRemoved;
 
                 base.Add(behaviour);
             }
 
-            public override bool Remove(ModelInstance behaviour)
+            private void Changed(ModelInstance instance)
             {
-                foreach (var mesh in behaviour.Model.Meshes)
+                Remove(instance);
+                Add(instance);
+            }
+
+            private void AddMesh(ModelInstance behaviour, Mesh mesh)
+            {
+                var instance = meshInstancePool.Get();
+                instance.Mesh = mesh;
+                instance.Instance = behaviour;
+                instance.IsVisible = false;
+
+                GetInstanceList(mesh).Add(instance);
+                dynamicMeshInstances.Add(instance);
+                //instance.UpdateBounds();
+                //octree.Add(instance);
+            }
+
+            private void MeshesAdded(ModelInstance modelInstance, IEnumerable<Mesh> added)
+            {
+                foreach (var mesh in added)
+                    AddMesh(modelInstance, mesh);
+            }
+
+            private void RemoveMesh(ModelInstance behaviour, Mesh mesh)
+            {
+                var instances = GetInstanceList(mesh);
+                for (int i = 0; i < instances.Count; i++)
                 {
-                    var instances = GetInstanceList(mesh);
-                    for (int i = 0; i < instances.Count; i++)
+                    if (instances[i].Instance == behaviour)
                     {
-                        if (instances[i].Instance == behaviour)
-                        {
-                            dynamicMeshInstances.Remove(instances[i]);
-                            //octree.Remove(instances[i]);
-                            meshInstancePool.Return(instances[i]);
-                            instances.RemoveAt(i);
-                            break;
-                        }
+                        dynamicMeshInstances.Remove(instances[i]);
+                        //octree.Remove(instances[i]);
+                        meshInstancePool.Return(instances[i]);
+                        instances.RemoveAt(i);
+                        break;
                     }
                 }
+            }
+
+            private void MeshesRemoved(ModelInstance modelInstance, IEnumerable<Mesh> removed)
+            {
+                foreach (var mesh in removed)
+                    RemoveMesh(modelInstance, mesh);
+            }
+
+            public override bool Remove(ModelInstance behaviour)
+            {
+                MeshesRemoved(behaviour, behaviour.Model.Meshes);
+                behaviour.ModelDataChanged -= Changed;
+                behaviour.ModelMeshesAdded -= MeshesAdded;
+                behaviour.ModelMeshesRemoved -= MeshesRemoved;
 
                 return base.Remove(behaviour);
             }
@@ -167,7 +245,7 @@ namespace Myre.Graphics.Geometry
                 QueryVisible(bounds, buffer);
 
                 foreach (var item in buffer)
-                    item.IsVisible = true & !item.Instance.IsInvisible;
+                    item.IsVisible = !item.Instance.IsInvisible;
 
                 var view = metadata.Get<Matrix>("view");
                 CalculateWorldViews(meshes, ref view.Value);    //Calculate WorldView for all mesh instances

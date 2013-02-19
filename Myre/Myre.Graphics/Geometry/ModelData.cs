@@ -1,13 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Geometry
 {
-    public sealed class ModelData
+    public interface IModelData
         :IDisposable
     {
-        public Mesh[] Meshes { get; set; }
-        //public ModelBone[] Skeleton { get; set; }
+        IEnumerable<Mesh> Meshes { get; }
+
+        event Action<IModelData, IEnumerable<Mesh>> MeshesAdded;
+        event Action<IModelData, IEnumerable<Mesh>> MeshesRemoved;
+    }
+
+    public sealed class ModelData
+        :IModelData
+    {
+        private readonly Mesh[] _meshes;
+        public IEnumerable<Mesh> Meshes
+        {
+            get { return _meshes; }
+        }
+
+        public event Action<IModelData, IEnumerable<Mesh>> MeshesAdded;
+        public event Action<IModelData, IEnumerable<Mesh>> MeshesRemoved;
+
+        public ModelData(Mesh[] meshes)
+        {
+            _meshes = meshes;
+        }
 
         public void Dispose()
         {
@@ -19,18 +40,25 @@ namespace Myre.Graphics.Geometry
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (_disposed)
+                return;
+
+            if (disposing)
             {
-                if (disposing)
+                if (Meshes != null)
                 {
-                    if (Meshes != null)
-                        foreach (var mesh in Meshes)
-                            mesh.Dispose();
-                    Meshes = null;
+                    for (int i = 0; i < _meshes.Length; i++)
+                    {
+                        _meshes[i].Dispose();
+                        _meshes[i] = null;
+                    }
                 }
 
-                _disposed = true;
+                MeshesAdded = null;
+                MeshesRemoved = null;
             }
+
+            _disposed = true;
         }
 
         ~ModelData()
@@ -43,17 +71,12 @@ namespace Myre.Graphics.Geometry
     {
         protected override ModelData Read(ContentReader input, ModelData existingInstance)
         {
-            var model = existingInstance ?? new ModelData();
-
             var size = input.ReadInt32();
-            model.Meshes = new Mesh[size];
+            var meshes = new Mesh[size];
             for (int i = 0; i < size; i++)
-                model.Meshes[i] = input.ReadObject<Mesh>();
+                meshes[i] = input.ReadObject<Mesh>();
 
-            //size = input.ReadInt32();
-            //model.Skeleton = new ModelBone[size];
-            //for (int i = 0; i < size; i++)
-            //    model.Skeleton[i] = input.ReadObject<ModelBone>();
+            var model = existingInstance ?? new ModelData(meshes);
 
             return model;
         }
