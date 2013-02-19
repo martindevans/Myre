@@ -4,30 +4,35 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Geometry
 {
-    public interface IModelData
+    public sealed class ModelData
         :IDisposable
     {
-        IEnumerable<Mesh> Meshes { get; }
-
-        event Action<IModelData, IEnumerable<Mesh>> MeshesAdded;
-        event Action<IModelData, IEnumerable<Mesh>> MeshesRemoved;
-    }
-
-    public sealed class ModelData
-        :IModelData
-    {
-        private readonly Mesh[] _meshes;
+        private readonly List<Mesh> _meshes;
         public IEnumerable<Mesh> Meshes
         {
             get { return _meshes; }
         }
 
-        public event Action<IModelData, IEnumerable<Mesh>> MeshesAdded;
-        public event Action<IModelData, IEnumerable<Mesh>> MeshesRemoved;
+        public event Action<ModelData, Mesh> MeshAdded;
+        public event Action<ModelData, Mesh> MeshRemoved;
 
-        public ModelData(Mesh[] meshes)
+        public ModelData(IEnumerable<Mesh> meshes)
         {
-            _meshes = meshes;
+            _meshes = new List<Mesh>(meshes);
+        }
+
+        public void Add(Mesh m)
+        {
+            _meshes.Add(m);
+            MeshAdded(this, m);
+        }
+
+        public bool Remove(Mesh m)
+        {
+            bool removed = _meshes.Remove(m);
+            if (removed)
+                MeshRemoved(this, m);
+            return removed;
         }
 
         public void Dispose()
@@ -47,15 +52,15 @@ namespace Myre.Graphics.Geometry
             {
                 if (Meshes != null)
                 {
-                    for (int i = 0; i < _meshes.Length; i++)
+                    for (int i = 0; i < _meshes.Count; i++)
                     {
                         _meshes[i].Dispose();
                         _meshes[i] = null;
                     }
                 }
 
-                MeshesAdded = null;
-                MeshesRemoved = null;
+                MeshAdded = null;
+                MeshRemoved = null;
             }
 
             _disposed = true;

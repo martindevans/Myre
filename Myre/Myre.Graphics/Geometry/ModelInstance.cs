@@ -14,81 +14,81 @@ namespace Myre.Graphics.Geometry
     public class ModelInstance
         : Behaviour
     {
-        private Property<IModelData> model;
-        private Property<Matrix> transform;
-        private Property<bool> isStatic;
-        private Property<bool> isInvisible;
+        private Property<ModelData> _model;
+        private Property<Matrix> _transform;
+        private Property<bool> _isStatic;
+        private Property<bool> _isInvisible;
 
-        public IModelData Model
+        public ModelData Model
         {
-            get { return model.Value; }
-            set { model.Value = value; }
+            get { return _model.Value; }
+            set { _model.Value = value; }
         }
 
         public Matrix Transform
         {
-            get { return transform.Value; }
-            set { transform.Value = value; }
+            get { return _transform.Value; }
+            set { _transform.Value = value; }
         }
 
         public bool IsStatic
         {
-            get { return isStatic.Value; }
-            set { isStatic.Value = value; }
+            get { return _isStatic.Value; }
+            set { _isStatic.Value = value; }
         }
 
         public bool IsInvisible
         {
-            get { return isInvisible.Value; }
-            set { isInvisible.Value = value; }
+            get { return _isInvisible.Value; }
+            set { _isInvisible.Value = value; }
         }
 
         internal event Action<ModelInstance> ModelDataChanged;
-        internal event Action<ModelInstance, IEnumerable<Mesh>> ModelMeshesAdded;
-        internal event Action<ModelInstance, IEnumerable<Mesh>> ModelMeshesRemoved;
+        internal event Action<ModelInstance, Mesh> ModelMeshAdded;
+        internal event Action<ModelInstance, Mesh> ModelMeshRemoved;
 
-        private void MeshesAdded(IModelData data, IEnumerable<Mesh> meshes)
+        private void MeshAdded(ModelData data, Mesh mesh)
         {
-            ModelMeshesAdded(this, meshes);
+            ModelMeshAdded(this, mesh);
         }
 
-        private void MeshesRemoved(IModelData data, IEnumerable<Mesh> meshes)
+        private void MeshRemoved(ModelData data, Mesh mesh)
         {
-            ModelMeshesRemoved(this, meshes);
+            ModelMeshRemoved(this, mesh);
         }
 
-        private void HookEvents(IModelData data)
+        private void HookEvents(ModelData data)
         {
             if (data == null)
                 return;
-            data.MeshesAdded += MeshesAdded;
-            data.MeshesRemoved += MeshesRemoved;
+            data.MeshAdded += MeshAdded;
+            data.MeshRemoved += MeshRemoved;
         }
 
-        private void UnhookEvents(IModelData data)
+        private void UnhookEvents(ModelData data)
         {
             if (data == null)
                 return;
-            data.MeshesAdded -= MeshesAdded;
-            data.MeshesRemoved -= MeshesRemoved;
+            data.MeshAdded -= MeshAdded;
+            data.MeshRemoved -= MeshRemoved;
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             var append = (Name == null ? "" : "_" + Name);
 
-            model = context.CreateProperty<IModelData>("model" + append);
-            transform = context.CreateProperty<Matrix>("transform" + append);
-            isStatic = context.CreateProperty<bool>("is_static" + append);
-            isInvisible = context.CreateProperty<bool>("is_invisible" + append);
+            _model = context.CreateProperty<ModelData>("model" + append);
+            _transform = context.CreateProperty<Matrix>("transform" + append);
+            _isStatic = context.CreateProperty<bool>("is_static" + append);
+            _isInvisible = context.CreateProperty<bool>("is_invisible" + append);
 
             base.CreateProperties(context);
         }
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            HookEvents(model.Value);
-            model.PropertySet += (p, o, n) =>
+            HookEvents(_model.Value);
+            _model.PropertySet += (p, o, n) =>
             {
                 UnhookEvents(o);
                 HookEvents(n);
@@ -100,13 +100,15 @@ namespace Myre.Graphics.Geometry
 
         public override void Shutdown(INamedDataProvider shutdownData)
         {
-            UnhookEvents(model.Value);
+            UnhookEvents(_model.Value);
 
             base.Shutdown(shutdownData);
         }
 
 
+// ReSharper disable MemberCanBePrivate.Global
         public class Manager
+// ReSharper restore MemberCanBePrivate.Global
             : BehaviourManager<ModelInstance>, IGeometryProvider
         {
             class MeshInstance
@@ -134,44 +136,38 @@ namespace Myre.Graphics.Geometry
             }
 
 #if PROFILE
-            private static readonly Statistic polysDrawnStat = Statistic.Get("Graphics.Primitives");
-            private static readonly Statistic drawsStat = Statistic.Get("Graphics.Draws");
+            private static readonly Statistic _polysDrawnStat = Statistic.Get("Graphics.Primitives");
+            private static readonly Statistic _drawsStat = Statistic.Get("Graphics.Draws");
 #endif
 
-            private readonly GraphicsDevice device;
-            private readonly Pool<MeshInstance> meshInstancePool;
-            private readonly Dictionary<Mesh, List<MeshInstance>> instances;
-            private readonly Dictionary<string, List<MeshRenderData>> phases;
-            private readonly List<MeshInstance> dynamicMeshInstances;
-            private List<MeshInstance> staticMeshInstances;
-            private readonly List<MeshInstance> buffer;
-            private readonly List<MeshInstance> visibleInstances;
-            private readonly List<ICullable> cullableBuffer;
-            private readonly BoundingVolume bounds;
-            private readonly Octree octree;
+            private readonly GraphicsDevice _device;
+            private readonly Pool<MeshInstance> _meshInstancePool;
+            private readonly Dictionary<Mesh, List<MeshInstance>> _instances;
+            private readonly Dictionary<string, List<MeshRenderData>> _phases;
+            private readonly List<MeshInstance> _dynamicMeshInstances;
+            private readonly List<MeshInstance> _buffer;
+            private readonly List<MeshInstance> _visibleInstances;
+            private readonly BoundingVolume _bounds;
 
             public Manager(
                 GraphicsDevice device)
             {
-                this.device = device;
-                meshInstancePool = new Pool<MeshInstance>();
-                instances = new Dictionary<Mesh, List<MeshInstance>>();
-                phases = new Dictionary<string, List<MeshRenderData>>();
-                dynamicMeshInstances = new List<MeshInstance>();
-                staticMeshInstances = new List<MeshInstance>();
-                buffer = new List<MeshInstance>();
-                visibleInstances = new List<MeshInstance>();
-                cullableBuffer = new List<ICullable>();
-                bounds = new BoundingVolume();
-                octree = new Octree();
+                _device = device;
+                _meshInstancePool = new Pool<MeshInstance>();
+                _instances = new Dictionary<Mesh, List<MeshInstance>>();
+                _phases = new Dictionary<string, List<MeshRenderData>>();
+                _dynamicMeshInstances = new List<MeshInstance>();
+                _buffer = new List<MeshInstance>();
+                _visibleInstances = new List<MeshInstance>();
+                _bounds = new BoundingVolume();
             }
 
             public override void Add(ModelInstance behaviour)
             {
                 MeshesAdded(behaviour, behaviour.Model.Meshes);
                 behaviour.ModelDataChanged += Changed;
-                behaviour.ModelMeshesAdded += MeshesAdded;
-                behaviour.ModelMeshesAdded += MeshesRemoved;
+                behaviour.ModelMeshAdded += AddMesh;
+                behaviour.ModelMeshAdded += RemoveMesh;
 
                 base.Add(behaviour);
             }
@@ -184,15 +180,13 @@ namespace Myre.Graphics.Geometry
 
             private void AddMesh(ModelInstance behaviour, Mesh mesh)
             {
-                var instance = meshInstancePool.Get();
+                var instance = _meshInstancePool.Get();
                 instance.Mesh = mesh;
                 instance.Instance = behaviour;
                 instance.IsVisible = false;
 
                 GetInstanceList(mesh).Add(instance);
-                dynamicMeshInstances.Add(instance);
-                //instance.UpdateBounds();
-                //octree.Add(instance);
+                _dynamicMeshInstances.Add(instance);
             }
 
             private void MeshesAdded(ModelInstance modelInstance, IEnumerable<Mesh> added)
@@ -203,15 +197,14 @@ namespace Myre.Graphics.Geometry
 
             private void RemoveMesh(ModelInstance behaviour, Mesh mesh)
             {
-                var instances = GetInstanceList(mesh);
-                for (int i = 0; i < instances.Count; i++)
+                var meshInstances = GetInstanceList(mesh);
+                for (int i = 0; i < meshInstances.Count; i++)
                 {
-                    if (instances[i].Instance == behaviour)
+                    if (meshInstances[i].Instance == behaviour)
                     {
-                        dynamicMeshInstances.Remove(instances[i]);
-                        //octree.Remove(instances[i]);
-                        meshInstancePool.Return(instances[i]);
-                        instances.RemoveAt(i);
+                        _dynamicMeshInstances.Remove(meshInstances[i]);
+                        _meshInstancePool.Return(meshInstances[i]);
+                        meshInstances.RemoveAt(i);
                         break;
                     }
                 }
@@ -227,8 +220,8 @@ namespace Myre.Graphics.Geometry
             {
                 MeshesRemoved(behaviour, behaviour.Model.Meshes);
                 behaviour.ModelDataChanged -= Changed;
-                behaviour.ModelMeshesAdded -= MeshesAdded;
-                behaviour.ModelMeshesRemoved -= MeshesRemoved;
+                behaviour.ModelMeshAdded -= AddMesh;
+                behaviour.ModelMeshRemoved -= RemoveMesh;
 
                 return base.Remove(behaviour);
             }
@@ -236,15 +229,15 @@ namespace Myre.Graphics.Geometry
             public void Draw(string phase, BoxedValueStore<string> metadata)
             {
                 List<MeshRenderData> meshes;
-                if (!phases.TryGetValue(phase, out meshes))
+                if (!_phases.TryGetValue(phase, out meshes))
                     return;
 
                 var viewFrustum = metadata.Get<BoundingFrustum>("viewfrustum").Value;
-                bounds.Clear();
-                bounds.Add(viewFrustum);
-                QueryVisible(bounds, buffer);
+                _bounds.Clear();
+                _bounds.Add(viewFrustum);
+                QueryVisible(_bounds, _buffer);
 
-                foreach (var item in buffer)
+                foreach (var item in _buffer)
                     item.IsVisible = !item.Instance.IsInvisible;
 
                 var view = metadata.Get<Matrix>("view");
@@ -257,19 +250,19 @@ namespace Myre.Graphics.Geometry
                     foreach (var instance in mesh.Instances)
                     {
                         if (instance.IsVisible)
-                            visibleInstances.Add(instance);
+                            _visibleInstances.Add(instance);
                     }
 
-                    if (visibleInstances.Count > 0)
+                    if (_visibleInstances.Count > 0)
                     {
                         DrawMesh(mesh, metadata);
-                        visibleInstances.Clear();
+                        _visibleInstances.Clear();
                     }
                 }
 
-                foreach (var item in buffer)
+                foreach (var item in _buffer)
                     item.IsVisible = false;
-                buffer.Clear();
+                _buffer.Clear();
             }
 
             private void DepthSortMeshes(List<MeshRenderData> meshes)
@@ -288,54 +281,44 @@ namespace Myre.Graphics.Geometry
             {
                 for (int b = 0; b < batches.Count; b++)
                 {
-                    var instances = batches[b].Instances;
-                    for (int i = 0; i < instances.Count; i++)
+                    var meshInstances = batches[b].Instances;
+                    for (int i = 0; i < meshInstances.Count; i++)
                     {
-                        var instance = instances[i];
+                        var instance = meshInstances[i];
                         Matrix world = instance.Instance.Transform;
                         Matrix.Multiply(ref world, ref view, out instance.WorldView);
                     }
                 }
             }
 
-            private void QueryVisible(BoundingVolume volume, List<MeshInstance> instances)
+            private void QueryVisible(BoundingVolume volume, List<MeshInstance> meshInstances)
             {
-                cullableBuffer.Clear();
-                octree.Query(cullableBuffer, volume);
-                foreach (var item in cullableBuffer)
-                {
-                    var instance = (MeshInstance)item;
-                    instance.UpdateBounds();
-                    if (volume.Intersects(instance.Bounds))
-                        instances.Add(item as MeshInstance);
-                }
-
-                foreach (var item in dynamicMeshInstances)
+                foreach (var item in _dynamicMeshInstances)
                 {
                     item.UpdateBounds();
                     if (volume.Intersects(item.Bounds))
-                        instances.Add(item);
+                        meshInstances.Add(item);
                 }
             }
 
             private void DrawMesh(MeshRenderData data, BoxedValueStore<string> metadata)
             {
                 var mesh = data.Mesh;
-                device.SetVertexBuffer(mesh.VertexBuffer);
-                device.Indices = mesh.IndexBuffer;
+                _device.SetVertexBuffer(mesh.VertexBuffer);
+                _device.Indices = mesh.IndexBuffer;
 
                 var world = metadata.Get<Matrix>("world");
                 var projection = metadata.Get<Matrix>("projection");
                 var worldView = metadata.Get<Matrix>("worldview");
                 var worldViewProjection = metadata.Get<Matrix>("worldviewprojection");
 
-                DepthSortInstances(visibleInstances);
+                DepthSortInstances(_visibleInstances);
 
-                int maxPrimitives = device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
+                int maxPrimitives = _device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
 
-                for (int i = 0; i < visibleInstances.Count; i++)
+                for (int i = 0; i < _visibleInstances.Count; i++)
                 {
-                    var instance = visibleInstances[i];
+                    var instance = _visibleInstances[i];
 
                     world.Value = instance.Instance.Transform;
                     worldView.Value = instance.WorldView;
@@ -356,23 +339,23 @@ namespace Myre.Graphics.Geometry
                             int primitiveCount = Math.Min(primitives, maxPrimitives);
                             primitives -= primitiveCount;
 
-                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, mesh.MinVertexIndex, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
+                            _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, mesh.MinVertexIndex, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
 
                             offset += primitiveCount;
                         }
 
 #if PROFILE
-                        polysDrawnStat.Value += mesh.TriangleCount;
-                        drawsStat.Value++;
+                        _polysDrawnStat.Value += mesh.TriangleCount;
+                        _drawsStat.Value++;
 #endif
                     }
                 }
             }
 
-            private void DepthSortInstances(List<MeshInstance> instances)
+            private void DepthSortInstances(List<MeshInstance> meshInstances)
             {
-                if (instances.Count > 1)
-                    instances.Sort(InstanceComparator);
+                if (meshInstances.Count > 1)
+                    meshInstances.Sort(InstanceComparator);
             }
 
             private int InstanceComparator(MeshInstance a, MeshInstance b)
@@ -380,7 +363,7 @@ namespace Myre.Graphics.Geometry
                 return CompareWorldViews(ref a.WorldView, ref b.WorldView);
             }
 
-            public static int CompareWorldViews(ref Matrix worldViewA, ref Matrix worldViewB)
+            private static int CompareWorldViews(ref Matrix worldViewA, ref Matrix worldViewB)
             {
                 //Negated, because XNA uses a negative Z space
                 return -worldViewA.Translation.Z.CompareTo(worldViewB.Translation.Z);
@@ -389,10 +372,10 @@ namespace Myre.Graphics.Geometry
             private List<MeshInstance> GetInstanceList(Mesh mesh)
             {
                 List<MeshInstance> value;
-                if (!instances.TryGetValue(mesh, out value))
+                if (!_instances.TryGetValue(mesh, out value))
                 {
                     value = new List<MeshInstance>();
-                    instances[mesh] = value;
+                    _instances[mesh] = value;
 
                     RegisterMeshParts(mesh, value);
                 }
@@ -400,22 +383,22 @@ namespace Myre.Graphics.Geometry
                 return value;
             }
 
-            private void RegisterMeshParts(Mesh mesh, List<MeshInstance> instances)
+            private void RegisterMeshParts(Mesh mesh, List<MeshInstance> meshInstances)
             {
                 foreach (var material in mesh.Materials)
                 {
                     List<MeshRenderData> data;
-                    if (!phases.TryGetValue(material.Key, out data))
+                    if (!_phases.TryGetValue(material.Key, out data))
                     {
                         data = new List<MeshRenderData>();
-                        phases[material.Key] = data;
+                        _phases[material.Key] = data;
                     }
 
                     data.Add(new MeshRenderData()
                     {
                         Mesh = mesh,
                         Material = material.Value,
-                        Instances = instances
+                        Instances = meshInstances
                     });
                 }
             }
