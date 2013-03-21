@@ -1,42 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Myre;
+﻿using Microsoft.Xna.Framework;
 using Myre.Extensions;
 
-namespace Myre.Graphics
+namespace Myre.Graphics.Geometry
 {
     public class OrientedBoundingBox
     {
-        private BoundingBox bounds;
-        private Matrix transform;
-        private BoundingBox axisAligned;
-        private bool dirty;
+        private BoundingBox _bounds;
+        private Matrix _transform;
+        private BoundingBox _axisAligned;
+        private bool _dirty;
 
         public BoundingBox LocalBounds
         {
-            get { return bounds; }
+            get { return _bounds; }
             set
             {
-                if (bounds != value)
+                if (_bounds != value)
                 {
-                    bounds = value;
-                    dirty = true;
+                    _bounds = value;
+                    _dirty = true;
                 }
             }
         }
 
         public Matrix Transform
         {
-            get { return transform; }
+            get { return _transform; }
             set
             {
-                if (transform != value)
+                if (_transform != value)
                 {
-                    transform = value;
-                    dirty = true;
+                    _transform = value;
+                    _dirty = true;
                 }
             }
         }
@@ -45,15 +40,15 @@ namespace Myre.Graphics
         {
             get
             {
-                if (dirty) Update();
-                return axisAligned;
+                if (_dirty) Update();
+                return _axisAligned;
             }
         }
 
         private void Update()
         {
-            axisAligned = bounds.Transform(ref transform);
-            dirty = false;
+            _axisAligned = _bounds.Transform(ref _transform);
+            _dirty = false;
         }
     }
 }

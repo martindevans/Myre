@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.ObjectModel;
 
 namespace Myre.Graphics
 {
@@ -13,7 +8,7 @@ namespace Myre.Graphics
     public class RenderableComponent
         : RendererComponent
     {
-        private ReadOnlyCollection<IRenderable> renderables;
+        private ReadOnlyCollection<IRenderable> _renderables;
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
@@ -23,13 +18,13 @@ namespace Myre.Graphics
                 context.DefineOutput(resource);
             }
 
-            renderables = renderer.Scene.FindManagers<IRenderable>();
+            _renderables = renderer.Scene.FindManagers<IRenderable>();
             base.Initialise(renderer, context);
         }
 
         public override void Draw(Renderer renderer)
         {
-            foreach (var item in renderables)
+            foreach (var item in _renderables)
                 item.Draw(renderer);
         }
     }

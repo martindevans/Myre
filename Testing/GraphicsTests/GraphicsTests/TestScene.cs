@@ -185,7 +185,7 @@ namespace GraphicsTests
             hebe.AddBehaviour<ModelInstance>();
             var hebeEntity = hebe.Create();
             hebeEntity.GetProperty<ModelData>("model").Value = hebeModel;
-            hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes[0].BoundingSphere.Radius)
+            hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
             hebeEntity.GetProperty<bool>("is_static").Value = true;
@@ -194,7 +194,7 @@ namespace GraphicsTests
             var lightBlocker = hebe.Create();
             hebeTransform = lightBlocker.GetProperty<Matrix>("transform");
             lightBlocker.GetProperty<ModelData>("model").Value = hebeModel;
-            lightBlocker.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes[0].BoundingSphere.Radius)
+            lightBlocker.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
             lightBlocker.GetProperty<bool>("is_static").Value = true;

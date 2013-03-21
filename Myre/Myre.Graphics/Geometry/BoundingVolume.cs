@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Geometry
@@ -9,7 +6,7 @@ namespace Myre.Graphics.Geometry
     public class BoundingVolume
         : List<Plane>
     {
-        private Vector3[] corners = new Vector3[8];
+        private readonly Vector3[] _corners = new Vector3[8];
 
         public BoundingVolume()
         {
@@ -50,7 +47,7 @@ namespace Myre.Graphics.Geometry
             for (int i = 0; i < Count; i++)
             {
                 var plane = this[i];
-                float distance = 0;
+                float distance;
                 plane.DotCoordinate(ref point, out distance);
 
                 if (distance < 0)
@@ -65,7 +62,7 @@ namespace Myre.Graphics.Geometry
             for (int i = 0; i < Count; i++)
             {
                 var plane = this[i];
-                float distance = 0;
+                float distance;
                 Vector3.Dot(ref plane.Normal, ref sphere.Center, out distance);
 
                 if (-plane.D - distance > sphere.Radius)
@@ -102,7 +99,7 @@ namespace Myre.Graphics.Geometry
             for (int i = 0; i < Count; i++)
             {
                 var plane = this[i];
-                float distance = 0;
+                float distance;
                 plane.DotCoordinate(ref sphere.Center, out distance);
 
                 if (distance < sphere.Radius)
@@ -121,17 +118,17 @@ namespace Myre.Graphics.Geometry
         {
             var outside = 0;
 
-            box.GetCorners(corners);
-            for (int i = 0; i < corners.Length; i++)
+            box.GetCorners(_corners);
+            for (int i = 0; i < _corners.Length; i++)
             {
-                if (!Intersects(corners[i]))
+                if (!Intersects(_corners[i]))
                     outside++;
 
                 if (outside > 0 && outside != i)
                     return ContainmentType.Intersects;
             }
 
-            return (outside == corners.Length) ? ContainmentType.Disjoint : ContainmentType.Contains;
+            return (outside == _corners.Length) ? ContainmentType.Disjoint : ContainmentType.Contains;
         }
     }
 }

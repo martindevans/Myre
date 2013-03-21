@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 
@@ -43,6 +39,6 @@ namespace Myre.Graphics.Particles
                                   VertexElementUsage.TextureCoordinate, 1)
         );
 
-        public const int SizeInBytes = 48;
+        public const int SIZE_IN_BYTES = 48;
     }
 }

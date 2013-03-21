@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Myre.Entities;
-using Microsoft.Xna.Framework.Graphics;
 using Ninject;
-using System.Diagnostics;
 
 namespace Myre.Graphics.Particles
 {
     public class EllipsoidParticleEmitter
         : ParticleEmitter
     {
-        private Property<Vector3> position;
-        private Vector3 previousPosition;
-        private Matrix transform;
-        private float time;
-        private Random random;
-        private Vector3 velocity;
-        private Vector3 direction;
-        private Vector3 tangent1;
-        private Vector3 tangent2;
+        private Property<Vector3> _position;
+        private Vector3 _previousPosition;
+        private Matrix _transform;
+        private float _time;
+        private readonly Random _random;
+        private Vector3 _velocity;
+        private Vector3 _direction;
+        private Vector3 _tangent1;
 
         public int Capacity { get; set; }
         public float EmitPerSecond { get; set; }
@@ -42,32 +36,30 @@ namespace Myre.Graphics.Particles
 
         public Vector3 Velocity 
         {
-            get { return velocity; }
+            get { return _velocity; }
             set
             {
-                velocity = value;
+                _velocity = value;
 
-                if (velocity != Vector3.Zero)
+                if (_velocity != Vector3.Zero)
                 {
-                    Vector3.Normalize(ref velocity, out direction);
-                    tangent1 = Vector3.Cross(direction, (velocity == Vector3.Forward) ? Vector3.Up : Vector3.Forward);
-                    tangent2 = Vector3.Cross(direction, tangent1);
+                    Vector3.Normalize(ref _velocity, out _direction);
+                    _tangent1 = Vector3.Cross(_direction, (_velocity == Vector3.Forward) ? Vector3.Up : Vector3.Forward);
                 }
                 else
                 {
-                    direction = Vector3.Up;
-                    tangent1 = Vector3.Forward;
-                    tangent2 = Vector3.Right;
+                    _direction = Vector3.Up;
+                    _tangent1 = Vector3.Forward;
                 }
             }
         }
 
         public Matrix Transform
         {
-            get { return transform; }
+            get { return _transform; }
             set
             {
-                transform = value;
+                _transform = value;
 
                 //if (value != Matrix.Identity && !UsingUniqueSystem)
                 //    Dirty = true;
@@ -77,12 +69,12 @@ namespace Myre.Graphics.Particles
         public EllipsoidParticleEmitter(IKernel kernel)
             : base(kernel)
         {
-            this.random = new Random();
+            _random = new Random();
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.position = context.CreateProperty<Vector3>("position");
+            _position = context.CreateProperty<Vector3>("position");
 
             base.CreateProperties(context);
         }
@@ -93,26 +85,26 @@ namespace Myre.Graphics.Particles
             {
                 CreateParticleSystem();//transform != Matrix.Identity);
                 System.GrowCapacity(Capacity);
-                previousPosition = position.Value;
+                _previousPosition = _position.Value;
                 Dirty = false;
             }
 
-            System.Transform = transform;
+            System.Transform = _transform;
 
             // adapted from particle 3D sample on creators.xna.com
 
-            var emitterVelocity = (position.Value - previousPosition) / dt;
+            var emitterVelocity = (_position.Value - _previousPosition) / dt;
             var baseParticleVelocity = Velocity + emitterVelocity * VelocityBleedThrough;
 
             var timePerParticle = 1f / EmitPerSecond;
 
             // If we had any time left over that we didn't use during the
             // previous update, add that to the current elapsed time.
-            float timeToSpend = time + dt;
+            float timeToSpend = _time + dt;
             float now = timeToSpend;
 
             // Counter for looping over the time interval.
-            float currentTime = -time;
+            float currentTime = -_time;
 
             // Create particles as long as we have a big enough time interval.
             while (timeToSpend > timePerParticle)
@@ -124,7 +116,7 @@ namespace Myre.Graphics.Particles
                 // evenly spaced particles regardless of the object speed, particle
                 // creation frequency, or game update rate.
                 var mu = currentTime / dt;
-                var particlePosition = Vector3.Lerp(previousPosition, position.Value, mu) + RandomPositionOffset();
+                var particlePosition = Vector3.Lerp(_previousPosition, _position.Value, mu) + RandomPositionOffset();
 
                 var randomVector = RandomNormalVector();
                 randomVector.X *= HorizontalVelocityVariance;
@@ -132,11 +124,11 @@ namespace Myre.Graphics.Particles
                 randomVector.Y *= VerticalVelocityVariance;
                 var particleVelocity = baseParticleVelocity + randomVector;
 
-                var particleAngularVelocity = MathHelper.Lerp(MinAngularVelocity, MaxAngularVelocity, (float)random.NextDouble());
-                var particleSize = MathHelper.Lerp(MinStartSize, MaxStartSize, (float)random.NextDouble());
-                var particleStartColour = Color.Lerp(MinStartColour, MaxStartColour, (float)random.NextDouble());
-                var particleEndColour = Color.Lerp(MinEndColour, MaxEndColour, (float)random.NextDouble());
-                var particleLifetime = 1 - MathHelper.Lerp(0, LifetimeVariance, (float)random.NextDouble());
+                var particleAngularVelocity = MathHelper.Lerp(MinAngularVelocity, MaxAngularVelocity, (float)_random.NextDouble());
+                var particleSize = MathHelper.Lerp(MinStartSize, MaxStartSize, (float)_random.NextDouble());
+                var particleStartColour = Color.Lerp(MinStartColour, MaxStartColour, (float)_random.NextDouble());
+                var particleEndColour = Color.Lerp(MinEndColour, MaxEndColour, (float)_random.NextDouble());
+                var particleLifetime = 1 - MathHelper.Lerp(0, LifetimeVariance, (float)_random.NextDouble());
                 particleLifetime *= 1 - (now - currentTime) / (Lifetime * particleLifetime);
 
                 // Create the particle.
@@ -144,40 +136,32 @@ namespace Myre.Graphics.Particles
             }
 
             // Store any time we didn't use, so it can be part of the next update.
-            time = timeToSpend;
-            previousPosition = position.Value;
+            _time = timeToSpend;
+            _previousPosition = _position.Value;
         }
 
         private Vector3 RandomNormalVector()
         {
-            float randomA = (float)random.NextDouble() * 2 - 1;
-            float randomB = (float)random.NextDouble() * 2 - 1;
-            float randomC = (float)random.NextDouble() * 2 - 1;
+            float randomA = (float)_random.NextDouble() * 2 - 1;
+            float randomB = (float)_random.NextDouble() * 2 - 1;
+            float randomC = (float)_random.NextDouble() * 2 - 1;
             var randomVector = Vector3.Normalize(new Vector3(randomA, randomB, randomC));
             return randomVector;
         }
 
         private Vector3 RandomPositionOffset()
         {
-            Vector3 rand;
             Vector3 min;
             Vector3 max;
 
             do
             {
-                rand = RandomNormalVector();
+                Vector3 rand = RandomNormalVector();
                 max = rand * Ellipsoid;
                 min = Vector3.Normalize(max) * MinEmitDistance;
             } while (MinEmitDistance > max.Length());
 
-            return Vector3.Lerp(min, max, (float)random.NextDouble());
-        }
-
-        private float RandomBellCurve()
-        {
-            var rng = (float)random.NextDouble();
-            rng *= rng;
-            return rng * 2 - 1;
+            return Vector3.Lerp(min, max, (float)_random.NextDouble());
         }
     }
 }

@@ -105,14 +105,12 @@
     <Compile Include="Deferred\RestoreDepthPhase.cs" />
     <Compile Include="Deferred\Ssao.cs" />
     <Compile Include="Geometry\BoundingVolume.cs" />
-    <Compile Include="Geometry\IBoxIntersectTester.cs" />
     <Compile Include="Geometry\ICullable.cs" />
     <Compile Include="Geometry\IGeometryProvider.cs" />
     <Compile Include="Geometry\Mesh.cs" />
     <Compile Include="Geometry\MeshPart.cs" />
     <Compile Include="Geometry\ModelData.cs" />
     <Compile Include="Geometry\ModelInstance.cs" />
-    <Compile Include="Geometry\Octree.cs" />
     <Compile Include="Geometry\OrientedBoundingBox.cs" />
     <Compile Include="IRenderable.cs" />
     <Compile Include="Lighting\AmbientLight.cs" />

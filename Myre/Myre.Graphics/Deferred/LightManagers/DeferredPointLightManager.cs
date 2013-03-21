@@ -1,56 +1,49 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
     public class DeferredPointLightManager
             : BehaviourManager<PointLight>, IDirectLight
     {
-        private Material geometryLightingMaterial;
-        private Material quadLightingMaterial;
-        private Quad quad;
-        private Model geometry;
+        private readonly Material _geometryLightingMaterial;
+        private readonly Material _quadLightingMaterial;
+        private readonly Quad _quad;
+        private readonly Model _geometry;
 
-        private List<PointLight> touchesNearPlane;
-        private List<PointLight> touchesBothPlanes;
-        private List<PointLight> doesntTouchNear;
+        private readonly List<PointLight> _touchesNearPlane;
+        private readonly List<PointLight> _touchesBothPlanes;
+        private readonly List<PointLight> _doesntTouchNear;
 
-        private DepthStencilState depthGreater;
-        private DepthStencilState depthLess;
-        private BlendState colourWriteDisable;
-        private DepthStencilState stencilWritePass;
-        private DepthStencilState stencilCheckPass;
+        private readonly DepthStencilState _depthGreater;
+        private readonly DepthStencilState _depthLess;
 
         public DeferredPointLightManager(GraphicsDevice device)
         {
             var effect = Content.Load<Effect>("PointLight");
-            geometryLightingMaterial = new Material(effect.Clone(), "Geometry");
-            quadLightingMaterial = new Material(effect.Clone(), "Quad");
+            _geometryLightingMaterial = new Material(effect.Clone(), "Geometry");
+            _quadLightingMaterial = new Material(effect.Clone(), "Quad");
             
-            geometry = Content.Load<Model>("sphere");
+            _geometry = Content.Load<Model>("sphere");
 
-            quad = new Quad(device);
+            _quad = new Quad(device);
 
-            touchesNearPlane = new List<PointLight>();
-            touchesBothPlanes = new List<PointLight>();
-            doesntTouchNear = new List<PointLight>();
+            _touchesNearPlane = new List<PointLight>();
+            _touchesBothPlanes = new List<PointLight>();
+            _doesntTouchNear = new List<PointLight>();
 
-            depthGreater = new DepthStencilState()
+            _depthGreater = new DepthStencilState()
             {
                 DepthBufferEnable = true,
                 DepthBufferWriteEnable = false,
                 DepthBufferFunction = CompareFunction.GreaterEqual
             };
 
-            depthLess = new DepthStencilState()
+            _depthLess = new DepthStencilState()
             {
                 DepthBufferEnable = true,
                 DepthBufferWriteEnable = false,
@@ -58,16 +51,11 @@ namespace Myre.Graphics.Deferred.LightManagers
             };
         }
 
-        public override void Add(PointLight behaviour)
-        {
-            base.Add(behaviour);
-        }
-
         public void Prepare(Renderer renderer)
         {
-            touchesNearPlane.Clear();
-            touchesBothPlanes.Clear();
-            doesntTouchNear.Clear();
+            _touchesNearPlane.Clear();
+            _touchesBothPlanes.Clear();
+            _doesntTouchNear.Clear();
 
             var frustum = renderer.Data.Get<BoundingFrustum>("viewfrustum").Value;
             
@@ -81,11 +69,11 @@ namespace Myre.Graphics.Deferred.LightManagers
                 var far = bounds.Intersects(frustum.Far) == PlaneIntersectionType.Intersecting;
 
                 if (near && far)
-                    touchesBothPlanes.Add(light);
+                    _touchesBothPlanes.Add(light);
                 else if (near)
-                    touchesNearPlane.Add(light);
+                    _touchesNearPlane.Add(light);
                 else
-                    doesntTouchNear.Add(light);
+                    _doesntTouchNear.Add(light);
             }
         }
 
@@ -96,44 +84,46 @@ namespace Myre.Graphics.Deferred.LightManagers
             var device = renderer.Device;
 
             // set deice for drawing sphere mesh
-            var part = geometry.Meshes[0].MeshParts[0];
+            var part = _geometry.Meshes[0].MeshParts[0];
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
 
             // draw lights which touch near plane
             // back faces, cull those in front of geometry
-            device.DepthStencilState = depthGreater;
+            device.DepthStencilState = _depthGreater;
             device.RasterizerState = RasterizerState.CullClockwise;
-            DrawGeometryLights(touchesNearPlane, metadata, device);
+            DrawGeometryLights(_touchesNearPlane, metadata, device);
 
             // draw lights which touch both planes
             // full screen quad
             device.DepthStencilState = DepthStencilState.None;
             device.RasterizerState = RasterizerState.CullCounterClockwise;
-            foreach (var light in touchesBothPlanes)
+            foreach (var light in _touchesBothPlanes)
             {
-                SetupLight(metadata, quadLightingMaterial, light);
-                quad.Draw(quadLightingMaterial, metadata);
+                SetupLight(metadata, _quadLightingMaterial, light);
+                _quad.Draw(_quadLightingMaterial, metadata);
             }
 
             // draw all other lights
             // front faces, cull those behind geometry
-            device.DepthStencilState = depthLess;
-            DrawGeometryLights(doesntTouchNear, metadata, device);
+            device.DepthStencilState = _depthLess;
+            DrawGeometryLights(_doesntTouchNear, metadata, device);
         }
 
+// ReSharper disable ParameterTypeCanBeEnumerable.Local
         private void DrawGeometryLights(List<PointLight> lights, RendererMetadata metadata, GraphicsDevice device)
+// ReSharper restore ParameterTypeCanBeEnumerable.Local
         {
             foreach (var light in lights)
             {
-                SetupLight(metadata, geometryLightingMaterial, light);
-                DrawGeomery(geometryLightingMaterial, metadata, device);
+                SetupLight(metadata, _geometryLightingMaterial, light);
+                DrawGeomery(_geometryLightingMaterial, metadata, device);
             }
         }
 
         private void DrawGeomery(Material material, RendererMetadata metadata, GraphicsDevice device)
         {
-            var part = geometry.Meshes[0].MeshParts[0];
+            var part = _geometry.Meshes[0].MeshParts[0];
             foreach (var pass in material.Begin(metadata))
             {
                 pass.Apply();
@@ -153,7 +143,7 @@ namespace Myre.Graphics.Deferred.LightManagers
                 material.Parameters["Range"].SetValue(light.Range);
             }
 
-            var world = Matrix.CreateScale(light.Range / geometry.Meshes[0].BoundingSphere.Radius)
+            var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
                         * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
             Matrix.Multiply(ref world, ref metadata.Get<Matrix>("view").Value, out metadata.Get<Matrix>("worldview").Value);

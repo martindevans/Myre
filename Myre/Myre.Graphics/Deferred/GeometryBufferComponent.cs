@@ -1,29 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics.Materials;
-using Myre.Collections;
-using Myre.Graphics.PostProcessing;
 using Myre.Graphics.Geometry;
+using Myre.Graphics.Materials;
+using Myre.Graphics.PostProcessing;
 
 namespace Myre.Graphics.Deferred
 {
     public class GeometryBufferComponent
         : RendererComponent
     {
-        private Resample scale;
-        private Material clear;
-        private Quad quad;
+        private readonly Resample _scale;
+        private readonly Material _clear;
+        private readonly Quad _quad;
 
         public GeometryBufferComponent(GraphicsDevice device)
         {
-            clear = new Material(Content.Load<Effect>("ClearGBuffer"));
-            scale = new Resample(device);
-            quad = new Quad(device);
+            _clear = new Material(Content.Load<Effect>("ClearGBuffer"));
+            _scale = new Resample(device);
+            _quad = new Quad(device);
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
@@ -55,7 +49,7 @@ namespace Myre.Graphics.Deferred
             device.Clear(Color.Black);
 
             device.DepthStencilState = DepthStencilState.None;
-            quad.Draw(clear, metadata);
+            _quad.Draw(_clear, metadata);
             device.DepthStencilState = DepthStencilState.Default;
 
             device.BlendState = BlendState.Opaque;
@@ -73,7 +67,7 @@ namespace Myre.Graphics.Deferred
         private void DownsampleDepth(Renderer renderer, RenderTarget2D depth)
         {
             var downsampled = RenderTargetManager.GetTarget(renderer.Device, depth.Width / 2, depth.Height / 2, SurfaceFormat.Single, name:"downsample depth");
-            scale.Scale(depth, downsampled);
+            _scale.Scale(depth, downsampled);
             Output("gbuffer_depth_downsample", downsampled);
         }
     }

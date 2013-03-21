@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
-using Myre.Graphics.Materials;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Entities.Behaviours;
-using Myre.Graphics.Lighting;
-using Ninject;
-using Microsoft.Xna.Framework.Content;
 using Myre.Entities;
+using Myre.Entities.Behaviours;
 using Myre.Graphics.Geometry;
+using Myre.Graphics.Lighting;
+using Myre.Graphics.Materials;
+using Ninject;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -27,38 +24,36 @@ namespace Myre.Graphics.Deferred.LightManagers
             public Matrix Projection;
         }
 
-        private Material material;
-        private Quad quad;
-        private List<ICullable> visibilityResults;
+        private readonly Material _material;
+        private readonly Quad _quad;
 
-        private List<LightData> lights;
+        private readonly List<LightData> _lights;
 
-        private Vector3[] frustumCornersWS;
-        private Vector3[] frustumCornersVS;
-        private View shadowView;
+        private readonly Vector3[] _frustumCornersWs;
+        private readonly Vector3[] _frustumCornersVs;
+        private readonly View _shadowView;
 
         public DeferredSunLightManager(IKernel kernel, GraphicsDevice device)
         {
             var effect = Content.Load<Effect>("DirectionalLight");
-            material = new Material(effect, null);
+            _material = new Material(effect, null);
 
-            quad = new Quad(device);
-            visibilityResults = new List<ICullable>();
+            _quad = new Quad(device);
 
-            lights = new List<LightData>();
+            _lights = new List<LightData>();
 
-            frustumCornersWS = new Vector3[8];
-            frustumCornersVS = new Vector3[8];
+            _frustumCornersWs = new Vector3[8];
+            _frustumCornersVs = new Vector3[8];
 
             var shadowCameraEntity = kernel.Get<EntityDescription>();
             shadowCameraEntity.AddBehaviour<View>();
-            shadowView = shadowCameraEntity.Create().GetBehaviour<View>();
-            shadowView.Camera = new Camera();
+            _shadowView = shadowCameraEntity.Create().GetBehaviour<View>();
+            _shadowView.Camera = new Camera();
         }
 
         public override void Add(SunLight behaviour)
         {
-            lights.Add(new LightData()
+            _lights.Add(new LightData()
             {
                 Light = behaviour,
             });
@@ -70,11 +65,11 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             if (base.Remove(behaviour))
             {
-                for (int i = 0; i < lights.Count; i++)
+                for (int i = 0; i < _lights.Count; i++)
                 {
-                    if (lights[i].Light == behaviour)
+                    if (_lights[i].Light == behaviour)
                     {
-                        lights.RemoveAt(i);
+                        _lights.RemoveAt(i);
                         return true;
                     }
                 }
@@ -84,10 +79,10 @@ namespace Myre.Graphics.Deferred.LightManagers
 
         public void Draw(Renderer renderer)
         {
-            foreach (var light in lights)
+            foreach (var light in _lights)
             {
                 SetupLight(renderer.Data, light);
-                quad.Draw(material, renderer.Data);
+                _quad.Draw(_material, renderer.Data);
             }
         }
 
@@ -95,7 +90,7 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             var light = data.Light;
 
-            if (material != null)
+            if (_material != null)
             {
                 Matrix view = metadata.Get<Matrix>("view").Value;
                 Vector3 direction = light.Direction;
@@ -103,28 +98,28 @@ namespace Myre.Graphics.Deferred.LightManagers
 
                 var shadowsEnabled = light.ShadowResolution > 0;
 
-                material.Parameters["Direction"].SetValue(direction);
-                material.Parameters["Colour"].SetValue(light.Colour);
-                material.Parameters["EnableShadows"].SetValue(shadowsEnabled);
+                _material.Parameters["Direction"].SetValue(direction);
+                _material.Parameters["Colour"].SetValue(light.Colour);
+                _material.Parameters["EnableShadows"].SetValue(shadowsEnabled);
 
                 if (shadowsEnabled)
                 {
-                    material.Parameters["ShadowProjection"].SetValue(metadata.Get<Matrix>("inverseview").Value * data.View * data.Projection);
-                    material.Parameters["ShadowMapSize"].SetValue(new Vector2(light.ShadowResolution, light.ShadowResolution));
-                    material.Parameters["ShadowMap"].SetValue(data.ShadowMap);
-                    material.Parameters["LightFarClip"].SetValue(data.FarClip);
-                    material.Parameters["LightNearPlane"].SetValue(data.NearClip);
+                    _material.Parameters["ShadowProjection"].SetValue(metadata.Get<Matrix>("inverseview").Value * data.View * data.Projection);
+                    _material.Parameters["ShadowMapSize"].SetValue(new Vector2(light.ShadowResolution, light.ShadowResolution));
+                    _material.Parameters["ShadowMap"].SetValue(data.ShadowMap);
+                    _material.Parameters["LightFarClip"].SetValue(data.FarClip);
+                    _material.Parameters["LightNearPlane"].SetValue(data.NearClip);
                 }
             }
         }
 
         public void Prepare(Renderer renderer)
         {
-            renderer.Data.Get<BoundingFrustum>("viewfrustum").Value.GetCorners(frustumCornersWS);
+            renderer.Data.Get<BoundingFrustum>("viewfrustum").Value.GetCorners(_frustumCornersWs);
 
-            for (int i = 0; i < lights.Count; i++)
+            for (int i = 0; i < _lights.Count; i++)
             {
-                var data = lights[i];
+                var data = _lights[i];
                 var light = data.Light;
 
                 light.Direction = Vector3.Normalize(light.Direction);
@@ -149,9 +144,9 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             var min = float.PositiveInfinity;
             var max = float.NegativeInfinity;
-            for (int i = 0; i < frustumCornersWS.Length; i++)
+            for (int i = 0; i < _frustumCornersWs.Length; i++)
             {
-                var projection = Vector3.Dot(frustumCornersWS[i], light.Direction);
+                var projection = Vector3.Dot(_frustumCornersWs[i], light.Direction);
                 min = Math.Min(min, projection);
                 max = Math.Max(max, projection);
             }
@@ -164,9 +159,9 @@ namespace Myre.Graphics.Deferred.LightManagers
             var lightIsVertical = light.Direction == Vector3.Up || light.Direction == Vector3.Down;
             var viewMatrix = Matrix.CreateLookAt(lightPosition, Vector3.Zero, lightIsVertical ? Vector3.Forward : Vector3.Up);
 
-            Vector3.Transform(frustumCornersWS, ref viewMatrix, frustumCornersVS);
+            Vector3.Transform(_frustumCornersWs, ref viewMatrix, _frustumCornersVs);
 
-            var bounds = BoundingSphere.CreateFromPoints(frustumCornersVS);
+            var bounds = BoundingSphere.CreateFromPoints(_frustumCornersVs);
 
             var farClip = max - min;
             var projectionMatrix = Matrix.CreateOrthographicOffCenter(-bounds.Radius, bounds.Radius, -bounds.Radius, bounds.Radius, 0, farClip);
@@ -200,14 +195,14 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             var view = renderer.Data.Get<View>("activeview");
             var previousView = view.Value;
-            view.Value = shadowView;
+            view.Value = _shadowView;
 
-            shadowView.Camera.View = data.View;
-            shadowView.Camera.Projection = data.Projection;
-            shadowView.Camera.NearClip = 1;
-            shadowView.Camera.FarClip = data.FarClip;
-            shadowView.Viewport = new Viewport(0, 0, light.ShadowResolution, light.ShadowResolution);
-            shadowView.SetMetadata(renderer.Data);
+            _shadowView.Camera.View = data.View;
+            _shadowView.Camera.Projection = data.Projection;
+            _shadowView.Camera.NearClip = 1;
+            _shadowView.Camera.FarClip = data.FarClip;
+            _shadowView.Viewport = new Viewport(0, 0, light.ShadowResolution, light.ShadowResolution);
+            _shadowView.SetMetadata(renderer.Data);
 
             foreach (var item in renderer.Scene.FindManagers<IGeometryProvider>())
                 item.Draw("shadows_viewz", renderer.Data);

@@ -1,93 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Microsoft.Xna.Framework;
-using Myre.Entities;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics.Materials;
-using Ninject;
-using Myre.Graphics.Geometry;
-using System.Diagnostics;
-using Myre.Debugging.Statistics;
+using Myre.Entities;
+using Myre.Entities.Behaviours;
 
 namespace Myre.Graphics.Lighting
 {
     public class SpotLight
         : Behaviour
     {
-        private Property<Vector3> colour;
-        private Property<Vector3> position;
-        private Property<Vector3> direction;
-        private Property<float> angle;
-        private Property<float> range;
-        private Property<Texture2D> mask;
-        private Property<int> shadowResolution;
-        private Property<bool> active;
-        private RenderTarget2D shadowMap;
-        private Matrix view;
-        private Matrix projection;
+        private Property<Vector3> _colour;
+        private Property<Vector3> _position;
+        private Property<Vector3> _direction;
+        private Property<float> _angle;
+        private Property<float> _range;
+        private Property<Texture2D> _mask;
+        private Property<int> _shadowResolution;
+        private Property<bool> _active;
 
         public bool Active
         {
-            get { return active.Value; }
-            set { active.Value = value; }
+            get { return _active.Value; }
+            set { _active.Value = value; }
         }
 
         public Vector3 Colour
         {
-            get { return colour.Value; }
-            set { colour.Value = value; }
+            get { return _colour.Value; }
+            set { _colour.Value = value; }
         }
 
         public Vector3 Position
         {
-            get { return position.Value; }
-            set { position.Value = value; }
+            get { return _position.Value; }
+            set { _position.Value = value; }
         }
 
         public Vector3 Direction
         {
-            get { return direction.Value; }
-            set { direction.Value = Vector3.Normalize(value); }
+            get { return _direction.Value; }
+            set { _direction.Value = Vector3.Normalize(value); }
         }
 
         public float Angle
         {
-            get { return angle.Value; }
-            set { angle.Value = value; }
+            get { return _angle.Value; }
+            set { _angle.Value = value; }
         }
 
         public float Range
         {
-            get { return range.Value; }
-            set { range.Value = value; }
+            get { return _range.Value; }
+            set { _range.Value = value; }
         }
 
         public Texture2D Mask
         {
-            get { return mask.Value; }
-            set { mask.Value = value; }
+            get { return _mask.Value; }
+            set { _mask.Value = value; }
         }
 
         public int ShadowResolution
         {
-            get { return shadowResolution.Value; }
-            set { shadowResolution.Value = value; }
+            get { return _shadowResolution.Value; }
+            set { _shadowResolution.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.colour = context.CreateProperty<Vector3>("colour");
-            this.position = context.CreateProperty<Vector3>("position");
-            this.direction = context.CreateProperty<Vector3>("direction");
-            this.angle = context.CreateProperty<float>("angle");
-            this.range = context.CreateProperty<float>("range");
-            this.mask = context.CreateProperty<Texture2D>("mask");
-            this.shadowResolution = context.CreateProperty<int>("shadow_resolution");
-            this.active = context.CreateProperty<bool>("spotlight_active", true);
+            _colour = context.CreateProperty<Vector3>("colour");
+            _position = context.CreateProperty<Vector3>("position");
+            _direction = context.CreateProperty<Vector3>("direction");
+            _angle = context.CreateProperty<float>("angle");
+            _range = context.CreateProperty<float>("range");
+            _mask = context.CreateProperty<Texture2D>("mask");
+            _shadowResolution = context.CreateProperty<int>("shadow_resolution");
+            _active = context.CreateProperty<bool>("spotlight_active", true);
 
             base.CreateProperties(context);
         }

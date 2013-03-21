@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Myre.Entities.Behaviours;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Ninject;
 using Myre.Entities;
+using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
+using Ninject;
 
 namespace Myre.Graphics.Particles
 {
@@ -16,103 +12,102 @@ namespace Myre.Graphics.Particles
     public abstract class ParticleEmitter
         : Behaviour
     {
-        private static Dictionary<ParticleSystemDescription, ParticleSystem> systemsDictionary = new Dictionary<ParticleSystemDescription, ParticleSystem>();
-        private static List<ParticleSystem> systems = new List<ParticleSystem>();
+        private static readonly List<ParticleSystem> _systems = new List<ParticleSystem>();
 
-        private IKernel kernel;
-        private ParticleSystem system;
-        private ParticleSystemDescription description;
-        private bool dirty;
+        private readonly IKernel _kernel;
+        private ParticleSystem _system;
+        private ParticleSystemDescription _description;
+        private bool _dirty;
 
         public bool Enabled { get; set; }
 
         public ParticleType Type
         {
-            get { return description.Type; }
+            get { return _description.Type; }
             set
             {
-                description.Type = value;
-                dirty = true;
+                _description.Type = value;
+                _dirty = true;
             }
         }
 
         public Texture2D Texture
         {
-            get { return description.Texture; }
+            get { return _description.Texture; }
             set
             {
-                description.Texture = value;
-                dirty = true;
+                _description.Texture = value;
+                _dirty = true;
             }
         }
 
         public BlendState BlendState
         {
-            get { return description.BlendState; }
+            get { return _description.BlendState; }
             set
             {
-                description.BlendState = value;
-                dirty = true;
+                _description.BlendState = value;
+                _dirty = true;
             }
         }
 
         public float Lifetime
         {
-            get { return description.Lifetime; }
+            get { return _description.Lifetime; }
             set
             {
-                description.Lifetime = value;
-                dirty = true;
+                _description.Lifetime = value;
+                _dirty = true;
             }
         }
 
         public float EndLinearVelocity
         {
-            get { return description.EndLinearVelocity; }
+            get { return _description.EndLinearVelocity; }
             set
             {
-                description.EndLinearVelocity = value;
-                dirty = true;
+                _description.EndLinearVelocity = value;
+                _dirty = true;
             }
         }
         
         public float EndScale
         {
-            get { return description.EndScale; }
+            get { return _description.EndScale; }
             set
             {
-                description.EndScale = value;
-                dirty = true;
+                _description.EndScale = value;
+                _dirty = true;
             }
         }
 
         public Vector3 Gravity
         {
-            get { return description.Gravity; }
+            get { return _description.Gravity; }
             set
             {
-                description.Gravity = value;
-                dirty = true;
+                _description.Gravity = value;
+                _dirty = true;
             }
         }
 
         protected ParticleSystem System
         {
-            get { return system; }
+            get { return _system; }
         }
 
         protected bool Dirty
         {
-            get { return dirty; }
-            set { dirty = value; }
+            get { return _dirty; }
+            set { _dirty = value; }
         }
 
         protected bool UsingUniqueSystem { get; set; }
 
         public ParticleEmitter(IKernel kernel)
         {
-            this.kernel = kernel;
-            this.dirty = true;
+            _kernel = kernel;
+            _dirty = true;
         }
 
         protected abstract void Update(float dt);
@@ -121,9 +116,9 @@ namespace Myre.Graphics.Particles
         {
             //if (unique)
             //{
-                system = kernel.Get<ParticleSystem>();
-                system.Initialise(description);
-                systems.Add(system);
+                _system = _kernel.Get<ParticleSystem>();
+                _system.Initialise(_description);
+                _systems.Add(_system);
             //}
             //else
             //{
@@ -145,10 +140,6 @@ namespace Myre.Graphics.Particles
         {
             public bool IsComplete { get { return false; } }
 
-            public Manager()
-            {
-            }
-
             public override void Initialise(Scene scene)
             {
                 var processes = scene.GetService<ProcessService>();
@@ -165,7 +156,7 @@ namespace Myre.Graphics.Particles
                         item.Update(elapsedTime);
                 }
 
-                foreach (var item in systems)
+                foreach (var item in _systems)
                 {
                     item.Update(elapsedTime);
                 }
@@ -173,7 +164,7 @@ namespace Myre.Graphics.Particles
 
             public void Draw(Renderer renderer)
             {
-                foreach (var item in systems)
+                foreach (var item in _systems)
                 {
                     item.Draw(renderer.Data);
                 }

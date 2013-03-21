@@ -1,47 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
-using Ninject;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework;
+using Myre.Entities.Behaviours;
 
 namespace Myre.Graphics.Lighting
 {
     public class Skybox
         : Behaviour
     {
-        private Property<TextureCube> texture;
-        private Property<float> brightness;
-        private Property<bool> gammaCorrect;
+        private Property<TextureCube> _texture;
+        private Property<float> _brightness;
+        private Property<bool> _gammaCorrect;
 
         public TextureCube Texture
         {
-            get { return texture.Value; }
-            set { texture.Value = value; }
+            get { return _texture.Value; }
+            set { _texture.Value = value; }
         }
 
         public float Brightness
         {
-            get { return brightness.Value; }
-            set { brightness.Value = value; }
+            get { return _brightness.Value; }
+            set { _brightness.Value = value; }
         }
 
         public bool GammaCorrect
         {
-            get { return gammaCorrect.Value; }
-            set { gammaCorrect.Value = value; }
+            get { return _gammaCorrect.Value; }
+            set { _gammaCorrect.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            this.texture = context.CreateProperty<TextureCube>("texture");
-            this.brightness = context.CreateProperty<float>("brightness");
-            this.gammaCorrect = context.CreateProperty<bool>("gamma_correct");
+            _texture = context.CreateProperty<TextureCube>("texture");
+            _brightness = context.CreateProperty<float>("brightness");
+            _gammaCorrect = context.CreateProperty<bool>("gamma_correct");
 
             base.CreateProperties(context);
         }

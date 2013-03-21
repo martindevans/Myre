@@ -1,34 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Graphics;
-using Myre.Graphics.PostProcessing;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Deferred
 {
     public class Ssao
         : RendererComponent
     {
-        private Material ssaoMaterial;
-        private Material ssaoBlurMaterial;
-        private RenderTarget2D ssao;
-        private Gaussian gaussian;
-        private Quad quad;
+        private readonly Material _ssaoMaterial;
+        private readonly Material _ssaoBlurMaterial;
+        private RenderTarget2D _ssao;
+        private readonly Quad _quad;
 
         public Ssao(GraphicsDevice device)
         {
-            this.ssaoMaterial = new Material(Content.Load<Effect>("SSAO"));
-            this.ssaoBlurMaterial = new Material(Content.Load<Effect>("BlurSSAO"));
+            _ssaoMaterial = new Material(Content.Load<Effect>("SSAO"));
+            _ssaoBlurMaterial = new Material(Content.Load<Effect>("BlurSSAO"));
             Random rand = new Random();
-            this.ssaoMaterial.Parameters["Random"].SetValue(GenerateRandomNormals(device, 4, 4, rand));//content.Load<Texture2D>("randomnormals"));
-            this.ssaoMaterial.Parameters["RandomResolution"].SetValue(4);
-            this.ssaoMaterial.Parameters["Samples"].SetValue(GenerateRandomSamplePositions(16, rand));
-            this.gaussian = new Gaussian(device);
-            this.quad = new Quad(device);
+            _ssaoMaterial.Parameters["Random"].SetValue(GenerateRandomNormals(device, 4, 4, rand));//content.Load<Texture2D>("randomnormals"));
+            _ssaoMaterial.Parameters["RandomResolution"].SetValue(4);
+            _ssaoMaterial.Parameters["Samples"].SetValue(GenerateRandomSamplePositions(16, rand));
+            _quad = new Quad(device);
         }
 
         private Texture2D GenerateRandomNormals(GraphicsDevice device, int width, int height, Random rand)
@@ -106,26 +100,23 @@ namespace Myre.Graphics.Deferred
             //    ssaoMaterial.CurrentTechnique = ssaoMaterial.Techniques["SSGI"];
             //else
             //{
-                if (renderer.Data.Get<bool>("ssao_highquality").Value)
-                    ssaoMaterial.CurrentTechnique = ssaoMaterial.Techniques["HQ_SSAO"];
-                else
-                    ssaoMaterial.CurrentTechnique = ssaoMaterial.Techniques["LQ_SSAO"];
+                _ssaoMaterial.CurrentTechnique = renderer.Data.Get<bool>("ssao_highquality").Value ? _ssaoMaterial.Techniques["HQ_SSAO"] : _ssaoMaterial.Techniques["LQ_SSAO"];
             //}
 
             var unblured = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, surfaceFormat: SurfaceFormat.HalfVector4, name: "ssao unblurred");//, SurfaceFormat.HalfVector4);
             renderer.Device.SetRenderTarget(unblured);
             renderer.Device.Clear(Color.Transparent);
             renderer.Device.BlendState = BlendState.Opaque;
-            quad.Draw(ssaoMaterial, renderer.Data);
+            _quad.Draw(_ssaoMaterial, renderer.Data);
 
-            ssao = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.HalfVector4, name: "ssao");
-            renderer.Device.SetRenderTarget(ssao);
+            _ssao = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.HalfVector4, name: "ssao");
+            renderer.Device.SetRenderTarget(_ssao);
             renderer.Device.Clear(Color.Transparent);
-            ssaoBlurMaterial.Parameters["SSAO"].SetValue(unblured);
-            quad.Draw(ssaoBlurMaterial, renderer.Data);
+            _ssaoBlurMaterial.Parameters["SSAO"].SetValue(unblured);
+            _quad.Draw(_ssaoBlurMaterial, renderer.Data);
             RenderTargetManager.RecycleTarget(unblured);
 
-            Output("ssao", ssao);
+            Output("ssao", _ssao);
         }
     }
 }

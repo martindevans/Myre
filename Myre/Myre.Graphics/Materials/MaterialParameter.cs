@@ -12,9 +12,16 @@ namespace Myre.Graphics.Materials
 {
     struct ParameterType
     {
-        public EffectParameterType Type;
-        public int Rows;
-        public int Columns;
+        public readonly EffectParameterType Type;
+        public readonly int Rows;
+        public readonly int Columns;
+
+        public ParameterType(EffectParameterType type, int columns, int rows)
+        {
+            Type = type;
+            Rows = rows;
+            Columns = columns;
+        }
 
         public override bool Equals(object obj)
         {
@@ -23,9 +30,9 @@ namespace Myre.Graphics.Materials
 
         public bool Equals(ParameterType obj)
         {
-            return this.Type == obj.Type
-                && this.Rows == obj.Rows
-                && this.Columns == obj.Columns;
+            return Type == obj.Type
+                && Rows == obj.Rows
+                && Columns == obj.Columns;
         }
 
         public override int GetHashCode()
@@ -37,7 +44,8 @@ namespace Myre.Graphics.Materials
     public class MaterialParameter
     {
         #region Type Mappings
-        internal static Dictionary<string, Type> SetterTypeMappings = new Dictionary<string, Type>()
+
+        private static readonly Dictionary<string, Type> _setterTypeMappings = new Dictionary<string, Type>
         {
             { typeof(Boolean).Name,   typeof(BooleanMaterialParameterSetter)      },
             { typeof(Texture2D).Name, typeof(Texture2DMaterialParameterSetter)    },
@@ -57,22 +65,24 @@ namespace Myre.Graphics.Materials
             { typeof(Matrix[]).Name,  typeof(MatrixArrayMaterialParameterSetter)  },
         };
 
-        internal static Dictionary<ParameterType, Type> ParameterTypeMappings = new Dictionary<ParameterType, Type>()
+        internal static readonly Dictionary<ParameterType, Type> ParameterTypeMappings = new Dictionary<ParameterType, Type>()
         {
-            { new ParameterType() { Type = EffectParameterType.Bool,    Columns = 1, Rows = 1 },  typeof(Boolean)   },
-            { new ParameterType() { Type = EffectParameterType.Texture, Columns = 0, Rows = 0 },  typeof(Texture2D) },
-            { new ParameterType() { Type = EffectParameterType.Int32,   Columns = 1, Rows = 1 },  typeof(Int32)     },
-            { new ParameterType() { Type = EffectParameterType.Single,  Columns = 1, Rows = 1 },  typeof(Single)    },
-            { new ParameterType() { Type = EffectParameterType.Single,  Columns = 2, Rows = 1 },  typeof(Vector2)   },
-            { new ParameterType() { Type = EffectParameterType.Single,  Columns = 3, Rows = 1 },  typeof(Vector3)   },
-            { new ParameterType() { Type = EffectParameterType.Single,  Columns = 4, Rows = 1 },  typeof(Vector4)   },
-            { new ParameterType() { Type = EffectParameterType.Single,  Columns = 4, Rows = 4 },  typeof(Matrix)    },
-            { new ParameterType() { Type = EffectParameterType.String,  Columns = 0, Rows = 0 },  typeof(String)    }
+            { new ParameterType(EffectParameterType.Bool, 1, 1 ), typeof(Boolean)   },
+            { new ParameterType(EffectParameterType.Texture, 0, 0), typeof(Texture2D) },
+            { new ParameterType(EffectParameterType.Int32, 1, 1), typeof(Int32)     },
+            { new ParameterType(EffectParameterType.Single, 1, 1), typeof(Single)    },
+            { new ParameterType(EffectParameterType.Single, 2, 1), typeof(Vector2)   },
+            { new ParameterType(EffectParameterType.Single, 3, 1), typeof(Vector3)   },
+            { new ParameterType(EffectParameterType.Single, 4, 1), typeof(Vector4)   },
+            { new ParameterType(EffectParameterType.Single, 4, 4), typeof(Matrix)    },
+            { new ParameterType(EffectParameterType.String, 0, 0), typeof(String)    }
         };
         #endregion
 
-        private EffectParameter Parameter;
-        private MaterialParameterSetter setter;
+// ReSharper disable NotAccessedField.Local
+        private EffectParameter _parameter;
+// ReSharper restore NotAccessedField.Local
+        private readonly MaterialParameterSetter _setter;
 
         public MaterialParameter(EffectParameter parameter)
         {
@@ -81,14 +91,14 @@ namespace Myre.Graphics.Materials
             if (string.IsNullOrEmpty(parameter.Semantic))
                 throw new ArgumentException("Material parameters must have a semantic");
 
-            this.Parameter = parameter;
-            this.setter = CreateSetter(parameter);
+            _parameter = parameter;
+            _setter = CreateSetter(parameter);
         }
 
         public void Apply(BoxedValueStore<string> data)
         {
-            if (setter != null)
-                setter.Apply(data);
+            if (_setter != null)
+                _setter.Apply(data);
         }
 
         private static MaterialParameterSetter CreateSetter(EffectParameter parameter)
@@ -96,7 +106,7 @@ namespace Myre.Graphics.Materials
             if (string.IsNullOrEmpty(parameter.Semantic))
                 return null;
 
-            var parameterType = new ParameterType() { Type = parameter.ParameterType, Rows = parameter.RowCount, Columns = parameter.ColumnCount };
+            var parameterType = new ParameterType(parameter.ParameterType, parameter.ColumnCount, parameter.RowCount);
             Type type;
             if (!ParameterTypeMappings.TryGetValue(parameterType, out type))
             {
@@ -105,13 +115,14 @@ namespace Myre.Graphics.Materials
 #endif
             }
 
+            Debug.Assert(type != null, "type != null");
             var typeName = type.Name;
 
             if (parameter.Elements.Count > 0)
                 typeName += "[]";
 
             Type setterType;
-            if (SetterTypeMappings.TryGetValue(typeName, out setterType))
+            if (_setterTypeMappings.TryGetValue(typeName, out setterType))
                 return Activator.CreateInstance(setterType, parameter) as MaterialParameterSetter;
             else
                 return null;
@@ -120,13 +131,13 @@ namespace Myre.Graphics.Materials
 
     abstract class MaterialParameterSetter
     {
-        protected EffectParameter Parameter;
-        protected string Semantic;
+        protected readonly EffectParameter Parameter;
+        protected readonly string Semantic;
 
-        public MaterialParameterSetter(EffectParameter parameter)
+        protected MaterialParameterSetter(EffectParameter parameter)
         {
-            this.Parameter = parameter;
-            this.Semantic = parameter.Semantic.ToLower();
+            Parameter = parameter;
+            Semantic = parameter.Semantic.ToLower();
         }
 
         public abstract void Apply(BoxedValueStore<string> globals);
@@ -135,7 +146,7 @@ namespace Myre.Graphics.Materials
     #region SetterGenerator
     static class ParameterSetterGenerator
     {
-        static string classTemplate = @"
+        private const string CLASS_TEMPLATE = @"
     class [ClassPrefix]MaterialParameterSetter
         : MaterialParameterSetter
     {
@@ -160,7 +171,7 @@ namespace Myre.Graphics.Materials
         }
     }";
 
-        static string initialisationTemplate = "{ typeof([Type]).Name, typeof([ClassPrefix]MaterialParameterSetter) },";
+        private const string INITIALISATION_TEMPLATE = "{ typeof([Type]).Name, typeof([ClassPrefix]MaterialParameterSetter) },";
 
         public static string Generate()
         {
@@ -184,10 +195,10 @@ namespace Myre.Graphics.Materials
 
             foreach (var type in types.Union(arrays))
             {
-                var classDefinition = classTemplate.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
+                var classDefinition = CLASS_TEMPLATE.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
                 output.AppendLine(classDefinition);
 
-                var initialisationLine = initialisationTemplate.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
+                var initialisationLine = INITIALISATION_TEMPLATE.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
                 initialisation.AppendLine(initialisationLine);
             }
 
@@ -202,8 +213,8 @@ namespace Myre.Graphics.Materials
     class BooleanMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Boolean> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Boolean> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public BooleanMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -212,22 +223,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Texture2DMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Texture2D> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Texture2D> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Texture2DMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -236,22 +247,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Int32MaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Int32> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Int32> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Int32MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -260,22 +271,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class SingleMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Single> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Single> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public SingleMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -284,22 +295,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Vector2MaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Vector2> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Vector2> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Vector2MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -308,22 +319,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Vector3MaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Vector3> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Vector3> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Vector3MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -332,22 +343,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Vector4MaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Vector4> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Vector4> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Vector4MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -356,22 +367,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class MatrixMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Matrix> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Matrix> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public MatrixMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -380,22 +391,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class StringMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<String> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<String> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public StringMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -404,22 +415,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class BooleanArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Boolean[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Boolean[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public BooleanArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -428,22 +439,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Int32ArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Int32[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Int32[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Int32ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -452,22 +463,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class SingleArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Single[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Single[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public SingleArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -476,22 +487,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Vector2ArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Vector2[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Vector2[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Vector2ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -500,22 +511,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Vector3ArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Vector3[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Vector3[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Vector3ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -524,22 +535,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class Vector4ArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Vector4[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Vector4[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public Vector4ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -548,22 +559,22 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 
     class MatrixArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Matrix[]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private Box<Matrix[]> _value;
+        private BoxedValueStore<string> _previousGlobals;
 
         public MatrixArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -572,14 +583,14 @@ namespace Myre.Graphics.Materials
 
         public override void Apply(BoxedValueStore<string> globals)
         {
-            if (value == null || previousGlobals != globals)
+            if (_value == null || _previousGlobals != globals)
             {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
+                globals.TryGet(Semantic, out _value);
+                _previousGlobals = globals;
             }
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
+            if (_value != null)
+                Parameter.SetValue(_value.Value);
         }
     }
 #endregion

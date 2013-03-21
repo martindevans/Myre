@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Myre.Collections;
-using System.Collections.ObjectModel;
-using Myre.Collections;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Graphics
@@ -53,8 +49,8 @@ namespace Myre.Graphics
         public ResourceInfo(string name, RenderTargetInfo format)
             : this()
         {
-            this.Name = name;
-            this.Format = format;
+            Name = name;
+            Format = format;
         }
     }
 
@@ -64,8 +60,8 @@ namespace Myre.Graphics
     /// </summary>
     public class ResourceContext
     {
-        private List<string> inputs;
-        private List<Resource> outputs;
+        private readonly List<string> _inputs;
+        private readonly List<Resource> _outputs;
 
         /// <summary>
         /// All resources available to the component.
@@ -77,15 +73,17 @@ namespace Myre.Graphics
         /// </summary>
         public ResourceInfo[] SetRenderTargets { get; private set; }
 
-        internal List<string> Inputs { get { return inputs; } }
-        internal List<Resource> Outputs { get { return outputs; } }
+// ReSharper disable ReturnTypeCanBeEnumerable.Global
+        internal List<string> Inputs { get { return _inputs; } }
+// ReSharper restore ReturnTypeCanBeEnumerable.Global
+        internal List<Resource> Outputs { get { return _outputs; } }
 
         public ResourceContext(ResourceInfo[] availableResources, ResourceInfo[] setRenderTargets)
         {
-            this.AvailableResources = availableResources;
-            this.SetRenderTargets = setRenderTargets;
-            this.inputs = new List<string>();
-            this.outputs = new List<Resource>();
+            AvailableResources = availableResources;
+            SetRenderTargets = setRenderTargets;
+            _inputs = new List<string>();
+            _outputs = new List<Resource>();
         }
 
         /// <summary>
@@ -97,7 +95,7 @@ namespace Myre.Graphics
             if (!AvailableResources.Any(info => info.Name == name))
                 throw new ArgumentException(string.Format("The resource {0} is not available.", name));
 
-            inputs.Add(name);
+            _inputs.Add(name);
         }
 
         /// <summary>
@@ -125,16 +123,7 @@ namespace Myre.Graphics
             bool mipMap = false,
             RenderTargetUsage usage = RenderTargetUsage.DiscardContents)
         {
-            var info = new RenderTargetInfo()
-            {
-                Width = width,
-                Height = height,
-                SurfaceFormat = surfaceFormat,
-                DepthFormat = depthFormat,
-                MultiSampleCount = multiSampleCount,
-                MipMap = mipMap,
-                Usage = usage
-            };
+            var info = new RenderTargetInfo(width, height, surfaceFormat, depthFormat, multiSampleCount, mipMap, usage);
 
             DefineOutput(name, isLeftSet, finaliser, info);
         }
@@ -160,7 +149,7 @@ namespace Myre.Graphics
                 Format = format
             };
 
-            outputs.Add(resource);
+            _outputs.Add(resource);
         }
 
         public void DefineOutput(ResourceInfo resourceInfo, bool isLeftSet = true)
@@ -173,7 +162,7 @@ namespace Myre.Graphics
                 Format = resourceInfo.Format
             };
 
-            outputs.Add(resource);
+            _outputs.Add(resource);
         }
     }
 
@@ -184,7 +173,7 @@ namespace Myre.Graphics
     /// </summary>
     public abstract class RendererComponent
     {
-        internal RenderPlan plan;
+        internal RenderPlan Plan;
 
         /// <summary>
         /// Gets or sets a value indicating if this component has been initialised.
@@ -218,7 +207,7 @@ namespace Myre.Graphics
         /// <returns>A resource outputted from a previous component.</returns>
         protected RenderTarget2D GetResource(string name)
         {
-            return plan.GetResource(name);
+            return Plan.GetResource(name);
         }
 
         /// <summary>
@@ -228,7 +217,7 @@ namespace Myre.Graphics
         /// <param name="resource">The resource.</param>
         protected void Output(string name, RenderTarget2D resource)
         {
-            plan.SetResource(name, resource);
+            Plan.SetResource(name, resource);
         }
 
         /*

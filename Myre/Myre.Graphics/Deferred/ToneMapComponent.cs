@@ -1,57 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
-using Myre.Debugging.Statistics;
+using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
+using Myre.Graphics.Materials;
 using Myre.Graphics.PostProcessing;
-using System.Threading;
 
 namespace Myre.Graphics.Deferred
 {
     public class ToneMapComponent
        : RendererComponent
     {
-        Quad quad;
-        Material calculateLuminance;
-        Material readLuminance;
-        Material adaptLuminance;
-        Material copyLuminance;
-        Material toneMap;
-        Effect bloom;
-        Gaussian gaussian;
-        Resample scale;
-        RenderTarget2D[] adaptedLuminance;
-        RenderTarget2D averageLuminance;
-        float[] textureData = new float[1];
-        int current = 0;
-        int previous = -1;
+        readonly Quad _quad;
+        readonly Material _calculateLuminance;
+        readonly Material _readLuminance;
+        readonly Material _adaptLuminance;
+        readonly Material _toneMap;
+        readonly Effect _bloom;
+        readonly Gaussian _gaussian;
+        readonly RenderTarget2D[] _adaptedLuminance;
+        RenderTarget2D _averageLuminance;
+        int _current = 0;
+        int _previous = -1;
 
         public RenderTarget2D AdaptedLuminance
         {
-            get { return adaptedLuminance[current]; }
+            get { return _adaptedLuminance[_current]; }
         }
 
         public ToneMapComponent(GraphicsDevice device)
         {
-            quad = new Quad(device);
+            _quad = new Quad(device);
             var effect = Content.Load<Effect>("CalculateLuminance");
-            calculateLuminance = new Material(effect.Clone(), "ExtractLuminance");
-            adaptLuminance = new Material(effect.Clone(), "AdaptLuminance");
-            readLuminance = new Material(effect.Clone(), "ReadLuminance");
-            copyLuminance = new Material(effect.Clone(), "Copy");
-            toneMap = new Material(Content.Load<Effect>("ToneMap"), null);
-            bloom = Content.Load<Effect>("Bloom");
-            gaussian = new Gaussian(device);
-            scale = new Resample(device);
+            _calculateLuminance = new Material(effect.Clone(), "ExtractLuminance");
+            _adaptLuminance = new Material(effect.Clone(), "AdaptLuminance");
+            _readLuminance = new Material(effect.Clone(), "ReadLuminance");
+            _toneMap = new Material(Content.Load<Effect>("ToneMap"), null);
+            _bloom = Content.Load<Effect>("Bloom");
+            _gaussian = new Gaussian(device);
 
-            adaptedLuminance = new RenderTarget2D[2];
-            adaptedLuminance[0] = new RenderTarget2D(device, 1, 1, false, SurfaceFormat.Single, DepthFormat.None);
-            adaptedLuminance[1] = new RenderTarget2D(device, 1, 1, false, SurfaceFormat.Single, DepthFormat.None);
+            _adaptedLuminance = new RenderTarget2D[2];
+            _adaptedLuminance[0] = new RenderTarget2D(device, 1, 1, false, SurfaceFormat.Single, DepthFormat.None);
+            _adaptedLuminance[1] = new RenderTarget2D(device, 1, 1, false, SurfaceFormat.Single, DepthFormat.None);
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
@@ -92,40 +81,40 @@ namespace Myre.Graphics.Deferred
 
         private void CalculateLuminance(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
         {
-            if (previous == -1)
+            if (_previous == -1)
             {
-                previous = 1;
-                device.SetRenderTarget(adaptedLuminance[previous]);
+                _previous = 1;
+                device.SetRenderTarget(_adaptedLuminance[_previous]);
                 device.Clear(Color.Transparent);
                 device.SetRenderTarget(null);
             }
 
-            var tmp = previous;
-            previous = current;
-            current = tmp;
+            var tmp = _previous;
+            _previous = _current;
+            _current = tmp;
 
             // calculate luminance map
             var luminanceMap = RenderTargetManager.GetTarget(device, 1024, 1024, SurfaceFormat.Single, mipMap: true, name:"luminance map");
             device.SetRenderTarget(luminanceMap);
             device.BlendState = BlendState.Opaque;
             device.Clear(Color.Transparent);
-            calculateLuminance.Parameters["Texture"].SetValue(lightBuffer);
-            quad.Draw(calculateLuminance, renderer.Data);
+            _calculateLuminance.Parameters["Texture"].SetValue(lightBuffer);
+            _quad.Draw(_calculateLuminance, renderer.Data);
             Output("luminance", luminanceMap);
 
             // read bottom mipmap to find average luminance
-            averageLuminance = RenderTargetManager.GetTarget(device, 1, 1, SurfaceFormat.Single, name: "average luminance");
-            device.SetRenderTarget(averageLuminance);
-            readLuminance.Parameters["Texture"].SetValue(luminanceMap);
-            quad.Draw(readLuminance, renderer.Data);
+            _averageLuminance = RenderTargetManager.GetTarget(device, 1, 1, SurfaceFormat.Single, name: "average luminance");
+            device.SetRenderTarget(_averageLuminance);
+            _readLuminance.Parameters["Texture"].SetValue(luminanceMap);
+            _quad.Draw(_readLuminance, renderer.Data);
 
             // adapt towards the current luminance
-            device.SetRenderTarget(adaptedLuminance[current]);
-            adaptLuminance.Parameters["Texture"].SetValue(averageLuminance);
-            adaptLuminance.Parameters["PreviousAdaption"].SetValue(adaptedLuminance[previous]);
-            quad.Draw(adaptLuminance, renderer.Data);
+            device.SetRenderTarget(_adaptedLuminance[_current]);
+            _adaptLuminance.Parameters["Texture"].SetValue(_averageLuminance);
+            _adaptLuminance.Parameters["PreviousAdaption"].SetValue(_adaptedLuminance[_previous]);
+            _quad.Draw(_adaptLuminance, renderer.Data);
 
-            RenderTargetManager.RecycleTarget(averageLuminance);
+            RenderTargetManager.RecycleTarget(_averageLuminance);
         }
 
         private void Bloom(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
@@ -137,32 +126,32 @@ namespace Myre.Graphics.Deferred
             // downsample the light buffer to half resolution, and threshold at the same time
             var thresholded = RenderTargetManager.GetTarget(device, (int)halfResolution.X, (int)halfResolution.Y, SurfaceFormat.Rgba64, name:"bloom thresholded");
             device.SetRenderTarget(thresholded);
-            bloom.Parameters["Resolution"].SetValue(halfResolution);
-            bloom.Parameters["Threshold"].SetValue(renderer.Data.Get<float>("hdr_bloomthreshold").Value);
-            bloom.Parameters["MinExposure"].SetValue(renderer.Data.Get<float>("hdr_minexposure").Value);
-            bloom.Parameters["MaxExposure"].SetValue(renderer.Data.Get<float>("hdr_maxexposure").Value);
-            bloom.Parameters["Texture"].SetValue(lightBuffer);
-            bloom.Parameters["Luminance"].SetValue(adaptedLuminance[current]);
-            bloom.CurrentTechnique = bloom.Techniques["ThresholdDownsample2X"];
-            quad.Draw(bloom);
+            _bloom.Parameters["Resolution"].SetValue(halfResolution);
+            _bloom.Parameters["Threshold"].SetValue(renderer.Data.Get<float>("hdr_bloomthreshold").Value);
+            _bloom.Parameters["MinExposure"].SetValue(renderer.Data.Get<float>("hdr_minexposure").Value);
+            _bloom.Parameters["MaxExposure"].SetValue(renderer.Data.Get<float>("hdr_maxexposure").Value);
+            _bloom.Parameters["Texture"].SetValue(lightBuffer);
+            _bloom.Parameters["Luminance"].SetValue(_adaptedLuminance[_current]);
+            _bloom.CurrentTechnique = _bloom.Techniques["ThresholdDownsample2X"];
+            _quad.Draw(_bloom);
 
             // downsample again to quarter resolution
             var downsample = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom downsampled");
             device.SetRenderTarget(downsample);
-            bloom.Parameters["Resolution"].SetValue(quarterResolution);
-            bloom.Parameters["Texture"].SetValue(thresholded);
-            bloom.CurrentTechnique = bloom.Techniques["Scale"];
-            quad.Draw(bloom);
+            _bloom.Parameters["Resolution"].SetValue(quarterResolution);
+            _bloom.Parameters["Texture"].SetValue(thresholded);
+            _bloom.CurrentTechnique = _bloom.Techniques["Scale"];
+            _quad.Draw(_bloom);
 
             // blur the target
             var blurred = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom blurred");
-            gaussian.Blur(downsample, blurred, renderer.Data.Get<float>("hdr_bloomblurammount").Value);
+            _gaussian.Blur(downsample, blurred, renderer.Data.Get<float>("hdr_bloomblurammount").Value);
 
             // upscale back to half resolution
             device.SetRenderTarget(thresholded);
-            bloom.Parameters["Resolution"].SetValue(halfResolution);
-            bloom.Parameters["Texture"].SetValue(blurred);
-            quad.Draw(bloom);
+            _bloom.Parameters["Resolution"].SetValue(halfResolution);
+            _bloom.Parameters["Texture"].SetValue(blurred);
+            _quad.Draw(_bloom);
 
             // output result
             Output("bloom", thresholded);
@@ -180,11 +169,11 @@ namespace Myre.Graphics.Deferred
             device.DepthStencilState = DepthStencilState.None;
             device.BlendState = BlendState.Opaque;
 
-            toneMap.Parameters["Texture"].SetValue(lightBuffer);
-            toneMap.Parameters["Luminance"].SetValue(adaptedLuminance[current]);
-            toneMap.Parameters["MinExposure"].SetValue(renderer.Data.Get<float>("hdr_minexposure").Value);
-            toneMap.Parameters["MaxExposure"].SetValue(renderer.Data.Get<float>("hdr_maxexposure").Value);
-            quad.Draw(toneMap, renderer.Data);
+            _toneMap.Parameters["Texture"].SetValue(lightBuffer);
+            _toneMap.Parameters["Luminance"].SetValue(_adaptedLuminance[_current]);
+            _toneMap.Parameters["MinExposure"].SetValue(renderer.Data.Get<float>("hdr_minexposure").Value);
+            _toneMap.Parameters["MaxExposure"].SetValue(renderer.Data.Get<float>("hdr_maxexposure").Value);
+            _quad.Draw(_toneMap, renderer.Data);
             Output("tonemapped", toneMapped);
         }
 

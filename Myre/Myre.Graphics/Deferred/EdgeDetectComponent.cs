@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Myre.Graphics.Materials;
-using Myre.Collections;
-using Myre.Graphics.PostProcessing;
-using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Deferred
 {
     public class EdgeDetectComponent
         : RendererComponent
     {
-        private Material edgeDetect;
-        private Quad quad;
+        private readonly Material _edgeDetect;
+        private readonly Quad _quad;
 
         public EdgeDetectComponent(GraphicsDevice device)
         {
-            edgeDetect = new Material(Content.Load<Effect>("EdgeDetect"));
-            quad = new Quad(device);
+            _edgeDetect = new Material(Content.Load<Effect>("EdgeDetect"));
+            _quad = new Quad(device);
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
@@ -58,8 +50,8 @@ namespace Myre.Graphics.Deferred
             device.BlendState = BlendState.Opaque;
             device.Clear(Color.Black);
 
-            edgeDetect.Parameters["TexelSize"].SetValue(new Vector2(1f / width, 1f / height));
-            quad.Draw(edgeDetect, metadata);
+            _edgeDetect.Parameters["TexelSize"].SetValue(new Vector2(1f / width, 1f / height));
+            _quad.Draw(_edgeDetect, metadata);
 
             Output("edges", target);
         }

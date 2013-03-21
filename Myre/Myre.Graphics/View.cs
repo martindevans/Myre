@@ -10,25 +10,25 @@ namespace Myre.Graphics
     public class View
         : Behaviour
     {
-        private Property<Camera> camera;
-        private Property<Viewport> viewport;
+        private Property<Camera> _camera;
+        private Property<Viewport> _viewport;
 
         public Camera Camera
         {
-            get { return camera.Value; }
-            set { camera.Value = value; }
+            get { return _camera.Value; }
+            set { _camera.Value = value; }
         }
 
         public Viewport Viewport
         {
-            get { return viewport.Value; }
-            set { viewport.Value = value; }
+            get { return _viewport.Value; }
+            set { _viewport.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            camera = context.CreateProperty<Camera>("camera");
-            viewport = context.CreateProperty<Viewport>("viewport");
+            _camera = context.CreateProperty<Camera>("camera");
+            _viewport = context.CreateProperty<Viewport>("viewport");
 
             base.CreateProperties(context);
         }
@@ -36,9 +36,9 @@ namespace Myre.Graphics
         public void SetMetadata(RendererMetadata metadata)
         {
             metadata.Set("activeview", this);
-            metadata.Set("resolution", new Vector2(viewport.Value.Width, viewport.Value.Height));
-            metadata.Set("viewport", viewport.Value);
-            camera.Value.SetMetadata(metadata);
+            metadata.Set("resolution", new Vector2(_viewport.Value.Width, _viewport.Value.Height));
+            metadata.Set("viewport", _viewport.Value);
+            _camera.Value.SetMetadata(metadata);
         }
 
 

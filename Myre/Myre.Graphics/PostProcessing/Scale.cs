@@ -1,42 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Myre.Extensions;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.PostProcessing
 {
     public class Resample
     {
-        GraphicsDevice device;
-        Effect effect;
-        Quad quad;
+        readonly GraphicsDevice _device;
+        readonly Effect _effect;
+        readonly Quad _quad;
 
         public Resample(GraphicsDevice device)
         {
-            this.device = device;
-            this.effect = Content.Load<Effect>("Downsample");
-            this.quad = new Quad(device);
+            _device = device;
+            _effect = Content.Load<Effect>("Downsample");
+            _quad = new Quad(device);
         }
 
         public void Scale(RenderTarget2D source, RenderTarget2D destination)
         {
-            effect.CurrentTechnique = source.Format.IsFloatingPoint() ? effect.Techniques["Software"] : effect.Techniques["Hardware"];
+            _effect.CurrentTechnique = source.Format.IsFloatingPoint() ? _effect.Techniques["Software"] : _effect.Techniques["Hardware"];
 
             Vector2 resolution = new Vector2(source.Width, source.Height);
-            float ScaleFactor = (destination.Width > source.Width) ? 2 : 0.5f;
+            float scaleFactor = (destination.Width > source.Width) ? 2 : 0.5f;
 
             RenderTarget2D input = source;
-            RenderTarget2D output = null;
 
-            while (IntermediateNeeded(resolution, destination, ScaleFactor))
+            while (IntermediateNeeded(resolution, destination, scaleFactor))
             {
-                resolution *= ScaleFactor;
+                resolution *= scaleFactor;
 
-                output = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, source.Format, name:"scaled");
+                RenderTarget2D output = RenderTargetManager.GetTarget(_device, (int)resolution.X, (int)resolution.Y, source.Format, name:"scaled");
                 Draw(input, output);
 
                 if (input != source)
@@ -52,19 +46,21 @@ namespace Myre.Graphics.PostProcessing
 
         private bool IntermediateNeeded(Vector2 currentResolution, RenderTarget2D target, float scale)
         {
+// ReSharper disable CompareOfFloatsByEqualityOperator
             return (scale == 2) ? (currentResolution.X * 2 < target.Width && currentResolution.Y * 2 < target.Height)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                                 : (currentResolution.X / 2 > target.Width && currentResolution.Y / 2 > target.Height);
         }
 
         private void Draw(RenderTarget2D input, RenderTarget2D output)
         {
-            device.SetRenderTarget(output);
+            _device.SetRenderTarget(output);
 
-            effect.Parameters["Resolution"].SetValue(new Vector2(output.Width, output.Height));
-            effect.Parameters["SourceResolution"].SetValue(new Vector2(input.Width, input.Height));
-            effect.Parameters["Texture"].SetValue(input);
+            _effect.Parameters["Resolution"].SetValue(new Vector2(output.Width, output.Height));
+            _effect.Parameters["SourceResolution"].SetValue(new Vector2(input.Width, input.Height));
+            _effect.Parameters["Texture"].SetValue(input);
 
-            quad.Draw(effect);
+            _quad.Draw(_effect);
         }
     }
 }

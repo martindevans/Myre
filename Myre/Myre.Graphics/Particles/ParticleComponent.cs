@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Particles
 {
     public class ParticleComponent
         : RendererComponent
     {
-        private ReadOnlyCollection<ParticleEmitter.Manager> managers;
+        private ReadOnlyCollection<ParticleEmitter.Manager> _managers;
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
-            managers = renderer.Scene.FindManagers<ParticleEmitter.Manager>();
+            _managers = renderer.Scene.FindManagers<ParticleEmitter.Manager>();
 
             // define inputs
             if (context.AvailableResources.Any(r => r.Name == "gbuffer_depth"))
@@ -31,7 +25,7 @@ namespace Myre.Graphics.Particles
 
         public override void Draw(Renderer renderer)
         {
-            foreach (var item in managers)
+            foreach (var item in _managers)
                 item.Draw(renderer);
         }
     }

@@ -2,17 +2,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Graphics;
 using Ninject;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework;
-using Myre.Entities;
-using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -27,36 +24,29 @@ namespace Myre.Graphics.Deferred.LightManagers
             public Matrix Projection;
         }
 
-        private Material geometryLightingMaterial;
-        private Material quadLightingMaterial;
-        private Material nothingMaterial;
-        private Quad quad;
-        private Model geometry;
-        private View shadowView;
+        private readonly Material _geometryLightingMaterial;
+        private readonly Material _quadLightingMaterial;
+        private readonly Quad _quad;
+        private readonly Model _geometry;
+        private readonly View _shadowView;
 
         //private BasicEffect basicEffect;
         //private VertexPositionColor[] debugVertices;
         //private int[] debugIndices;
 
-        private List<LightData> lights;
-        private List<LightData> touchesNearPlane;
-        private List<LightData> touchesFarPlane;
-        private List<LightData> touchesBothPlanes;
-        private List<LightData> touchesNeitherPlane;
+        private readonly List<LightData> _lights;
+        private readonly List<LightData> _touchesNearPlane;
+        private readonly List<LightData> _touchesFarPlane;
+        private readonly List<LightData> _touchesBothPlanes;
+        private readonly List<LightData> _touchesNeitherPlane;
 
-        private DepthStencilState depthGreater;
-        private BlendState colourWriteDisable;
-        private DepthStencilState stencilWritePass;
-        private DepthStencilState stencilCheckPass;
-        
+        private readonly DepthStencilState _depthGreater;
+
         public DeferredSpotLightManager(IKernel kernel, GraphicsDevice device)
         {
             var effect = Content.Load<Effect>("SpotLight");
-            geometryLightingMaterial = new Material(effect.Clone(), "Geometry");
-            quadLightingMaterial = new Material(effect.Clone(), "Quad");
-
-            effect = Content.Load<Effect>("Nothing");
-            nothingMaterial = new Material(effect, null);
+            _geometryLightingMaterial = new Material(effect.Clone(), "Geometry");
+            _quadLightingMaterial = new Material(effect.Clone(), "Quad");
 
             //basicEffect = new BasicEffect(device);
             //debugVertices = new VertexPositionColor[10];
@@ -77,51 +67,26 @@ namespace Myre.Graphics.Deferred.LightManagers
             //    debugIndices[index + 3] = (i % (debugVertices.Length - 1)) + 1; //i < debugVertices.Length - 1 ? i + 1 : 1;
             //}
 
-            geometry = Content.Load<Model>("sphere");
+            _geometry = Content.Load<Model>("sphere");
 
-            quad = new Quad(device);
+            _quad = new Quad(device);
 
             var shadowCameraEntity = kernel.Get<EntityDescription>();
             shadowCameraEntity.AddBehaviour<View>();
-            shadowView = shadowCameraEntity.Create().GetBehaviour<View>();
-            shadowView.Camera = new Camera();
+            _shadowView = shadowCameraEntity.Create().GetBehaviour<View>();
+            _shadowView.Camera = new Camera();
 
-            lights = new List<LightData>();
-            touchesNearPlane = new List<LightData>();
-            touchesFarPlane = new List<LightData>();
-            touchesBothPlanes = new List<LightData>();
-            touchesNeitherPlane = new List<LightData>();
+            _lights = new List<LightData>();
+            _touchesNearPlane = new List<LightData>();
+            _touchesFarPlane = new List<LightData>();
+            _touchesBothPlanes = new List<LightData>();
+            _touchesNeitherPlane = new List<LightData>();
 
-            depthGreater = new DepthStencilState()
+            _depthGreater = new DepthStencilState()
             {
                 DepthBufferEnable = true,
                 DepthBufferWriteEnable = false,
                 DepthBufferFunction = CompareFunction.GreaterEqual
-            };
-
-            stencilWritePass = new DepthStencilState()
-            {
-                DepthBufferEnable = true,
-                DepthBufferWriteEnable = false,
-                DepthBufferFunction = CompareFunction.LessEqual,
-                StencilEnable = true,
-                TwoSidedStencilMode = true,
-                StencilFunction = CompareFunction.Always,
-                StencilPass = StencilOperation.Increment,
-                CounterClockwiseStencilPass = StencilOperation.Decrement
-            };
-
-            stencilCheckPass = new DepthStencilState()
-            {
-                DepthBufferEnable = false,
-                StencilEnable = true,
-                StencilFunction = CompareFunction.NotEqual,
-                ReferenceStencil = 0
-            };
-
-            colourWriteDisable = new BlendState()
-            {
-                ColorWriteChannels = ColorWriteChannels.None
             };
         }
 
@@ -132,7 +97,7 @@ namespace Myre.Graphics.Deferred.LightManagers
                 Light = behaviour
             };
 
-            lights.Add(data);
+            _lights.Add(data);
             
             base.Add(behaviour);
         }
@@ -142,11 +107,11 @@ namespace Myre.Graphics.Deferred.LightManagers
             bool removed = base.Remove(behaviour);
             if (removed)
             {
-                for (int i = 0; i < lights.Count; i++)
+                for (int i = 0; i < _lights.Count; i++)
                 {
-                    if (lights[i].Light == behaviour)
+                    if (_lights[i].Light == behaviour)
                     {
-                        lights.RemoveAt(i);
+                        _lights.RemoveAt(i);
                         break;
                     }
                 }
@@ -157,23 +122,23 @@ namespace Myre.Graphics.Deferred.LightManagers
 
         public void Prepare(Renderer renderer)
         {
-            touchesNearPlane.Clear();
-            touchesFarPlane.Clear();
-            touchesBothPlanes.Clear();
-            touchesNeitherPlane.Clear();
+            _touchesNearPlane.Clear();
+            _touchesFarPlane.Clear();
+            _touchesBothPlanes.Clear();
+            _touchesNeitherPlane.Clear();
 
             var frustum = renderer.Data.Get<BoundingFrustum>("viewfrustum").Value;
 
             float falloffFactor = renderer.Data.Get("lighting_attenuationscale", 100).Value;
-            geometryLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
-            quadLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
+            _geometryLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
+            _quadLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
 
             //float threshold = renderer.Data.Get("lighting_threshold", 1f / 100f).Value;
             //float adaptedLuminance = renderer.Data.Get<float>("adaptedluminance", 1).Value;
 
             //threshold = adaptedLuminance * threshold;
 
-            foreach (var light in lights)
+            foreach (var light in _lights)
             {
                 if (!light.Light.Active)
                     continue;
@@ -191,13 +156,13 @@ namespace Myre.Graphics.Deferred.LightManagers
                 var far = bounds.Intersects(frustum.Far) == PlaneIntersectionType.Intersecting;
 
                 if (near && far)
-                    touchesBothPlanes.Add(light);
+                    _touchesBothPlanes.Add(light);
                 else if (near)
-                    touchesNearPlane.Add(light);
+                    _touchesNearPlane.Add(light);
                 else if (far)
-                    touchesFarPlane.Add(light);
+                    _touchesFarPlane.Add(light);
                 else
-                    touchesNeitherPlane.Add(light);
+                    _touchesNeitherPlane.Add(light);
 
                 if (light.ShadowMap != null)
                 {
@@ -228,7 +193,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             var view = renderer.Data.Get<View>("activeview");
             var previousView = view.Value;
-            view.Value = shadowView;
+            view.Value = _shadowView;
 
             data.View = Matrix.CreateLookAt(
                 light.Position,
@@ -236,12 +201,12 @@ namespace Myre.Graphics.Deferred.LightManagers
                 light.Direction == Vector3.Up || light.Direction == Vector3.Down ? Vector3.Right : Vector3.Up);
             data.Projection = Matrix.CreatePerspectiveFieldOfView(light.Angle, 1, 1, light.Range);
 
-            shadowView.Camera.View = data.View;
-            shadowView.Camera.Projection = data.Projection;
-            shadowView.Camera.NearClip = 1;
-            shadowView.Camera.FarClip = light.Range;
-            shadowView.Viewport = new Viewport(0, 0, light.ShadowResolution, light.ShadowResolution);
-            shadowView.SetMetadata(renderer.Data);
+            _shadowView.Camera.View = data.View;
+            _shadowView.Camera.Projection = data.Projection;
+            _shadowView.Camera.NearClip = 1;
+            _shadowView.Camera.FarClip = light.Range;
+            _shadowView.Viewport = new Viewport(0, 0, light.ShadowResolution, light.ShadowResolution);
+            _shadowView.SetMetadata(renderer.Data);
 
             foreach (var item in renderer.Scene.FindManagers<IGeometryProvider>())
                 item.Draw("shadows_viewlength", renderer.Data);
@@ -257,16 +222,16 @@ namespace Myre.Graphics.Deferred.LightManagers
             var metadata = renderer.Data;
             var device = renderer.Device;
 
-            var part = geometry.Meshes[0].MeshParts[0];
+            var part = _geometry.Meshes[0].MeshParts[0];
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
 
-            DrawGeometryLights(touchesFarPlane, metadata, device);
+            DrawGeometryLights(_touchesFarPlane, metadata, device);
 
-            device.DepthStencilState = depthGreater;
+            device.DepthStencilState = _depthGreater;
             device.RasterizerState = RasterizerState.CullClockwise;
-            DrawGeometryLights(touchesNearPlane, metadata, device);
-            DrawGeometryLights(touchesNeitherPlane, metadata, device);
+            DrawGeometryLights(_touchesNearPlane, metadata, device);
+            DrawGeometryLights(_touchesNeitherPlane, metadata, device);
 
             //foreach (var light in touchesNeitherPlane)
             //{
@@ -287,25 +252,27 @@ namespace Myre.Graphics.Deferred.LightManagers
             device.DepthStencilState = DepthStencilState.None;
             device.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            foreach (var light in touchesBothPlanes)
+            foreach (var light in _touchesBothPlanes)
             {
-                SetupLight(metadata, quadLightingMaterial, light);
-                quad.Draw(quadLightingMaterial, metadata);
+                SetupLight(metadata, _quadLightingMaterial, light);
+                _quad.Draw(_quadLightingMaterial, metadata);
             }
         }
 
+// ReSharper disable ParameterTypeCanBeEnumerable.Local
         private void DrawGeometryLights(List<LightData> lights, RendererMetadata metadata, GraphicsDevice device)
+// ReSharper restore ParameterTypeCanBeEnumerable.Local
         {
             foreach (var light in lights)
             {
-                SetupLight(metadata, geometryLightingMaterial, light);
-                DrawGeomery(geometryLightingMaterial, metadata, device);
+                SetupLight(metadata, _geometryLightingMaterial, light);
+                DrawGeomery(_geometryLightingMaterial, metadata, device);
             }
         }
 
         private void DrawGeomery(Material material, RendererMetadata metadata, GraphicsDevice device)
         {
-            var part = geometry.Meshes[0].MeshParts[0];
+            var part = _geometry.Meshes[0].MeshParts[0];
             foreach (var pass in material.Begin(metadata))
             {
                 pass.Apply();
@@ -353,7 +320,7 @@ namespace Myre.Graphics.Deferred.LightManagers
                 material.Parameters["LightNearPlane"].SetValue(new Vector4(nearPlane.Normal, nearPlane.D));
             }
 
-            var world = Matrix.CreateScale(light.Range / geometry.Meshes[0].BoundingSphere.Radius)
+            var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
                         * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
             Matrix.Multiply(ref world, ref metadata.Get<Matrix>("view").Value, out metadata.Get<Matrix>("worldview").Value);

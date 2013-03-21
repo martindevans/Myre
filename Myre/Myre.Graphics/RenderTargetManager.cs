@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Collections;
 using Myre.Debugging.Statistics;
 using Myre.Extensions;
 
@@ -11,23 +8,34 @@ namespace Myre.Graphics
 {
     public struct RenderTargetInfo
     {
-        public int Height;
-        public int Width;
-        public SurfaceFormat SurfaceFormat;
-        public DepthFormat DepthFormat;
-        public int MultiSampleCount;
-        public bool MipMap;
-        public RenderTargetUsage Usage;
-        
+        public readonly int Height;
+        public readonly int Width;
+        public readonly SurfaceFormat SurfaceFormat;
+        public readonly DepthFormat DepthFormat;
+        public readonly int MultiSampleCount;
+        public readonly bool MipMap;
+        public readonly RenderTargetUsage Usage;
+
+        public RenderTargetInfo(int width, int height, SurfaceFormat format, DepthFormat depthFormat, int multiSampleCount, bool mipMap, RenderTargetUsage usage)
+        {
+            Width = width;
+            Height = height;
+            SurfaceFormat = format;
+            DepthFormat = depthFormat;
+            MultiSampleCount = multiSampleCount;
+            MipMap = mipMap;
+            Usage = usage;
+        }
+
         public bool Equals(RenderTargetInfo info)
         {
-            return this.Height == info.Height
-                && this.Width == info.Width
-                && this.SurfaceFormat == info.SurfaceFormat
-                && this.DepthFormat == info.DepthFormat
-                && this.MultiSampleCount == info.MultiSampleCount
-                && this.MipMap == info.MipMap
-                && this.Usage == info.Usage;
+            return Height == info.Height
+                && Width == info.Width
+                && SurfaceFormat == info.SurfaceFormat
+                && DepthFormat == info.DepthFormat
+                && MultiSampleCount == info.MultiSampleCount
+                && MipMap == info.MipMap
+                && Usage == info.Usage;
         }
 
         public override bool Equals(object obj)
@@ -48,46 +56,28 @@ namespace Myre.Graphics
 
         public static RenderTargetInfo FromRenderTarget(RenderTarget2D target)
         {
-            return new RenderTargetInfo()
-            {
-                Height = target.Height,
-                Width = target.Width,
-                SurfaceFormat = target.Format,
-                DepthFormat = target.DepthStencilFormat,
-                MultiSampleCount = target.MultiSampleCount,
-                MipMap = target.LevelCount > 1,
-                Usage = target.RenderTargetUsage
-            };
+            return new RenderTargetInfo(target.Width, target.Height, target.Format, target.DepthStencilFormat, target.MultiSampleCount, target.LevelCount > 1, target.RenderTargetUsage);
         }
     }
 
     public static class RenderTargetManager
     {
 #if PROFILE
-        private static Statistic numRenderTargets = Statistic.Get("Graphics.RTs");
-        private static Statistic renderTargetMemory = Statistic.Get("Graphics.RT_Memory", "{0:0.00}MB");
+        private static readonly Statistic _numRenderTargets = Statistic.Get("Graphics.RTs");
+        private static readonly Statistic _renderTargetMemory = Statistic.Get("Graphics.RT_Memory", "{0:0.00}MB");
 #endif
 
-        private static Dictionary<RenderTargetInfo, Stack<RenderTarget2D>> pool = new Dictionary<RenderTargetInfo, Stack<RenderTarget2D>>();
-        private static Dictionary<RenderTargetInfo, RenderTargetInfo> infoMappings = new Dictionary<RenderTargetInfo, RenderTargetInfo>();
+        private static readonly Dictionary<RenderTargetInfo, Stack<RenderTarget2D>> _pool = new Dictionary<RenderTargetInfo, Stack<RenderTarget2D>>();
+        private static readonly Dictionary<RenderTargetInfo, RenderTargetInfo> _infoMappings = new Dictionary<RenderTargetInfo, RenderTargetInfo>();
 
 
 #if DEBUG
-        private static List<string> active = new List<string>();
+        private static readonly List<string> _active = new List<string>();
 #endif
 
         public static RenderTarget2D GetTarget(GraphicsDevice device, int width, int height, SurfaceFormat surfaceFormat = SurfaceFormat.Color, DepthFormat depthFormat = DepthFormat.None, int multiSampleCount = 0, bool mipMap = false, RenderTargetUsage usage = RenderTargetUsage.DiscardContents, string name = null)
         {
-            var info = new RenderTargetInfo()
-            {
-                Width = width,
-                Height = height,
-                SurfaceFormat = surfaceFormat,
-                DepthFormat = depthFormat,
-                MultiSampleCount = multiSampleCount,
-                MipMap = mipMap,
-                Usage = usage
-            };
+            var info = new RenderTargetInfo(width, height, surfaceFormat, depthFormat, multiSampleCount, mipMap, usage);
 
             return GetTarget(device, info, name);
         }
@@ -95,7 +85,7 @@ namespace Myre.Graphics
         public static RenderTarget2D GetTarget(GraphicsDevice device, RenderTargetInfo info, string name = null)
         {
             RenderTargetInfo mapped;
-            bool wasMapped = infoMappings.TryGetValue(info, out mapped);
+            bool wasMapped = _infoMappings.TryGetValue(info, out mapped);
             if (!wasMapped)
                 mapped = info;
 
@@ -105,22 +95,21 @@ namespace Myre.Graphics
                 var t = stack.Pop();
                 t.Tag = name;
 #if DEBUG
-                active.Add(t.Tag as string);
+                _active.Add(t.Tag as string);
 #endif
                 return t;
             }
 
-            var target = new RenderTarget2D(device, mapped.Width, mapped.Height, mapped.MipMap, mapped.SurfaceFormat, mapped.DepthFormat, mapped.MultiSampleCount, mapped.Usage);
-            target.Tag = name;
+            var target = new RenderTarget2D(device, mapped.Width, mapped.Height, mapped.MipMap, mapped.SurfaceFormat, mapped.DepthFormat, mapped.MultiSampleCount, mapped.Usage) { Tag = name };
 
             if (!wasMapped)
             {
                 var targetInfo = RenderTargetInfo.FromRenderTarget(target);
-                infoMappings[info] = targetInfo;
+                _infoMappings[info] = targetInfo;
             }
 
 #if PROFILE
-            numRenderTargets.Value++;
+            _numRenderTargets.Value++;
 
             var resolution = target.Width * target.Height;
             float size = resolution * target.Format.FormatSize();
@@ -129,11 +118,11 @@ namespace Myre.Graphics
             if (info.MipMap)
                 size *= 1.33f;
             size += resolution * target.DepthStencilFormat.FormatSize();
-            renderTargetMemory.Value += size / (1024 * 1024);
+            _renderTargetMemory.Value += size / (1024 * 1024);
 #endif
 
 #if DEBUG
-            active.Add(target.Tag as string);
+            _active.Add(target.Tag as string);
 #endif
 
             return target;
@@ -147,7 +136,7 @@ namespace Myre.Graphics
             if (GetPool(info).Contains(target))
                 throw new InvalidOperationException("Render target has already been freed.");
 
-            active.Remove(target.Tag as string);
+            _active.Remove(target.Tag as string);
 #endif
 
             GetPool(info).Push(target);
@@ -157,10 +146,10 @@ namespace Myre.Graphics
         private static Stack<RenderTarget2D> GetPool(RenderTargetInfo info)
         {
             Stack<RenderTarget2D> stack;
-            if (!pool.TryGetValue(info, out stack))
+            if (!_pool.TryGetValue(info, out stack))
             {
                 stack = new Stack<RenderTarget2D>();
-                pool.Add(info, stack);
+                _pool.Add(info, stack);
             }
 
             return stack;

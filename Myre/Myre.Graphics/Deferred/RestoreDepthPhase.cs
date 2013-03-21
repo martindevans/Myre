@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Deferred
 {
     public class RestoreDepthPhase
         : RendererComponent
     {
-        private Quad quad;
-        private Material restoreDepth;
+        private readonly Quad _quad;
+        private readonly Material _restoreDepth;
 
         public bool ClearDepth { get; set; }
 
         public RestoreDepthPhase(GraphicsDevice device)
         {
-            this.quad = new Quad(device);
-            this.restoreDepth = new Material(Content.Load<Effect>("RestoreDepth").Clone());
-            this.ClearDepth = true;
+            _quad = new Quad(device);
+            _restoreDepth = new Material(Content.Load<Effect>("RestoreDepth").Clone());
+            ClearDepth = true;
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
@@ -47,7 +42,7 @@ namespace Myre.Graphics.Deferred
 
             renderer.Device.DepthStencilState = DepthStencilState.Default;
             renderer.Device.BlendState = BlendState.Additive;
-            quad.Draw(restoreDepth, renderer.Data);
+            _quad.Draw(_restoreDepth, renderer.Data);
         }
     }
 }

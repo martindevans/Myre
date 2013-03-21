@@ -148,7 +148,7 @@ namespace Myre.Graphics
             for (int i = 0; i < _components.Length; i++)
             {
                 var component = _components[i];
-                component.plan = this;
+                component.Plan = this;
                 component.Draw(renderer);
 
                 while (resourceIndex < _freePoints.Length && _freePoints[resourceIndex].Index <= i)

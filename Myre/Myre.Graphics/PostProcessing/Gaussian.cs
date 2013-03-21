@@ -1,55 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Graphics.PostProcessing
 {
     public class Gaussian
     {
-        Effect effect;
-        Quad quad;
-        GraphicsDevice device;
-        float[] weights;
-        float[] offsets;
+        readonly Effect _effect;
+        readonly Quad _quad;
+        readonly GraphicsDevice _device;
+        readonly float[] _weights;
+        readonly float[] _offsets;
 
-        int height;
-        int width;
-        float sigma;
+        int _height;
+        int _width;
+        float _sigma;
 
         public Gaussian(GraphicsDevice device)
         {
-            this.effect = Content.Load<Effect>("Gaussian");
-            this.quad = new Quad(device);
-            this.device = device;
+            _effect = Content.Load<Effect>("Gaussian");
+            _quad = new Quad(device);
+            _device = device;
 
-            var sampleCount = effect.Parameters["Weights"].Elements.Count;
-            this.weights = new float[sampleCount];
-            this.offsets = new float[sampleCount];
+            var sampleCount = _effect.Parameters["Weights"].Elements.Count;
+            _weights = new float[sampleCount];
+            _offsets = new float[sampleCount];
         }
 
         public void Blur(RenderTarget2D source, RenderTarget2D destination, float sigma)
         {
-            if (width != source.Width || height != source.Height || this.sigma != sigma)
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            if (_width != source.Width || _height != source.Height || _sigma != sigma)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                 CalculateWeights(source.Width, source.Height, sigma);
 
-            effect.Parameters["Resolution"].SetValue(new Vector2(width, height));
+            _effect.Parameters["Resolution"].SetValue(new Vector2(_width, _height));
 
-            var intermediate = RenderTargetManager.GetTarget(device, width, height, destination.Format, name:"gaussian intermediate");
-            device.SetRenderTarget(intermediate);
+            var intermediate = RenderTargetManager.GetTarget(_device, _width, _height, destination.Format, name:"gaussian intermediate");
+            _device.SetRenderTarget(intermediate);
 
-            effect.Parameters["Texture"].SetValue(source);
-            effect.CurrentTechnique = effect.Techniques["BlurHorizontal"];
-            quad.Draw(effect);
+            _effect.Parameters["Texture"].SetValue(source);
+            _effect.CurrentTechnique = _effect.Techniques["BlurHorizontal"];
+            _quad.Draw(_effect);
 
-            device.SetRenderTarget(destination);
+            _device.SetRenderTarget(destination);
 
-            effect.Parameters["Texture"].SetValue(intermediate);
-            effect.CurrentTechnique = effect.Techniques["BlurVertical"];
-            quad.Draw(effect);
+            _effect.Parameters["Texture"].SetValue(intermediate);
+            _effect.CurrentTechnique = _effect.Techniques["BlurVertical"];
+            _quad.Draw(_effect);
 
             RenderTargetManager.RecycleTarget(intermediate);
         }
@@ -57,26 +55,26 @@ namespace Myre.Graphics.PostProcessing
         // from the bloom sample on creators.xna.com
         private void CalculateWeights(int width, int height, float sigma)
         {
-            this.width = width;
-            this.height = height;
-            this.sigma = sigma;
+            _width = width;
+            _height = height;
+            _sigma = sigma;
 
             // The first sample always has a zero offset.
-            weights[0] = ComputeGaussian(0);
-            offsets[0] = 0;
+            _weights[0] = ComputeGaussian(0);
+            _offsets[0] = 0;
 
             // Maintain a sum of all the weighting values.
-            float totalWeights = weights[0];
+            float totalWeights = _weights[0];
 
             // Add pairs of additional sample taps, positioned
             // along a line in both directions from the center.
-            for (int i = 0; i < weights.Length / 2; i++)
+            for (int i = 0; i < _weights.Length / 2; i++)
             {
                 // Store weights for the positive and negative taps.
                 float weight = ComputeGaussian(i + 1);
 
-                weights[i * 2 + 1] = weight;
-                weights[i * 2 + 2] = weight;
+                _weights[i * 2 + 1] = weight;
+                _weights[i * 2 + 2] = weight;
 
                 totalWeights += weight * 2;
 
@@ -91,25 +89,25 @@ namespace Myre.Graphics.PostProcessing
                 float offset = i * 2 + 1.5f;
 
                 // Store texture coordinate offsets for the positive and negative taps.
-                offsets[i * 2 + 1] = offset;
-                offsets[i * 2 + 2] = -offset;
+                _offsets[i * 2 + 1] = offset;
+                _offsets[i * 2 + 2] = -offset;
             }
 
             // Normalize the list of sample weightings, so they will always sum to one.
-            for (int i = 0; i < weights.Length; i++)
+            for (int i = 0; i < _weights.Length; i++)
             {
-                weights[i] /= totalWeights;
+                _weights[i] /= totalWeights;
             }
 
             // Tell the effect about our new filter settings.
-            effect.Parameters["Weights"].SetValue(weights);
-            effect.Parameters["Offsets"].SetValue(offsets);
+            _effect.Parameters["Weights"].SetValue(_weights);
+            _effect.Parameters["Offsets"].SetValue(_offsets);
         }
 
         private float ComputeGaussian(float n)
         {
-            return (float)((1.0 / Math.Sqrt(2 * Math.PI * sigma)) *
-                           Math.Exp(-(n * n) / (2 * sigma * sigma)));
+            return (float)((1.0 / Math.Sqrt(2 * Math.PI * _sigma)) *
+                           Math.Exp(-(n * n) / (2 * _sigma * _sigma)));
         }
     }
 }

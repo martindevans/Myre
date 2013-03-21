@@ -1,45 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Myre.Graphics.Materials;
-using Myre.Collections;
-using Myre.Graphics.PostProcessing;
-using Myre.Graphics.Geometry;
-using Ninject;
 
 namespace Myre.Graphics.Deferred
 {
     public class AntiAliasComponent
         : RendererComponent
     {
-        private Material edgeBlur;
-        private Quad quad;
-        private string inputResource;
+        private readonly Material _edgeBlur;
+        private readonly Quad _quad;
+        private string _inputResource;
 
-        [Inject]
-        public AntiAliasComponent(GraphicsDevice device)
-            : this(device, null)
+        public AntiAliasComponent(GraphicsDevice device, string inputResource = null)
         {
-        }
-
-        public AntiAliasComponent(GraphicsDevice device, string inputResource)
-        {
-            this.edgeBlur = new Material(Content.Load<Effect>("EdgeBlur"));
-            this.quad = new Quad(device);
-            this.inputResource = inputResource;
+            _edgeBlur = new Material(Content.Load<Effect>("EdgeBlur"));
+            _quad = new Quad(device);
+            _inputResource = inputResource;
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
             // define inputs
-            if (inputResource == null)
-                inputResource = context.SetRenderTargets[0].Name;
+            if (_inputResource == null)
+                _inputResource = context.SetRenderTargets[0].Name;
             
-            context.DefineInput(inputResource);
+            context.DefineInput(_inputResource);
             context.DefineInput("edges");
 
             // define outputs
@@ -63,9 +48,9 @@ namespace Myre.Graphics.Deferred
             device.BlendState = BlendState.Opaque;
             device.Clear(Color.Black);
 
-            edgeBlur.Parameters["Texture"].SetValue(GetResource(inputResource));
-            edgeBlur.Parameters["TexelSize"].SetValue(new Vector2(1f / width, 1f / height));
-            quad.Draw(edgeBlur, metadata);
+            _edgeBlur.Parameters["Texture"].SetValue(GetResource(_inputResource));
+            _edgeBlur.Parameters["TexelSize"].SetValue(new Vector2(1f / width, 1f / height));
+            _quad.Draw(_edgeBlur, metadata);
 
             Output("antialiased", target);
         }

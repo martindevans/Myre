@@ -1,29 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Myre.Graphics.Materials;
 using Myre.Collections;
+using Myre.Graphics.Materials;
 
 namespace Myre.Graphics
 {
     public class Quad
     {
-        private GraphicsDevice device;
-        private Vertex[] vertices;
-        private short[] indices;
-        private Vector2 topLeft;
-        private Vector2 bottomRight;
-        private float depth;
+        private readonly GraphicsDevice _device;
+        private readonly Vertex[] _vertices;
+        private readonly short[] _indices;
+        private Vector2 _topLeft;
+        private Vector2 _bottomRight;
+        private float _depth;
 
         struct Vertex
             : IVertexType
         {
+// ReSharper disable NotAccessedField.Local
+// ReSharper disable MemberCanBePrivate.Local
             public Vector3 Position;
             public Vector2 TexCoord;
             public float CornerIndex;
+// ReSharper restore MemberCanBePrivate.Local
+// ReSharper restore NotAccessedField.Local
 
             public Vertex(Vector3 position, Vector2 texCoord, float cornerIndex)
             {
@@ -32,13 +32,13 @@ namespace Myre.Graphics
                 CornerIndex = cornerIndex;
             }
 
-            readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(
+            readonly static VertexDeclaration _vertexDeclaration = new VertexDeclaration(
                 new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                 new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
                 new VertexElement(20, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 1)
             );
 
-            VertexDeclaration IVertexType.VertexDeclaration { get { return VertexDeclaration; } }
+            VertexDeclaration IVertexType.VertexDeclaration { get { return _vertexDeclaration; } }
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Myre.Graphics
         /// <value>The top left.</value>
         public Vector2 TopLeft
         {
-            get { return topLeft; }
+            get { return _topLeft; }
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Myre.Graphics
         /// <value>The bottom right.</value>
         public Vector2 BottomRight
         {
-            get { return bottomRight; }
+            get { return _bottomRight; }
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Myre.Graphics
         /// <value>The depth.</value>
         public float Depth
         {
-            get { return depth; }
+            get { return _depth; }
         }
         
         /// <summary>
@@ -74,16 +74,16 @@ namespace Myre.Graphics
         /// <param name="device">The graphics device.</param>
         public Quad(GraphicsDevice device)
         {
-            this.device = device;
-            this.vertices = new Vertex[4];
-            this.indices = new short[] { 0, 1, 3, 3, 1, 2 };
+            _device = device;
+            _vertices = new Vertex[4];
+            _indices = new short[] { 0, 1, 3, 3, 1, 2 };
 
             SetPosition(new Vector2(-1, 1), new Vector2(1, -1), 0);
         }
 
         public void SetPosition(Rectangle screenCoordinates, float depth = 0)
         {
-            var pp = device.PresentationParameters;
+            var pp = _device.PresentationParameters;
             var resolution = new Vector2(pp.BackBufferWidth, pp.BackBufferHeight);
             SetPosition(ToDeviceCoordinate(screenCoordinates.Left, screenCoordinates.Top, resolution),
                         ToDeviceCoordinate(screenCoordinates.Right, screenCoordinates.Bottom, resolution),
@@ -91,7 +91,7 @@ namespace Myre.Graphics
 
         }
 
-        private Vector2 ToDeviceCoordinate(float x, float y, Vector2 resolution)
+        private static Vector2 ToDeviceCoordinate(float x, float y, Vector2 resolution)
         {
             return new Vector2((x / resolution.X) * 2 - 1, -((y / resolution.Y) * 2 - 1));
         }
@@ -111,23 +111,23 @@ namespace Myre.Graphics
         /// <param name="depth">The depth.</param>
         public void SetPosition(Vector2 topLeft, Vector2 bottomRight, float depth = 0)
         {
-            this.topLeft = topLeft;
-            this.bottomRight = bottomRight;
-            this.depth = depth;
+            _topLeft = topLeft;
+            _bottomRight = bottomRight;
+            _depth = depth;
 
-            vertices[0] = new Vertex(
+            _vertices[0] = new Vertex(
                 new Vector3(topLeft.X, topLeft.Y, depth),
                 new Vector2(0, 0),
                 0);
-            vertices[1] = new Vertex(
+            _vertices[1] = new Vertex(
                 new Vector3(bottomRight.X, topLeft.Y, depth),
                 new Vector2(1, 0),
                 1);
-            vertices[2] = new Vertex(
+            _vertices[2] = new Vertex(
                 new Vector3(bottomRight.X, bottomRight.Y, depth),
                 new Vector2(1, 1),
                 2);
-            vertices[3] = new Vertex(
+            _vertices[3] = new Vertex(
                 new Vector3(topLeft.X, bottomRight.Y, depth),
                 new Vector2(0, 1),
                 3);
@@ -138,7 +138,7 @@ namespace Myre.Graphics
         /// </summary>
         public void Draw()
         {
-            device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, indices, 0, 2);
+            _device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, _vertices, 0, 4, _indices, 0, 2);
         }
 
         public void Draw(Effect effect)

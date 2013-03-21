@@ -1,44 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Content;
-using System.IO;
-using Myre.Extensions;
 using Myre.Graphics.Deferred.LightManagers;
-using System.Collections.ObjectModel;
+using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Deferred
 {
     public class LightingComponent
        : RendererComponent
     {
-        Quad quad;
-        Material restoreDepth;
-        Material copyTexture;
-        ReadOnlyCollection<IDirectLight> directLights;
-        ReadOnlyCollection<IIndirectLight> indirectLights;
+        readonly Quad _quad;
+        readonly Material _restoreDepth;
+        readonly Material _copyTexture;
+        ReadOnlyCollection<IDirectLight> _directLights;
+        ReadOnlyCollection<IIndirectLight> _indirectLights;
 
-        RenderTarget2D directLightBuffer;
-        RenderTarget2D indirectLightBuffer;
+        RenderTarget2D _directLightBuffer;
+        RenderTarget2D _indirectLightBuffer;
 
         public LightingComponent(GraphicsDevice device)
         {
-            quad = new Quad(device);
-            quad.SetPosition(depth: 0.99999f);
+            _quad = new Quad(device);
+            _quad.SetPosition(depth: 0.99999f);
 
-            restoreDepth = new Material(Content.Load<Effect>("RestoreDepth"));
-            copyTexture = new Material(Content.Load<Effect>("CopyTexture"));
+            _restoreDepth = new Material(Content.Load<Effect>("RestoreDepth"));
+            _copyTexture = new Material(Content.Load<Effect>("CopyTexture"));
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
-            // create debug settings
-            var settings = renderer.Settings;
-
             // define inputs
             context.DefineInput("gbuffer_depth");
             context.DefineInput("gbuffer_normals");
@@ -61,8 +52,8 @@ namespace Myre.Graphics.Deferred
             scene.GetManager<DeferredSunLightManager>();
 
             // get lights
-            directLights = scene.FindManagers<IDirectLight>();
-            indirectLights = scene.FindManagers<IIndirectLight>();
+            _directLights = scene.FindManagers<IDirectLight>();
+            _indirectLights = scene.FindManagers<IIndirectLight>();
 
             base.Initialise(renderer, context);
         }
@@ -77,12 +68,12 @@ namespace Myre.Graphics.Deferred
             var height = (int)resolution.Y;
 
             // prepare direct lights
-            for (int i = 0; i < directLights.Count; i++)
-                directLights[i].Prepare(renderer);
+            for (int i = 0; i < _directLights.Count; i++)
+                _directLights[i].Prepare(renderer);
 
             // set and clear direct light buffer
-            directLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
-            device.SetRenderTarget(directLightBuffer);
+            _directLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
+            device.SetRenderTarget(_directLightBuffer);
             device.Clear(Color.Transparent);
 
             // work around for a bug in xna 4.0
@@ -94,37 +85,37 @@ namespace Myre.Graphics.Deferred
             device.DepthStencilState = DepthStencilState.Default;
 
             // restore depth
-            quad.Draw(restoreDepth, metadata);
+            _quad.Draw(_restoreDepth, metadata);
             
             // set render states to additive blend
             device.BlendState = BlendState.Additive;
 
             // draw direct lights
-            for (int i = 0; i < directLights.Count; i++)
-                directLights[i].Draw(renderer);
+            for (int i = 0; i < _directLights.Count; i++)
+                _directLights[i].Draw(renderer);
 
             // output direct lighting
-            Output("directlighting", directLightBuffer);
+            Output("directlighting", _directLightBuffer);
 
             // prepare indirect lights
-            for (int i = 0; i < indirectLights.Count; i++)
-                indirectLights[i].Prepare(renderer);
+            for (int i = 0; i < _indirectLights.Count; i++)
+                _indirectLights[i].Prepare(renderer);
 
             // set and clear indirect light buffer
-            indirectLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
-            device.SetRenderTarget(indirectLightBuffer);
+            _indirectLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
+            device.SetRenderTarget(_indirectLightBuffer);
             device.Clear(Color.Transparent);
 
             //draw indirect lights
-            for (int i = 0; i < indirectLights.Count; i++)
-                indirectLights[i].Draw(renderer);
+            for (int i = 0; i < _indirectLights.Count; i++)
+                _indirectLights[i].Draw(renderer);
 
             // blend direct lighting into the indirect light buffer
-            copyTexture.Parameters["Texture"].SetValue(directLightBuffer);
-            quad.Draw(copyTexture, metadata);
+            _copyTexture.Parameters["Texture"].SetValue(_directLightBuffer);
+            _quad.Draw(_copyTexture, metadata);
 
             // output resulting light buffer
-            Output("lightbuffer", indirectLightBuffer);
+            Output("lightbuffer", _indirectLightBuffer);
         }
     }
 }

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Debugging;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using Myre.Collections;
-using System.Diagnostics;
+using Myre.Debugging;
 
 namespace Myre.Graphics
 {
@@ -20,7 +15,9 @@ namespace Myre.Graphics
         class Setting<T>
             : ISetting
         {
+// ReSharper disable UnusedMember.Local
             public T Value
+// ReSharper restore UnusedMember.Local
             {
                 get { return Target.Value; }
                 set { Target.Value = value; }
@@ -31,24 +28,26 @@ namespace Myre.Graphics
             public Box<T> Target { get; set; }
         }
 
-        private Renderer renderer;
-        private CommandEngine engine;
-        private List<ISetting> settings;
+        private readonly Renderer _renderer;
+        private CommandEngine _engine;
+        private readonly List<ISetting> _settings;
 
         public CommandEngine Engine
         {
-            get { return engine; }
+            get { return _engine; }
         }
 
         public RendererSettings(Renderer renderer)
         {
-            this.renderer = renderer;
-            this.settings = new List<ISetting>();
+            _renderer = renderer;
+            _settings = new List<ISetting>();
         }
 
+// ReSharper disable UnusedMethodReturnValue.Global
         public Box<T> Add<T>(string name, string description = null, T defaultValue = default(T))
+// ReSharper restore UnusedMethodReturnValue.Global
         {
-            var box = renderer.Data.Get(name, defaultValue);
+            var box = _renderer.Data.Get(name, defaultValue);
             var setting = new Setting<T>()
             {
                 Name = name,
@@ -56,35 +55,35 @@ namespace Myre.Graphics
                 Target = box,
             };
 
-            settings.Add(setting);
+            _settings.Add(setting);
 
-            if (engine != null)
+            if (_engine != null)
             {
-                engine.RemoveOption(name);
-                engine.AddOption(setting, "Value", name, description);
+                _engine.RemoveOption(name);
+                _engine.AddOption(setting, "Value", name, description);
             }
 
             return box;
         }
 
-        public void BindCommandEngine(CommandEngine engine)
+        public void BindCommandEngine(CommandEngine commandEngine)
         {
-            if (this.engine == engine)
+            if (_engine == commandEngine)
                 return;
 
-            if (this.engine != null)
+            if (_engine != null)
             {
-                foreach (var item in settings)
-                    this.engine.RemoveCommand(item.Name);
+                foreach (var item in _settings)
+                    _engine.RemoveCommand(item.Name);
             }
 
-            this.engine = engine;
-            if (engine != null)
+            _engine = commandEngine;
+            if (commandEngine != null)
             {
-                foreach (var item in settings)
+                foreach (var item in _settings)
                 {
-                    engine.RemoveOption(item.Name);
-                    engine.AddOption(item, "Value", item.Name, item.Description);
+                    commandEngine.RemoveOption(item.Name);
+                    commandEngine.AddOption(item, "Value", item.Name, item.Description);
                 }
             }
         }

@@ -1,49 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Myre.Entities;
+﻿using Microsoft.Xna.Framework;
 using Myre.Collections;
-using Myre.Entities.Behaviours;
 
 namespace Myre.Graphics
 {
     public sealed class Camera
     {
-        private Matrix view;
-        private Matrix projection;
-        private Matrix viewProjection;
-        private Matrix inverseView;
-        private Matrix inverseProjection;
-        private Matrix inverseViewProjection;
-        private float nearClip;
-        private float farClip;
-        private BoundingFrustum bounds;
-        private bool isDirty = true;
+        private Matrix _view;
+        private Matrix _projection;
+        private Matrix _viewProjection;
+        private Matrix _inverseView;
+        private Matrix _inverseProjection;
+        private Matrix _inverseViewProjection;
+        private float _nearClip;
+        private float _farClip;
+        private BoundingFrustum _bounds;
+        private bool _isDirty = true;
 
-        private Vector3[] frustumCorners = new Vector3[8];
-        private Vector3[] farFrustumCorners = new Vector3[4];
+        private readonly Vector3[] _frustumCorners = new Vector3[8];
+        private readonly Vector3[] _farFrustumCorners = new Vector3[4];
 
         public Matrix View
         {
-            get { return view; }
+            get { return _view; }
             set
             {
-                if (view != value)
+                if (_view != value)
                 {
-                    view = value;
-                    isDirty = true;
+                    _view = value;
+                    _isDirty = true;
                 }
             }
         }
 
         public Matrix Projection
         {
-            get { return projection; }
+            get { return _projection; }
             set 
             {
-                projection = value; 
+                _projection = value; 
             }
         }
 
@@ -51,33 +45,37 @@ namespace Myre.Graphics
         {
             get 
             {
-                if (isDirty) Update();
-                return viewProjection; 
+                if (_isDirty) Update();
+                return _viewProjection; 
             }
         }
 
         public float NearClip
         {
-            get { return nearClip; }
+            get { return _nearClip; }
             set
             {
-                if (nearClip != value)
+// ReSharper disable CompareOfFloatsByEqualityOperator
+                if (_nearClip != value)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                 {
-                    nearClip = value;
-                    isDirty = true;
+                    _nearClip = value;
+                    _isDirty = true;
                 }
             }
         }
 
         public float FarClip
         {
-            get { return farClip; }
+            get { return _farClip; }
             set
             {
-                if (farClip != value)
+// ReSharper disable CompareOfFloatsByEqualityOperator
+                if (_farClip != value)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                 {
-                    farClip = value;
-                    isDirty = true;
+                    _farClip = value;
+                    _isDirty = true;
                 }
             }
         }
@@ -86,19 +84,19 @@ namespace Myre.Graphics
         {
             get 
             {
-                if (isDirty) Update();
-                return bounds; 
+                if (_isDirty) Update();
+                return _bounds; 
             }
         }
 
         private void Update()
         {
-            Matrix.Multiply(ref view, ref projection, out viewProjection);
-            Matrix.Invert(ref view, out inverseView);
-            Matrix.Invert(ref projection, out inverseProjection);
-            Matrix.Invert(ref viewProjection, out inverseViewProjection);
-            bounds = new BoundingFrustum(viewProjection);
-            isDirty = false;
+            Matrix.Multiply(ref _view, ref _projection, out _viewProjection);
+            Matrix.Invert(ref _view, out _inverseView);
+            Matrix.Invert(ref _projection, out _inverseProjection);
+            Matrix.Invert(ref _viewProjection, out _inverseViewProjection);
+            _bounds = new BoundingFrustum(_viewProjection);
+            _isDirty = false;
         }
 
         public void SetMetadata(BoxedValueStore<string> metadata)
@@ -107,19 +105,19 @@ namespace Myre.Graphics
             metadata.Set("view", View);
             metadata.Set("projection", Projection);
             metadata.Set("viewprojection", ViewProjection);
-            metadata.Set("inverseview", inverseView);
-            metadata.Set("inverseprojection", inverseProjection);
-            metadata.Set("inverseviewprojection", inverseViewProjection);
+            metadata.Set("inverseview", _inverseView);
+            metadata.Set("inverseprojection", _inverseProjection);
+            metadata.Set("inverseviewprojection", _inverseViewProjection);
             metadata.Set("viewfrustum", Bounds);
             metadata.Set("nearclip", NearClip);
             metadata.Set("farclip", FarClip);
-            metadata.Set("cameraposition", -view.Translation);
+            metadata.Set("cameraposition", -_view.Translation);
 
-            bounds.GetCorners(frustumCorners);
+            _bounds.GetCorners(_frustumCorners);
             for (int i = 0; i < 4; i++)
-                farFrustumCorners[i] = frustumCorners[i + 4];
-            Vector3.Transform(farFrustumCorners, ref view, farFrustumCorners);
-            metadata.Set("farfrustumcorners", farFrustumCorners);
+                _farFrustumCorners[i] = _frustumCorners[i + 4];
+            Vector3.Transform(_farFrustumCorners, ref _view, _farFrustumCorners);
+            metadata.Set("farfrustumcorners", _farFrustumCorners);
         }
     }
 }

@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Myre.Entities;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics.Materials;
-using Ninject;
-using Myre.Graphics.Geometry;
-using Myre.Debugging;
+using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Lighting
@@ -18,33 +8,33 @@ namespace Myre.Graphics.Lighting
     public class SunLight
         : Behaviour
     {
-        private Property<Vector3> colour;
-        private Property<Vector3> direction;
-        private Property<int> shadowResolution;
+        private Property<Vector3> _colour;
+        private Property<Vector3> _direction;
+        private Property<int> _shadowResolution;
 
         public Vector3 Colour
         {
-            get { return colour.Value; }
-            set { colour.Value = value; }
+            get { return _colour.Value; }
+            set { _colour.Value = value; }
         }
 
         public Vector3 Direction
         {
-            get { return direction.Value; }
-            set { direction.Value = Vector3.Normalize(value); }
+            get { return _direction.Value; }
+            set { _direction.Value = Vector3.Normalize(value); }
         }
 
         public int ShadowResolution
         {
-            get { return shadowResolution.Value; }
-            set { shadowResolution.Value = value; }
+            get { return _shadowResolution.Value; }
+            set { _shadowResolution.Value = value; }
         }
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            colour = context.CreateProperty<Vector3>("colour");
-            direction = context.CreateProperty<Vector3>("direction");
-            shadowResolution = context.CreateProperty<int>("shadow_resolution");
+            _colour = context.CreateProperty<Vector3>("colour");
+            _direction = context.CreateProperty<Vector3>("direction");
+            _shadowResolution = context.CreateProperty<int>("shadow_resolution");
 
             base.CreateProperties(context);
         }
@@ -53,9 +43,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue("colour", colour);
-            initialisationData.TryCopyValue("direction", direction);
-            initialisationData.TryCopyValue("shadow_resolution", shadowResolution);
+            initialisationData.TryCopyValue("colour", _colour);
+            initialisationData.TryCopyValue("direction", _direction);
+            initialisationData.TryCopyValue("shadow_resolution", _shadowResolution);
         }
     }
 }
