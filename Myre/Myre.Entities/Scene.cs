@@ -6,7 +6,6 @@ using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Ninject;
-using Ninject.Planning.Bindings;
 
 namespace Myre.Entities
 {
@@ -16,11 +15,11 @@ namespace Myre.Entities
     public class Scene
         : IDisposableObject
     {
-        private static readonly Dictionary<Type, Type> defaultManagers = new Dictionary<Type, Type>();
+        private static readonly Dictionary<Type, Type> _defaultManagers = new Dictionary<Type, Type>();
         
-        private readonly ServiceContainer services;
-        private readonly BehaviourManagerContainer managers;
-        private readonly List<Entity> entities;
+        private readonly ServiceContainer _services;
+        private readonly BehaviourManagerContainer _managers;
+        private readonly List<Entity> _entities;
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -38,20 +37,20 @@ namespace Myre.Entities
         /// Gets the services.
         /// </summary>
         /// <value>The services.</value>
-        public IEnumerable<IService> Services { get { return services; } }
+        public IEnumerable<IService> Services { get { return _services; } }
 
 #if WINDOWS
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
-        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes { get { return services.ExecutionTimes; } }
+        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes { get { return _services.ExecutionTimes; } }
 #endif
 
         /// <summary>
         /// Gets the managers.
         /// </summary>
         /// <value>The managers.</value>
-        public IEnumerable<IBehaviourManager> Managers { get { return managers; } }
+        public IEnumerable<IBehaviourManager> Managers { get { return _managers; } }
 
         /// <summary>
         /// Gets the Ninject kernel used to instantiate services and behaviour managers.
@@ -64,11 +63,11 @@ namespace Myre.Entities
         /// <param name="kernel">The kernel used to instantiate services and behaviours. <c>null</c> for NinjectKernel.Instance.</param>
         public Scene(IKernel kernel = null)
         {
-            services = new ServiceContainer();
-            managers = new BehaviourManagerContainer();
-            entities = new List<Entity>();
+            _services = new ServiceContainer();
+            _managers = new BehaviourManagerContainer();
+            _entities = new List<Entity>();
             Kernel = kernel ?? NinjectKernel.Instance; //new ChildKernel(kernel ?? NinjectKernel.Instance);
-            Entities = new ReadOnlyCollection<Entity>(entities);
+            Entities = new ReadOnlyCollection<Entity>(_entities);
 
             Kernel.Bind<Scene>().ToConstant(this);
         }
@@ -90,21 +89,21 @@ namespace Myre.Entities
             {
                 var managerType = SearchForDefaultManager(behaviour.GetType());
                 var manager = (managerType != null) ? GetManager(managerType) : null;
-                var handler = managers.Find(behaviour.GetType(), manager);
+                var handler = _managers.Find(behaviour.GetType(), manager);
 
                 if (handler != null)
                     handler.Add(behaviour);
             }
 
-            entities.Add(entity);
+            _entities.Add(entity);
         }
 
         private Type SearchForDefaultManager(Type behaviourType)
         {
             Type managerType;
-            lock (defaultManagers)
+            lock (_defaultManagers)
             {
-                if (defaultManagers.TryGetValue(behaviourType, out managerType))
+                if (_defaultManagers.TryGetValue(behaviourType, out managerType))
                     return managerType;
             }
 
@@ -114,9 +113,9 @@ namespace Myre.Entities
                 var attribute = (DefaultManagerAttribute)attributes[0];
                 managerType = attribute.Manager;
 
-                lock (defaultManagers)
+                lock (_defaultManagers)
                 {
-                    defaultManagers.Add(behaviourType, managerType);
+                    _defaultManagers.Add(behaviourType, managerType);
                 }
                 return managerType;
             }
@@ -134,7 +133,7 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the entity was removed; else <c>false</c>.</returns>
         internal void Remove(Entity entity)
         {
-            var index = entities.IndexOf(entity);
+            var index = _entities.IndexOf(entity);
             if (index != -1)
             {
                 foreach (var behaviour in entity.Behaviours)
@@ -148,7 +147,7 @@ namespace Myre.Entities
                 if (removeNow)
                 {
                     entity.Scene = null;
-                    entities.RemoveAt(index);
+                    _entities.RemoveAt(index);
                 }
             }
         }
@@ -162,7 +161,7 @@ namespace Myre.Entities
         public IBehaviourManager GetManager(Type managerType)
         {
             IBehaviourManager manager;
-            if (managers.TryGet(managerType, out manager))
+            if (_managers.TryGet(managerType, out manager))
                 return manager;
 
             manager = (IBehaviourManager)Kernel.Get(managerType);
@@ -170,11 +169,11 @@ namespace Myre.Entities
             var behaviourTypes = manager.GetManagedTypes();
             foreach (var type in behaviourTypes)
             {
-                if (managers.ContainsForBehaviour(type))
+                if (_managers.ContainsForBehaviour(type))
                     throw new InvalidOperationException(string.Format("A manager for {0} already exists.", type));
             }
 
-            managers.Add(manager);
+            _managers.Add(manager);
             AddBehavioursToManager(behaviourTypes);
 
             manager.Initialise(this);
@@ -186,8 +185,8 @@ namespace Myre.Entities
         {
             var behavioursToBeAdded = 
                 from behaviourType in behaviourTypes
-                let handler = managers.GetByBehaviour(behaviourType)
-                from entity in entities
+                let handler = _managers.GetByBehaviour(behaviourType)
+                from entity in _entities
                 from behaviour in entity.Behaviours
                 let type = behaviour.GetType()
                 where
@@ -222,14 +221,14 @@ namespace Myre.Entities
         public IService GetService(Type serviceType)
         {
             IService service;
-            if (services.TryGet(serviceType, out service))
+            if (_services.TryGet(serviceType, out service))
                 return service;
             
             if (!typeof(IService).IsAssignableFrom(serviceType))
                 throw new ArgumentException("serviceType is not an IService.");
 
             service = (IService)Kernel.Get(serviceType);
-            services.Add(service);
+            _services.Add(service);
 
             service.Initialise(this);
 
@@ -255,7 +254,7 @@ namespace Myre.Entities
         /// <returns></returns>
         public ReadOnlyCollection<T> FindManagers<T>()
         {
-            return managers.FindByType<T>();
+            return _managers.FindByType<T>();
         }
 
         /// <summary>
@@ -264,12 +263,12 @@ namespace Myre.Entities
         /// <param name="elapsedTime">The number of seconds which have elapsed since the previous frame.</param>
         public void Update(float elapsedTime)
         {
-            services.Update(elapsedTime);
+            _services.Update(elapsedTime);
 
-            for (int i = entities.Count - 1; i >= 0; i--)
+            for (int i = _entities.Count - 1; i >= 0; i--)
             {
-                if (entities[i].IsDisposed)
-                    Remove(entities[i]);
+                if (_entities[i].IsDisposed)
+                    Remove(_entities[i]);
             }
         }
 
@@ -278,7 +277,7 @@ namespace Myre.Entities
         /// </summary>
         public void Draw()
         {
-            services.Draw();
+            _services.Draw();
         }
 
         /// <summary>
@@ -305,15 +304,15 @@ namespace Myre.Entities
             {
                 Kernel.Unbind<Scene>();
 
-                entities.Clear();
+                _entities.Clear();
 
-                foreach (var manager in managers)
+                foreach (var manager in _managers)
                     manager.Dispose();
-                managers.Clear();
+                _managers.Clear();
 
-                foreach (var service in services)
+                foreach (var service in _services)
                     service.Dispose();
-                services.Clear();
+                _services.Clear();
             }
         }
 

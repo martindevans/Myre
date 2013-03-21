@@ -1,68 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Extensions;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Myre.Extensions;
 
 namespace Myre.Entities.Services
 {
     class ServiceContainer
         : IEnumerable<IService>
     {
-        private Dictionary<Type, IService> dictionary;
-        private List<IService> update;
-        private List<IService> draw;        
+        private readonly Dictionary<Type, IService> _dictionary;
+        private readonly List<IService> _update;
+        private readonly List<IService> _draw;        
 
-        private List<IService> buffer;
-        private bool dirty;
+        private readonly List<IService> _buffer;
+        private bool _dirty;
 
-        private Comparison<IService> updateOrder;
-        private Comparison<IService> drawOrder;
+        private readonly Comparison<IService> _updateOrder;
+        private readonly Comparison<IService> _drawOrder;
 
 #if WINDOWS
-        Stopwatch timer = new Stopwatch();
-        private List<KeyValuePair<IService, TimeSpan>> executionTimes;
-        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ExecutionTimes;
+        readonly Stopwatch _timer = new Stopwatch();
+        private readonly List<KeyValuePair<IService, TimeSpan>> _executionTimes;
+        public readonly ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ExecutionTimes;
 #endif
 
         public IService this[Type type]
         {
-            get { return dictionary[type]; }
+            get { return _dictionary[type]; }
         }
 
         public ServiceContainer()
         {
-            dictionary = new Dictionary<Type, IService>();
-            update = new List<IService>();
-            draw = new List<IService>();
-            buffer = new List<IService>();
+            _dictionary = new Dictionary<Type, IService>();
+            _update = new List<IService>();
+            _draw = new List<IService>();
+            _buffer = new List<IService>();
 
 #if WINDOWS
-            executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
-            ExecutionTimes = new ReadOnlyCollection<KeyValuePair<IService, TimeSpan>>(executionTimes);
+            _executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
+            ExecutionTimes = new ReadOnlyCollection<KeyValuePair<IService, TimeSpan>>(_executionTimes);
 #endif
 
-            updateOrder = (a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder);
-            drawOrder = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
+            _updateOrder = (a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder);
+            _drawOrder = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
         }
 
         public void Add(IService service)
         {
-            buffer.Add(service);
-            dictionary[service.GetType()] = service;
-            dirty = true;
+            _buffer.Add(service);
+            _dictionary[service.GetType()] = service;
+            _dirty = true;
         }
 
         public bool Remove(IService service)
         {
-            var removed = buffer.Remove(service);
+            var removed = _buffer.Remove(service);
 
             if (removed)
             {
-                dictionary.Remove(service.GetType());
-                dirty = true;
+                _dictionary.Remove(service.GetType());
+                _dirty = true;
             }
 
             return removed;
@@ -70,12 +68,12 @@ namespace Myre.Entities.Services
 
         public bool TryGet(Type serviceType, out IService service)
         {
-            if (dictionary.TryGetValue(serviceType, out service))
+            if (_dictionary.TryGetValue(serviceType, out service))
                 return true;
 
-            foreach (var item in buffer)
+            foreach (var item in _buffer)
             {
-                if (serviceType.IsAssignableFrom(item.GetType()))
+                if (serviceType.IsInstanceOfType(item))
                 {
                     service = item;
                     return true;
@@ -87,28 +85,28 @@ namespace Myre.Entities.Services
 
         public void Clear()
         {
-            buffer.Clear();
-            dirty = true;
+            _buffer.Clear();
+            _dirty = true;
         }
 
         public void Update(float elapsedTime)
         {
             UpdateLists();
-            update.InsertionSort(updateOrder);
+            _update.InsertionSort(_updateOrder);
 
 #if WINDOWS
-            executionTimes.Clear();
+            _executionTimes.Clear();
 #endif
 
-            for (int i = 0; i < update.Count; i++)
+            for (int i = 0; i < _update.Count; i++)
             {
 #if WINDOWS
-                timer.Restart();
+                _timer.Restart();
 #endif
-                update[i].Update(elapsedTime);
+                _update[i].Update(elapsedTime);
 #if WINDOWS
-                timer.Stop();
-                executionTimes.Add(new KeyValuePair<IService, TimeSpan>(update[i], timer.Elapsed));
+                _timer.Stop();
+                _executionTimes.Add(new KeyValuePair<IService, TimeSpan>(_update[i], _timer.Elapsed));
 #endif
             }
         }
@@ -116,42 +114,42 @@ namespace Myre.Entities.Services
         public void Draw()
         {
             UpdateLists();
-            draw.InsertionSort(drawOrder);
-            for (int i = 0; i < draw.Count; i++)
-                draw[i].Draw();
+            _draw.InsertionSort(_drawOrder);
+            for (int i = 0; i < _draw.Count; i++)
+                _draw[i].Draw();
         }
 
         private void UpdateLists()
         {
             RemoveDisposed();
 
-            if (!dirty)
+            if (!_dirty)
                 return;
 
-            update.Clear();
-            update.AddRange(buffer);
+            _update.Clear();
+            _update.AddRange(_buffer);
 
-            draw.Clear();
-            draw.AddRange(buffer);
+            _draw.Clear();
+            _draw.AddRange(_buffer);
 
-            dirty = false;
+            _dirty = false;
         }
 
         private void RemoveDisposed()
         {
-            for (int i = buffer.Count - 1; i >= 0; i--)
+            for (int i = _buffer.Count - 1; i >= 0; i--)
             {
-                if (buffer[i].IsDisposed)
+                if (_buffer[i].IsDisposed)
                 {
-                    buffer.RemoveAt(i);
-                    dirty = true;
+                    _buffer.RemoveAt(i);
+                    _dirty = true;
                 }
             }
         }
 
         public IEnumerator<IService> GetEnumerator()
         {
-            return buffer.GetEnumerator();
+            return _buffer.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

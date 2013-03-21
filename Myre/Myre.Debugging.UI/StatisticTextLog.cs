@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Myre.Debugging.Statistics;
 using Myre.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.UI.Text;
 using Myre.UI.Controls;
 
-namespace Myre.Debugging.Statistics
+namespace Myre.Debugging.UI
 {
     /// <summary>
     /// Shows a text representation of statistics.
@@ -16,17 +14,17 @@ namespace Myre.Debugging.Statistics
     public class StatisticTextLog                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
         : Control
     {
-        private Dictionary<string, StatisticText> stats;
-        private SpriteFont font;
-        private bool autoAdd;
-        private Color textColour;
+        private readonly Dictionary<string, StatisticText> _stats;
+        private readonly SpriteFont _font;
+        private readonly bool _autoAdd;
+        private Color _textColour;
 
         public Color TextColour
         {
-            get { return textColour; }
+            get { return _textColour; }
             set
             {
-                textColour = value;
+                _textColour = value;
                 UpdatePositions();
             }
         }
@@ -34,22 +32,14 @@ namespace Myre.Debugging.Statistics
         /// <summary>
         /// Initializes a new instance of the <see cref="StatisticTextLog"/> class.
         /// </summary>
-        public StatisticTextLog(Control parent, SpriteFont font)
-            : this(parent, font, false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StatisticTextLog"/> class.
-        /// </summary>
-        public StatisticTextLog(Control parent, SpriteFont font, bool autoAdd)
+        public StatisticTextLog(Control parent, SpriteFont font, bool autoAdd = false)
             : base(parent)
         {
-            this.autoAdd = autoAdd;
-            this.font = font;
-            this.textColour = Color.White;
+            _autoAdd = autoAdd;
+            _font = font;
+            _textColour = Color.White;
             RespectSafeArea = true;
-            stats = new Dictionary<string, StatisticText>();
+            _stats = new Dictionary<string, StatisticText>();
             SetPoint(Points.TopLeft, 0, 0);
             SetPoint(Points.Right, 0, 0);
 
@@ -75,8 +65,8 @@ namespace Myre.Debugging.Statistics
         {
             if (statistic == null)
                 throw new ArgumentNullException("statistic");
-            if (!stats.ContainsKey(statistic.Name))
-                stats.Add(statistic.Name, new StatisticText(this, statistic, accessInterval, font));
+            if (!_stats.ContainsKey(statistic.Name))
+                _stats.Add(statistic.Name, new StatisticText(this, statistic, accessInterval, _font));
             UpdatePositions();
         }
 
@@ -86,10 +76,10 @@ namespace Myre.Debugging.Statistics
         /// <param name="statisticName">Name of the statistic.</param>
         public void RemoveStatistic(string statisticName)
         {
-            if (stats.ContainsKey(statisticName))
+            if (_stats.ContainsKey(statisticName))
             {
-                stats[statisticName].Label.Dispose();
-                stats.Remove(statisticName);
+                _stats[statisticName].Label.Dispose();
+                _stats.Remove(statisticName);
                 UpdatePositions();
             }
         }
@@ -100,11 +90,11 @@ namespace Myre.Debugging.Statistics
         /// <param name="statistic">The statistic.</param>
         public void RemoveStatistic(Statistic statistic)
         {
-            if (stats.ContainsKey(statistic.Name) && stats[statistic.Name].Statistic == statistic)
+            if (_stats.ContainsKey(statistic.Name) && _stats[statistic.Name].Statistic == statistic)
             {
                 //Remove(stats[statistic.Name].Label);
-                stats[statistic.Name].Label.Dispose();
-                stats.Remove(statistic.Name);
+                _stats[statistic.Name].Label.Dispose();
+                _stats.Remove(statistic.Name);
                 UpdatePositions();
             }
         }
@@ -115,18 +105,18 @@ namespace Myre.Debugging.Statistics
         /// <param name="gameTime">The current game time.</param>
         public override void Update(GameTime gameTime)
         {
-            if (autoAdd)
+            if (_autoAdd)
             {
                 foreach (var item in Statistic.Statistics)
                 {
-                    if (!stats.ContainsKey(item.Key))
+                    if (!_stats.ContainsKey(item.Key))
                         AddStatistic(item.Key, TimeSpan.FromSeconds(0.5));
                 }
             }
 
             RemoveDisposed();
 
-            foreach (var stat in stats.Values)
+            foreach (var stat in _stats.Values)
                 stat.Update();
 
             base.Update(gameTime);
@@ -135,7 +125,7 @@ namespace Myre.Debugging.Statistics
         private void RemoveDisposed()
         {
             List<Statistic> disposed = null;
-            foreach (var stat in stats.Values)
+            foreach (var stat in _stats.Values)
             {
                 if (stat.Statistic.IsDisposed)
                 {
@@ -157,7 +147,7 @@ namespace Myre.Debugging.Statistics
         {
             int height = 0;
             Control previous = null;
-            foreach (var stat in stats.Values)
+            foreach (var stat in _stats.Values)
             {
                 if (previous == null)
                     stat.Label.SetPoint(Points.Top, 0, 0);
@@ -166,7 +156,7 @@ namespace Myre.Debugging.Statistics
 
                 stat.Label.SetPoint(Points.Left, 0, 0);
                 stat.Label.SetPoint(Points.Right, 0, 0);
-                stat.Label.Colour = textColour;
+                stat.Label.Colour = _textColour;
 
                 height += stat.Label.Area.Height;
                 previous = stat.Label;
@@ -179,15 +169,17 @@ namespace Myre.Debugging.Statistics
     class StatisticText
         : StatisticTracker
     {
-        Label label;
+        readonly Label _label;
 
-        public Label Label { get { return label; } }
+        public Label Label { get { return _label; } }
 
         public StatisticText(StatisticTextLog log, Statistic statistic, TimeSpan accessInterval, SpriteFont font)
             : base(statistic, accessInterval)
         {
-            label = new Label(log, font);
-            label.Text = statistic.Name + ": " + string.Format(statistic.Format, statistic.Value);
+            _label = new Label(log, font)
+            {
+                Text = statistic.Name + ": " + string.Format(statistic.Format, statistic.Value)
+            };
         }
 
         public void Update()
@@ -195,7 +187,7 @@ namespace Myre.Debugging.Statistics
             bool read, changed;
             float value = GetValue(out read, out changed);
             if (changed)
-                label.Text = Statistic.Name + ": " + string.Format(Statistic.Format, value);
+                _label.Text = Statistic.Name + ": " + string.Format(Statistic.Format, value);
         }
     }
 }

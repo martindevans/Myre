@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
+﻿using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures
 {
@@ -16,7 +11,7 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add(1 + 5/*Enum.(typeof(MouseButtons)).Length*/);
         }
 
-        public override bool Test(MouseDevice device)
+        protected override bool Test(MouseDevice device)
         {
             return device.WheelMovement != 0;
         }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Text;
 
 namespace Myre.UI.Controls
@@ -29,27 +27,23 @@ namespace Myre.UI.Controls
     public class TextLog
         : Control
     {
-        List<StringPart> text;
-        SpriteFont font;
-        bool moveNextDrawToNewLine;
-        int historyCapacity;
-        int startIndex;
+        readonly List<StringPart> _text;
+        SpriteFont _font;
+        bool _moveNextDrawToNewLine;
+        readonly int _historyCapacity;
+        int _startIndex;
 
         /// <summary>
         /// Gets or sets the font.
         /// </summary>
         public SpriteFont Font
         {
-            get { return font; }
+            get { return _font; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
-                if (font != value)
-                {
-                    font = value;
-                    //Recalculate();
-                }
+                _font = value;
             }
         }
 
@@ -97,11 +91,12 @@ namespace Myre.UI.Controls
         /// </summary>
         /// <param name="parent">This controls parent control.</param>
         /// <param name="font">The font to use to draw the text contained by this log.</param>
+        /// <param name="historyCapacity"></param>
         public TextLog(Control parent, SpriteFont font, int historyCapacity)
             : base(parent)
         {
-            this.historyCapacity = historyCapacity;
-            text = new List<StringPart>();
+            _historyCapacity = historyCapacity;
+            _text = new List<StringPart>();
             Font = font;
             Colour = Color.White;
             Scale = Vector2.One;
@@ -128,32 +123,32 @@ namespace Myre.UI.Controls
             //t.Height = t.Batch.CalculateArea(Int2D.Zero, Justification, Area.Width).Height;
             //text.Insert(0, t);
             Write(line.ToString());
-            moveNextDrawToNewLine = true;
+            _moveNextDrawToNewLine = true;
         }
 
         /// <summary>
         /// Appends text onto the last line written.
         /// </summary>
-        /// <param name="text">The text to append.</param>
+        /// <param name="line">The text to append.</param>
         public void Write(StringPart line)
         {
-            if (moveNextDrawToNewLine || text.Count == 0)
+            if (_moveNextDrawToNewLine || _text.Count == 0)
             {
-                text.Add(line);
-                moveNextDrawToNewLine = false;
+                _text.Add(line);
+                _moveNextDrawToNewLine = false;
             }
             else
             {
-                var current = text[text.Count - 1];
-                text[text.Count - 1] = current.ToString() + line.ToString();
+                var current = _text[_text.Count - 1];
+                _text[_text.Count - 1] = current.ToString() + line.ToString();
             }
 
             //if (line[line.Length - 1] == '\n')
             //    moveNextDrawToNewLine = true;
 
-            text.RemoveRange(0, Math.Max(0, text.Count - historyCapacity));
+            _text.RemoveRange(0, Math.Max(0, _text.Count - _historyCapacity));
 
-            if (startIndex == text.Count - 1)
+            if (_startIndex == _text.Count - 1)
                 ScrollToNewest();
         }
 
@@ -166,7 +161,7 @@ namespace Myre.UI.Controls
             //{
             //    text[i].Batch.Clear();
             //}
-            text.Clear();
+            _text.Clear();
         }
 
         /// <summary>
@@ -177,10 +172,10 @@ namespace Myre.UI.Controls
         {
             var heightOffset = 0f;
 
-            for (int i = startIndex - 1; i >= 0; i--)
+            for (int i = _startIndex - 1; i >= 0; i--)
             {
-                var line = text[i];
-                var size = font.MeasureParsedString(line, Scale, Area.Width);
+                var line = _text[i];
+                var size = _font.MeasureParsedString(line, Scale, Area.Width);
 
                 var position = new Vector2(Area.X, Area.Y + (Direction == GrowthDirection.Down ? heightOffset : Area.Height - heightOffset - size.Y));
                 batch.DrawParsedString(Font, line, position, Colour, 0, Vector2.Zero, Scale, Area.Width, Justification);
@@ -198,7 +193,7 @@ namespace Myre.UI.Controls
         /// </summary>
         public void ScrollBackward()
         {
-            startIndex = Math.Max(0, startIndex - 1);
+            _startIndex = Math.Max(0, _startIndex - 1);
         }
 
         /// <summary>
@@ -206,7 +201,7 @@ namespace Myre.UI.Controls
         /// </summary>
         public void ScrollForward()
         {
-            startIndex = Math.Min(text.Count, startIndex + 1);
+            _startIndex = Math.Min(_text.Count, _startIndex + 1);
         }
 
         /// <summary>
@@ -214,7 +209,7 @@ namespace Myre.UI.Controls
         /// </summary>
         public void ScrollToNewest()
         {
-            startIndex = text.Count;
+            _startIndex = _text.Count;
         }
     }
 }

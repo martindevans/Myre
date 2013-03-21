@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
-using System.Reflection;
 
 namespace Myre.Collections
 {
@@ -12,10 +8,10 @@ namespace Myre.Collections
     /// </summary>
     /// <typeparam name="T">
     /// The type of object to store. It must define a parameterless constructor, 
-    /// and may implement <see cref="IResetable"/>.</typeparam>
+    /// and may implement <see cref="IRecycleable"/>.</typeparam>
     public class Pool<T> where T : class, new()
     {
-        static Pool<T> instance;
+        static Pool<T> _instance;
         /// <summary>
         /// Gets the static instance.
         /// </summary>
@@ -24,18 +20,18 @@ namespace Myre.Collections
         {
             get
             {
-                if (instance == null)
+                if (_instance == null)
                 {
                     var p = new Pool<T>();
-                    Interlocked.CompareExchange(ref instance, p, null);
+                    Interlocked.CompareExchange(ref _instance, p, null);
                 }
 
-                return instance;
+                return _instance;
             }
         }
 
-        Stack<T> items;
-        bool isResetableType;
+        readonly Stack<T> _items;
+        readonly bool _isResetableType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Pool&lt;T&gt;"/> class.
@@ -51,10 +47,10 @@ namespace Myre.Collections
         /// <param name="initialCapacity">The initial number of elements contained within the <see cref="Pool&lt;T&gt;"/>.</param>
         public Pool(int initialCapacity)
         {
-            isResetableType = typeof(IRecycleable).IsAssignableFrom(typeof(T));
-            items = new Stack<T>(initialCapacity);
+            _isResetableType = typeof(IRecycleable).IsAssignableFrom(typeof(T));
+            _items = new Stack<T>(initialCapacity);
             for (int i = 0; i < initialCapacity; i++)
-                items.Push(new T());
+                _items.Push(new T());
         }
 
         /// <summary>
@@ -63,10 +59,10 @@ namespace Myre.Collections
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Get()
         {
-            if (items.Count > 0)
+            if (_items.Count > 0)
             {
-                T item = items.Pop();
-                if (isResetableType)
+                T item = _items.Pop();
+                if (_isResetableType)
                     (item as IRecycleable).Recycle();
                 return item;
             }
@@ -80,7 +76,7 @@ namespace Myre.Collections
         /// <param name="item">The item to be returned.</param>
         public void Return(T item)
         {
-            items.Push(item);
+            _items.Push(item);
         }
     }
 }

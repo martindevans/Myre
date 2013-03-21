@@ -14,7 +14,7 @@ namespace Myre.Graphics
 #if WINDOWS
             _manager = new ResourceContentManager(services, x86Resources.ResourceManager);
 #else
-            manager = new ResourceContentManager(services, XboxResources.ResourceManager);
+            _manager = new ResourceContentManager(services, XboxResources.ResourceManager);
 #endif
         }
 

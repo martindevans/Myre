@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 
@@ -13,7 +10,7 @@ namespace Myre.Extensions
     /// </summary>
     public static class ColorExtensions
     {
-        static Dictionary<string, Color> colours;
+        static Dictionary<string, Color> _colours;
 
         /// <summary>
         /// Multiplies the the specified <see cref="Color"/> with this <see cref="Color"/>.
@@ -94,7 +91,7 @@ namespace Myre.Extensions
 
         private static void InitialiseColours()
         {
-            colours = new Dictionary<string, Color>();
+            _colours = new Dictionary<string, Color>();
             var t = typeof(Color);
             var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Static);
             foreach (var p in properties)
@@ -104,7 +101,7 @@ namespace Myre.Extensions
 
                 var value = p.GetValue(null, null);
                 if (value.GetType() == t)
-                    colours.Add(p.Name.ToUpper(), (Color)value);
+                    _colours.Add(p.Name.ToUpper(), (Color)value);
             }
         }
 
@@ -145,17 +142,17 @@ namespace Myre.Extensions
 
         private static bool TryGetColourByName(this string name, out Color colour)
         {
-            if (colours == null)
+            if (_colours == null)
                 InitialiseColours();
 
             name = name.ToUpper();
-            if (!colours.ContainsKey(name))
+            if (!_colours.ContainsKey(name))
             {
                 colour = Color.White;
                 return false;
             }
 
-            colour = colours[name];
+            colour = _colours[name];
             return true;
         }
     }

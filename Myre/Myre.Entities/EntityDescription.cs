@@ -87,15 +87,15 @@ namespace Myre.Entities
     /// </summary>
     public class EntityDescription
     {
-        private static readonly Dictionary<Type, ConstructorInfo> propertyConstructors = new Dictionary<Type, ConstructorInfo>();
-        private static readonly Type genericType = Type.GetType("Myre.Entities.Property`1");
+        private static readonly Dictionary<Type, ConstructorInfo> _propertyConstructors = new Dictionary<Type, ConstructorInfo>();
+        private static readonly Type _genericType = Type.GetType("Myre.Entities.Property`1");
 
-        private readonly IKernel kernel;
-        private readonly List<BehaviourData> behaviours;
-        private readonly List<PropertyData> properties;
+        private readonly IKernel _kernel;
+        private readonly List<BehaviourData> _behaviours;
+        private readonly List<PropertyData> _properties;
 
-        private readonly Queue<Entity> pool;
-        private uint version;
+        private readonly Queue<Entity> _pool;
+        private uint _version;
 
         /// <summary>
         /// Gets a list of behaviours in this instance.
@@ -115,13 +115,13 @@ namespace Myre.Entities
         /// <param name="kernel">The kernel.</param>
         public EntityDescription(IKernel kernel = null)
         {
-            this.kernel = kernel ?? NinjectKernel.Instance;
-            behaviours = new List<BehaviourData>();
-            properties = new List<PropertyData>();
-            pool = new Queue<Entity>();
+            _kernel = kernel ?? NinjectKernel.Instance;
+            _behaviours = new List<BehaviourData>();
+            _properties = new List<PropertyData>();
+            _pool = new Queue<Entity>();
 
-            Behaviours = new ReadOnlyCollection<BehaviourData>(behaviours);
-            Properties = new ReadOnlyCollection<PropertyData>(properties);
+            Behaviours = new ReadOnlyCollection<BehaviourData>(_behaviours);
+            Properties = new ReadOnlyCollection<PropertyData>(_properties);
         }
 
         /// <summary>
@@ -129,8 +129,8 @@ namespace Myre.Entities
         /// </summary>
         public virtual void Reset()
         {
-            behaviours.Clear();
-            properties.Clear();
+            _behaviours.Clear();
+            _properties.Clear();
             IncrementVersion();
         }
 
@@ -156,10 +156,10 @@ namespace Myre.Entities
         {
             Assert.ArgumentNotNull("behaviour.Type", behaviour.Type);
 
-            if (behaviours.Contains(behaviour))
+            if (_behaviours.Contains(behaviour))
                 return false;
 
-            behaviours.Add(behaviour);
+            _behaviours.Add(behaviour);
             IncrementVersion();
 
             return true;
@@ -210,12 +210,12 @@ namespace Myre.Entities
         /// <returns></returns>
         public bool RemoveBehaviour(Type type, string name = null)
         {
-            for (int i = 0; i < behaviours.Count; i++)
+            for (int i = 0; i < _behaviours.Count; i++)
             {
-                var item = behaviours[i];
+                var item = _behaviours[i];
                 if (item.Type == type && (name == null || item.Name == name))
                 {
-                    behaviours.RemoveAt(i);
+                    _behaviours.RemoveAt(i);
                     IncrementVersion();
                     return true;
                 }
@@ -253,10 +253,10 @@ namespace Myre.Entities
                 Assert.IsTrue(property.DataType.IsAssignableFrom(initialType), "Cannot cast initial value to type of property");
             }
 
-            if (properties.Contains(property))
+            if (_properties.Contains(property))
                 return false;
 
-            properties.Add(property);
+            _properties.Add(property);
             IncrementVersion();
 
             return true;
@@ -293,11 +293,11 @@ namespace Myre.Entities
         /// <returns></returns>
         public bool RemoveProperty(string name)
         {
-            for (int i = 0; i < properties.Count; i++)
+            for (int i = 0; i < _properties.Count; i++)
             {
-                if (properties[i].Name == name)
+                if (_properties[i].Name == name)
                 {
-                    properties.RemoveAt(i);
+                    _properties.RemoveAt(i);
                     IncrementVersion();
                     return true;
                 }
@@ -315,10 +315,10 @@ namespace Myre.Entities
         {
             Entity e;
 
-            if (pool.Count > 0)
+            if (_pool.Count > 0)
                 e = InitialisePooledEntity();
             else
-                e = new Entity(CreateProperties(), CreateBehaviours(), new EntityVersion(this, version));
+                e = new Entity(CreateProperties(), CreateBehaviours(), new EntityVersion(this, _version));
 
             return e;
         }
@@ -330,20 +330,20 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the entity was recycled; else <c>false</c>.</returns>
         public virtual bool Recycle(Entity entity)
         {
-            if (entity.Version.Creator != this || entity.Version.Version != version)
+            if (entity.Version.Creator != this || entity.Version.Version != _version)
                 return false;
 
-            pool.Enqueue(entity);
+            _pool.Enqueue(entity);
             return true;
         }
 
         private Entity InitialisePooledEntity()
         {
-            var entity = pool.Dequeue();
+            var entity = _pool.Dequeue();
             foreach (IProperty item in entity.Properties)
             {
                 item.Clear();
-                foreach (var p in properties)
+                foreach (var p in _properties)
                 {
                     if (p.Name == item.Name && p.DataType == item.Type)
                     {
@@ -360,37 +360,39 @@ namespace Myre.Entities
         {
             unchecked
             {
-                version++;
+                _version++;
             }
 
-            pool.Clear();
+            _pool.Clear();
         }
 
         private IEnumerable<IProperty> CreateProperties()
         {
-            foreach (var item in properties)
+            foreach (var item in _properties)
                 yield return CreatePropertyInstance(item);
         }
 
         private IEnumerable<Behaviour> CreateBehaviours()
         {
-            foreach (var item in behaviours)
-                yield return CreateBehaviourInstance(kernel, item);
+            foreach (var item in _behaviours)
+                yield return CreateBehaviourInstance(_kernel, item);
         }
 
         private IProperty CreatePropertyInstance(PropertyData property)
         {
             ConstructorInfo constructor;
-            if (!propertyConstructors.TryGetValue(property.DataType, out constructor))
+            if (!_propertyConstructors.TryGetValue(property.DataType, out constructor))
             {
-                var type = genericType.MakeGenericType(property.DataType);
+                var type = _genericType.MakeGenericType(property.DataType);
                 constructor = type.GetConstructor(new Type[] { typeof(string) });
-                propertyConstructors.Add(property.DataType, constructor);
+                _propertyConstructors.Add(property.DataType, constructor);
             }
 
             Assert.ArgumentNotNull("constructor", constructor);
+            Debug.Assert(constructor != null, "constructor != null");
             IProperty prop = constructor.Invoke(new object[] { property.Name }) as IProperty;
             Assert.ArgumentNotNull("property", prop);
+            Debug.Assert(prop != null, "prop != null");
             prop.Value = property.InitialValue;
 
             return prop;
@@ -403,7 +405,7 @@ namespace Myre.Entities
             if (behaviour.Factory != null)
                 instance = behaviour.Factory(behaviour.Name);
             else
-                instance = kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name)) as Behaviour;
+                instance = (Behaviour)kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name));
 
             instance.Name = behaviour.Name;
             return instance;

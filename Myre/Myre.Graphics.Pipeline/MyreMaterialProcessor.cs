@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
 namespace Myre.Graphics.Pipeline
 {
@@ -25,11 +19,9 @@ namespace Myre.Graphics.Pipeline
     {
         public override MyreMaterialContent Process(MyreMaterialData input, ContentProcessorContext context)
         {
-            MyreMaterialContent output = new MyreMaterialContent();
-            output.Technique = input.Technique;
+            MyreMaterialContent output = new MyreMaterialContent {Technique = input.Technique};
 
-            EffectMaterialContent material = new EffectMaterialContent();
-            material.Effect = new ExternalReference<EffectContent>(input.EffectName);
+            EffectMaterialContent material = new EffectMaterialContent {Effect = new ExternalReference<EffectContent>(input.EffectName)};
 
             foreach (var texture in input.Textures)
                 material.Textures.Add(texture.Key, new ExternalReference<TextureContent>(texture.Value));

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -27,74 +25,69 @@ namespace Myre.UI.InputDevices
         : IInputDevice
     {
         public PlayerIndex Player { get; private set; }
-        private GamePadState currentState;
-        private GamePadState previousState;
-        private GamePadThumbSticks currentThumbsticks;
-        private GamePadThumbSticks previousThumbsticks;
-        private float minDeadZone = 0.25f;
-        private List<int> blocked;
+        private GamePadState _currentState;
+        private GamePadState _previousState;
+        private const float MIN_DEAD_ZONE = 0.25f;
+        private readonly List<int> _blocked;
 
         public InputActor Owner { get; set; }
 
         public Vector2 LeftThumbstick
         {
-            get { return currentState.ThumbSticks.Left; }
+            get { return _currentState.ThumbSticks.Left; }
         }
 
         public Vector2 LeftThumbstickMovement
         {
-            get { return currentState.ThumbSticks.Left - previousState.ThumbSticks.Left; }
+            get { return _currentState.ThumbSticks.Left - _previousState.ThumbSticks.Left; }
         }
 
         public Vector2 RightThumbstick
         {
-            get { return currentState.ThumbSticks.Right; }
+            get { return _currentState.ThumbSticks.Right; }
         }
 
         public Vector2 RightThumbstickMovement
         {
-            get { return currentState.ThumbSticks.Right - previousState.ThumbSticks.Right; }
+            get { return _currentState.ThumbSticks.Right - _previousState.ThumbSticks.Right; }
         }
 
         public float LeftTrigger
         {
-            get { return currentState.Triggers.Left; }
+            get { return _currentState.Triggers.Left; }
         }
 
         public float LeftTriggerMovement
         {
-            get { return currentState.Triggers.Left - previousState.Triggers.Left; }
+            get { return _currentState.Triggers.Left - _previousState.Triggers.Left; }
         }
 
         public float RightTrigger
         {
-            get { return currentState.Triggers.Right; }
+            get { return _currentState.Triggers.Right; }
         }
 
         public float RightTriggerMovement
         {
-            get { return currentState.Triggers.Right - previousState.Triggers.Right; }
+            get { return _currentState.Triggers.Right - _previousState.Triggers.Right; }
         }
 
         public GamepadDevice(PlayerIndex player)
         {
-            this.Player = player;
-            previousState = currentState = GamePad.GetState(player);
-            blocked = new List<int>();
+            Player = player;
+            _previousState = _currentState = GamePad.GetState(player);
+            _blocked = new List<int>();
         }
 
         public void Update(GameTime gameTime)
         {
-            previousState = currentState;
-            currentState = GamePad.GetState(Player, GamePadDeadZone.IndependentAxes);
-
-            previousThumbsticks = currentThumbsticks;
-            currentThumbsticks = GamePad.GetState(Player, GamePadDeadZone.None).ThumbSticks;
+            _previousState = _currentState;
+            _currentState = GamePad.GetState(Player, GamePadDeadZone.IndependentAxes);
         }
 
         public void Evaluate(GameTime gameTime, Control focused, UserInterface ui)
         {
-            if (!currentState.IsConnected)
+            if (!_currentState.IsConnected)
                 return;
 
             var type = typeof(GamepadDevice);
@@ -106,21 +99,21 @@ namespace Myre.UI.InputDevices
                     break;
             }
 
-            ui.EvaluateGlobalGestures(gameTime, this, blocked);
+            ui.EvaluateGlobalGestures(gameTime, this);
 
-            blocked.Clear();
+            _blocked.Clear();
         }
 
         public void BlockInputs(IEnumerable<int> inputs)
         {
-            blocked.AddRange(inputs);
+            _blocked.AddRange(inputs);
         }
 
-        public bool IsBlocked(ICollection<int> inputs)
+        public bool IsBlocked(IEnumerable<int> inputs)
         {
             foreach (var item in inputs)
             {
-                if (blocked.Contains(item))
+                if (_blocked.Contains(item))
                     return true;
             }
 
@@ -142,14 +135,14 @@ namespace Myre.UI.InputDevices
             }
         }
 
-        private Vector2 RescaleMagnitude(Vector2 direction, float power)
+        private static Vector2 RescaleMagnitude(Vector2 direction, float power)
         {
             float magnitude = direction.Length();
 
-            if (magnitude == 0)
+            if (Math.Abs(magnitude - 0) < float.Epsilon)
                 return Vector2.Zero;
 
-            float targetMagnitude = Rescale(magnitude, minDeadZone, 1f);
+            float targetMagnitude = Rescale(magnitude, MIN_DEAD_ZONE, 1f);
             targetMagnitude = (float)Math.Pow(targetMagnitude, power);
             return direction * (targetMagnitude / magnitude);
         }
@@ -157,9 +150,9 @@ namespace Myre.UI.InputDevices
         private float RescaleAxis(float value, float power)
         {
             if (value > 0)
-                value = Rescale(value, minDeadZone, 1f);
+                value = Rescale(value, MIN_DEAD_ZONE, 1f);
             else
-                value = -Rescale(-value, minDeadZone, 1f);
+                value = -Rescale(-value, MIN_DEAD_ZONE, 1f);
 
             return (float)Math.Pow(value, power);
         }
@@ -173,22 +166,22 @@ namespace Myre.UI.InputDevices
 
         public bool IsButtonDown(Buttons button)
         {
-            return currentState.IsButtonDown(button);
+            return _currentState.IsButtonDown(button);
         }
 
         public bool IsButtonUp(Buttons button)
         {
-            return currentState.IsButtonUp(button);
+            return _currentState.IsButtonUp(button);
         }
 
         public bool WasButtonDown(Buttons button)
         {
-            return previousState.IsButtonDown(button);
+            return _previousState.IsButtonDown(button);
         }
 
         public bool WasButtonUp(Buttons button)
         {
-            return previousState.IsButtonUp(button);
+            return _previousState.IsButtonUp(button);
         }
 
         public bool IsButtonNewlyDown(Buttons button)

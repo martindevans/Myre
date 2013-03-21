@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Entities.Services;
 
 namespace Myre.Physics2D
 {

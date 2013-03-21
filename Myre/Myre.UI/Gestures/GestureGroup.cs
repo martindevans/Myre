@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Myre.UI.InputDevices;
 
@@ -10,11 +8,11 @@ namespace Myre.UI.Gestures
     /// <summary>
     /// Encapsulates a method which handles input events.
     /// </summary>
-    /// <typeparam name="T">The type of input gesture. This must inherit from IGesture.</typeparam>
+    /// <typeparam name="G">The type of input gesture. This must inherit from IGesture.</typeparam>
     /// <param name="gesture">The gesture which has caused the input event.</param>
     /// <param name="gameTime">The GameTime for this frame.</param>
     /// <param name="device">The input device which caused the event.</param>
-    public delegate void GestureHandler<G>(G gesture, GameTime gameTime, IInputDevice device) 
+    public delegate void GestureHandler<in G>(G gesture, GameTime gameTime, IInputDevice device) 
         where G : IGesture;
 
     interface IGesturePair
@@ -32,7 +30,7 @@ namespace Myre.UI.Gestures
         public GestureHandler<G> Handler { get; set; }
         public bool Evaluated { get; set; }
 
-        private bool matched;
+        private bool _matched;
 
         public bool Evaluate(GameTime gameTime, IInputDevice device)
         {
@@ -44,7 +42,7 @@ namespace Myre.UI.Gestures
             if (Gesture.Test(device))
             {
                 Handler(Gesture, gameTime, device);
-                matched = true;
+                _matched = true;
                 return true;
             }
 
@@ -53,10 +51,10 @@ namespace Myre.UI.Gestures
 
         public void BlockInputs(IInputDevice device)
         {
-            if (matched)
+            if (_matched)
             {
                 device.BlockInputs(Gesture.BlockedInputs);
-                matched = false;
+                _matched = false;
             }
         }
     }
@@ -64,15 +62,15 @@ namespace Myre.UI.Gestures
 
     public class GestureGroup
     {
-        private Dictionary<Type, List<IGesturePair>> gesturePairs;
-        private UserInterface ui;
+        private readonly Dictionary<Type, List<IGesturePair>> _gesturePairs;
+        private readonly UserInterface _ui;
 
         public List<Type> BlockedDevices { get; private set; }
 
         public GestureGroup(UserInterface ui)
         {
-            this.gesturePairs = new Dictionary<Type, List<IGesturePair>>();
-            this.ui = ui;
+            _gesturePairs = new Dictionary<Type, List<IGesturePair>>();
+            _ui = ui;
 
             BlockedDevices = new List<Type>();
         }
@@ -80,9 +78,9 @@ namespace Myre.UI.Gestures
         public void Evaluate(GameTime gameTime, IInputDevice device)
         {
             Type type = device.GetType();
-            if (gesturePairs.ContainsKey(type))
+            if (_gesturePairs.ContainsKey(type))
             {
-                List<IGesturePair> pairs = gesturePairs[type];
+                List<IGesturePair> pairs = _gesturePairs[type];
                 for (int i = 0; i < pairs.Count; i++)
                     pairs[i].Evaluate(gameTime, device);
                 for (int i = 0; i < pairs.Count; i++)
@@ -103,28 +101,28 @@ namespace Myre.UI.Gestures
         /// <summary>
         /// Binds the specified gesture to the control.
         /// </summary>
-        /// <param name="handler">A delegate with signature: (<typeparamref name="Gesture"/> gesture, GameTime gameTime, IInputDevice device)</param>
+        /// <param name="handler">A delegate with signature: (<typeparamref name="TGesture"/> gesture, GameTime gameTime, IInputDevice device)</param>
         /// <param name="gestures">The gestures to bind.</param>
-        public void Bind<Gesture>(GestureHandler<Gesture> handler, params Gesture[] gestures)
-            where Gesture : IGesture
+        public void Bind<TGesture>(GestureHandler<TGesture> handler, params TGesture[] gestures)
+            where TGesture : IGesture
         {
             if (handler == null)
                 throw new ArgumentNullException("handler");
 
             foreach (var gesture in gestures)
             {
-                AddGesture<Gesture>(gesturePairs, handler, gesture);
+                AddGesture<TGesture>(_gesturePairs, handler, gesture);
 
                 if (gesture.AlwaysEvaluate)
-                    AddGesture<Gesture>(ui.GlobalGestures, handler, gesture);
+                    AddGesture<TGesture>(_ui.GlobalGestures, handler, gesture);
             }
         }
 
-        private static void AddGesture<Gesture>(Dictionary<Type, List<IGesturePair>> pairs, GestureHandler<Gesture> handler, Gesture gesture)
-            where Gesture : IGesture
+        private static void AddGesture<TGesture>(Dictionary<Type, List<IGesturePair>> pairs, GestureHandler<TGesture> handler, TGesture gesture)
+            where TGesture : IGesture
         {
             Type type = gesture.DeviceType;
-            List<IGesturePair> p = null;
+            List<IGesturePair> p;
             if (pairs.ContainsKey(type))
                 p = pairs[type];
             else
@@ -133,7 +131,7 @@ namespace Myre.UI.Gestures
                 pairs.Add(type, p);
             }
 
-            p.Add(new GesturePair<Gesture>()
+            p.Add(new GesturePair<TGesture>()
             {
                 Gesture = gesture,
                 Handler = handler

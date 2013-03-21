@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
-using Myre.Extensions;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.GamerServices;
 
 namespace Myre.UI
 {
-    public class UserInterface
+    public sealed class UserInterface
         : IGameComponent, IDrawable, IUpdateable
     {
-        private List<Control> buffer;
-        private SpriteBatch spriteBatch;
-        private InputActorCollection actors;
-        private int drawOrder;
-        private bool visible;
-        private int updateOrder;
-        private bool enabled;
-        private bool enableInput;
-        private Dictionary<Type, List<IGesturePair>> globalGestures;
+        private readonly List<Control> _buffer;
+        private readonly SpriteBatch _spriteBatch;
+        private readonly InputActorCollection _actors;
+        private int _drawOrder;
+        private bool _visible;
+        private int _updateOrder;
+        private bool _enabled;
+        private readonly Dictionary<Type, List<IGesturePair>> _globalGestures;
 
         public Control Root
         {
@@ -32,19 +28,15 @@ namespace Myre.UI
 
         internal Dictionary<Type, List<IGesturePair>> GlobalGestures
         {
-            get { return globalGestures; }
+            get { return _globalGestures; }
         }
 
         public InputActorCollection Actors
         {
-            get { return actors; }
+            get { return _actors; }
         }
 
-        public bool EnableInput
-        {
-            get { return enableInput; }
-            set { enableInput = value; }
-        }
+        public bool EnableInput { get; set; }
 
         public GraphicsDevice Device
         {
@@ -56,12 +48,12 @@ namespace Myre.UI
 
         public bool Enabled
         {
-            get { return enabled; }
+            get { return _enabled; }
             set
             {
-                if (enabled != value)
+                if (_enabled != value)
                 {
-                    enabled = value;
+                    _enabled = value;
                     OnEnabledChanged();
                 }
             }
@@ -69,12 +61,12 @@ namespace Myre.UI
 
         public int UpdateOrder
         {
-            get { return updateOrder; }
+            get { return _updateOrder; }
             set
             {
-                if (updateOrder != value)
+                if (_updateOrder != value)
                 {
-                    updateOrder = value;
+                    _updateOrder = value;
                     OnUpdateOrderChanged();
                 }
             }
@@ -93,12 +85,12 @@ namespace Myre.UI
         #region IDrawable Members
         public int DrawOrder
         {
-            get { return drawOrder; }
+            get { return _drawOrder; }
             set
             {
-                if (drawOrder != value)
+                if (_drawOrder != value)
                 {
-                    drawOrder = value;
+                    _drawOrder = value;
                     OnDrawOrderChanged();
                 }
             }
@@ -106,12 +98,12 @@ namespace Myre.UI
 
         public bool Visible
         {
-            get { return visible; }
+            get { return _visible; }
             set
             {
-                if (visible != value)
+                if (_visible != value)
                 {
-                    visible = value;
+                    _visible = value;
                     OnVisiblChanged();
                 }
             }
@@ -129,15 +121,15 @@ namespace Myre.UI
         public UserInterface(GraphicsDevice graphics)
         {
             Device = graphics;
-            spriteBatch = new SpriteBatch(Device);
-            buffer = new List<Control>();
-            actors = new InputActorCollection();
-            globalGestures = new Dictionary<Type, List<IGesturePair>>();
-            enableInput = true;
-            visible = true;
-            drawOrder = 100;
-            enabled = true;
-            updateOrder = 0;
+            _spriteBatch = new SpriteBatch(Device);
+            _buffer = new List<Control>();
+            _actors = new InputActorCollection();
+            _globalGestures = new Dictionary<Type, List<IGesturePair>>();
+            EnableInput = true;
+            _visible = true;
+            _drawOrder = 100;
+            _enabled = true;
+            _updateOrder = 0;
 
             Root = new Control(this);
             Root.SetPoint(Points.TopLeft, 0, 0);
@@ -157,16 +149,16 @@ namespace Myre.UI
                 && !Guide.IsVisible)
 #endif
             {
-                foreach (var actor in actors)
+                foreach (var actor in _actors)
                     actor.Evaluate(gameTime, this);
             }
 
-            buffer.Clear();
+            _buffer.Clear();
             AddControlsToBuffer(Root);
-            buffer.InsertionSort(ControlStrataComparer.BottomToTop);
+            _buffer.InsertionSort(ControlStrataComparer.BottomToTop);
 
-            for (int i = 0; i < buffer.Count; i++)
-                buffer[i].Update(gameTime);
+            for (int i = 0; i < _buffer.Count; i++)
+                _buffer[i].Update(gameTime);
         }
 
         public void Draw(GameTime gameTime)
@@ -174,22 +166,22 @@ namespace Myre.UI
 #if XNA_3_1
             spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
 #else
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 #endif
-            for (int i = 0; i < buffer.Count; i++)
+            for (int i = 0; i < _buffer.Count; i++)
             {
-                if (buffer[i].IsVisible)
-                    buffer[i].Draw(spriteBatch);
+                if (_buffer[i].IsVisible)
+                    _buffer[i].Draw(_spriteBatch);
             }
-            spriteBatch.End();
+            _spriteBatch.End();
         }
 
-        public void EvaluateGlobalGestures(GameTime gameTime, IInputDevice device, ICollection<int> blocked)
+        public void EvaluateGlobalGestures(GameTime gameTime, IInputDevice device)
         {
             var deviceType = device.GetType();
-            if (globalGestures.ContainsKey(deviceType))
+            if (_globalGestures.ContainsKey(deviceType))
             {
-                var gestures = globalGestures[deviceType];
+                var gestures = _globalGestures[deviceType];
                 foreach (var gesture in gestures)
                 {
                     if (!gesture.Evaluated)
@@ -202,33 +194,33 @@ namespace Myre.UI
 
         public void FindControls(Vector2 point, ICollection<Control> results)
         {
-            for (int i = buffer.Count - 1; i >= 0; i--)
+            for (int i = _buffer.Count - 1; i >= 0; i--)
             {
-                var control = buffer[i];
+                var control = _buffer[i];
                 if (control.IsVisible && control.Contains(point))
                     results.Add(control);
             }
         }
 
-        protected virtual void OnDrawOrderChanged()
+        private void OnDrawOrderChanged()
         {
             if (DrawOrderChanged != null)
                 DrawOrderChanged(this, new EventArgs());
         }
 
-        protected virtual void OnVisiblChanged()
+        private void OnVisiblChanged()
         {
             if (VisibleChanged != null)
                 VisibleChanged(this, new EventArgs());
         }
 
-        protected virtual void OnEnabledChanged()
+        private void OnEnabledChanged()
         {
             if (EnabledChanged != null)
                 EnabledChanged(this, new EventArgs());
         }
 
-        protected virtual void OnUpdateOrderChanged()
+        private void OnUpdateOrderChanged()
         {
             if (UpdateOrderChanged != null)
                 UpdateOrderChanged(this, new EventArgs());
@@ -236,7 +228,7 @@ namespace Myre.UI
 
         private void AddControlsToBuffer(Control control)
         {
-            buffer.Add(control);
+            _buffer.Add(control);
             foreach (var child in control.Children)
                 AddControlsToBuffer(child);
         }

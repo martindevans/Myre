@@ -1,31 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
 using System.Reflection;
-using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Myre.UI.Text
 {
     public static class ColourParser
     {
-        private static Dictionary<StringPart, Color> colours;
+        private static Dictionary<StringPart, Color> _colours;
 
         public static Dictionary<StringPart, Color> Colours
         {
             get 
             {
-                if (colours == null)
+                if (_colours == null)
                     InitialiseColours();
 
-                return colours; 
+                return _colours; 
             }
         }
 
         private static void InitialiseColours()
         {
-            colours = new Dictionary<StringPart, Color>();
+            _colours = new Dictionary<StringPart, Color>();
             var t = typeof(Color);
             var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Static);
             foreach (var p in properties)
@@ -35,7 +32,7 @@ namespace Myre.UI.Text
 
                 var value = p.GetValue(null, null);
                 if (value.GetType() == t)
-                    colours.Add(p.Name.ToUpper(), (Color)value);
+                    _colours.Add(p.Name.ToUpper(), (Color)value);
             }
         }
 

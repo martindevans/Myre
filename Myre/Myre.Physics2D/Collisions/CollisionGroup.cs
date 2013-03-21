@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿#if WINDOWS
+using System.Collections.Generic;
+#else
+using Myre.Collections;
+#endif
 
 namespace Myre.Physics2D.Collisions
 {

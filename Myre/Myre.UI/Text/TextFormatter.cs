@@ -1,13 +1,9 @@
-﻿// TODO: TextFormatter code is horrible. Tidy up sometime.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Myre.Extensions;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.UI.Text
 {
@@ -29,37 +25,43 @@ namespace Myre.UI.Text
             NewLine
         }
 
-        private static ContentParser<SpriteFont> fonts;
-        private static Stack<SpriteFont> fontHistory;
-        private static Stack<Color> colourHistory;
-        private static StringBuilder buffer;
-        private static StringBuilder input;
-        private static List<FontChange> fontChanges;
-        private static List<float> lineWidths;
+        private static ContentParser<SpriteFont> _fonts;
+        private static readonly Stack<SpriteFont> _fontHistory;
+        private static readonly Stack<Color> _colourHistory;
+        private static readonly StringBuilder _buffer;
+        private static readonly StringBuilder _input;
+        private static readonly List<FontChange> _fontChanges;
+        private static readonly List<float> _lineWidths;
 
-        private static SpriteFont defaultFont;
-        private static Color defaultColour;
+        private static SpriteFont _defaultFont;
+        private static Color _defaultColour;
 
         static TextFormatter()// TextFormatter(ContentManager fontContent)
         {
             //fonts = new ContentParser<SpriteFont>(fontContent);
-            fontHistory = new Stack<SpriteFont>();
-            colourHistory = new Stack<Color>();
-            buffer = new StringBuilder();
-            input = new StringBuilder();
-            fontChanges = new List<FontChange>();
-            lineWidths = new List<float>();
+            _fontHistory = new Stack<SpriteFont>();
+            _colourHistory = new Stack<Color>();
+            _buffer = new StringBuilder();
+            _input = new StringBuilder();
+            _fontChanges = new List<FontChange>();
+            _lineWidths = new List<float>();
         }
 
         public static void SetFontSource(ContentManager fontContent)
         {
-            fonts = new ContentParser<SpriteFont>(fontContent);
+            _fonts = new ContentParser<SpriteFont>(fontContent);
+        }
+
+        public static Vector2 MeasureParsedString(this SpriteFont font, StringPart text, int wrapWidth)
+        {
+            // bit of a hack..
+            return font.MeasureParsedString(text, Vector2.One, wrapWidth);
         }
 
         public static Vector2 MeasureParsedString(this SpriteFont font, StringPart text, Vector2 scale, int wrapWidth)
         {
             // bit of a hack..
-            return DrawParsedString(null, font, text, Vector2.Zero, Color.White, 0, Vector2.Zero, Vector2.One, wrapWidth, Justification.Left, false);
+            return DrawParsedString(null, font, text, Vector2.Zero, Color.White, 0, Vector2.Zero, scale, wrapWidth, Justification.Left, false);
         }
 
         public static Vector2 DrawParsedString(this SpriteBatch spriteBatch, SpriteFont font, StringPart text, Vector2 position, Color colour)
@@ -77,44 +79,44 @@ namespace Myre.UI.Text
 
         private static Vector2 DrawParsedString(this SpriteBatch spriteBatch, SpriteFont font, StringPart text, Vector2 position, Color colour, float rotation, Vector2 origin, Vector2 scale, int wrapWidth, Justification justification, bool drawingEnabled)
         {
-            input.Clear();
-            input.AppendPart(text);
+            _input.Clear();
+            _input.AppendPart(text);
 
-            defaultFont = font;
-            defaultColour = colour;
+            _defaultFont = font;
+            _defaultColour = colour;
 
-            lineWidths.Clear();
+            _lineWidths.Clear();
             if (wrapWidth > 0)
-                Wrap(input, scale, wrapWidth);
+                Wrap(_input, scale, wrapWidth);
 
-            input.Replace("\n", "[\n]");
+            _input.Replace("\n", "[\n]");
 
-            colourHistory.Clear();
-            fontHistory.Clear();
+            _colourHistory.Clear();
+            _fontHistory.Clear();
 
             var currentPositionOffset = Vector2.Zero;
             var lineSpacing = CurrentFont().LineSpacing;
             var width = 0f;
 
             int lineIndex = 0;
-            Vector2 justificationOffset = new Vector2(Justify(lineWidths.Count > 0 ? lineWidths[0] : 0, wrapWidth, justification), 0);
+            Vector2 justificationOffset = new Vector2(Justify(_lineWidths.Count > 0 ? _lineWidths[0] : 0, wrapWidth, justification), 0);
 
             int i = 0;
-            int tagStart = 0;
-            int tagEnd = 0;
-            Vector2 size = Vector2.Zero;
-            while (i < input.Length
-                && (tagStart = IndexOf(input, "[", i)) != -1
-                && (tagEnd = IndexOf(input, "]", tagStart)) != -1)
+            int tagStart;
+            int tagEnd;
+            Vector2 size;
+            while (i < _input.Length
+                && (tagStart = IndexOf(_input, "[", i)) != -1
+                && (tagEnd = IndexOf(_input, "]", tagStart)) != -1)
             {
                 if (tagStart > i)
                 {
-                    SetBuffer(new StringPart(input, i, tagStart - i));
+                    SetBuffer(new StringPart(_input, i, tagStart - i));
 
                     if (drawingEnabled)
                         DrawBuffer(spriteBatch, ref position, rotation, ref origin, ref scale, currentPositionOffset + justificationOffset);
 
-                    size = CurrentFont().MeasureString(buffer);
+                    size = CurrentFont().MeasureString(_buffer);
                     currentPositionOffset.X += size.X;
                     lineSpacing = Math.Max(lineSpacing, (int)size.Y);
                     width = Math.Max(width, currentPositionOffset.X);
@@ -122,21 +124,21 @@ namespace Myre.UI.Text
 
                 i = tagStart;
 
-                if (ParseTag(new StringPart(input, tagStart + 1, tagEnd - tagStart - 1), ref currentPositionOffset, ref lineSpacing, ref lineIndex) != TagType.None)
+                if (ParseTag(new StringPart(_input, tagStart + 1, tagEnd - tagStart - 1), ref currentPositionOffset, ref lineSpacing, ref lineIndex) != TagType.None)
                 {
                     i = tagEnd;
 
-                    if (lineWidths.Count > lineIndex)
-                        justificationOffset.X = Justify(lineWidths[lineIndex], wrapWidth, justification);
+                    if (_lineWidths.Count > lineIndex)
+                        justificationOffset.X = Justify(_lineWidths[lineIndex], wrapWidth, justification);
                 }
                 else
                 {
-                    SetBuffer(new StringPart(input, i, 1));
+                    SetBuffer(new StringPart(_input, i, 1));
 
                     if (drawingEnabled)
                         DrawBuffer(spriteBatch, ref position, rotation, ref origin, ref scale, currentPositionOffset + justificationOffset);
 
-                    size = CurrentFont().MeasureString(buffer);
+                    size = CurrentFont().MeasureString(_buffer);
                     currentPositionOffset.X += size.X;
                     lineSpacing = Math.Max(lineSpacing, (int)size.Y);
                     width = Math.Max(width, currentPositionOffset.X);
@@ -145,14 +147,14 @@ namespace Myre.UI.Text
                 i++;
             }
 
-            if (i != input.Length)
+            if (i != _input.Length)
             {                
-                SetBuffer(new StringPart(input, i, input.Length - i));
+                SetBuffer(new StringPart(_input, i, _input.Length - i));
                 
                 if (drawingEnabled)
                     DrawBuffer(spriteBatch, ref position, rotation, ref origin, ref scale, currentPositionOffset + justificationOffset);
 
-                size = CurrentFont().MeasureString(buffer);
+                size = CurrentFont().MeasureString(_buffer);
                 currentPositionOffset.X += size.X;
                 lineSpacing = Math.Max(lineSpacing, (int)size.Y);
                 width = Math.Max(width, currentPositionOffset.X);
@@ -163,15 +165,15 @@ namespace Myre.UI.Text
 
         private static void SetBuffer(StringPart text)
         {
-            buffer.Clear();
-            buffer.AppendPart(text);
+            _buffer.Clear();
+            _buffer.AppendPart(text);
         }
 
         private static void DrawBuffer(SpriteBatch spriteBatch, ref Vector2 position, float rotation, ref Vector2 origin, ref Vector2 scale, Vector2 currentPositionOffset)
         {
             spriteBatch.DrawString(
                 CurrentFont(),
-                buffer,
+                _buffer,
                 position,
                 CurrentColour(),
                 rotation,
@@ -239,7 +241,7 @@ namespace Myre.UI.Text
 
                 if (input[i] == '\n')
                 {
-                    lineWidths.Add((lineWidth + wordWidth) / scale.X);
+                    _lineWidths.Add((lineWidth + wordWidth) / scale.X);
 
                     lineWidth = 0;
                     wordWidth = 0;
@@ -247,10 +249,10 @@ namespace Myre.UI.Text
                     continue;
                 }
 
-                SpriteFont font = defaultFont;
-                while (fontIndex < fontChanges.Count && fontChanges[fontIndex].Index <= i)
+                SpriteFont font = _defaultFont;
+                while (fontIndex < _fontChanges.Count && _fontChanges[fontIndex].Index <= i)
                 {
-                    font = fontChanges[fontIndex].Font;
+                    font = _fontChanges[fontIndex].Font;
                     fontIndex++;
                 }
                 
@@ -264,14 +266,14 @@ namespace Myre.UI.Text
                     continue;
                 }
 
-                buffer.Clear();
-                buffer.AppendPart(new StringPart(input, i, 1));
-                var size = font.MeasureString(buffer) * scale;
+                _buffer.Clear();
+                _buffer.AppendPart(new StringPart(input, i, 1));
+                var size = font.MeasureString(_buffer) * scale;
                 wordWidth += size.X;
 
                 if (wordWidth > allowedWidth)
                 {
-                    lineWidths.Add((wordWidth - size.X) / scale.X);
+                    _lineWidths.Add((wordWidth - size.X) / scale.X);
 
                     input.Insert(i, "\n");
                     //i++;
@@ -283,7 +285,7 @@ namespace Myre.UI.Text
                 {
                     if (lineWidth > 0)
                         lineWidth -= spaceSize;
-                    lineWidths.Add(lineWidth / scale.X);
+                    _lineWidths.Add(lineWidth / scale.X);
 
                     input.Insert(wordStart, "\n");
                     i++;
@@ -292,14 +294,14 @@ namespace Myre.UI.Text
                 }
             }
 
-            lineWidths.Add(lineWidth + wordWidth);
+            _lineWidths.Add(lineWidth + wordWidth);
         }
 
         private static void RecordFontChanges(StringBuilder input)
         {
-            fontChanges.Clear();
+            _fontChanges.Clear();
 
-            int tagStart = 0;
+            int tagStart;
             int tagEnd = 0;
             while ((tagStart = IndexOf(input, "[", tagEnd)) != -1
                 && (tagEnd = IndexOf(input, "]", tagStart)) != -1)
@@ -307,11 +309,11 @@ namespace Myre.UI.Text
                 var tag = new StringPart(input, tagStart + 1, tagEnd - tagStart - 1);
 
                 var fontChanged = false;
-                if (tag.StartsWith("f:") && fonts != null)
+                if (tag.StartsWith("f:") && _fonts != null)
                 {
                     var fontName = tag.Substring(2);
                     SpriteFont font;
-                    if (fonts.TryParse(fontName, out font))
+                    if (_fonts.TryParse(fontName, out font))
                     {
                         PushFont(font);
                         fontChanged = true;
@@ -324,7 +326,7 @@ namespace Myre.UI.Text
                 }
 
                 if (fontChanged)
-                    fontChanges.Add(new FontChange() { Font = CurrentFont(), Index = tagStart });
+                    _fontChanges.Add(new FontChange() { Font = CurrentFont(), Index = tagStart });
             }
         }
 
@@ -337,11 +339,11 @@ namespace Myre.UI.Text
                 NewLine(ref position, ref lineSpacing, ref lineIndex);
                 type = TagType.NewLine;
             }
-            else if (text.StartsWith("f:") && fonts != null)
+            else if (text.StartsWith("f:") && _fonts != null)
             {
                 var fontName = text.Substring(2);
                 SpriteFont font;
-                if (fonts.TryParse(fontName, out font))
+                if (_fonts.TryParse(fontName, out font))
                 {
                     PushFont(font);
                     type = TagType.FontStart;
@@ -373,45 +375,45 @@ namespace Myre.UI.Text
 
         private static SpriteFont CurrentFont()
         {
-            if (fontHistory.Count > 0)
-                return fontHistory.Peek();
+            if (_fontHistory.Count > 0)
+                return _fontHistory.Peek();
 
-            return defaultFont;
+            return _defaultFont;
         }
 
         private static void PushFont(SpriteFont font)
         {
-            fontHistory.Push(font);
+            _fontHistory.Push(font);
         }
 
         private static void PopFont()
         {
-            if (fontHistory.Count > 0)
-                fontHistory.Pop();
+            if (_fontHistory.Count > 0)
+                _fontHistory.Pop();
         }
 
         private static Color CurrentColour()
         {
-            if (colourHistory.Count > 0)
+            if (_colourHistory.Count > 0)
             {
-                var colour = colourHistory.Peek().ToVector4();
-                colour *= defaultColour.ToVector4();
+                var colour = _colourHistory.Peek().ToVector4();
+                colour *= _defaultColour.ToVector4();
 
                 return new Color(colour);
             }
 
-            return defaultColour;
+            return _defaultColour;
         }
 
         private static void PushColour(Color colour)
         {
-            colourHistory.Push(colour);
+            _colourHistory.Push(colour);
         }
 
         private static void PopColour()
         {
-            if (colourHistory.Count > 0)
-                colourHistory.Pop();
+            if (_colourHistory.Count > 0)
+                _colourHistory.Pop();
         }
 
         private static void NewLine(ref Vector2 position, ref int lineSpacing, ref int lineIndex)

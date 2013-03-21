@@ -1,14 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
+using System.IO;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using System.IO;
-using System.Diagnostics;
-using System.ComponentModel;
 
 namespace Myre.Graphics.Pipeline
 {
@@ -27,14 +22,14 @@ namespace Myre.Graphics.Pipeline
     public class MyreModelProcessor : ContentProcessor<NodeContent, MyreModelContent>
     {
 
-        ContentProcessorContext context;
-        MyreModelContent outputModel;
-        string directory;
+        ContentProcessorContext _context;
+        MyreModelContent _outputModel;
+        string _directory;
 
         // A single material may be reused on more than one piece of geometry.
         // This dictionary keeps track of materials we have already converted,
         // to make sure we only bother processing each of them once.
-        Dictionary<MaterialContent, Dictionary<string, MyreMaterialContent>> processedMaterials =
+        readonly Dictionary<MaterialContent, Dictionary<string, MyreMaterialContent>> _processedMaterials =
                             new Dictionary<MaterialContent, Dictionary<string, MyreMaterialContent>>();
 
         [DisplayName("Diffuse Texture")]
@@ -73,9 +68,9 @@ namespace Myre.Graphics.Pipeline
         public override MyreModelContent Process(NodeContent input,
                                                    ContentProcessorContext context)
         {
-            this.context = context;
+            _context = context;
 
-            directory = Path.GetDirectoryName(input.Identity.SourceFilename);
+            _directory = Path.GetDirectoryName(input.Identity.SourceFilename);
 
             // Find the skeleton.
             BoneContent skeleton = MeshHelper.FindSkeleton(input);
@@ -84,7 +79,7 @@ namespace Myre.Graphics.Pipeline
             // in different local coordinate systems, so let's just bake everything.
             FlattenTransforms(input, skeleton);
 
-            outputModel = new MyreModelContent();
+            _outputModel = new MyreModelContent();
 
             //if (skeleton != null)
             //    outputModel.Skeleton = MeshHelper.FlattenSkeleton(skeleton).ToArray();
@@ -93,7 +88,7 @@ namespace Myre.Graphics.Pipeline
 
             ProcessNode(input);
 
-            return outputModel;
+            return _outputModel;
         }
 
         /// <summary>
@@ -157,7 +152,7 @@ namespace Myre.Graphics.Pipeline
                 // Process all the geometry in the mesh.
                 foreach (GeometryContent geometry in mesh.Geometry)
                 {
-                    ProcessGeometry(geometry, outputModel);
+                    ProcessGeometry(geometry, _outputModel);
                 }
 
                 //outputModel.AddMesh(outputMesh);
@@ -224,32 +219,28 @@ namespace Myre.Graphics.Pipeline
                 material = new MaterialContent();
 
             // Have we already processed this material?
-            if (!processedMaterials.ContainsKey(material))
+            if (!_processedMaterials.ContainsKey(material))
             {
                 // If not, process it now.
-                processedMaterials[material] = new Dictionary<string, MyreMaterialContent>();
+                _processedMaterials[material] = new Dictionary<string, MyreMaterialContent>();
                 CreateGBufferMaterial(material, mesh);
                 CreateShadowMaterial(material);
             }
 
-            return processedMaterials[material];
+            return _processedMaterials[material];
         }
 
         private void CreateShadowMaterial(MaterialContent material)
         {
-            var materialData = new MyreMaterialData();
-            materialData.EffectName = Path.GetFullPath("DefaultShadows.fx");
-            materialData.Technique = "ViewLength";
+            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = "ViewLength"};
 
-            var shadowMaterial = context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
-            processedMaterials[material].Add("shadows_viewlength", shadowMaterial);
+            var shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            _processedMaterials[material].Add("shadows_viewlength", shadowMaterial);
 
-            materialData = new MyreMaterialData();
-            materialData.EffectName = Path.GetFullPath("DefaultShadows.fx");
-            materialData.Technique = "ViewZ";
+            materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = "ViewZ"};
 
-            shadowMaterial = context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
-            processedMaterials[material].Add("shadows_viewz", shadowMaterial);
+            shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            _processedMaterials[material].Add("shadows_viewz", shadowMaterial);
         }
 
         private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh)
@@ -262,15 +253,13 @@ namespace Myre.Graphics.Pipeline
             if (diffuseTexture == null)
                 return;
 
-            var materialData = new MyreMaterialData();
-            materialData.EffectName = Path.GetFullPath("DefaultGBuffer.fx");
-            materialData.Technique = "ClipAlpha";//IsOpaque(diffuseTexture) ? "Default" : "ClipAlpha";
+            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultGBuffer.fx"), Technique = "ClipAlpha"};
             materialData.Textures.Add("DiffuseMap", diffuseTexture);
             materialData.Textures.Add("NormalMap", normalTexture);
             materialData.Textures.Add("SpecularMap", specularTexture);
 
-            var gbufferMaterial = context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
-            processedMaterials[material].Add("gbuffer", gbufferMaterial);
+            var gbufferMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            _processedMaterials[material].Add("gbuffer", gbufferMaterial);
         }
 
         //private bool IsOpaque(string textureFilename)
@@ -310,7 +299,7 @@ namespace Myre.Graphics.Pipeline
                 return null;
             }
             else
-                return Path.Combine(directory, DiffuseTexture);
+                return Path.Combine(_directory, DiffuseTexture);
         }
 
         private string FindNormalTexture(MeshContent mesh, MaterialContent material)
@@ -318,7 +307,7 @@ namespace Myre.Graphics.Pipeline
             if (string.IsNullOrEmpty(NormalTexture))
                 return FindTexture(mesh, material, "normalmap", "normal", "norm", "n", "bumpmap", "bump", "b") ?? "null_normal.tga";
             else
-                return Path.Combine(directory, NormalTexture);
+                return Path.Combine(_directory, NormalTexture);
         }
 
         private string FindSpecularTexture(MeshContent mesh, MaterialContent material)
@@ -326,7 +315,7 @@ namespace Myre.Graphics.Pipeline
             if (string.IsNullOrEmpty(SpecularTexture))
                 return FindTexture(mesh, material, "specularmap", "specular", "spec", "s") ?? "null_specular.tga";
             else
-                return Path.Combine(directory, SpecularTexture);
+                return Path.Combine(_directory, SpecularTexture);
         }
 
         private string FindTexture(MeshContent mesh, MaterialContent material, params string[] possibleKeys)
@@ -343,11 +332,11 @@ namespace Myre.Graphics.Pipeline
                 // search in material opaque data
                 foreach (var item in material.OpaqueData)
                 {
-                    if (item.Key.ToLowerInvariant() == key && item.Value.GetType() == typeof(string))
+                    if (item.Key.ToLowerInvariant() == key && item.Value is string)
                     {
                         var file = item.Value as string;
                         if (!Path.IsPathRooted(file))
-                            file = Path.Combine(directory, file);
+                            file = Path.Combine(_directory, file);
 
                         return file;
                     }
@@ -356,11 +345,11 @@ namespace Myre.Graphics.Pipeline
                 // search in mesh opaque data
                 foreach (var item in mesh.OpaqueData)
                 {
-                    if (item.Key.ToLowerInvariant() == key && item.Value.GetType() == typeof(string))
+                    if (item.Key.ToLowerInvariant() == key && item.Value is string)
                     {
                         var file = item.Value as string;
                         if (!Path.IsPathRooted(file))
-                            file = Path.Combine(directory, file);
+                            file = Path.Combine(_directory, file);
 
                         return file;
                     }
@@ -370,7 +359,7 @@ namespace Myre.Graphics.Pipeline
             // try and find the file in the meshs' directory
             foreach (var key in possibleKeys)
             {
-                foreach (var file in Directory.EnumerateFiles(directory, mesh.Name + "_" + key + ".*", SearchOption.AllDirectories))
+                foreach (var file in Directory.EnumerateFiles(_directory, mesh.Name + "_" + key + ".*", SearchOption.AllDirectories))
                     return file;
             }
 

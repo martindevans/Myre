@@ -1,45 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Myre.UI.InputDevices;
 
 namespace Myre.UI
 {
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
     public class InputActor
+// ReSharper restore ClassWithVirtualMembersNeverInherited.Global
         : FocusChain, IGameComponent, IUpdateable, ICollection<IInputDevice>
     {
-        private IList<IInputDevice> devices;
-        private int id;
-        private bool enabled;
-        private int updateOrder;
+        private readonly IList<IInputDevice> _devices;
+        private readonly int _id;
+        private bool _enabled;
+        private int _updateOrder;
 
         public IInputDevice this[int i]
         {
-            get { return devices[i]; }
+            get { return _devices[i]; }
             set
             { 
-                devices[i] = value;
-                devices[i].Owner = this;
+                _devices[i] = value;
+                _devices[i].Owner = this;
             }
         }
 
         public int ID
         {
-            get { return id; }
+            get { return _id; }
         }
 
         #region IUpdateable Members
 
         public bool Enabled
         {
-            get { return enabled; }
+            get { return _enabled; }
             set
             {
-                if (enabled != value)
+                if (_enabled != value)
                 {
-                    enabled = value;
+                    _enabled = value;
                     OnEnabledChanged();
                 }
             }
@@ -47,12 +47,12 @@ namespace Myre.UI
 
         public int UpdateOrder
         {
-            get { return updateOrder; }
+            get { return _updateOrder; }
             set
             {
-                if (updateOrder != value)
+                if (_updateOrder != value)
                 {
-                    updateOrder = value;
+                    _updateOrder = value;
                     OnUpdateOrderChanged();
                 }
             }
@@ -82,9 +82,9 @@ namespace Myre.UI
 
         public InputActor(int id)
         {
-            this.id = id;
-            this.devices = new List<IInputDevice>();
-            this.enabled = true;
+            _id = id;
+            _devices = new List<IInputDevice>();
+            _enabled = true;
         }
 
         public InputActor(int id, params IInputDevice[] inputs)
@@ -103,7 +103,7 @@ namespace Myre.UI
             if (FocusedControl != null && FocusedControl.IsDisposed)
                 RestorePrevious(null);
 
-            foreach (var device in devices)
+            foreach (var device in _devices)
                 device.Update(gameTIme);
         }
 
@@ -146,7 +146,7 @@ namespace Myre.UI
 
         internal void Evaluate(GameTime gameTime, UserInterface ui)
         {
-            foreach (var device in devices)
+            foreach (var device in _devices)
                 device.Evaluate(gameTime, FocusRoot == ui.Root ? FocusedControl : null, ui);
         }
 
@@ -154,38 +154,38 @@ namespace Myre.UI
 
         public void Add(IInputDevice item)
         {
-            devices.Add(item);
+            _devices.Add(item);
             item.Owner = this;
         }
 
         public void Clear()
         {
-            devices.Clear();
+            _devices.Clear();
         }
 
         public bool Contains(IInputDevice item)
         {
-            return devices.Contains(item);
+            return _devices.Contains(item);
         }
 
         public void CopyTo(IInputDevice[] array, int arrayIndex)
         {
-            devices.CopyTo(array, arrayIndex);
+            _devices.CopyTo(array, arrayIndex);
         }
 
         public int Count
         {
-            get { return devices.Count; }
+            get { return _devices.Count; }
         }
 
         public bool IsReadOnly
         {
-            get { return devices.IsReadOnly; }
+            get { return _devices.IsReadOnly; }
         }
 
         public bool Remove(IInputDevice item)
         {
-            if (devices.Remove(item))
+            if (_devices.Remove(item))
             {
                 item.Owner = null;
                 return true;
@@ -202,7 +202,7 @@ namespace Myre.UI
 
         public IEnumerator<IInputDevice> GetEnumerator()
         {
-            return devices.GetEnumerator();
+            return _devices.GetEnumerator();
         }
 
         #endregion

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI.Gestures;
@@ -46,7 +43,6 @@ namespace Myre.UI.Controls
         /// Initializes a new instance of the <see cref="Menu"/> class.
         /// </summary>
         /// <param name="parent">This controls parent control.</param>
-        /// <param name="focusScope">The focus scope.</param>
         public Menu(Control parent)
             : base(parent)
         {

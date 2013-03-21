@@ -1,10 +1,7 @@
-﻿#if !XNA_3_1
-using System;
+﻿
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 
 namespace Myre.UI.InputDevices
@@ -12,13 +9,13 @@ namespace Myre.UI.InputDevices
     public class TouchDevice
         : IInputDevice
     {
-        private TouchCollection touches;
-        private List<int> blocked;
-        private List<Control> buffer;
-        private List<Control> current;
-        private List<Control> previous;
-        private IEnumerable<Control> warmed;
-        private IEnumerable<Control> cooled;
+        private TouchCollection _touches;
+        private List<int> _blocked;
+        private List<Control> _buffer;
+        private List<Control> _current;
+        private List<Control> _previous;
+        private IEnumerable<Control> _warmed;
+        private IEnumerable<Control> _cooled;
 
         public InputActor Owner { get; set; }
 
@@ -26,61 +23,61 @@ namespace Myre.UI.InputDevices
 
         public void Update(GameTime gameTime)
         {
-            touches = TouchPanel.GetState();
-            buffer = new List<Control>();
-            current = new List<Control>();
-            previous = new List<Control>();
-            blocked = new List<int>();
+            _touches = TouchPanel.GetState();
+            _buffer = new List<Control>();
+            _current = new List<Control>();
+            _previous = new List<Control>();
+            _blocked = new List<int>();
 
-            cooled = previous.Except(current).Distinct();
-            warmed = current.Except(previous).Distinct();
+            _cooled = _previous.Except(_current).Distinct();
+            _warmed = _current.Except(_previous).Distinct();
         }
 
         public void Evaluate(GameTime gameTime, Control focused, UserInterface ui)
         {
             var type = typeof(TouchDevice);
 
-            for (int i = 0; i < touches.Count; i++)
+            for (int i = 0; i < _touches.Count; i++)
             {
-                var t = touches[i];
+                var t = _touches[i];
                 Current = t;
 
-                ui.FindControls(t.Position, buffer);
-                current.AddRange(buffer);
+                ui.FindControls(t.Position, _buffer);
+                _current.AddRange(_buffer);
 
-                for (int j = 0; j < buffer.Count; j++)
+                for (int j = 0; j < _buffer.Count; j++)
                 {
-                    buffer[j].Gestures.Evaluate(gameTime, this);
+                    _buffer[j].Gestures.Evaluate(gameTime, this);
 
-                    if (buffer[j].Gestures.BlockedDevices.Contains(type))
+                    if (_buffer[j].Gestures.BlockedDevices.Contains(type))
                         break;
                 }
 
-                ui.EvaluateGlobalGestures(gameTime, this, blocked);
-                blocked.Clear();
-                buffer.Clear();
+                ui.EvaluateGlobalGestures(gameTime, this);
+                _blocked.Clear();
+                _buffer.Clear();
             }
 
-            foreach (var item in cooled)
+            foreach (var item in _cooled)
                 item.HeatCount--;
-            foreach (var item in warmed)
+            foreach (var item in _warmed)
                 item.HeatCount++;
 
-            previous.Clear();
-            previous.AddRange(current);
-            current.Clear();
+            _previous.Clear();
+            _previous.AddRange(_current);
+            _current.Clear();
         }
 
         public void BlockInputs(IEnumerable<int> inputs)
         {
-            blocked.AddRange(inputs);
+            _blocked.AddRange(inputs);
         }
 
-        public bool IsBlocked(ICollection<int> inputs)
+        public bool IsBlocked(IEnumerable<int> inputs)
         {
             foreach (var item in inputs)
             {
-                if (blocked.Contains(item))
+                if (_blocked.Contains(item))
                     return true;
             }
 
@@ -88,4 +85,3 @@ namespace Myre.UI.InputDevices
         }
     }
 }
-#endif

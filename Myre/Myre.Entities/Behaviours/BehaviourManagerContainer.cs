@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace Myre.Entities.Behaviours
 {
@@ -18,12 +15,12 @@ namespace Myre.Entities.Behaviours
         : IManagerHandler
         where T : Behaviour
     {
-        private IBehaviourManager<T> manager;
+        private IBehaviourManager<T> _manager;
 
         public IBehaviourManager Manager
         {
-            get { return manager; }
-            set { manager = value as IBehaviourManager<T>; }
+            get { return _manager; }
+            set { _manager = value as IBehaviourManager<T>; }
         }
 
         public void Add(T behaviour)
@@ -31,7 +28,7 @@ namespace Myre.Entities.Behaviours
             if (behaviour.CurrentManager.Handler != null)
                 behaviour.CurrentManager.Handler.Remove(behaviour);
 
-            manager.Add(behaviour);
+            _manager.Add(behaviour);
 
             behaviour.CurrentManager.Handler = this;
             behaviour.CurrentManager.ManagedAs = typeof(T);
@@ -45,7 +42,7 @@ namespace Myre.Entities.Behaviours
             behaviour.CurrentManager.Handler = null;
             behaviour.CurrentManager.ManagedAs = null;
 
-            manager.Remove(behaviour);
+            _manager.Remove(behaviour);
         }
 
         #region IManagerHandler Members
@@ -72,34 +69,34 @@ namespace Myre.Entities.Behaviours
             public object ReadOnly;
         }
 
-        private List<IBehaviourManager> managers;
-        private Dictionary<Type, IBehaviourManager> byType;
-        private Dictionary<Type, IManagerHandler> byBehaviour;
-        private Dictionary<Type, PrivateList> catagorised;
+        private readonly List<IBehaviourManager> _managers;
+        private readonly Dictionary<Type, IBehaviourManager> _byType;
+        private readonly Dictionary<Type, IManagerHandler> _byBehaviour;
+        private readonly Dictionary<Type, PrivateList> _catagorised;
 
         public BehaviourManagerContainer()
         {
-            managers = new List<IBehaviourManager>();
-            byType = new Dictionary<Type, IBehaviourManager>();
-            byBehaviour = new Dictionary<Type, IManagerHandler>();
-            catagorised = new Dictionary<Type, PrivateList>();
+            _managers = new List<IBehaviourManager>();
+            _byType = new Dictionary<Type, IBehaviourManager>();
+            _byBehaviour = new Dictionary<Type, IManagerHandler>();
+            _catagorised = new Dictionary<Type, PrivateList>();
         }
 
         public void Add(IBehaviourManager manager)
         {
             var managerType = manager.GetType();
 
-            managers.Add(manager);
-            byType[managerType] = manager;
+            _managers.Add(manager);
+            _byType[managerType] = manager;
 
             foreach (var type in manager.GetManagedTypes())
             {
-                IManagerHandler handler = null;
-                if (!byBehaviour.TryGetValue(type, out handler))
+                IManagerHandler handler;
+                if (!_byBehaviour.TryGetValue(type, out handler))
                 {
                     var handlerType = typeof(ManagerHandler<>).MakeGenericType(type);
-                    handler = Activator.CreateInstance(handlerType) as IManagerHandler;
-                    byBehaviour[type] = handler;
+                    handler = (IManagerHandler)Activator.CreateInstance(handlerType);
+                    _byBehaviour[type] = handler;
                 }
 
                 handler.Manager = manager;
@@ -113,7 +110,7 @@ namespace Myre.Entities.Behaviours
             foreach (var item in IterateBaseTypesAndInterfaces(manager.GetType()))
             {
                 PrivateList list;
-                if (catagorised.TryGetValue(item, out list))
+                if (_catagorised.TryGetValue(item, out list))
                     AddToList(list, item, manager);
             }
         }
@@ -136,20 +133,20 @@ namespace Myre.Entities.Behaviours
 
         public bool Remove(IBehaviourManager manager)
         {
-            var removed = managers.Remove(manager);
+            var removed = _managers.Remove(manager);
 
             if (removed)
             {
                 var managerType = manager.GetType();
-                byType.Remove(managerType);
+                _byType.Remove(managerType);
 
                 foreach (var type in manager.GetManagedTypes())
-                    byBehaviour[type].Manager = null;
+                    _byBehaviour[type].Manager = null;
 
                 foreach (var type in IterateBaseTypesAndInterfaces(managerType))
                 {
                     PrivateList list;
-                    if (catagorised.TryGetValue(type, out list))
+                    if (_catagorised.TryGetValue(type, out list))
                         RemoveFromList(list, type, manager);
                 }
             }
@@ -166,52 +163,55 @@ namespace Myre.Entities.Behaviours
 
         public bool Contains(Type managerType)
         {
-            return byType.ContainsKey(managerType);
+            return _byType.ContainsKey(managerType);
         }
 
         public bool Contains(IBehaviourManager manager)
         {
-            return managers.Contains(manager);
+            return _managers.Contains(manager);
         }
 
         public bool ContainsForBehaviour(Type behaviourType)
         {
-            return byBehaviour.ContainsKey(behaviourType);
+            return _byBehaviour.ContainsKey(behaviourType);
         }
 
         public IBehaviourManager Get(Type managerType)
         {
-            return byType[managerType];
+            return _byType[managerType];
         }
 
         public bool TryGet(Type managerType, out IBehaviourManager manager)
         {
-            return byType.TryGetValue(managerType, out manager);
+            return _byType.TryGetValue(managerType, out manager);
         }
 
         public IManagerHandler GetByBehaviour(Type behaviourType)
         {
-            return byBehaviour[behaviourType];
+            return _byBehaviour[behaviourType];
         }
 
         public bool TryGetByBehaviour(Type behaviourType, out IManagerHandler manager)
         {
-            return byBehaviour.TryGetValue(behaviourType, out manager);
+            return _byBehaviour.TryGetValue(behaviourType, out manager);
         }
 
         public void Clear()
         {
-            managers.Clear();
-            byBehaviour.Clear();
-            byType.Clear();
+            _managers.Clear();
+            _byBehaviour.Clear();
+            _byType.Clear();
         }
 
         public IManagerHandler Find(Type behaviourType, IBehaviourManager manager = null)
         {
+            if (behaviourType == null)
+                throw new ArgumentException("behaviourType");
+
             var behaviour = typeof(Behaviour);
             while (behaviour.IsAssignableFrom(behaviourType))
             {
-                IManagerHandler handler = null;
+                IManagerHandler handler;
                 if (TryGetByBehaviour(behaviourType, out handler) && (manager == null || handler.Manager == manager))
                     return handler;
 
@@ -226,10 +226,10 @@ namespace Myre.Entities.Behaviours
             var type = typeof(T);
 
             PrivateList list;
-            if (!catagorised.TryGetValue(type, out list))
+            if (!_catagorised.TryGetValue(type, out list))
             {
                 list = CreatePrivateList(type);
-                catagorised[type] = list;
+                _catagorised[type] = list;
             }
 
             return list.ReadOnly as ReadOnlyCollection<T>;
@@ -245,7 +245,7 @@ namespace Myre.Entities.Behaviours
             list.ReadOnly = Activator.CreateInstance(readOnlyType, list.List);
 
             var addMethod = list.List.GetType().GetMethod("Add", new Type[] { type });
-            foreach (var manager in managers)
+            foreach (var manager in _managers)
             {
                 var managerType = manager.GetType();
                 if (type.IsAssignableFrom(managerType))
@@ -259,7 +259,7 @@ namespace Myre.Entities.Behaviours
 
         public IEnumerator<IBehaviourManager> GetEnumerator()
         {
-            return managers.GetEnumerator();
+            return _managers.GetEnumerator();
         }
 
         #endregion

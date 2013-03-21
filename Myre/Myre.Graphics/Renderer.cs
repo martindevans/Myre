@@ -101,7 +101,7 @@ namespace Myre.Graphics
             else
                 _device.SetRenderTarget(null);
 #else
-            device.SetRenderTarget(null);
+            _device.SetRenderTarget(null);
 #endif
 
 

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Debugging.Statistics
 {
@@ -10,9 +7,9 @@ namespace Myre.Debugging.Statistics
     /// </summary>
     public class FrequencyTracker
     {
-        DateTime lastUpdate;
-        Statistic statistic;
-        int counter;
+        DateTime _lastUpdate;
+        readonly Statistic _statistic;
+        int _counter;
 
         /// <summary>
         /// Gets or sets the frequency.
@@ -26,9 +23,9 @@ namespace Myre.Debugging.Statistics
         /// <param name="statisticName">Name of the statistic.</param>
         public FrequencyTracker(string statisticName)
         {
-            lastUpdate = DateTime.Now;
+            _lastUpdate = DateTime.Now;
             if (!string.IsNullOrEmpty(statisticName))
-                statistic = Statistic.Get(statisticName);
+                _statistic = Statistic.Get(statisticName);
         }
 
         /// <summary>
@@ -36,15 +33,15 @@ namespace Myre.Debugging.Statistics
         /// </summary>
         public void Pulse()
         {
-            counter++;
+            _counter++;
             var now = DateTime.Now;
-            if ((now - lastUpdate).TotalSeconds > 1f)
+            if ((now - _lastUpdate).TotalSeconds > 1f)
             {
-                Frequency = counter;
-                if (statistic != null)
-                    statistic.Value = counter;
-                counter = 0;
-                lastUpdate = now;
+                Frequency = _counter;
+                if (_statistic != null)
+                    _statistic.Value = _counter;
+                _counter = 0;
+                _lastUpdate = now;
             }
         }
     }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Myre.StateManagement
@@ -12,7 +9,7 @@ namespace Myre.StateManagement
     public abstract class Screen
         :IDisposable
     {
-        TransitionState transitionState = TransitionState.Hidden;
+        TransitionState _transitionState = TransitionState.Hidden;
 
         /// <summary>
         /// Gets the <see cref="ScreenManager"/> which this screen was last pushed onto.
@@ -80,14 +77,14 @@ namespace Myre.StateManagement
         /// <value>The state of the transition.</value>
         public TransitionState TransitionState
         {
-            get { return transitionState; }
+            get { return _transitionState; }
             internal set
             {
-                if (transitionState == value)
+                if (_transitionState == value)
                     return;
 
-                transitionState = value;
-                switch (transitionState)
+                _transitionState = value;
+                switch (_transitionState)
                 {
                     case TransitionState.Hidden:
                         OnHidden();

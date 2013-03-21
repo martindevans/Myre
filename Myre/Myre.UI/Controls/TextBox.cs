@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using System.Globalization;
-using Myre.UI.Text;
+using Microsoft.Xna.Framework.Input;
 using Myre.Extensions;
-using Microsoft.Xna.Framework.GamerServices;
-using Myre.UI.InputDevices;
 using Myre.UI.Gestures;
+using Myre.UI.InputDevices;
 
 namespace Myre.UI.Controls
 {
@@ -20,28 +17,28 @@ namespace Myre.UI.Controls
     public class TextBox
         : Control
     {
-        private string textString;
-        private StringBuilder text;
-        private bool typing;
-        private string title;
-        private string description;
+        private string _textString;
+        private readonly StringBuilder _text;
+        private bool _typing;
+        private readonly string _title;
+        private readonly string _description;
 
-        private StringBuilder drawBuffer;
-        private SpriteFont font;
-        private Color colour;
-        private int drawStartIndex;
-        private int drawEndIndex;
+        private readonly StringBuilder _drawBuffer;
+        private readonly SpriteFont _font;
+        private readonly Color _colour;
+        private int _drawStartIndex;
+        private int _drawEndIndex;
 
-        private Pulser blink;
-        private Pulser keyRepeat;
-        private int selectionStartIndex;
-        private int selectionEndIndex;
-        private int selectionStartDrawPosition;
-        private int selectionEndDrawPosition;
-        private StringBuilder measurementBuffer;
+        private readonly Pulser _blink;
+        private readonly Pulser _keyRepeat;
+        private int _selectionStartIndex;
+        private int _selectionEndIndex;
+        private int _selectionStartDrawPosition;
+        private int _selectionEndDrawPosition;
+        private readonly StringBuilder _measurementBuffer;
 
-        private bool dirty;
-        private Texture2D blank;
+        private bool _dirty;
+        private readonly Texture2D _blank;
 
 #if WINDOWS
         private KeyboardState currentState;
@@ -50,17 +47,17 @@ namespace Myre.UI.Controls
 
         public string Text
         {
-            get { return textString; }
+            get { return _textString; }
             set
             {
                 if (value == null)
                     throw new ArgumentException("value");
 
-                text.Clear();
-                text.Append(value);
-                textString = value;
-                selectionStartIndex = value.Length;
-                selectionEndIndex = value.Length;
+                _text.Clear();
+                _text.Append(value);
+                _textString = value;
+                _selectionStartIndex = value.Length;
+                _selectionEndIndex = value.Length;
                 Dirty();
             }
         }
@@ -80,31 +77,31 @@ namespace Myre.UI.Controls
         public TextBox(Control parent, Game game, SpriteFont font, string title, string description)
             : base(parent)
         {
-            this.textString = string.Empty;
-            this.text = new StringBuilder();
-            this.textString = "";
-            this.typing = false;
-            this.title = title;
-            this.description = description;
+            _textString = string.Empty;
+            _text = new StringBuilder();
+            _textString = "";
+            _typing = false;
+            _title = title;
+            _description = description;
 
-            this.drawBuffer = new StringBuilder();
-            this.font = font;
-            this.colour = Color.White;
-            this.drawStartIndex = 0;
-            this.drawEndIndex = 0;
+            _drawBuffer = new StringBuilder();
+            _font = font;
+            _colour = Color.White;
+            _drawStartIndex = 0;
+            _drawEndIndex = 0;
 
-            this.blink = new Pulser(PulserType.SquareWave, TimeSpan.FromSeconds(0.5));
-            this.keyRepeat = new Pulser(PulserType.Simple, TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.5));
-            this.selectionStartIndex = 0;
-            this.selectionEndIndex = 0;
-            this.measurementBuffer = new StringBuilder();
+            _blink = new Pulser(PulserType.SquareWave, TimeSpan.FromSeconds(0.5));
+            _keyRepeat = new Pulser(PulserType.Simple, TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.5));
+            _selectionStartIndex = 0;
+            _selectionEndIndex = 0;
+            _measurementBuffer = new StringBuilder();
 
-            this.blank = new Texture2D(game.GraphicsDevice, 1, 1);
-            this.blank.SetData(new Color[] { Color.White });
+            _blank = new Texture2D(game.GraphicsDevice, 1, 1);
+            _blank.SetData(new Color[] { Color.White });
 
-            this.IgnoredCharacters = new List<char>();
+            IgnoredCharacters = new List<char>();
 
-            base.SetSize(100, font.LineSpacing);
+            SetSize(100, font.LineSpacing);
 
             Gestures.Bind((g, t, i) =>
                 {
@@ -116,9 +113,9 @@ namespace Myre.UI.Controls
 
             Gestures.Bind((g, t, i) => 
                 {
-                    var keyboard = i as KeyboardDevice;
+                    var keyboard = (KeyboardDevice)i;
                     foreach (var character in keyboard.Characters)
-                        Write(character.ToString());
+                        Write(character.ToString(CultureInfo.InvariantCulture));
                 },
                 new CharactersEntered());
 
@@ -134,16 +131,16 @@ namespace Myre.UI.Controls
                 new KeyCombinationPressed(Keys.V, Keys.LeftControl),
                 new KeyCombinationPressed(Keys.V, Keys.RightControl));
 
-            FocusedChanged += control => { if (!IsFocused) typing = false; };
+            FocusedChanged += control => { if (!IsFocused) _typing = false; };
 
 
         }
 
         public void BeginTyping(PlayerIndex player)
         {
-            typing = true;
+            _typing = true;
 #if !WINDOWS
-            Guide.BeginShowKeyboardInput(player, title, description, text.ToString(), GuideCallback, null);
+            Guide.BeginShowKeyboardInput(player, _title, _description, _text.ToString(), GuideCallback, null);
 #endif
         }
 
@@ -153,31 +150,31 @@ namespace Myre.UI.Controls
             string input = Guide.EndShowKeyboardInput(result);
             Text = input;
 
-            selectionStartIndex = selectionEndIndex = 0;
-            typing = false;
+            _selectionStartIndex = _selectionEndIndex = 0;
+            _typing = false;
         }
 #endif
 
         public override void Update(GameTime gameTime)
         {
-            if (typing)
+            if (_typing)
             {
-                blink.Update();
-                keyRepeat.Update();
+                _blink.Update();
+                _keyRepeat.Update();
 
                 ReadNavigationKeys();
             }
 
-            if (dirty)
+            if (_dirty)
             {
                 UpdatePositions();
-                textString = text.ToString();
+                _textString = _text.ToString();
             }
         }
 
         private void Copy()
         {
-            Clipboard.Text = Text.Substring(Math.Min(selectionStartIndex, selectionEndIndex), Math.Abs(selectionEndIndex - selectionStartIndex));
+            Clipboard.Text = Text.Substring(Math.Min(_selectionStartIndex, _selectionEndIndex), Math.Abs(_selectionEndIndex - _selectionStartIndex));
         }
 
         private void Paste()
@@ -224,11 +221,11 @@ namespace Myre.UI.Controls
 
             if (!previousState.IsKeyDown(key))
             {
-                keyRepeat.Restart(false, true);
+                _keyRepeat.Restart(false, true);
                 return true;
             }
 
-            return keyRepeat.IsSignalled;
+            return _keyRepeat.IsSignalled;
         }
 #endif
 
@@ -237,22 +234,22 @@ namespace Myre.UI.Controls
             if (!IsVisible)
                 return;
 
-            spriteBatch.DrawString(font, drawBuffer, new Vector2(Area.X, Area.Y), colour);
+            spriteBatch.DrawString(_font, _drawBuffer, new Vector2(Area.X, Area.Y), _colour);
 
-            if (typing)
+            if (_typing)
             {
                 spriteBatch.Draw(
-                    blank,
+                    _blank,
                     new Rectangle(
-                        Area.X + Math.Min(selectionStartDrawPosition, selectionEndDrawPosition), Area.Y,
-                        Math.Abs(selectionEndDrawPosition - selectionStartDrawPosition), font.LineSpacing),
+                        Area.X + Math.Min(_selectionStartDrawPosition, _selectionEndDrawPosition), Area.Y,
+                        Math.Abs(_selectionEndDrawPosition - _selectionStartDrawPosition), _font.LineSpacing),
                     new Color(0.5f, 0.5f, 0.5f, 0.5f));
 
-                if (blink.IsSignalled)
+                if (_blink.IsSignalled)
                 {
                     spriteBatch.Draw(
-                        blank,
-                        new Rectangle(Area.X + selectionEndDrawPosition, Area.Y, 1, font.LineSpacing),
+                        _blank,
+                        new Rectangle(Area.X + _selectionEndDrawPosition, Area.Y, 1, _font.LineSpacing),
                         Color.White);
                 }
             }
@@ -260,96 +257,96 @@ namespace Myre.UI.Controls
 
         private void UpdatePositions()
         {
-            drawStartIndex = Math.Min(drawStartIndex, selectionEndIndex);
+            _drawStartIndex = Math.Min(_drawStartIndex, _selectionEndIndex);
 
-            bool success = true;
+            bool success;
             do
             {
-                drawBuffer.Clear();
-                drawEndIndex = drawStartIndex;
+                _drawBuffer.Clear();
+                _drawEndIndex = _drawStartIndex;
 
-                bool fits;
                 while (true)
                 {
-                    fits = font.MeasureString(drawBuffer).X <= Area.Width;
+                    bool fits = _font.MeasureString(_drawBuffer).X <= Area.Width;
                     if (!fits)
                     {
-                        drawBuffer.Remove(drawBuffer.Length - 1, 1);
-                        drawEndIndex--;
+                        _drawBuffer.Remove(_drawBuffer.Length - 1, 1);
+                        _drawEndIndex--;
                         break;
                     }
                     else
                     {
-                        if (drawEndIndex >= text.Length)
+                        if (_drawEndIndex >= _text.Length)
                             break;
 
-                        drawBuffer.Append(text[drawEndIndex]);
-                        drawEndIndex++;
+                        _drawBuffer.Append(_text[_drawEndIndex]);
+                        _drawEndIndex++;
                     }
                 }
 
-                success = drawEndIndex >= selectionEndIndex;
+                success = _drawEndIndex >= _selectionEndIndex;
 
                 if (!success)
-                    drawStartIndex++;
+                    _drawStartIndex++;
 
             } while (!success);
 
-            TextFitsInSpace = font.MeasureString(text).X <= Area.Width;
+            TextFitsInSpace = _font.MeasureString(_text).X <= Area.Width;
 
-            selectionStartDrawPosition = (int)MathHelper.Clamp(MeasureString(text, drawStartIndex, selectionStartIndex - drawStartIndex).X, 0, Area.Width - 1);
-            selectionEndDrawPosition = (int)MathHelper.Clamp(MeasureString(text, drawStartIndex, selectionEndIndex - drawStartIndex).X, 0, Area.Width - 1);
+            _selectionStartDrawPosition = (int)MathHelper.Clamp(MeasureString(_text, _drawStartIndex, _selectionStartIndex - _drawStartIndex).X, 0, Area.Width - 1);
+            _selectionEndDrawPosition = (int)MathHelper.Clamp(MeasureString(_text, _drawStartIndex, _selectionEndIndex - _drawStartIndex).X, 0, Area.Width - 1);
 
-            dirty = false;
+            _dirty = false;
         }
 
         private Vector2 MeasureString(StringBuilder sb, int startIndex, int length)
         {
-            measurementBuffer.Clear();
-            measurementBuffer.Append(sb, startIndex, length);
-            return font.MeasureString(measurementBuffer);
+            _measurementBuffer.Clear();
+            _measurementBuffer.Append(sb, startIndex, length);
+            return _font.MeasureString(_measurementBuffer);
         }
 
         private void Write(string characters)
         {
-            var selectStart = Math.Min(selectionStartIndex, selectionEndIndex);
-            var selectEnd = Math.Max(selectionStartIndex, selectionEndIndex);
+            var selectStart = Math.Min(_selectionStartIndex, _selectionEndIndex);
+            var selectEnd = Math.Max(_selectionStartIndex, _selectionEndIndex);
 
-            text.Remove(selectStart, selectEnd - selectStart);
+            _text.Remove(selectStart, selectEnd - selectStart);
 
             int charactersAdded = 0;
             for (int i = characters.Length - 1; i >= 0; i--)
             {
                 var c = characters[i];
-                if ((font.DefaultCharacter != null || font.Characters.Contains(c))
+                if ((_font.DefaultCharacter != null || _font.Characters.Contains(c))
                     && !IgnoredCharacters.Contains(c))
                 {
-                    text.Insert(selectStart, c.ToString());
+                    _text.Insert(selectStart, c.ToString(CultureInfo.InvariantCulture));
                     charactersAdded++;
                 }
             }
 
-            selectionEndIndex = selectStart + charactersAdded;
-            selectionStartIndex = selectionEndIndex;
+            _selectionEndIndex = selectStart + charactersAdded;
+            _selectionStartIndex = _selectionEndIndex;
 
             Dirty();
         }
 
         private void Dirty()
         {
-            blink.Restart(true, true);
-            dirty = true;
+            _blink.Restart(true, true);
+            _dirty = true;
         }
 
+#if WINDOWS
         private void Delete()
         {
-            if (selectionEndIndex != selectionStartIndex)
+            if (_selectionEndIndex != _selectionStartIndex)
                 Write(string.Empty);
             else
             {
-                if (selectionEndIndex < text.Length)
+                if (_selectionEndIndex < _text.Length)
                 {
-                    text.Remove(selectionEndIndex, 1);
+                    _text.Remove(_selectionEndIndex, 1);
                     Dirty();
                 }
             }
@@ -357,7 +354,7 @@ namespace Myre.UI.Controls
 
         private void Backspace()
         {
-            if (selectionEndIndex != selectionStartIndex)
+            if (_selectionEndIndex != _selectionStartIndex)
                 Write(string.Empty);
             else
             {
@@ -368,34 +365,35 @@ namespace Myre.UI.Controls
 
         private void Left(bool shift)
         {
-            selectionEndIndex--;
+            _selectionEndIndex--;
             CompleteMove(shift);
         }
 
         private void Right(bool shift)
         {
-            selectionEndIndex++;
+            _selectionEndIndex++;
             CompleteMove(shift);
         }
 
         private void Home(bool shift)
         {
-            selectionEndIndex = 0;
+            _selectionEndIndex = 0;
             CompleteMove(shift);
         }
 
         private void End(bool shift)
         {
-            selectionEndIndex = text.Length;
+            _selectionEndIndex = _text.Length;
             CompleteMove(shift);
         }
 
         private void CompleteMove(bool shift)
         {
-            selectionEndIndex = (int)MathHelper.Clamp(selectionEndIndex, 0, text.Length);
+            _selectionEndIndex = (int)MathHelper.Clamp(_selectionEndIndex, 0, _text.Length);
             if (!shift)
-                selectionStartIndex = selectionEndIndex;
+                _selectionStartIndex = _selectionEndIndex;
             Dirty();
         }
+#endif
     }
 }

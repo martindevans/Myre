@@ -46,8 +46,7 @@ namespace Myre.Entities
                 var property = _entity.GetProperty<T>(name);
                 if (property == null)
                 {
-                    property = new Property<T>(name);
-                    property.Value = value;
+                    property = new Property<T>(name) {Value = value};
                     _entity.AddProperty(property);
                 }
 
@@ -314,7 +313,9 @@ namespace Myre.Entities
             Behaviour[] array;
             if (_behaviours.TryGetValue(type, out array))
             {
+// ReSharper disable LoopCanBeConvertedToQuery
                 foreach (var item in array)
+// ReSharper restore LoopCanBeConvertedToQuery
                 {
                     if (item.Name == name)
                         return item;
@@ -329,7 +330,9 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns></returns>
+// ReSharper disable ReturnTypeCanBeEnumerable.Global
         public Behaviour[] GetBehaviours(Type type)
+// ReSharper restore ReturnTypeCanBeEnumerable.Global
         {
             Behaviour[] array;
             _behaviours.TryGetValue(type, out array);

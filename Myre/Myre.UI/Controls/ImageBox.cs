@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.UI.Controls
 {
@@ -13,7 +10,7 @@ namespace Myre.UI.Controls
     public class ImageBox
         : Control
     {
-        private Texture2D texture;
+        private Texture2D _texture;
 
         /// <summary>
         /// Gets or sets the texture.
@@ -21,12 +18,12 @@ namespace Myre.UI.Controls
         /// <value>The texture.</value>
         public Texture2D Texture 
         {
-            get { return texture; }
+            get { return _texture; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
-                texture = value;
+                _texture = value;
             }
         }
 
@@ -49,7 +46,6 @@ namespace Myre.UI.Controls
         /// <param name="texture">The texture.</param>
         /// <param name="colour">The colour.</param>
         /// <param name="sourceRectangle">The source rectangle.</param>
-        /// <param name="focusScope">The focus scope.</param>
         public ImageBox(Control parent, Texture2D texture, Color colour, Rectangle? sourceRectangle)
             : base(parent)
         {
@@ -75,7 +71,7 @@ namespace Myre.UI.Controls
         public override void Draw(SpriteBatch batch)
         {
             batch.Draw(
-                texture,
+                _texture,
                 Area,
                 SourceRectangle,
                 Colour);

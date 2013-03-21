@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures
@@ -18,17 +16,17 @@ namespace Myre.UI.Gestures
         : IGesture
         where Device : IInputDevice
     {
-        private static Type deviceType = typeof(Device);
-        private List<int> blockedInputs = new List<int>();
+        private static readonly Type _deviceType = typeof(Device);
+        private readonly List<int> _blockedInputs = new List<int>();
 
         public ICollection<int> BlockedInputs
         {
-            get { return blockedInputs; }
+            get { return _blockedInputs; }
         }
 
         public Type DeviceType
         {
-            get { return deviceType; }
+            get { return _deviceType; }
         }
 
         public bool AlwaysEvaluate
@@ -37,12 +35,12 @@ namespace Myre.UI.Gestures
             private set;
         }
 
-        public Gesture(bool alwaysEvaluate)
+        protected Gesture(bool alwaysEvaluate)
         {
             AlwaysEvaluate = alwaysEvaluate;
         }
 
-        public abstract bool Test(Device device);
+        protected abstract bool Test(Device device);
 
         bool IGesture.Test(IInputDevice device)
         {

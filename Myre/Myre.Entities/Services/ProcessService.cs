@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Services;
 
 namespace Myre.Entities.Services
 {
@@ -25,16 +22,16 @@ namespace Myre.Entities.Services
     public class ProcessService
         : Service, IProcessService
     {
-        private List<IProcess> processes;
-        private List<IProcess> buffer;
+        private readonly List<IProcess> _processes;
+        private readonly List<IProcess> _buffer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessService"/> class.
         /// </summary>
         public ProcessService()
         {
-            processes = new List<IProcess>();
-            buffer = new List<IProcess>();
+            _processes = new List<IProcess>();
+            _buffer = new List<IProcess>();
         }
 
         /// <summary>
@@ -45,19 +42,19 @@ namespace Myre.Entities.Services
         {
             var startTime = DateTime.Now;
 
-            lock (buffer)
+            lock (_buffer)
             {
-                processes.AddRange(buffer);
-                buffer.Clear();
+                _processes.AddRange(_buffer);
+                _buffer.Clear();
             }
 
-            for (int i = processes.Count - 1; i >= 0; i--)
+            for (int i = _processes.Count - 1; i >= 0; i--)
             {
-                var process = processes[i];
+                var process = _processes[i];
 
                 if (process.IsComplete)
                 {
-                    processes.RemoveAt(i);
+                    _processes.RemoveAt(i);
                     continue;
                 }
 
@@ -71,8 +68,8 @@ namespace Myre.Entities.Services
         /// <param name="process">The process.</param>
         public void Add(IProcess process)
         {
-            lock (buffer)
-                buffer.Add(process);
+            lock (_buffer)
+                _buffer.Add(process);
         }
     }
 }

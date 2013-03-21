@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Entities.Behaviours;
 using Myre.Entities;
+using Myre.Entities.Behaviours;
 
 namespace Myre.Physics2D
 {

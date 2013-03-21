@@ -25,7 +25,7 @@ namespace Myre.Physics2D
         private Property<float> _angularAcceleration;
         private Property<Vector2> _linearAcceleration;
 
-        private Event<CollisionImpulseApplied> collisonImpulseEvent;
+        private Event<CollisionImpulseApplied> _collisonImpulseEvent;
 
         private Vector2 _force;
         private float _torque;
@@ -99,25 +99,25 @@ namespace Myre.Physics2D
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION);
-            _rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION);
+            _position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION, default(Vector2));
+            _rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION, default(float));
             _mass = context.CreateProperty<float>(PhysicsProperties.MASS, 1);
             _inertiaTensor = context.CreateProperty<float>(PhysicsProperties.INERTIA_TENSOR, 1);
-            _linearVelocity = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_VELOCITY);
-            _angularVelocity = context.CreateProperty<float>(PhysicsProperties.ANGULAR_VELOCITY);
-            _linearVelocityBias = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_VELOCITY_BIAS);
-            _angularVelocityBias = context.CreateProperty<float>(PhysicsProperties.ANGULAR_VELOCITY_BIAS);
-            _linearAcceleration = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_ACCELERATION);
-            _angularAcceleration = context.CreateProperty<float>(PhysicsProperties.ANGULAR_ACCELERATION);
-            _timeMultiplier = context.CreateProperty<float>(PhysicsProperties.TIME_MULTIPLIER);
-            _sleeping = context.CreateProperty<bool>(PhysicsProperties.SLEEPING);
+            _linearVelocity = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_VELOCITY, default(Vector2));
+            _angularVelocity = context.CreateProperty<float>(PhysicsProperties.ANGULAR_VELOCITY, default(float));
+            _linearVelocityBias = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_VELOCITY_BIAS, default(Vector2));
+            _angularVelocityBias = context.CreateProperty<float>(PhysicsProperties.ANGULAR_VELOCITY_BIAS, default(float));
+            _linearAcceleration = context.CreateProperty<Vector2>(PhysicsProperties.LINEAR_ACCELERATION, default(Vector2));
+            _angularAcceleration = context.CreateProperty<float>(PhysicsProperties.ANGULAR_ACCELERATION, default(float));
+            _timeMultiplier = context.CreateProperty<float>(PhysicsProperties.TIME_MULTIPLIER, default(float));
+            _sleeping = context.CreateProperty<bool>(PhysicsProperties.SLEEPING, default(bool));
 
             base.CreateProperties(context);
         }
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            collisonImpulseEvent = Owner.Scene.GetService<EventService>().GetEvent<CollisionImpulseApplied>();
+            _collisonImpulseEvent = Owner.Scene.GetService<EventService>().GetEvent<CollisionImpulseApplied>(null);
 
             _timeTillSleep = 5;
             base.Initialise(initialisationData);
@@ -181,7 +181,7 @@ namespace Myre.Physics2D
 
         internal void CollisionImpulse(Geometry geometry, Geometry other, ref Vector2 impulse, ref Vector2 worldOffset)
         {
-            collisonImpulseEvent.Send(new CollisionImpulseApplied(geometry, other, impulse));
+            _collisonImpulseEvent.Send(new CollisionImpulseApplied(geometry, other, impulse));
             ApplyImpulseAtOffset(ref impulse, ref worldOffset);
         }
 

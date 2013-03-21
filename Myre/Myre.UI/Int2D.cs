@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 namespace Myre.UI
 {
@@ -11,36 +7,36 @@ namespace Myre.UI
     /// </summary>
     public struct Int2D
     {
-        private static Int2D zero = new Int2D(0);
-        private static Int2D one = new Int2D(1);
+        private static readonly Int2D _zero = new Int2D(0);
+        private static readonly Int2D _one = new Int2D(1);
 
         /// <summary>
         /// An Int2D with X and Y components of 0.
         /// </summary>
-        public static Int2D Zero { get { return zero; } }
+        public static Int2D Zero { get { return _zero; } }
 
         /// <summary>
         /// An Int2D with X and Y components of 1.
         /// </summary>
-        public static Int2D One { get { return one; } }
+        public static Int2D One { get { return _one; } }
 
         /// <summary>
         /// The x component of this vector.
         /// </summary>
-        public int X;
+        public readonly int X;
 
         /// <summary>
         /// The y component of this vector.
         /// </summary>
-        public int Y;
+        public readonly int Y;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Int2D"/> struct.
         /// </summary>
         public Int2D(int value)
         {
-            this.X = value;
-            this.Y = value;
+            X = value;
+            Y = value;
         }
 
         /// <summary>
@@ -48,8 +44,8 @@ namespace Myre.UI
         /// </summary>
         public Int2D(int x, int y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
 
         /// <summary>
@@ -57,8 +53,8 @@ namespace Myre.UI
         /// </summary>
         public Int2D(Vector2 v)
         {
-            this.X = (int)v.X;
-            this.Y = (int)v.Y;
+            X = (int)v.X;
+            Y = (int)v.Y;
         }
 
         /// <summary>
@@ -79,7 +75,7 @@ namespace Myre.UI
         /// <returns>true is <paramref name="value"/> and this instance are equal; else false.</returns>
         public bool Equals(Int2D value)
         {
-            return this.X == value.X && this.Y == value.Y;
+            return X == value.X && Y == value.Y;
         }
 
         /// <summary>
@@ -92,7 +88,7 @@ namespace Myre.UI
         public override bool Equals(object obj)
         {
             if (obj is Int2D)
-                return this.Equals((Int2D)obj);
+                return Equals((Int2D)obj);
             return base.Equals(obj);
         }
 

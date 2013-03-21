@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Myre.Extensions
 {
@@ -63,6 +61,7 @@ namespace Myre.Extensions
         /// Creates an instance of this type.
         /// </summary>
         /// <param name="type">The type.</param>
+        /// <param name="parameterTypes"></param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
         public static object CreateInstance(this Type type, Type[] parameterTypes, object[] parameters)

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ninject;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Ninject;
 
 namespace Myre.Entities
 {
@@ -14,7 +11,7 @@ namespace Myre.Entities
     /// </summary>
     public static class NinjectKernel
     {
-        private static IKernel kernel;
+        private static IKernel _kernel;
 
         /// <summary>
         /// Gets the instance.
@@ -23,10 +20,10 @@ namespace Myre.Entities
         {
             get
             {
-                if (kernel == null)
-                    kernel = new StandardKernel();
+                if (_kernel == null)
+                    _kernel = new StandardKernel();
 
-                return kernel;
+                return _kernel;
             }
         }
 

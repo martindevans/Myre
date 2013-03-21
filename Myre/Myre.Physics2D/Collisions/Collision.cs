@@ -7,153 +7,149 @@ namespace Myre.Physics2D.Collisions
 {
     public class Collision
     {
-        private readonly static Stack<Collision> Pool = new Stack<Collision>();
+        private readonly static Stack<Collision> _pool = new Stack<Collision>();
 
-        private Geometry a;
-        private Geometry b;
-        private Vector2 normal;
-        private float penetrationDepth;
-        private List<Contact> contacts;
-        private List<Contact> newContacts;
-        private bool initialised;
+        private Vector2 _normal;
+        private List<Contact> _newContacts;
+        private bool _initialised;
 
-        private float frictionCoefficient;
-        private float restitutionCoefficient;
+        private float _frictionCoefficient;
+        private float _restitutionCoefficient;
 
-        public Geometry A { get { return a; } }
-        public Geometry B { get { return b; } }
-        public List<Contact> Contacts { get { return contacts; } }
-        public Vector2 Normal { get { return normal; } }
-        public float PenetrationDepth { get { return penetrationDepth; } }
+        public Geometry A { get; private set; }
+        public Geometry B { get; private set; }
+        public List<Contact> Contacts { get; private set; }
+        public Vector2 Normal { get { return _normal; } }
+        public float PenetrationDepth { get; private set; }
 
         public bool IsDead
         {
-            get { return contacts.Count == 0; }
+            get { return Contacts.Count == 0; }
         }
 
         public bool IsActive
         {
-            get { return !(a.Body.Sleeping && b.Body.Sleeping); }
+            get { return !(A.Body.Sleeping && B.Body.Sleeping); }
         }
 
         #region temp variables
-        Vector2 r1, r2;
-        float rn1, rn2;
-        float float1, float2;
-        float kNormal;
-        float rt1, rt2;
-        Vector2 tangent;
-        float kTangent;
-        Vector2 vec1, vec2;
-        Vector2 dv;
-        float vn;
-        Vector2 impulse;
-        float max;
-        float normalImpulse;
-        float oldNormalImpulse;
-        float normalVelocityBias;
-        float normalImpulseBias;
-        float normalImpulseBiasOriginal;
-        Vector2 impulseBias;
-        float maxTangentImpulse;
-        float vt;
-        float tangentImpulse;
-        float oldTangentImpulse;
+        Vector2 _r1, _r2;
+        float _rn1, _rn2;
+        float _float1, _float2;
+        float _kNormal;
+        float _rt1, _rt2;
+        Vector2 _tangent;
+        float _kTangent;
+        Vector2 _vec1, _vec2;
+        Vector2 _dv;
+        float _vn;
+        Vector2 _impulse;
+        float _max;
+        float _normalImpulse;
+        float _oldNormalImpulse;
+        float _normalVelocityBias;
+        float _normalImpulseBias;
+        float _normalImpulseBiasOriginal;
+        Vector2 _impulseBias;
+        float _maxTangentImpulse;
+        float _vt;
+        float _tangentImpulse;
+        float _oldTangentImpulse;
         #endregion
 
         private Collision()
         {
-            this.contacts = new List<Contact>();
-            this.newContacts = new List<Contact>();
-            this.normal = Vector2.Zero;
-            this.penetrationDepth = 0;
-            this.initialised = false;
+            Contacts = new List<Contact>();
+            _newContacts = new List<Contact>();
+            _normal = Vector2.Zero;
+            PenetrationDepth = 0;
+            _initialised = false;
         }
 
         public static Collision Create(Geometry a, Geometry b)
         {
-            var collision = Pool.Count > 0 ? Pool.Pop() : new Collision();
-            collision.a = a;
-            collision.b = b;
+            var collision = _pool.Count > 0 ? _pool.Pop() : new Collision();
+            collision.A = a;
+            collision.B = b;
             return collision;
         }
 
-        public void FindContacts(SatTester tester, int maxContacts = 8)
+        public void FindContacts(SatTester tester, int maxContacts)
         {
             if (!IsActive)
                 return;
 
             // perform SAT collision detection
-            SatResult? r = tester.FindIntersection(a, b);
+            SatResult? r = tester.FindIntersection(A, B);
 
             if (r == null)
             {
-                contacts.Clear();
+                Contacts.Clear();
                 return;
             }
 
             SatResult result = r.Value;
-            normal = result.NormalAxis;
-            penetrationDepth = result.Penetration;
+            _normal = result.NormalAxis;
+            PenetrationDepth = result.Penetration;
 
             // find all vertices in a which are inside b, add them as contacts
-            var aVertices = a.GetVertices(result.NormalAxis);
+            var aVertices = A.GetVertices(result.NormalAxis);
             for (int i = 0; i < aVertices.Length; i++)
             {
-                if (newContacts.Count == maxContacts)
+                if (_newContacts.Count == maxContacts)
                     break;
 
-                if (b.Contains(aVertices[i]))
-                    newContacts.Add(new Contact(aVertices[i], a, i));
+                if (B.Contains(aVertices[i]))
+                    _newContacts.Add(new Contact(aVertices[i], A, i));
             }
 
             // find all vertices in b which are inside a, add them as contacts
-            var bVertices = b.GetVertices(-result.NormalAxis);
+            var bVertices = B.GetVertices(-result.NormalAxis);
             for (int i = 0; i < bVertices.Length; i++)
             {
-                if (contacts.Count == maxContacts)
+                if (Contacts.Count == maxContacts)
                     break;
 
-                if (a.Contains(bVertices[i]))
-                    newContacts.Add(new Contact(bVertices[i], b, i));
+                if (A.Contains(bVertices[i]))
+                    _newContacts.Add(new Contact(bVertices[i], B, i));
             }
 
             // add the deepest point if we found no others
-            if (newContacts.Count == 0)
-                newContacts.Add(new Contact(result.DeepestPoint, a, 0));
+            if (_newContacts.Count == 0)
+                _newContacts.Add(new Contact(result.DeepestPoint, A, 0));
 
             // merge new contacts with the old ones
             MergeContacts();
 
-            if (!initialised)
+            if (!_initialised)
             {
                 A.collidingWith.Add(B);
                 B.collidingWith.Add(A);
-                initialised = true;
+                _initialised = true;
             }
         }
 
         private void MergeContacts()
         {
-            for (int i = 0; i < newContacts.Count; i++)
+            for (int i = 0; i < _newContacts.Count; i++)
             {
-                var contact = newContacts[i];
+                var contact = _newContacts[i];
 
-                var index = contacts.IndexOf(contact);
+                var index = Contacts.IndexOf(contact);
                 if (index == -1)
                     continue;
 
-                var previous = contacts[index];
-                contact.normalImpulse = previous.normalImpulse;
-                contact.tangentImpulse = previous.tangentImpulse;
+                var previous = Contacts[index];
+                contact.NormalImpulse = previous.NormalImpulse;
+                contact.TangentImpulse = previous.TangentImpulse;
 
-                newContacts[i] = contact;
+                _newContacts[i] = contact;
             }
 
-            contacts.Clear();
-            var tmp = contacts;
-            contacts = newContacts;
-            newContacts = tmp;
+            Contacts.Clear();
+            var tmp = Contacts;
+            Contacts = _newContacts;
+            _newContacts = tmp;
         }
 
         //public bool ShouldActivateBody(out DynamicPhysics body)
@@ -178,38 +174,38 @@ namespace Myre.Physics2D.Collisions
         //    return false;
         //}
 
-        public void Prepare(float allowedPenetration, float biasFactor, float inverseDT)
+        public void Prepare(float allowedPenetration, float biasFactor, float inverseDt)
         {
             if (!IsActive)
                 return;
 
-            frictionCoefficient = (a.FrictionCoefficient + b.FrictionCoefficient) * 0.5f;
-            restitutionCoefficient = (a.Restitution + b.Restitution) * 0.5f;
+            _frictionCoefficient = (A.FrictionCoefficient + B.FrictionCoefficient) * 0.5f;
+            _restitutionCoefficient = (A.Restitution + B.Restitution) * 0.5f;
 
-            for (int i = 0; i < contacts.Count; i++)
+            for (int i = 0; i < Contacts.Count; i++)
             {
-                var contact = contacts[i];
+                var contact = Contacts[i];
 
                 // copy + paste from farseer.. which is based on Box2D, and I cba to write yet another variation
 
                 //calculate contact offset from body position
-                var aPos = a.Body.Position;
-                var bPos = b.Body.Position;
-                Vector2.Subtract(ref contact.Position, ref aPos, out r1);
-                Vector2.Subtract(ref contact.Position, ref bPos, out r2);
+                var aPos = A.Body.Position;
+                var bPos = B.Body.Position;
+                Vector2.Subtract(ref contact.Position, ref aPos, out _r1);
+                Vector2.Subtract(ref contact.Position, ref bPos, out _r2);
 
                 //project normal onto offset vectors
-                Vector2.Dot(ref r1, ref normal, out rn1);
-                Vector2.Dot(ref r2, ref normal, out rn2);
+                Vector2.Dot(ref _r1, ref _normal, out _rn1);
+                Vector2.Dot(ref _r2, ref _normal, out _rn2);
 
                 //calculate mass normal
-                float invMassSum = (1f / a.Body.Mass) + (1f / b.Body.Mass);
-                Vector2.Dot(ref r1, ref r1, out float1);
-                Vector2.Dot(ref r2, ref r2, out float2);
-                kNormal = invMassSum
-                    + (float1 - rn1 * rn1) / a.Body.InertiaTensor
-                    + (float2 - rn2 * rn2) / b.Body.InertiaTensor;
-                contact.massNormal = 1f / kNormal;
+                float invMassSum = (1f / A.Body.Mass) + (1f / B.Body.Mass);
+                Vector2.Dot(ref _r1, ref _r1, out _float1);
+                Vector2.Dot(ref _r2, ref _r2, out _float2);
+                _kNormal = invMassSum
+                    + (_float1 - _rn1 * _rn1) / A.Body.InertiaTensor
+                    + (_float2 - _rn2 * _rn2) / B.Body.InertiaTensor;
+                contact.MassNormal = 1f / _kNormal;
 
                 //float rnA = r1.X * normal.Y - r1.Y * normal.X;
                 //float rnB = r2.X * normal.Y - r2.Y * normal.X;
@@ -220,16 +216,16 @@ namespace Myre.Physics2D.Collisions
                 //contact.massNormal = 1f / kNormal;
 
                 //calculate mass tangent
-                tangent = normal.Perpendicular();
-                Vector2.Dot(ref r1, ref tangent, out rt1);
-                Vector2.Dot(ref r2, ref tangent, out rt2);
+                _tangent = _normal.Perpendicular();
+                Vector2.Dot(ref _r1, ref _tangent, out _rt1);
+                Vector2.Dot(ref _r2, ref _tangent, out _rt2);
 
-                Vector2.Dot(ref r1, ref r1, out float1);
-                Vector2.Dot(ref r2, ref r2, out float2);
-                kTangent = invMassSum
-                    + (float1 - rt1 * rt1) / a.Body.InertiaTensor
-                    + (float2 - rt2 * rt2) / b.Body.InertiaTensor;
-                contact.massTangent = 1f / kTangent;
+                Vector2.Dot(ref _r1, ref _r1, out _float1);
+                Vector2.Dot(ref _r2, ref _r2, out _float2);
+                _kTangent = invMassSum
+                    + (_float1 - _rt1 * _rt1) / A.Body.InertiaTensor
+                    + (_float2 - _rt2 * _rt2) / B.Body.InertiaTensor;
+                contact.MassTangent = 1f / _kTangent;
 
                 //float rtA = r1.X * tangent.Y - r1.Y * tangent.X;
                 //float rtB = r2.X * tangent.Y - r2.Y * tangent.X;
@@ -240,31 +236,31 @@ namespace Myre.Physics2D.Collisions
                 //contact.massTangent = 1f / kTangent;
 
                 //calc velocity bias
-                max = Math.Max(0, penetrationDepth - allowedPenetration);
-                contact.normalVelocityBias = biasFactor * inverseDT * max;
+                _max = Math.Max(0, PenetrationDepth - allowedPenetration);
+                contact.NormalVelocityBias = biasFactor * inverseDt * _max;
 
                 //calc bounce velocity
-                vec1 = a.Body.GetVelocityAtOffset(r1);
-                vec2 = b.Body.GetVelocityAtOffset(r2);
-                Vector2.Subtract(ref vec2, ref vec1, out dv);
+                _vec1 = A.Body.GetVelocityAtOffset(_r1);
+                _vec2 = B.Body.GetVelocityAtOffset(_r2);
+                Vector2.Subtract(ref _vec2, ref _vec1, out _dv);
 
                 //calc velocity difference along contact normal
-                Vector2.Dot(ref dv, ref normal, out vn);
-                contact.bounceVelocity = vn * restitutionCoefficient;
+                Vector2.Dot(ref _dv, ref _normal, out _vn);
+                contact.BounceVelocity = _vn * _restitutionCoefficient;
 
                 //apply accumulated impulse
-                Vector2.Multiply(ref normal, contact.normalImpulse, out vec1);
-                Vector2.Multiply(ref tangent, contact.tangentImpulse, out vec2);
-                Vector2.Add(ref vec1, ref vec2, out impulse);
+                Vector2.Multiply(ref _normal, contact.NormalImpulse, out _vec1);
+                Vector2.Multiply(ref _tangent, contact.TangentImpulse, out _vec2);
+                Vector2.Add(ref _vec1, ref _vec2, out _impulse);
 
-                b.Body.CollisionImpulse(b, a, ref impulse, ref r2);
+                B.Body.CollisionImpulse(B, A, ref _impulse, ref _r2);
 
-                Vector2.Multiply(ref impulse, -1, out impulse);
-                a.Body.CollisionImpulse(b, a, ref impulse, ref r2);
+                Vector2.Multiply(ref _impulse, -1, out _impulse);
+                A.Body.CollisionImpulse(B, A, ref _impulse, ref _r2);
 
-                contact.normalImpulseBias = 0;
+                contact.NormalImpulseBias = 0;
 
-                contacts[i] = contact;
+                Contacts[i] = contact;
             }
         }
 
@@ -273,172 +269,172 @@ namespace Myre.Physics2D.Collisions
             if (!IsActive)
                 return;
 
-            var aPos = a.Body.Position;
-            var bPos = b.Body.Position;
+            var aPos = A.Body.Position;
+            var bPos = B.Body.Position;
 
-            for (int i = 0; i < contacts.Count; i++)
+            for (int i = 0; i < Contacts.Count; i++)
             {
-                var contact = contacts[i];
+                var contact = Contacts[i];
 
                 // copy + paste from farseer.. which is based on Box2D, and I cba to write yet another variation
 
                 #region INLINE: Vector2.Subtract(ref contact.Position, ref geometryA.body.position, out r1);
 
-                r1.X = contact.Position.X - aPos.X;
-                r1.Y = contact.Position.Y - aPos.Y;
+                _r1.X = contact.Position.X - aPos.X;
+                _r1.Y = contact.Position.Y - aPos.Y;
 
                 #endregion
 
                 #region INLINE: Vector2.Subtract(ref contact.Position, ref geometryB.body.position, out r2);
 
-                r2.X = contact.Position.X - bPos.X;
-                r2.Y = contact.Position.Y - bPos.Y;
+                _r2.X = contact.Position.X - bPos.X;
+                _r2.Y = contact.Position.Y - bPos.Y;
 
                 #endregion
 
                 //calc velocity difference
-                vec1 = a.Body.GetVelocityAtOffset(r1);
-                vec2 = b.Body.GetVelocityAtOffset(r2);
+                _vec1 = A.Body.GetVelocityAtOffset(_r1);
+                _vec2 = B.Body.GetVelocityAtOffset(_r2);
 
                 #region INLINE: Vector2.Subtract(ref vec2, ref vec1, out dv);
 
-                dv.X = vec2.X - vec1.X;
-                dv.Y = vec2.Y - vec1.Y;
+                _dv.X = _vec2.X - _vec1.X;
+                _dv.Y = _vec2.Y - _vec1.Y;
 
                 #endregion
 
                 //calc velocity difference along contact normal
                 #region INLINE: Vector2.Dot(ref dv, ref normal, out vn);
 
-                vn = (dv.X * normal.X) + (dv.Y * normal.Y);
+                _vn = (_dv.X * _normal.X) + (_dv.Y * _normal.Y);
 
                 #endregion
 
-                normalImpulse = contact.massNormal * -(vn + contact.bounceVelocity); //uncomment for preserve momentum
+                _normalImpulse = contact.MassNormal * -(_vn + contact.BounceVelocity); //uncomment for preserve momentum
 
                 //clamp accumulated impulse
-                oldNormalImpulse = contact.normalImpulse;
-                contact.normalImpulse = Math.Max(oldNormalImpulse + normalImpulse, 0);
-                normalImpulse = contact.normalImpulse - oldNormalImpulse;
+                _oldNormalImpulse = contact.NormalImpulse;
+                contact.NormalImpulse = Math.Max(_oldNormalImpulse + _normalImpulse, 0);
+                _normalImpulse = contact.NormalImpulse - _oldNormalImpulse;
 
                 //apply contact impulse
                 #region INLINE: Vector2.Multiply(ref normal, normalImpulse, out impulse);
 
-                impulse.X = normal.X * normalImpulse;
-                impulse.Y = normal.Y * normalImpulse;
+                _impulse.X = _normal.X * _normalImpulse;
+                _impulse.Y = _normal.Y * _normalImpulse;
 
                 #endregion
 
-                b.Body.ApplyImpulseAtOffset(ref impulse, ref r2);
+                B.Body.ApplyImpulseAtOffset(ref _impulse, ref _r2);
 
                 #region INLINE: Vector2.Multiply(ref impulse, -1, out impulse);
 
-                impulse.X = impulse.X * -1;
-                impulse.Y = impulse.Y * -1;
+                _impulse.X = _impulse.X * -1;
+                _impulse.Y = _impulse.Y * -1;
 
                 #endregion
 
-                a.Body.ApplyImpulseAtOffset(ref impulse, ref r1);
+                A.Body.ApplyImpulseAtOffset(ref _impulse, ref _r1);
 
                 //calc velocity bias difference (bias preserves momentum)
-                vec1 = a.Body.GetVelocityBiasAtOffset(r1);
-                vec2 = b.Body.GetVelocityBiasAtOffset(r2);
+                _vec1 = A.Body.GetVelocityBiasAtOffset(_r1);
+                _vec2 = B.Body.GetVelocityBiasAtOffset(_r2);
 
                 #region INLINE: Vector2.Subtract(ref vec2, ref vec1, out dv);
 
-                dv.X = vec2.X - vec1.X;
-                dv.Y = vec2.Y - vec1.Y;
+                _dv.X = _vec2.X - _vec1.X;
+                _dv.Y = _vec2.Y - _vec1.Y;
 
                 #endregion
 
                 //calc velocity bias along contact normal
                 #region INLINE: Vector2.Dot(ref dv, ref normal, out normalVelocityBias);
 
-                normalVelocityBias = (dv.X * normal.X) + (dv.Y * normal.Y);
+                _normalVelocityBias = (_dv.X * _normal.X) + (_dv.Y * _normal.Y);
 
                 #endregion
 
-                normalImpulseBias = contact.massNormal * (-normalVelocityBias + contact.normalVelocityBias);
-                normalImpulseBiasOriginal = contact.normalImpulseBias;
-                contact.normalImpulseBias = Math.Max(normalImpulseBiasOriginal + normalImpulseBias, 0);
-                normalImpulseBias = contact.normalImpulseBias - normalImpulseBiasOriginal;
+                _normalImpulseBias = contact.MassNormal * (-_normalVelocityBias + contact.NormalVelocityBias);
+                _normalImpulseBiasOriginal = contact.NormalImpulseBias;
+                contact.NormalImpulseBias = Math.Max(_normalImpulseBiasOriginal + _normalImpulseBias, 0);
+                _normalImpulseBias = contact.NormalImpulseBias - _normalImpulseBiasOriginal;
 
                 #region INLINE: Vector2.Multiply(ref normal, normalImpulseBias, out impulseBias);
 
-                impulseBias.X = normal.X * normalImpulseBias;
-                impulseBias.Y = normal.Y * normalImpulseBias;
+                _impulseBias.X = _normal.X * _normalImpulseBias;
+                _impulseBias.Y = _normal.Y * _normalImpulseBias;
 
                 #endregion
 
                 //apply bias impulse
-                b.Body.ApplyBiasImpulseAtOffset(ref impulseBias, ref r2);
+                B.Body.ApplyBiasImpulseAtOffset(ref _impulseBias, ref _r2);
 
                 #region INLINE: Vector2.Multiply(ref impulseBias, -1, out impulseBias);
 
-                impulseBias.X = impulseBias.X * -1;
-                impulseBias.Y = impulseBias.Y * -1;
+                _impulseBias.X = _impulseBias.X * -1;
+                _impulseBias.Y = _impulseBias.Y * -1;
 
                 #endregion
 
-                a.Body.ApplyBiasImpulseAtOffset(ref impulseBias, ref r1);
+                A.Body.ApplyBiasImpulseAtOffset(ref _impulseBias, ref _r1);
 
                 //calc relative velocity at contact.
-                vec1 = a.Body.GetVelocityAtOffset(r1);
-                vec2 = b.Body.GetVelocityAtOffset(r2);
+                _vec1 = A.Body.GetVelocityAtOffset(_r1);
+                _vec2 = B.Body.GetVelocityAtOffset(_r2);
 
                 #region INLINE: Vector2.Subtract(ref _vec2, ref _vec1, out _dv);
 
-                dv.X = vec2.X - vec1.X;
-                dv.Y = vec2.Y - vec1.Y;
+                _dv.X = _vec2.X - _vec1.X;
+                _dv.Y = _vec2.Y - _vec1.Y;
 
                 #endregion
 
                 //compute friction impulse
-                maxTangentImpulse = frictionCoefficient * contact.normalImpulse;
-                float1 = 1;
+                _maxTangentImpulse = _frictionCoefficient * contact.NormalImpulse;
+                _float1 = 1;
 
                 #region INLINE: Calculator.Cross(ref normal, ref float1, out tangent);
 
-                tangent.X = float1 * normal.Y;
-                tangent.Y = -float1 * normal.X;
+                _tangent.X = _float1 * _normal.Y;
+                _tangent.Y = -_float1 * _normal.X;
 
                 #endregion
 
                 #region INLINE: Vector2.Dot(ref dv, ref tangent, out vt);
 
-                vt = (dv.X * tangent.X) + (dv.Y * tangent.Y);
+                _vt = (_dv.X * _tangent.X) + (_dv.Y * _tangent.Y);
 
                 #endregion
 
-                tangentImpulse = contact.massTangent * (-vt);
+                _tangentImpulse = contact.MassTangent * (-_vt);
 
                 //clamp friction
-                oldTangentImpulse = contact.tangentImpulse;
-                contact.tangentImpulse = MathHelper.Clamp(oldTangentImpulse + tangentImpulse, -maxTangentImpulse,
-                                                           maxTangentImpulse);
-                tangentImpulse = contact.tangentImpulse - oldTangentImpulse;
+                _oldTangentImpulse = contact.TangentImpulse;
+                contact.TangentImpulse = MathHelper.Clamp(_oldTangentImpulse + _tangentImpulse, -_maxTangentImpulse,
+                                                           _maxTangentImpulse);
+                _tangentImpulse = contact.TangentImpulse - _oldTangentImpulse;
 
                 //apply friction impulse
                 #region INLINE:Vector2.Multiply(ref tangent, tangentImpulse, out impulse);
 
-                impulse.X = tangent.X * tangentImpulse;
-                impulse.Y = tangent.Y * tangentImpulse;
+                _impulse.X = _tangent.X * _tangentImpulse;
+                _impulse.Y = _tangent.Y * _tangentImpulse;
 
                 #endregion
 
                 //apply impulse
-                b.Body.ApplyImpulseAtOffset(ref impulse, ref r2);
+                B.Body.ApplyImpulseAtOffset(ref _impulse, ref _r2);
 
                 #region INLINE: Vector2.Multiply(ref impulse, -1, out impulse);
 
-                impulse.X = impulse.X * -1;
-                impulse.Y = impulse.Y * -1;
+                _impulse.X = _impulse.X * -1;
+                _impulse.Y = _impulse.Y * -1;
 
                 #endregion
 
-                a.Body.ApplyImpulseAtOffset(ref impulse, ref r1);
+                A.Body.ApplyImpulseAtOffset(ref _impulse, ref _r1);
 
-                contacts[i] = contact;
+                Contacts[i] = contact;
 
                 //System.Diagnostics.Debug.WriteLine(string.Format("Contact {0}: point:{4}, normal:{1}, penetration:{2}, impulse:{3}", i, normal, penetrationDepth, contact.normalImpulse, contact.Position));
             }
@@ -447,34 +443,35 @@ namespace Myre.Physics2D.Collisions
 
         public void Dispose()
         {
-            contacts.Clear();
-            newContacts.Clear();
+            Contacts.Clear();
+            _newContacts.Clear();
 
             A.collidingWith.Remove(B);
             B.collidingWith.Remove(A);
 
-            initialised = false;
+            _initialised = false;
 
-            Pool.Push(this);
+            _pool.Push(this);
         }
 
         public override int GetHashCode()
         {
-            return a.GetHashCode() + b.GetHashCode();
+            return A.GetHashCode() + B.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Collision)
-                return Equals((Collision)obj);
+            var a = obj as Collision;
+            if (a != null)
+                return Equals(a);
             else
-                return base.Equals(obj);
+                return ReferenceEquals(this, obj);
         }
 
         public bool Equals(Collision obj)
         {
-            return this.a == obj.a
-                && this.b == obj.b;
+            return A == obj.A
+                && B == obj.B;
         }
     }
 }

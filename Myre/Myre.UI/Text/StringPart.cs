@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Myre.UI.Text
@@ -32,10 +30,10 @@ namespace Myre.UI.Text
             if (length < 0 || (start + length) > source.Length)
                 throw new ArgumentOutOfRangeException("length", "length must be >= 0, and (start + length) <= source.Length");
 
-            this.StringBuilder = null;
-            this.String = source;
-            this.Start = start;
-            this.Length = length;
+            StringBuilder = null;
+            String = source;
+            Start = start;
+            Length = length;
         }
 
         public StringPart(StringBuilder source, int start, int length)
@@ -47,15 +45,15 @@ namespace Myre.UI.Text
             if (length < 0 || (start + length) > source.Length)
                 throw new ArgumentOutOfRangeException("length", "length must be >= 0, and (start + length) <= source.Length");
 
-            this.StringBuilder = source;
-            this.String = null;
-            this.Start = start;
-            this.Length = length;
+            StringBuilder = source;
+            String = null;
+            Start = start;
+            Length = length;
         }
 
         public bool StartsWith(StringPart s)
         {
-            if (this.Length < s.Length)
+            if (Length < s.Length)
                 return false;
 
             for (int i = 0; i < s.Length; i++)
@@ -85,28 +83,29 @@ namespace Myre.UI.Text
             if (obj is StringPart || obj is string)
                 return Equals((StringPart)obj);
 
-            if (obj is StringBuilder)
-                return Equals((StringBuilder)obj);
+            var a = obj as StringBuilder;
+            if (a != null)
+                return Equals(a);
 
             return base.Equals(obj);
         }
 
         public bool Equals(StringPart other)
         {
-            if (this.Length != other.Length)
+            if (Length != other.Length)
                 return false;
 
-            if (this.String == other.String && this.StringBuilder == other.StringBuilder)
+            if (String == other.String && StringBuilder == other.StringBuilder)
             {
-                return this.Start == other.Start;
+                return Start == other.Start;
             }
             else
             {
-                if ((this.String == null && this.StringBuilder == null) ||
+                if ((String == null && StringBuilder == null) ||
                     (other.String == null && other.StringBuilder == null))
                     return false;
 
-                for (int i = 0; i < this.Length; i++)
+                for (int i = 0; i < Length; i++)
                 {
                     if (other[i] != this[i])
                         return false;
@@ -118,7 +117,7 @@ namespace Myre.UI.Text
 
         public bool Equals(string other)
         {
-            return this.Equals((StringPart)other);
+            return Equals((StringPart)other);
         }
 
         public bool Equals(StringBuilder other)
@@ -128,15 +127,15 @@ namespace Myre.UI.Text
         
         public bool Equals(StringBuilder other, int start, int length)
         {
-            if (other == null || (this.String == null && this.StringBuilder == null))
+            if (other == null || (String == null && StringBuilder == null))
                 return false;
 
-            if (this.Length != length)
+            if (Length != length)
                 return false;
 
             for (int i = 0; i < length; i++)
             {
-                if (other[i + start] != this.String[i + this.Start])
+                if (other[i + start] != String[i + Start])
                     return false;
             }
 
@@ -152,7 +151,7 @@ namespace Myre.UI.Text
         public override string ToString()
         {
             object value = String ?? (object)StringBuilder;
-            return value == null ? null : value.ToString().Substring(Start, Length);
+            return value == null ? "null" : value.ToString().Substring(Start, Length);
         }
 
         public static implicit operator StringPart(string text)

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI.Gestures;
@@ -32,7 +29,7 @@ namespace Myre.UI.Controls
         /// </summary>
         public bool RespondOnMouseDown { get; set; }
 
-        private bool mouseDown;
+        private bool _mouseDown;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Button"/> class.
@@ -61,19 +58,18 @@ namespace Myre.UI.Controls
                 new ButtonPressed(Buttons.A),
                 new KeyPressed(Keys.Enter));
 
-            Gestures.Bind(MouseDown,
+            Gestures.Bind((GestureHandler<IGesture>) MouseDown,
                 new MousePressed(MouseButtons.Left));
 
-            Gestures.Bind(MouseUp,
+            Gestures.Bind((GestureHandler<IGesture>) MouseUp,
                 new MousePressed(MouseButtons.Left));
 
-            WarmChanged += c => { if (!IsWarm) mouseDown = false; };
+            WarmChanged += c => { if (!IsWarm) _mouseDown = false; };
         }
 
         /// <summary>
         /// Called when this option is selected.
         /// </summary>
-        /// <param name="player">The player.</param>
         protected virtual void OnSelected()
         {
             if (Selected != null)
@@ -90,12 +86,12 @@ namespace Myre.UI.Controls
             if (RespondOnMouseDown)
                 OnSelected();
 
-            mouseDown = true;
+            _mouseDown = true;
         }
 
         private void MouseUp(IGesture gesture, GameTime time, IInputDevice device)
         {
-            if (!RespondOnMouseDown && mouseDown)
+            if (!RespondOnMouseDown && _mouseDown)
                 OnSelected();
         }
     }

@@ -92,7 +92,7 @@ namespace Myre.Physics2D.Collisions
             for (int i = 0; i < _collisions.Count; i++)
             {
                 var collision = _collisions[i];
-                collision.FindContacts(_tester);
+                collision.FindContacts(_tester, 8);
 
                 if (collision.Contacts.Count > 0)
                 {

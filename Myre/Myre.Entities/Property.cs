@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace Myre.Entities
 {
@@ -57,7 +52,7 @@ namespace Myre.Entities
         /// </summary>
         public String Name { get; private set; }
 
-        private T value;
+        private T _value;
         /// <summary>
         /// The value of this property
         /// </summary>
@@ -65,12 +60,12 @@ namespace Myre.Entities
         {
             get
             {
-                return value;
+                return _value;
             }
             set
             {
-                var oldValue = this.value;
-                this.value = value;
+                var oldValue = _value;
+                _value = value;
                 OnValueSet(oldValue);
             }
         }
@@ -97,13 +92,13 @@ namespace Myre.Entities
                 foreach (var item in PropertySet.GetInvocationList())
                     PropertySet -= (PropertySetDelegate<T>)item;
 
-            value = default(T);
+            _value = default(T);
         }
 
         public Property(String name)
         {
-            this.Name = name;
-            this.value = default(T);
+            Name = name;
+            _value = default(T);
         }
 
         private void OnValueSet(T oldValue)
@@ -116,9 +111,7 @@ namespace Myre.Entities
 
         public override string ToString()
         {
-            if (Value == null)
-                return "null";
-            return Value.ToString();
+            return Value.Equals(default(T)) ? "null" : Value.ToString();
         }
 
         private event PropertySetDelegate _propertySet;

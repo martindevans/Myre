@@ -2,71 +2,69 @@
 
 using System;
 using System.Runtime.InteropServices;
-
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Myre.UI.InputDevices
 {
     public class CharacterEventArgs : EventArgs
     {
-        private readonly char character;
-        private readonly int lParam;
+        private readonly char _character;
+        private readonly int _lParam;
 
         public CharacterEventArgs(char character, int lParam)
         {
-            this.character = character;
-            this.lParam = lParam;
+            _character = character;
+            _lParam = lParam;
         }
 
         public char Character
         {
-            get { return character; }
+            get { return _character; }
         }
 
         public int Param
         {
-            get { return lParam; }
+            get { return _lParam; }
         }
 
         public int RepeatCount
         {
-            get { return lParam & 0xffff; }
+            get { return _lParam & 0xffff; }
         }
 
         public bool ExtendedKey
         {
-            get { return (lParam & (1 << 24)) > 0; }
+            get { return (_lParam & (1 << 24)) > 0; }
         }
 
         public bool AltPressed
         {
-            get { return (lParam & (1 << 29)) > 0; }
+            get { return (_lParam & (1 << 29)) > 0; }
         }
 
         public bool PreviousState
         {
-            get { return (lParam & (1 << 30)) > 0; }
+            get { return (_lParam & (1 << 30)) > 0; }
         }
 
         public bool TransitionState
         {
-            get { return (lParam & (1 << 31)) > 0; }
+            get { return (_lParam & (1 << 31)) > 0; }
         }
     }
 
     public class KeyEventArgs : EventArgs
     {
-        private Keys keyCode;
+        private readonly Keys _keyCode;
 
         public KeyEventArgs(Keys keyCode)
         {
-            this.keyCode = keyCode;
+            _keyCode = keyCode;
         }
 
         public Keys KeyCode
         {
-            get { return keyCode; }
+            get { return _keyCode; }
         }
     }
 
@@ -105,9 +103,9 @@ namespace Myre.UI.InputDevices
 #if WINDOWS
         delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
-        static IntPtr prevWndProc;
-        static WndProc hookProcDelegate;
-        static IntPtr hIMC;
+        static IntPtr _prevWndProc;
+        static WndProc _hookProcDelegate;
+        static IntPtr _hImc;
 
         //various Win32 constants that we need
         const int GWL_WNDPROC = -4;
@@ -125,10 +123,10 @@ namespace Myre.UI.InputDevices
         static extern IntPtr ImmGetContext(IntPtr hWnd);
 
         [DllImport("Imm32.dll")]
-        static extern IntPtr ImmAssociateContext(IntPtr hWnd, IntPtr hIMC);
+        static extern IntPtr ImmAssociateContext(IntPtr hWnd, IntPtr hImc);
 
         [DllImport("user32.dll")]
-        static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll")]
         static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -137,18 +135,18 @@ namespace Myre.UI.InputDevices
         /// <summary>
         /// Initialize the TextInput with the given GameWindow.
         /// </summary>
-        /// <param name="window">The XNA window to which text input should be linked.</param>
+        /// <param name="handle">The XNA window to which text input should be linked.</param>
         public static void Initialize(IntPtr handle)
         {
             if (Initialized)
                 throw new InvalidOperationException("TextInput.Initialize can only be called once!");
 
 #if WINDOWS
-            hookProcDelegate = new WndProc(HookProc);
-            prevWndProc = (IntPtr)SetWindowLong(handle, GWL_WNDPROC,
-                (int)Marshal.GetFunctionPointerForDelegate(hookProcDelegate));
+            _hookProcDelegate = HookProc;
+            _prevWndProc = (IntPtr)SetWindowLong(handle, GWL_WNDPROC,
+                (int)Marshal.GetFunctionPointerForDelegate(_hookProcDelegate));
 
-            hIMC = ImmGetContext(handle);
+            _hImc = ImmGetContext(handle);
 #endif
             Initialized = true;
         }
@@ -156,7 +154,7 @@ namespace Myre.UI.InputDevices
 #if WINDOWS
         static IntPtr HookProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
-            IntPtr returnCode = CallWindowProc(prevWndProc, hWnd, msg, wParam, lParam);
+            IntPtr returnCode = CallWindowProc(_prevWndProc, hWnd, msg, wParam, lParam);
 
             switch (msg)
             {
@@ -181,11 +179,11 @@ namespace Myre.UI.InputDevices
 
                 case WM_IME_SETCONTEXT:
                     if (wParam.ToInt32() == 1)
-                        ImmAssociateContext(hWnd, hIMC);
+                        ImmAssociateContext(hWnd, _hImc);
                     break;
 
                 case WM_INPUTLANGCHANGE:
-                    ImmAssociateContext(hWnd, hIMC);
+                    ImmAssociateContext(hWnd, _hImc);
                     returnCode = (IntPtr)1;
                     break;
             }

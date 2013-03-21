@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Extensions
 {
@@ -92,22 +90,11 @@ namespace Myre.Extensions
         /// <param name="enumerable">The enumerable.</param>
         /// <param name="startIndex">The start index.</param>
         /// <returns></returns>
-        public static IEnumerable<KeyValuePair<int, T>> ZipWithIndex<T>(this IEnumerable<T> enumerable, int startIndex)
+        public static IEnumerable<KeyValuePair<int, T>> ZipWithIndex<T>(this IEnumerable<T> enumerable, int startIndex = 0)
         {
             int index = startIndex;
             foreach (var item in enumerable)
                 yield return new KeyValuePair<int, T>(index++, item);
-        }
-
-        /// <summary>
-        /// Returns every element in the sequence with it's index in the sequence
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <returns></returns>
-        public static IEnumerable<KeyValuePair<int, T>> ZipWithIndex<T>(this IEnumerable<T> enumerable)
-        {
-            return ZipWithIndex(enumerable, 0);
         }
     }
 }

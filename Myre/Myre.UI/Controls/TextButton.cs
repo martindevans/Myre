@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Text;
@@ -46,7 +43,6 @@ namespace Myre.UI.Controls
         /// <param name="parent">This controls parent control.</param>
         /// <param name="font">The font to use to draw this buttons text value.</param>
         /// <param name="text">The text.</param>
-        /// <param name="focusScope">The focus scope.</param>
         public TextButton(Control parent, SpriteFont font, string text)
             : base(parent)
         {

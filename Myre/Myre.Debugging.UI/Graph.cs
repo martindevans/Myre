@@ -1,107 +1,104 @@
-﻿ using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
-namespace Myre.Debugging.Statistics
+namespace Myre.Debugging.UI
 {
     public class Graph
     {
-        float max;
-        float[] data;
-        VertexPositionColor[] transformedData;
-        VertexBuffer vertices;
-        bool dirty;
-        Color colour;
-        BasicEffect effect;
-        float screenWidth, screenHeight;
-        Rectangle previousArea;
+        float _max;
+        readonly float[] _data;
+        readonly VertexPositionColor[] _transformedData;
+        readonly VertexBuffer _vertices;
+        bool _dirty;
+        Color _colour;
+        readonly BasicEffect _effect;
+        float _screenWidth, _screenHeight;
+        Rectangle _previousArea;
 
         public Color Colour
         {
-            get { return colour; }
+            get { return _colour; }
             set
             {
-                if (colour != value)
+                if (_colour != value)
                 {
-                    colour = value;
-                    dirty = true;
+                    _colour = value;
+                    _dirty = true;
                 }
             }
         }
 
         public Graph(GraphicsDevice device, int resolution)
         {
-            vertices = new VertexBuffer(device, typeof(VertexPositionColor), resolution, BufferUsage.WriteOnly);
-            data = new float[resolution];
-            transformedData = new VertexPositionColor[resolution];
-            colour = Color.Red;
+            _vertices = new VertexBuffer(device, typeof(VertexPositionColor), resolution, BufferUsage.WriteOnly);
+            _data = new float[resolution];
+            _transformedData = new VertexPositionColor[resolution];
+            _colour = Color.Red;
             //effect = Content.Load<Effect>(game, "Graph");
 
             //var pp = device.PresentationParameters;
-#if XNA_3_1
-            effect = new BasicEffect(device, new EffectPool());
-#else
-            effect = new BasicEffect(device);
-#endif
-            effect.LightingEnabled = false;
-            effect.VertexColorEnabled = true;
-            effect.World = Matrix.Identity;
-            effect.View = Matrix.Identity;
-            effect.Projection = Matrix.Identity; //Matrix.CreateOrthographic(pp.BackBufferWidth, pp.BackBufferHeight, 0, 1);
 
-            dirty = true;
+            _effect = new BasicEffect(device)
+            {
+                LightingEnabled = false, 
+                VertexColorEnabled = true,
+                World = Matrix.Identity,
+                View = Matrix.Identity,
+                Projection = Matrix.Identity
+            };
+
+            _dirty = true;
         }
 
         public void Add(float value)
         {
-            for (int i = 0; i < data.Length - 1; i++)
-                data[i] = data[i + 1];
+            for (int i = 0; i < _data.Length - 1; i++)
+                _data[i] = _data[i + 1];
 
-            if (value > max)
+            if (value > _max)
             {
-                float scale = max / value;
-                for (int i = 0; i < data.Length - 1; i++)
-                    data[i] = data[i] * scale;
-                data[data.Length - 1] = 1;
-                max = value;
+                float scale = _max / value;
+                for (int i = 0; i < _data.Length - 1; i++)
+                    _data[i] = _data[i] * scale;
+                _data[_data.Length - 1] = 1;
+                _max = value;
             }
             else
-                data[data.Length - 1] = value / max;
+                _data[_data.Length - 1] = value / _max;
 
-            dirty = true;
+            _dirty = true;
         }
 
         public void Draw(Rectangle area)
         {
-            var device = vertices.GraphicsDevice;
+            var device = _vertices.GraphicsDevice;
             var pp = device.PresentationParameters;
 
-            if (dirty || area != previousArea || screenHeight != pp.BackBufferHeight || screenWidth != pp.BackBufferWidth)
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            if (_dirty || area != _previousArea || _screenHeight != pp.BackBufferHeight || _screenWidth != pp.BackBufferWidth)
+// ReSharper restore CompareOfFloatsByEqualityOperator
             {
-                screenHeight = pp.BackBufferHeight;
-                screenWidth = pp.BackBufferWidth;
+                _screenHeight = pp.BackBufferHeight;
+                _screenWidth = pp.BackBufferWidth;
 
-                float x = (area.X / screenWidth) * 2 - 1;
-                float y = -((area.Y / screenHeight) * 2 - 1);
-                float width = (area.Width / screenWidth) * 2;
-                float height = (area.Height / screenHeight) * 2;
+                float x = (area.X / _screenWidth) * 2 - 1;
+                float y = -((area.Y / _screenHeight) * 2 - 1);
+                float width = (area.Width / _screenWidth) * 2;
+                float height = (area.Height / _screenHeight) * 2;
 
-                for (int i = 0; i < data.Length; i++)
+                for (int i = 0; i < _data.Length; i++)
                 {
                     var position = new Vector3(
-                            x + (i / (float)(data.Length - 1)) * width,
-                            (y - height) + data[i] * height,
+                            x + (i / (float)(_data.Length - 1)) * width,
+                            (y - height) + _data[i] * height,
                             0);
-                    transformedData[i] = new VertexPositionColor(position, colour);
+                    _transformedData[i] = new VertexPositionColor(position, _colour);
                 }
 
-                vertices.SetData<VertexPositionColor>(transformedData);
+                _vertices.SetData<VertexPositionColor>(_transformedData);
 
-                dirty = false;
-                previousArea = area;
+                _dirty = false;
+                _previousArea = area;
             }
 
 #if XNA_3_1
@@ -112,9 +109,9 @@ namespace Myre.Debugging.Statistics
             effect.Techniques[0].Passes[0].End();
             effect.End();
 #else
-            effect.Techniques[0].Passes[0].Apply();
-            device.SetVertexBuffer(vertices);
-            device.DrawPrimitives(PrimitiveType.LineStrip, 0, data.Length - 1);
+            _effect.Techniques[0].Passes[0].Apply();
+            device.SetVertexBuffer(_vertices);
+            device.DrawPrimitives(PrimitiveType.LineStrip, 0, _data.Length - 1);
 #endif
         }
     }

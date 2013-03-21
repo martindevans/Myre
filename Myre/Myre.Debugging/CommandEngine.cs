@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
-using System.Collections.ObjectModel;
-using Myre.Debugging;
 using Myre.Extensions;
 
 namespace Myre.Debugging
@@ -20,11 +17,11 @@ namespace Myre.Debugging
     /// </summary>
     public class CommandEngine
     {
-        Dictionary<string, OptionInfo> options;
-        Dictionary<string, CommandInfo> commands;
-        string error;
+        readonly Dictionary<string, OptionInfo> _options;
+        readonly Dictionary<string, CommandInfo> _commands;
+        string _error;
 
-        Dictionary<string, CommandHelpInfo> help;
+        readonly Dictionary<string, CommandHelpInfo> _help;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandEngine"/> class.
@@ -37,12 +34,12 @@ namespace Myre.Debugging
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandEngine"/> class.
         /// </summary>
-        /// <param name="assembly">The assembly from which to find options and commands.</param>
+        /// <param name="assemblies">The assembly from which to find options and commands.</param>
         public CommandEngine(params Assembly[] assemblies)
         {
-            options = new Dictionary<string, OptionInfo>();
-            commands = new Dictionary<string, CommandInfo>();
-            help = new Dictionary<string, CommandHelpInfo>();
+            _options = new Dictionary<string, OptionInfo>();
+            _commands = new Dictionary<string, CommandInfo>();
+            _help = new Dictionary<string, CommandHelpInfo>();
 
             foreach (var assembly in assemblies)
                 ScanAssembly(assembly);
@@ -64,10 +61,10 @@ namespace Myre.Debugging
                         var optionAtt = optionAttributes[0] as CommandAttribute;
                         if (string.IsNullOrEmpty(optionAtt.Name))
                             optionAtt.Name = property.Name;
-                        if (options.ContainsKey(optionAtt.Name))
+                        if (_options.ContainsKey(optionAtt.Name))
                             throw new Exception(string.Format("Multiple options with the name {0} found. Each option must have a unique name.", optionAtt.Name));
-                        options.Add(optionAtt.Name, new OptionInfo() { Attribute = optionAtt, Property = property });
-                        help.Add(optionAtt.Name, new CommandHelpInfo()
+                        _options.Add(optionAtt.Name, new OptionInfo() { Attribute = optionAtt, Property = property });
+                        _help.Add(optionAtt.Name, new CommandHelpInfo()
                         {
                             Name = optionAtt.Name,
                             Description = optionAtt.Description,
@@ -89,10 +86,10 @@ namespace Myre.Debugging
                         var commandAtt = commmandAttributes[0] as CommandAttribute;
                         if (string.IsNullOrEmpty(commandAtt.Name))
                             commandAtt.Name = method.Name;
-                        if (commands.ContainsKey(commandAtt.Name))
+                        if (_commands.ContainsKey(commandAtt.Name))
                             throw new Exception(string.Format("Multiple commands with the name {0} found. Each command must have a unique name.", commandAtt.Name));
-                        commands.Add(commandAtt.Name, new CommandInfo() { Attribute = commandAtt, Command = method });
-                        help.Add(commandAtt.Name, new CommandHelpInfo()
+                        _commands.Add(commandAtt.Name, new CommandInfo() { Attribute = commandAtt, Command = method });
+                        _help.Add(commandAtt.Name, new CommandHelpInfo()
                         {
                             Name = commandAtt.Name,
                             Description = commandAtt.Description,
@@ -149,6 +146,7 @@ namespace Myre.Debugging
         /// <param name="target">The object containing the method.</param>
         /// <param name="methodName">Name of the method.</param>
         /// <param name="commandName">Name of the command.</param>
+        /// <param name="description"></param>
         public void AddCommand(object target, string methodName, string commandName, string description = null)
         {
             if (target == null)
@@ -158,21 +156,21 @@ namespace Myre.Debugging
             if (string.IsNullOrEmpty(commandName))
                 throw new ArgumentException("commandName cannot be null or empty.");
 
-            if (commands.ContainsKey(commandName) || options.ContainsKey(commandName))
+            if (_commands.ContainsKey(commandName) || _options.ContainsKey(commandName))
                 throw new InvalidOperationException(string.Format("A command or option of the name \"{0}\" has already been added.", commandName));
 
             var method = target.GetType().GetMethod(methodName);
             if (method == null)
                 throw new ArgumentException(string.Format("{0} could not be found.", methodName));
 
-            commands.Add(commandName, new CommandInfo()
+            _commands.Add(commandName, new CommandInfo()
             {
                 Command = method,
                 Attribute = new CommandAttribute() { Name = commandName },
                 Target = target
             });
 
-            help.Add(commandName, new CommandHelpInfo()
+            _help.Add(commandName, new CommandHelpInfo()
             {
                 Name = commandName,
                 Description = description,
@@ -189,8 +187,8 @@ namespace Myre.Debugging
         /// <param name="commandName">Name of the command.</param>
         public void RemoveCommand(string commandName)
         {
-            commands.Remove(commandName);
-            help.Remove(commandName);
+            _commands.Remove(commandName);
+            _help.Remove(commandName);
         }
 
         /// <summary>
@@ -209,6 +207,8 @@ namespace Myre.Debugging
         /// <param name="target">The object containing the property.</param>
         /// <param name="propertyName">Name of the property.</param>
         /// <param name="optionName">Name of the option.</param>
+        /// <param name="description"></param>
+        /// <param name="onSet"></param>
         public void AddOption(object target, string propertyName, string optionName, string description = null, Action onSet = null)
         {
             if (target == null)
@@ -218,14 +218,14 @@ namespace Myre.Debugging
             if (string.IsNullOrEmpty(optionName))
                 throw new ArgumentException("commandName cannot be null or empty.");
 
-            if (commands.ContainsKey(optionName) || options.ContainsKey(optionName))
+            if (_commands.ContainsKey(optionName) || _options.ContainsKey(optionName))
                 throw new InvalidOperationException(string.Format("A command or option of the name \"{0}\" has already been added.", optionName));
 
             var property = target.GetType().GetProperty(propertyName);
             if (property == null)
                 throw new ArgumentException(string.Format("{0} could not be found.", propertyName));
 
-            options.Add(optionName, new OptionInfo()
+            _options.Add(optionName, new OptionInfo()
             {
                 Property = property,
                 Attribute = new CommandAttribute() { Name = optionName },
@@ -233,7 +233,7 @@ namespace Myre.Debugging
                 SetEvent = onSet
             });
 
-            help.Add(optionName, new CommandHelpInfo()
+            _help.Add(optionName, new CommandHelpInfo()
             {
                 Name = optionName,
                 Description = description,
@@ -246,8 +246,8 @@ namespace Myre.Debugging
 
         public void RemoveOption(string optionName)
         {
-            options.Remove(optionName);
-            help.Remove(optionName);
+            _options.Remove(optionName);
+            _help.Remove(optionName);
         }
 
         #region Help
@@ -258,8 +258,8 @@ namespace Myre.Debugging
         /// <returns></returns>
         public CommandHelpInfo? GetIdentifierHelp(string commandOrOption)
         {
-            if (help.ContainsKey(commandOrOption))
-                return help[commandOrOption];
+            if (_help.ContainsKey(commandOrOption))
+                return _help[commandOrOption];
             else
                 return null;
         }
@@ -270,7 +270,7 @@ namespace Myre.Debugging
         /// <returns></returns>
         public IEnumerable<CommandHelpInfo> GetHelp()
         {
-            return help.Values;
+            return _help.Values;
         }
 
         /// <summary>
@@ -280,20 +280,15 @@ namespace Myre.Debugging
         /// <returns></returns>
         public CommandHelp GetHelp(string command)
         {
-            CommandHelp help = new CommandHelp();
-            help.Command = command;
-            help.Definitions = "";
-            help.Description = "";
-            help.PossibleCommands = new string[0];
+            CommandHelp help = new CommandHelp {Command = command, Definitions = "", Description = "", PossibleCommands = new string[0]};
 
-            string firstIdentifier;
             int equals = command.IndexOf('=');
             if (equals > 0)
             {
-                firstIdentifier = command.Substring(0, equals).Trim();
+                string firstIdentifier = command.Substring(0, @equals).Trim();
                 AppendDefinition(firstIdentifier, ref help);
-                if (options.ContainsKey(firstIdentifier))
-                    help.ValidType = options[firstIdentifier].Property.PropertyType.Name;
+                if (_options.ContainsKey(firstIdentifier))
+                    help.ValidType = _options[firstIdentifier].Property.PropertyType.Name;
                 command = command.Substring(equals + 1);
             }
 
@@ -313,12 +308,11 @@ namespace Myre.Debugging
                 if (!AppendDefinition(command, ref help))
                 {
                     string validType = help.ValidType;
-                    help.PossibleCommands = this.help.Keys.Where(
+                    help.PossibleCommands = this._help.Keys.Where(
                         n => n.StartsWith(command, StringComparison.InvariantCultureIgnoreCase)
                             && (validType == null || validType == GetReturnType(n))
                     ).ToArray();
-                    help.TabStart = help.Command.LastIndexOf(command);
-                    return;
+                    help.TabStart = help.Command.LastIndexOf(command, StringComparison.Ordinal);
                 }
             }
             else
@@ -331,10 +325,10 @@ namespace Myre.Debugging
 
         private string GetReturnType(string item)
         {
-            if (options.ContainsKey(item))
-                return options[item].Property.PropertyType.Name;
-            else if (commands.ContainsKey(item))
-                return commands[item].Command.ReturnType.Name;
+            if (_options.ContainsKey(item))
+                return _options[item].Property.PropertyType.Name;
+            else if (_commands.ContainsKey(item))
+                return _commands[item].Command.ReturnType.Name;
             return null;
         }
 
@@ -359,9 +353,9 @@ namespace Myre.Debugging
 
             if (brackets > 0)
             {
-                if (commands.ContainsKey(command))
+                if (_commands.ContainsKey(command))
                 {
-                    var p = commands[command].Command.GetParameters();
+                    var p = _commands[command].Command.GetParameters();
                     if (p.Length > paramIndex)
                         help.ValidType = p[paramIndex].ParameterType.Name;
                     else
@@ -373,14 +367,14 @@ namespace Myre.Debugging
 
         private bool AppendDefinition(string item, ref CommandHelp commandHelp)
         {
-            if (help.ContainsKey(item))
+            if (_help.ContainsKey(item))
             {
-                var i = help[item];
+                var i = _help[item];
                 commandHelp.Definitions += i.Definition + "\n";
                 commandHelp.Description = i.Description;
-                if (options.ContainsKey(item))
+                if (_options.ContainsKey(item))
                 {
-                    commandHelp.Description += string.Format("\n\"{0}\"", options[item].Property.GetValue(options[item].Target, null).ToString());
+                    commandHelp.Description += string.Format("\n\"{0}\"", _options[item].Property.GetValue(_options[item].Target, null).ToString());
                     commandHelp.ValidType = "";
                 }
                 return true;
@@ -396,7 +390,7 @@ namespace Myre.Debugging
         /// <param name="command">The command.</param>
         public CommandResult Execute(string command)
         {
-            error = null;
+            _error = null;
             object result = null;
 
             int equals = command.IndexOf('=');
@@ -409,34 +403,34 @@ namespace Myre.Debugging
             {
                 // there is an '=', so we should be dealing with an option assignment.
                 var optionName = command.Substring(0, equals).Trim();
-                if (options.ContainsKey(optionName))
+                if (_options.ContainsKey(optionName))
                 {
-                    var option = options[optionName];
+                    var option = _options[optionName];
                     if (option.Property.CanWrite)
                     {
                         var value = RunExpression(command.Substring(equals + 1));
                         try
                         {
-                            option.Property.SetValue(options[optionName].Target, value, null);
+                            option.Property.SetValue(_options[optionName].Target, value, null);
                             if (option.SetEvent != null)
                                 option.SetEvent();
                         }
                         catch (Exception e)
                         {
-                            error = e.Message;
+                            _error = e.Message;
                         }
                     }
                     else
-                        error = string.Format("Option \"{0}\" cannot be written to.", optionName);
+                        _error = string.Format("Option \"{0}\" cannot be written to.", optionName);
                 }
                 else
-                    error = string.Format("Option \"{0}\" cannot be found.", optionName);
+                    _error = string.Format("Option \"{0}\" cannot be found.", optionName);
             }
 
-            if (error == null)
+            if (_error == null)
                 return new CommandResult() { Result = result };
             else
-                return new CommandResult() { Error = error };
+                return new CommandResult() { Error = _error };
         }
 
         private object RunExpression(string commandString)
@@ -463,12 +457,12 @@ namespace Myre.Debugging
             // break out of some error cases
             if ((paramsStart == -1 && paramsEnd != -1) || (paramsStart != -1 && paramsEnd == -1))
             {
-                error = "Bracket pair invalid.";
+                _error = "Bracket pair invalid.";
                 return null;
             }
             if (paramsStart > paramsEnd )
             {
-                error = "')' found before '('.";
+                _error = "')' found before '('.";
                 return null;
             }
 
@@ -478,19 +472,19 @@ namespace Myre.Debugging
 
             // get command name
             string commandName = commandString.Substring(0, paramsStart).Trim();
-            if (!commands.ContainsKey(commandName))
+            if (!_commands.ContainsKey(commandName))
             {
-                error = string.Format("Command \"{0}\" not found.", commandName);
+                _error = string.Format("Command \"{0}\" not found.", commandName);
                 return null;
             }
 
             // get command parameters
-            var command = commands[commandName].Command;
+            var command = _commands[commandName].Command;
             var numParameters = command.GetParameters().Length;
             string[] parameterStrings = SplitParameters(commandString.Substring(paramsStart + 1, paramsEnd - paramsStart - 1));
             if (numParameters != parameterStrings.Length)
             {
-                error = string.Format("Command \"{0}\" has {1} parameters, but {2} were given.", commandName, numParameters, parameterStrings.Length);
+                _error = string.Format("Command \"{0}\" has {1} parameters, but {2} were given.", commandName, numParameters, parameterStrings.Length);
                 return null;
             }
 
@@ -499,32 +493,32 @@ namespace Myre.Debugging
             for (int i = 0; i < numParameters; i++)
                 parameterValues[i] = RunExpression(parameterStrings[i]);
 
-            if (error != null)
+            if (_error != null)
                 return null;
 
             try
             {
-                return command.Invoke(commands[commandName].Target, parameterValues);
+                return command.Invoke(_commands[commandName].Target, parameterValues);
             }
             catch (Exception e)
             {
-                error = string.Format("{0} error:\n{1}", commandName, e.Message);
+                _error = string.Format("{0} error:\n{1}", commandName, e.Message);
                 return null;
             }
         }
 
         private object GetOption(string optionName)
         {
-            if (options.ContainsKey(optionName))
+            if (_options.ContainsKey(optionName))
             {
-                var option = options[optionName].Property;
+                var option = _options[optionName].Property;
                 if (option.CanRead)
-                    return options[optionName].Property.GetValue(null, null);
+                    return _options[optionName].Property.GetValue(null, null);
                 else
-                    error = string.Format("Option \"{0}\" cannot be read.", optionName);
+                    _error = string.Format("Option \"{0}\" cannot be read.", optionName);
             }
             else
-                error = string.Format("Option \"{0}\" not found.", optionName);
+                _error = string.Format("Option \"{0}\" not found.", optionName);
 
             return null;
         }

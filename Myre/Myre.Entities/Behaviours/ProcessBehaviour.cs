@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Myre.Entities;
-using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 
 namespace Myre.Entities.Behaviours
@@ -10,7 +8,11 @@ namespace Myre.Entities.Behaviours
     {
         protected abstract void Update(float elapsedTime);
 
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
         public class Manager<B>
+// ReSharper restore ClassWithVirtualMembersNeverInherited.Global
+// ReSharper restore MemberCanBeProtected.Global
             : BehaviourManager<B>, IProcess
             where B : ProcessBehaviour
         {

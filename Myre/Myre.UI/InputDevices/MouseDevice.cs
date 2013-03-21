@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -10,91 +8,93 @@ namespace Myre.UI.InputDevices
     public class MouseDevice
         : IInputDevice
     {
-        private MouseState previousState;
-        private MouseState currentState;
-        private List<Control> controls;
-        private List<Control> previous;
-        private IEnumerable<Control> cooled;
-        private IEnumerable<Control> warmed;
-        private List<int> blocked;
+        private MouseState _previousState;
+        private MouseState _currentState;
+        private readonly List<Control> _controls;
+        private readonly List<Control> _previous;
+        private readonly IEnumerable<Control> _cooled;
+        private readonly IEnumerable<Control> _warmed;
+        private readonly List<int> _blocked;
 
         public InputActor Owner { get; set; }
 
         public Vector2 Position
         {
-            get { return new Vector2(currentState.X, currentState.Y); }
+            get { return new Vector2(_currentState.X, _currentState.Y); }
             set { Mouse.SetPosition((int)value.X, (int)value.Y); }
         }
 
         public Vector2 PositionMovement
         {
-            get { return new Vector2(currentState.X - previousState.X, currentState.Y - previousState.Y); }
+            get { return new Vector2(_currentState.X - _previousState.X, _currentState.Y - _previousState.Y); }
         }
 
         public float Wheel
         {
-            get { return currentState.ScrollWheelValue; }
+            get { return _currentState.ScrollWheelValue; }
         }
 
         public float WheelMovement
         {
-            get { return currentState.ScrollWheelValue - previousState.ScrollWheelValue; }
+            get { return _currentState.ScrollWheelValue - _previousState.ScrollWheelValue; }
         }
 
         public MouseDevice()
         {
-            previousState = currentState = Mouse.GetState();
-            controls = new List<Control>();
-            blocked = new List<int>();
-            previous = new List<Control>();
+            _previousState = _currentState = Mouse.GetState();
+            _controls = new List<Control>();
+            _blocked = new List<int>();
+            _previous = new List<Control>();
 
-            cooled = previous.Except(controls);
-            warmed = controls.Except(previous);
+            _cooled = _previous.Except(_controls);
+            _warmed = _controls.Except(_previous);
         }
 
         public void Update(GameTime gameTime)
         {
-            previousState = currentState;
-            currentState = Mouse.GetState();
+            _previousState = _currentState;
+            _currentState = Mouse.GetState();
         }
 
         public void Evaluate(GameTime gameTime, Control focused, UserInterface ui)
         {
-            ui.FindControls(Position, controls);
+            ui.FindControls(Position, _controls);
 
-            foreach (var item in cooled)
+            foreach (var item in _cooled)
                 item.HeatCount--;
-            foreach (var item in warmed)
+            foreach (var item in _warmed)
                 item.HeatCount++;
 
             var type = typeof(MouseDevice);
 
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < _controls.Count; i++)
             {
-                controls[i].Gestures.Evaluate(gameTime, this);
+                _controls[i].Gestures.Evaluate(gameTime, this);
 
-                if (controls[i].Gestures.BlockedDevices.Contains(type))
+                if (_controls[i].Gestures.BlockedDevices.Contains(type))
                     break;
             }
 
-            ui.EvaluateGlobalGestures(gameTime, this, blocked);
+            ui.EvaluateGlobalGestures(gameTime, this);
 
-            previous.Clear();
-            previous.AddRange(controls);
-            blocked.Clear();
-            controls.Clear();
+            _previous.Clear();
+            _previous.AddRange(_controls);
+            _blocked.Clear();
+            _controls.Clear();
         }
 
         public void BlockInputs(IEnumerable<int> inputs)
         {
-            blocked.AddRange(inputs);
+            _blocked.AddRange(inputs);
         }
 
-        public bool IsBlocked(ICollection<int> inputs)
+        public bool IsBlocked(IEnumerable<int> inputs)
         {
+// ReSharper disable LoopCanBeConvertedToQuery
             foreach (var item in inputs)
+// ReSharper restore LoopCanBeConvertedToQuery
             {
-                if (blocked.Contains(item))
+                if (_blocked.Contains(item))
                     return true;
             }
 
@@ -103,22 +103,22 @@ namespace Myre.UI.InputDevices
 
         public bool IsButtonDown(MouseButtons button)
         {
-            return currentState.IsButtonDown(button);
+            return _currentState.IsButtonDown(button);
         }
 
         public bool IsButtonUp(MouseButtons button)
         {
-            return currentState.IsButtonUp(button);
+            return _currentState.IsButtonUp(button);
         }
 
         public bool WasButtonDown(MouseButtons button)
         {
-            return previousState.IsButtonDown(button);
+            return _previousState.IsButtonDown(button);
         }
 
         public bool WasButtonUp(MouseButtons button)
         {
-            return previousState.IsButtonUp(button);
+            return _previousState.IsButtonUp(button);
         }
 
         public bool IsButtonNewlyDown(MouseButtons button)
@@ -133,7 +133,7 @@ namespace Myre.UI.InputDevices
 
         ~MouseDevice()
         {
-            foreach (var item in previous)
+            foreach (var item in _previous)
             {
                 if (!item.IsDisposed)
                     item.HeatCount--;

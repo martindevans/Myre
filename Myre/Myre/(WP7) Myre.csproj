@@ -56,7 +56,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
-    <Compile Include="Collections\BinaryTree.cs" />
     <Compile Include="Collections\Box.cs" />
     <Compile Include="Collections\INamedDataProvider.cs" />
     <Compile Include="Collections\Pool.cs" />
@@ -87,6 +86,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework">
       <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xna.Framework.Game">
       <Private>False</Private>

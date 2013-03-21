@@ -2,7 +2,6 @@
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Physics2D;
 
 namespace Myre.Physics2D.Constraints
 {

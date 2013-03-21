@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework.Input;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
 
 namespace Myre.UI.Gestures
 {
@@ -26,14 +22,14 @@ namespace Myre.UI.Gestures
         public KeyCombinationPressed(Keys[] keys, params Keys[] modifiers)
             : base(false)
         {
-            this.Keys = keys;
-            this.Modifiers = modifiers;
+            Keys = keys;
+            Modifiers = modifiers;
 
             for (int i = 0; i < keys.Length; i++)
                 BlockedInputs.Add((int)keys[i]);
         }
 
-        public override bool Test(KeyboardDevice device)
+        protected override bool Test(KeyboardDevice device)
         {
             // modifiers are pressed,
             // not all the main keys were pressed,

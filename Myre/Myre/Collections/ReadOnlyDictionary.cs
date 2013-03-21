@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Collections
 {
@@ -13,7 +11,7 @@ namespace Myre.Collections
     public class ReadOnlyDictionary<Key, Data>
         : IEnumerable<KeyValuePair<Key, Data>>
     {
-        IDictionary<Key, Data> source;
+        readonly IDictionary<Key, Data> _source;
 
         /// <summary>
         /// Gets the data assosciated with the specified key.
@@ -21,7 +19,7 @@ namespace Myre.Collections
         /// <value></value>
         public Data this[Key key]
         {
-            get { return source[key]; }
+            get { return _source[key]; }
         }
 
         /// <summary>
@@ -30,7 +28,7 @@ namespace Myre.Collections
         /// <value>The count.</value>
         public int Count
         {
-            get { return source.Count; }
+            get { return _source.Count; }
         }
 
         /// <summary>
@@ -39,7 +37,7 @@ namespace Myre.Collections
         /// <value>The keys.</value>
         public IEnumerable<Key> Keys
         {
-            get { return source.Keys; }
+            get { return _source.Keys; }
         }
 
         /// <summary>
@@ -48,7 +46,7 @@ namespace Myre.Collections
         /// <value>The values.</value>
         public IEnumerable<Data> Values
         {
-            get { return source.Values; }
+            get { return _source.Values; }
         }
 
         /// <summary>
@@ -59,7 +57,7 @@ namespace Myre.Collections
         {
             if (source == null)
                 throw new ArgumentNullException("source");
-            this.source = source;
+            _source = source;
         }
 
         /// <summary>
@@ -71,7 +69,7 @@ namespace Myre.Collections
         /// </returns>
         public bool ContainsKey(Key key)
         {
-            return source.ContainsKey(key);
+            return _source.ContainsKey(key);
         }
 
         #region IEnumerable<KeyValuePair<Key,Data>> Members
@@ -83,7 +81,7 @@ namespace Myre.Collections
         /// </returns>
         public IEnumerator<KeyValuePair<Key, Data>> GetEnumerator()
         {
-            return source.GetEnumerator();
+            return _source.GetEnumerator();
         }
 
         #endregion
@@ -97,7 +95,7 @@ namespace Myre.Collections
         /// </returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return source.GetEnumerator();
+            return _source.GetEnumerator();
         }
         #endregion
     }

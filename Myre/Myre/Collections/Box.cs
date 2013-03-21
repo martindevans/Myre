@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Collections
 {
+    /// <summary>
+    /// A reference to a value
+    /// </summary>
     public interface IBox
     {
+        /// <summary>
+        /// The value of this box
+        /// </summary>
         object Value { get; set; }
     }
 
@@ -40,14 +44,16 @@ namespace Myre.Collections
     public class BoxedValueStore<Key>
         :IEnumerable<KeyValuePair<Key, IBox>>
     {
-        private Dictionary<Key, IBox> values;
+        private readonly Dictionary<Key, IBox> _values;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoxedValueStore&lt;Key&gt;"/> class.
         /// </summary>
+// ReSharper disable MemberCanBeProtected.Global
         public BoxedValueStore()
+// ReSharper restore MemberCanBeProtected.Global
         {
-            values = new Dictionary<Key, IBox>();
+            _values = new Dictionary<Key, IBox>();
         }
 
         /// <summary>
@@ -59,7 +65,7 @@ namespace Myre.Collections
         /// </returns>
         public bool Contains(Key key)
         {
-            return values.ContainsKey(key);
+            return _values.ContainsKey(key);
         }
 
         /// <summary>
@@ -72,7 +78,7 @@ namespace Myre.Collections
         public bool TryGet<T>(Key key, out Box<T> value)
         {
             IBox box;
-            if (values.TryGetValue(key, out box))
+            if (_values.TryGetValue(key, out box))
             {
                 value =  box as Box<T>;
                 return true;
@@ -101,7 +107,7 @@ namespace Myre.Collections
             {
                 var value = new Box<T> { Value = defaultValue };
 
-                values[key] = value;
+                _values[key] = value;
                 return value;
             }
         }
@@ -114,7 +120,7 @@ namespace Myre.Collections
         public IBox Get(Key key)
         {
             IBox box;
-            if (values.TryGetValue(key, out box))
+            if (_values.TryGetValue(key, out box))
                 return box;
             return null;
         }
@@ -130,7 +136,7 @@ namespace Myre.Collections
         {
             var box = Get<T>(key);
             if (box == null)
-                throw new InvalidOperationException("The value at key " + key + " is of type " + box.GetType().GetGenericArguments()[0]);
+                throw new InvalidOperationException("The value at key " + key + " is of the wrong type");
 
             box.Value = value;
             return box;
@@ -138,7 +144,7 @@ namespace Myre.Collections
 
         public IEnumerator<KeyValuePair<Key, IBox>> GetEnumerator()
         {
-            return values.GetEnumerator();
+            return _values.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()

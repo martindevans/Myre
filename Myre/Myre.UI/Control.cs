@@ -30,17 +30,17 @@ namespace Myre.UI
     public class Control
         : Frame, IDisposable
     {
-        private List<Control> children;
-        private ReadOnlyCollection<Control> childrenReadOnly;
+        private List<Control> _children;
+        private ReadOnlyCollection<Control> _childrenReadOnly;
         internal List<ActorFocus> focusedBy;
-        private ReadOnlyCollection<ActorFocus> focusedByReadOnly;
-        private int focusCount;
-        private int heatCount;
-        private bool isFocused;
-        private bool isWarm;
-        private bool isVisible;
-        private bool isLoaded;
-        private int strataOffsetCount;
+        private ReadOnlyCollection<ActorFocus> _focusedByReadOnly;
+        private int _focusCount;
+        private int _heatCount;
+        private bool _isFocused;
+        private bool _isWarm;
+        private bool _isVisible;
+        private bool _isLoaded;
+        private int _strataOffsetCount;
 
         /// <summary>
         /// Gets a value indicating if this control has been disposed.
@@ -60,9 +60,9 @@ namespace Myre.UI
         /// <summary>
         /// Gets this controls' children.
         /// </summary>
-        public ReadOnlyCollection<Control> Children { get { return childrenReadOnly; } }
+        public ReadOnlyCollection<Control> Children { get { return _childrenReadOnly; } }
 
-        public ReadOnlyCollection<ActorFocus> FocusedBy { get { return focusedByReadOnly; } }
+        public ReadOnlyCollection<ActorFocus> FocusedBy { get { return _focusedByReadOnly; } }
 
         /// <summary>
         /// Gets this controls' gesture collection.
@@ -74,14 +74,14 @@ namespace Myre.UI
         /// </summary>
         public bool IsFocused
         {
-            get { return isFocused; }
+            get { return _isFocused; }
             private set
             {
-                if (isFocused != value)
+                if (_isFocused != value)
                 {
-                    isFocused = value;
+                    _isFocused = value;
                     OnFocusChanged();
-                    if (isFocused)
+                    if (_isFocused)
                         IsVisible = true;
                 }
             }
@@ -92,12 +92,12 @@ namespace Myre.UI
         /// </summary>
         public bool IsWarm
         {
-            get { return isWarm; }
+            get { return _isWarm; }
             private set
             {
-                if (isWarm != value)
+                if (_isWarm != value)
                 {
-                    isWarm = value;
+                    _isWarm = value;
                     OnWarmChanged();
                 }
             }
@@ -108,10 +108,10 @@ namespace Myre.UI
         /// </summary>
         public bool IsVisible
         {
-            get { return (Parent == null || Parent.IsVisible) && isVisible; }
+            get { return (Parent == null || Parent.IsVisible) && _isVisible; }
             set
             {
-                if (isVisible != value)
+                if (_isVisible != value)
                 {
                     if (!value && IsFocused)
                         throw new InvalidOperationException("A focused control cannot be hidden. Focus a new control first.");
@@ -120,7 +120,7 @@ namespace Myre.UI
                         Parent.IsVisible = true;
 
 
-                    isVisible = value;
+                    _isVisible = value;
                     OnVisibleChanged();
                 }
             }
@@ -131,12 +131,12 @@ namespace Myre.UI
         /// </summary>
         public bool IsLoaded
         {
-            get { return isLoaded; }
+            get { return _isLoaded; }
             private set
             {
-                if (isLoaded != value)
+                if (_isLoaded != value)
                 {
-                    isLoaded = value;
+                    _isLoaded = value;
                     OnLoadedChanged();
                 }
             }
@@ -144,26 +144,26 @@ namespace Myre.UI
 
         internal int FocusedCount
         {
-            get { return focusCount; }
+            get { return _focusCount; }
             set
             {
-                if (focusCount != value)
+                if (_focusCount != value)
                 {
-                    focusCount = value;
-                    IsFocused = focusCount > 0;
+                    _focusCount = value;
+                    IsFocused = _focusCount > 0;
                 }
             }
         }
 
         internal int HeatCount
         {
-            get { return heatCount; }
+            get { return _heatCount; }
             set
             {
-                if (heatCount != value)
+                if (_heatCount != value)
                 {
-                    heatCount = value;
-                    isWarm = heatCount > 0;
+                    _heatCount = value;
+                    _isWarm = _heatCount > 0;
                 }
             }
         }
@@ -222,7 +222,9 @@ namespace Myre.UI
         /// Creates a new instance of the <see cref="Control"/> class.
         /// </summary>
         /// <param name="parent">The parent control.</param>
+// ReSharper disable MemberCanBeProtected.Global
         public Control(Control parent)
+// ReSharper restore MemberCanBeProtected.Global
             : base(parent.Device, parent)
         {
             if (parent == null)
@@ -248,19 +250,19 @@ namespace Myre.UI
 
         private void Initialise()
         {
-            children = new List<Control>();
-            childrenReadOnly = new ReadOnlyCollection<Control>(children);
+            _children = new List<Control>();
+            _childrenReadOnly = new ReadOnlyCollection<Control>(_children);
             focusedBy = new List<ActorFocus>();
-            focusedByReadOnly = new ReadOnlyCollection<ActorFocus>(focusedBy);
+            _focusedByReadOnly = new ReadOnlyCollection<ActorFocus>(focusedBy);
             Gestures = new GestureGroup(UserInterface);
-            isVisible = true;
+            _isVisible = true;
             LikesHavingFocus = true;
             FocusPriority = 100;
 
             if (Parent != null)
             {
-                Parent.strataOffsetCount++;
-                Strata = new ControlStrata() { Layer = Layer.Parent, Offset = Parent.Strata.Offset + Parent.strataOffsetCount };
+                Parent._strataOffsetCount++;
+                Strata = new ControlStrata() { Layer = Layer.Parent, Offset = Parent.Strata.Offset + Parent._strataOffsetCount };
 
                 Parent.AddChild(this);
             }
@@ -272,13 +274,13 @@ namespace Myre.UI
 
         private void AddChild(Control child)
         {
-            children.Add(child);
+            _children.Add(child);
             OnChildAdded();
         }
 
         private void RemoveChild(Control child)
         {
-            if (children.Remove(child))
+            if (_children.Remove(child))
                 OnChildRemoved();
         }
 
@@ -286,7 +288,9 @@ namespace Myre.UI
         /// Causes all input actors in this controls user interface to focus this control.
         /// Shortcut method for this.UserInterface.Actors.AllFocus(this);
         /// </summary>
+// ReSharper disable MemberCanBeProtected.Global
         public void Focus()
+// ReSharper restore MemberCanBeProtected.Global
         {
             UserInterface.Actors.AllFocus(this);
         }
@@ -345,7 +349,9 @@ namespace Myre.UI
         /// Updates the control and its' children.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
+// ReSharper disable UnusedParameter.Global
         public virtual void Update(GameTime gameTime)
+// ReSharper restore UnusedParameter.Global
         {
         }
 
@@ -440,9 +446,11 @@ namespace Myre.UI
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="automatic"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+// ReSharper disable UnusedParameter.Global
         protected virtual void Dispose(bool automatic)
+// ReSharper restore UnusedParameter.Global
         {                
-            if (isLoaded)
+            if (_isLoaded)
                 UnloadContent();
 
             if (Parent != null)
@@ -450,8 +458,8 @@ namespace Myre.UI
 
             IsDisposed = true;
 
-            for (int i = 0; i < children.Count; i++)
-                children[i].Dispose();
+            for (int i = 0; i < _children.Count; i++)
+                _children[i].Dispose();
         }
 
         /// <summary>

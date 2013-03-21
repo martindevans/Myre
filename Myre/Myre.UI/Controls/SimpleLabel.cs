@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,23 +11,23 @@ namespace Myre.UI.Controls
     public class SimpleLabel
         : Control
     {
-        private string text;
-        private SpriteFont font;
+        private string _text;
+        private SpriteFont _font;
 
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         public string Text 
         {
-            get { return text; }
+            get { return _text; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
-                if (!text.Equals(value))
+                if (!_text.Equals(value))
                 {
-                    text = value;
-                    SetSize((Int2D)font.MeasureString(text));
+                    _text = value;
+                    SetSize((Int2D)_font.MeasureString(_text));
                 }
             }
         }
@@ -40,12 +37,12 @@ namespace Myre.UI.Controls
         /// </summary>
         public SpriteFont Font
         {
-            get { return font; }
+            get { return _font; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
-                font = value;
+                _font = value;
                 SetSize(new Int2D(Area.Width, Font.LineSpacing));
             }
         }
@@ -66,14 +63,11 @@ namespace Myre.UI.Controls
             if (font == null)
                 throw new ArgumentNullException("font");
 
-            this.text = "";
-            this.Font = font;
-            this.SetSize((Int2D)font.MeasureString(text));
+            _text = "";
+            Font = font;
+            SetSize((Int2D)font.MeasureString(_text));
 
-            Action<Frame> recalculateSize = delegate(Frame c)
-            {
-                SetSize(new Int2D(Area.Width, Font.LineSpacing));
-            };
+            Action<Frame> recalculateSize = c => SetSize(new Int2D(Area.Width, Font.LineSpacing));
 
             AreaChanged += recalculateSize;
         }

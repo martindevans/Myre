@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Myre.UI.Text
 {
     public class ContentParser<T>
     {
-        private ContentManager content;
-        private Dictionary<StringPart, T> items;
+        private readonly ContentManager _content;
+        private readonly Dictionary<StringPart, T> _items;
 
         public Dictionary<StringPart, T> Items
         {
-            get { return items; }
+            get { return _items; }
         }
 
         public ContentParser(Game game, string contentDirectory)
@@ -27,13 +25,13 @@ namespace Myre.UI.Text
             if (content == null)
                 throw new ArgumentNullException("content");
 
-            this.content = content;
-            this.items = new Dictionary<StringPart, T>();
+            _content = content;
+            _items = new Dictionary<StringPart, T>();
         }
 
         public bool TryParse(StringPart name, out T item)
         {
-            if (items.TryGetValue(name, out item))
+            if (_items.TryGetValue(name, out item))
                 return true;
 
             if (TryLoad(name, out item))
@@ -46,8 +44,8 @@ namespace Myre.UI.Text
         {
             try
             {
-                item = content.Load<T>(name.ToString());
-                items.Add(name, item);
+                item = _content.Load<T>(name.ToString());
+                _items.Add(name, item);
                 return true;
             }
             catch

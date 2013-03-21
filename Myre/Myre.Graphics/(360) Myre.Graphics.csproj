@@ -56,14 +56,12 @@
     <Compile Include="Deferred\EdgeDetectComponent.cs" />
     <Compile Include="Deferred\GeometryBufferComponent.cs" />
     <Compile Include="Geometry\BoundingVolume.cs" />
-    <Compile Include="Geometry\IBoxIntersectTester.cs" />
     <Compile Include="Geometry\ICullable.cs" />
     <Compile Include="Geometry\IGeometryProvider.cs" />
     <Compile Include="Geometry\Mesh.cs" />
     <Compile Include="Geometry\MeshPart.cs" />
     <Compile Include="Geometry\ModelData.cs" />
     <Compile Include="Geometry\ModelInstance.cs" />
-    <Compile Include="Geometry\Octree.cs" />
     <Compile Include="Geometry\OrientedBoundingBox.cs" />
     <Compile Include="IRenderable.cs" />
     <Compile Include="Lighting\AmbientLight.cs" />
@@ -80,7 +78,6 @@
     <Compile Include="Materials\MaterialReader.cs" />
     <Compile Include="Particles\EllipsoidParticleEmitter.cs" />
     <Compile Include="Particles\ParticleEmitter.cs" />
-    <Compile Include="Particles\ParticlePhase.cs" />
     <Compile Include="Particles\ParticleSystem.cs" />
     <Compile Include="Particles\ParticleSystemDescription.cs" />
     <Compile Include="Particles\ParticleVertex.cs" />

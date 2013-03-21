@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework.Input;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
 
 namespace Myre.UI.Gestures
 {
@@ -19,7 +15,7 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add((int)Button);
         }
 
-        public override bool Test(GamepadDevice device)
+        protected override bool Test(GamepadDevice device)
         {
             return device.IsButtonNewlyDown(Button);
         }

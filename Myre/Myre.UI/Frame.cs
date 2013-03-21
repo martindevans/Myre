@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,13 +10,14 @@ namespace Myre.UI
     /// </summary>
     public class Frame
     {
-        GraphicsDevice device;
-        bool respectSafeArea;
-        Rectangle area;
-        Vector2 size;
-        Points anchoredPoints;
-        List<Frame> anchorChildren = new List<Frame>();
-        Dictionary<Points, Anchor> anchors = new Dictionary<Points, Anchor>()
+        readonly GraphicsDevice _device;
+        bool _respectSafeArea;
+        Rectangle _area;
+        Vector2 _size;
+        Points _anchoredPoints;
+        readonly List<Frame> _anchorChildren = new List<Frame>();
+
+        readonly Dictionary<Points, Anchor> _anchors = new Dictionary<Points, Anchor>()
         {
             { Points.Left,   new Anchor() },
             { Points.Right,  new Anchor() },
@@ -44,7 +43,7 @@ namespace Myre.UI
         {
             get
             {
-                return anchoredPoints.Selected(Points.Left) && anchoredPoints.Selected(Points.Right);
+                return _anchoredPoints.Selected(Points.Left) && _anchoredPoints.Selected(Points.Right);
             }
         }
 
@@ -59,7 +58,7 @@ namespace Myre.UI
         {
             get
             {
-                return anchoredPoints.Selected(Points.Top) && anchoredPoints.Selected(Points.Bottom);
+                return _anchoredPoints.Selected(Points.Top) && _anchoredPoints.Selected(Points.Bottom);
             }
         }
 
@@ -69,12 +68,12 @@ namespace Myre.UI
         /// <value><c>true</c> if positions are clamped to the safe area; otherwise, <c>false</c>.</value>
         public bool RespectSafeArea
         {
-            get { return respectSafeArea; }
+            get { return _respectSafeArea; }
             set
             {
-                if (respectSafeArea != value)
+                if (_respectSafeArea != value)
                 {
-                    respectSafeArea = value;
+                    _respectSafeArea = value;
                     UpdateAnchors();
                 }
             }
@@ -86,14 +85,14 @@ namespace Myre.UI
         /// <value>The area.</value>
         public Rectangle Area
         {
-            get { return area; }
+            get { return _area; }
             set
             {
-                if (area != value)
+                if (_area != value)
                 {
-                    area = value;
-                    for (int i = 0; i < anchorChildren.Count; i++)
-                        anchorChildren[i].UpdateAnchors();
+                    _area = value;
+                    for (int i = 0; i < _anchorChildren.Count; i++)
+                        _anchorChildren[i].UpdateAnchors();
 
                     OnAreaChanged();
                 }
@@ -105,7 +104,7 @@ namespace Myre.UI
         /// </summary>
         public GraphicsDevice Device
         {
-            get { return device; }
+            get { return _device; }
         }
 
         /// <summary>
@@ -122,8 +121,8 @@ namespace Myre.UI
         {
             if (graphics == null)
                 throw new ArgumentNullException("graphics");
-            this.device = graphics;
-            this.Parent = parent;
+            _device = graphics;
+            Parent = parent;
         }
 
         /// <summary>
@@ -152,7 +151,7 @@ namespace Myre.UI
         /// <param name="height">The height.</param>
         public void SetSize(int width, int height)
         {
-            size = new Vector2(width, height);
+            _size = new Vector2(width, height);
             UpdateAnchors();
         }
 
@@ -203,7 +202,7 @@ namespace Myre.UI
         /// <param name="anchoredTo">The point on the anchorFrame to anchor to.</param>
         public void SetPoint(Points point, int x, int y, Frame anchorFrame, Points anchoredTo)
         {
-            foreach (var side in anchors)
+            foreach (var side in _anchors)
             {
                 if (point.Selected(side.Key))
                 {
@@ -215,11 +214,11 @@ namespace Myre.UI
                 }
             }
 
-            anchoredPoints |= point;
+            _anchoredPoints |= point;
 
-            Frame parent = anchorFrame ?? this.Parent;
-            if (parent != null && !parent.anchorChildren.Contains(this))
-                parent.anchorChildren.Add(this);
+            Frame parent = anchorFrame ?? Parent;
+            if (parent != null && !parent._anchorChildren.Contains(this))
+                parent._anchorChildren.Add(this);
 
             UpdateAnchors();
         }
@@ -229,21 +228,21 @@ namespace Myre.UI
         /// </summary>
         public void ClearAllPoints()
         {
-            foreach (var anchor in anchors)
+            foreach (var anchor in _anchors)
             {
                 Frame parent = anchor.Value.AnchorControl ?? Parent;
                 if (parent != null)
-                    parent.anchorChildren.Remove(this);
+                    parent._anchorChildren.Remove(this);
             }
 
-            anchoredPoints = 0;
+            _anchoredPoints = 0;
             UpdateAnchors();
         }
 
         private void UpdateAnchors()
         {
             Rectangle parentArea;
-            var viewport = device.Viewport;
+            var viewport = _device.Viewport;
             if (Parent != null)
                 parentArea = Parent.Area;
             else if (RespectSafeArea)
@@ -251,11 +250,11 @@ namespace Myre.UI
             else
                 parentArea = new Rectangle(0, 0, viewport.Width, viewport.Height);
 
-            ControlArea area = new ControlArea(0, 0, (int)size.X, (int)size.Y);
-            foreach (var side in anchors)
+            ControlArea area = new ControlArea(0, 0, (int)_size.X, (int)_size.Y);
+            foreach (var side in _anchors)
             {
-                if (anchoredPoints.Selected(side.Key))
-                    side.Value.Apply(ref area, parentArea, anchoredPoints);
+                if (_anchoredPoints.Selected(side.Key))
+                    side.Value.Apply(ref area, parentArea, _anchoredPoints);
             }
 
             Area = area.ToRectangle();

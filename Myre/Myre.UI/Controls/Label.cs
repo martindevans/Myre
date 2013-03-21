@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Text;
 
 namespace Myre.UI.Controls
@@ -18,9 +15,9 @@ namespace Myre.UI.Controls
     public class Label
         : Control
     {
-        StringPart text;
-        SpriteFont font;
-        Vector2 scale;
+        StringPart _text;
+        SpriteFont _font;
+        Vector2 _scale;
 
         /// <summary>
         /// Gets the size of the text as printed by this label.
@@ -33,12 +30,12 @@ namespace Myre.UI.Controls
         /// <value>The text.</value>
         public StringPart Text
         {
-            get { return text; }
+            get { return _text; }
             set
             {
-                if (!text.Equals(value))
+                if (!_text.Equals(value))
                 {
-                    text = value;
+                    _text = value;
                     UpdateSize();
                 }
             }
@@ -59,12 +56,12 @@ namespace Myre.UI.Controls
         /// </summary>
         public SpriteFont Font
         {
-            get { return font; }
+            get { return _font; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
-                font = value;
+                _font = value;
                 UpdateSize();
             }
         }
@@ -80,12 +77,12 @@ namespace Myre.UI.Controls
 
         public Vector2 Scale
         {
-            get { return scale; }
+            get { return _scale; }
             set
             {
-                if (scale != value)
+                if (_scale != value)
                 {
-                    scale = value;
+                    _scale = value;
                     UpdateSize();
                 }
             }
@@ -96,14 +93,13 @@ namespace Myre.UI.Controls
         /// </summary>
         /// <param name="parent">The parent.</param>
         /// <param name="font">The font.</param>
-        /// <param name="focusScope">The focus scope.</param>
         public Label(Control parent, SpriteFont font)
             : base(parent)
         {
             if (font == null)
                 throw new ArgumentNullException("font");
 
-            this.font = font;
+            this._font = font;
             Text = "";
             Colour = Color.White;
             Scale = Vector2.One;

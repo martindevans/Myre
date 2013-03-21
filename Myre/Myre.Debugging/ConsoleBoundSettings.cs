@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Debugging;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using Myre.Collections;
-using System.Diagnostics;
 
 namespace Myre.Debugging
 {
@@ -27,7 +21,9 @@ namespace Myre.Debugging
         class Setting<T>
             : ISetting
         {
+// ReSharper disable UnusedMember.Local
             public T Value
+// ReSharper restore UnusedMember.Local
             {
                 get { return Target.Value; }
                 set { Target.Value = value; }
@@ -35,19 +31,19 @@ namespace Myre.Debugging
 
             public string Name { get; set; }
             public string Description { get; set; }
-            public Box<T> Target { get; set; }
+            public Box<T> Target { private get; set; }
         }
 
-        private BoxedValueStore<string> data;
-        private CommandEngine engine;
-        private List<ISetting> settings;
+        private readonly BoxedValueStore<string> _data;
+        private CommandEngine _engine;
+        private readonly List<ISetting> _settings;
 
         /// <summary>
         /// The command engine bound with this Settings instance
         /// </summary>
         public CommandEngine Engine
         {
-            get { return engine; }
+            get { return _engine; }
         }
 
         /// <summary>
@@ -56,8 +52,8 @@ namespace Myre.Debugging
         /// <param name="data">Where this instance reads and writes its value to</param>
         public ConsoleBoundSettings(BoxedValueStore<string> data)
         {
-            this.data = data;
-            this.settings = new List<ISetting>();
+            _data = data;
+            _settings = new List<ISetting>();
         }
 
         /// <summary>
@@ -70,7 +66,7 @@ namespace Myre.Debugging
         /// <returns>The box which this setting references</returns>
         public Box<T> Add<T>(string name, string description = null, T defaultValue = default(T))
         {
-            var box = data.Get(name, defaultValue);
+            var box = _data.Get(name, defaultValue);
             var setting = new Setting<T>()
             {
                 Name = name,
@@ -78,12 +74,12 @@ namespace Myre.Debugging
                 Target = box,
             };
 
-            settings.Add(setting);
+            _settings.Add(setting);
 
-            if (engine != null)
+            if (_engine != null)
             {
-                engine.RemoveOption(name);
-                engine.AddOption(setting, "Value", name, description);
+                _engine.RemoveOption(name);
+                _engine.AddOption(setting, "Value", name, description);
             }
 
             return box;
@@ -95,19 +91,19 @@ namespace Myre.Debugging
         /// <param name="engine"></param>
         public void BindCommandEngine(CommandEngine engine)
         {
-            if (this.engine == engine)
+            if (_engine == engine)
                 return;
 
-            if (this.engine != null)
+            if (_engine != null)
             {
-                foreach (var item in settings)
-                    this.engine.RemoveCommand(item.Name);
+                foreach (var item in _settings)
+                    _engine.RemoveCommand(item.Name);
             }
 
-            this.engine = engine;
+            _engine = engine;
             if (engine != null)
             {
-                foreach (var item in settings)
+                foreach (var item in _settings)
                 {
                     engine.RemoveOption(item.Name);
                     engine.AddOption(item, "Value", item.Name, item.Description);

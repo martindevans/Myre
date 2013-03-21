@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
@@ -16,21 +12,21 @@ namespace Myre.UI.Controls
     public abstract class MultiButton
         : Button
     {
-        private int count;
-        private int selectedOption;
+        private int _count;
+        private int _selectedOption;
 
         /// <summary>
         /// Gets or sets the number of options this <c>MultiButton</c> holds.
         /// </summary>
         public int OptionsCount 
         {
-            get { return count; }
+            get { return _count; }
             set
             {
                 if (value < 1)
                     throw new ArgumentOutOfRangeException("value", "value cannot be < 1.");
-                count = value;
-                selectedOption = Math.Min(selectedOption, count - 1);
+                _count = value;
+                _selectedOption = Math.Min(_selectedOption, _count - 1);
             }
         }
 
@@ -40,16 +36,16 @@ namespace Myre.UI.Controls
         /// <value>The selected option.</value>
         public int SelectedOption
         {
-            get { return selectedOption; }
+            get { return _selectedOption; }
             set
             {
                 System.Diagnostics.Debug.WriteLine(DateTime.Now);
                 while (value < 0)
-                    value += count;
-                value %= count;
-                if (selectedOption != value)
+                    value += _count;
+                value %= _count;
+                if (_selectedOption != value)
                 {
-                    selectedOption = value;
+                    _selectedOption = value;
                     OnSelectionChanged();
                 }
             }

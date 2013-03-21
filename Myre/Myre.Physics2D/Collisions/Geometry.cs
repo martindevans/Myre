@@ -64,7 +64,7 @@ namespace Myre.Physics2D.Collisions
         /// </summary>
         public ReadOnlyCollection<Geometry> CollidingWith { get; private set; }
 
-        public Geometry()
+        protected Geometry()
         {
             collidingWith = new List<Geometry>();
             CollidingWith = new ReadOnlyCollection<Geometry>(collidingWith);
@@ -72,10 +72,10 @@ namespace Myre.Physics2D.Collisions
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _frictionCoefficient = context.CreateProperty<float>("friction_coefficient");
-            _restitutionCoefficient = context.CreateProperty<float>("restitution_coefficient");
-            _sleeping = context.CreateProperty<bool>("sleeping");
-            _group = context.CreateProperty<CollisionGroup>("collision_group");
+            _frictionCoefficient = context.CreateProperty<float>("friction_coefficient", default(float));
+            _restitutionCoefficient = context.CreateProperty<float>("restitution_coefficient", default(float));
+            _sleeping = context.CreateProperty<bool>("sleeping", default(bool));
+            _group = context.CreateProperty<CollisionGroup>("collision_group", default(CollisionGroup));
 
             _restitutionCoefficient.PropertySet += ValidateRestitution;
             _sleeping.PropertySet += WakeUp;
@@ -85,7 +85,7 @@ namespace Myre.Physics2D.Collisions
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            Body = Owner.GetBehaviour<DynamicPhysics>();
+            Body = Owner.GetBehaviour<DynamicPhysics>(null);
 
             initialisationData.TryCopyValue("collision_group", _group);
 

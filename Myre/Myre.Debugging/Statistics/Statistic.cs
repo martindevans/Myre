@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Myre.Collections;
 
 namespace Myre.Debugging.Statistics
@@ -9,14 +7,16 @@ namespace Myre.Debugging.Statistics
     /// <summary>
     /// A statistic which can be tracked by tools in the Myre.Debugging library.
     /// </summary>
-    public class Statistic
+    public sealed class Statistic
         : IDisposableObject
     {
-        static Dictionary<string, Statistic> statistics = new Dictionary<string, Statistic>();
-        static ReadOnlyDictionary<string, Statistic> readOnlyStatistics = new ReadOnlyDictionary<string, Statistic>(statistics);
+        static readonly Dictionary<string, Statistic> _statistics = new Dictionary<string, Statistic>();
+        static readonly ReadOnlyDictionary<string, Statistic> _readOnlyStatistics = new ReadOnlyDictionary<string, Statistic>(_statistics);
+// ReSharper disable ReturnTypeCanBeEnumerable.Global
         public static ReadOnlyDictionary<string, Statistic> Statistics
+// ReSharper restore ReturnTypeCanBeEnumerable.Global
         {
-            get { return readOnlyStatistics; }
+            get { return _readOnlyStatistics; }
         }
 
 
@@ -57,6 +57,7 @@ namespace Myre.Debugging.Statistics
         /// Gets the statistic.
         /// </summary>
         /// <param name="name">The name.</param>
+        /// <param name="format"></param>
         /// <returns></returns>
         public static Statistic Get(string name, string format = null)
         {
@@ -64,19 +65,19 @@ namespace Myre.Debugging.Statistics
                 throw new ArgumentNullException("name");
 
             Statistic stat;
-            if (!statistics.TryGetValue(name, out stat))
+            if (!_statistics.TryGetValue(name, out stat))
             {
                 stat = new Statistic(name);
-                statistics[name] = stat;
+                _statistics[name] = stat;
             }
 
             stat.Format = format ?? stat.Format ?? "{0}";
             return stat;
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
-            statistics.Remove(Name);
+            _statistics.Remove(Name);
             IsDisposed = true;
         }
     }

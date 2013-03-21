@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace Myre.UI.InputDevices
@@ -9,9 +6,11 @@ namespace Myre.UI.InputDevices
     public interface IInputDevice
     {
         InputActor Owner { get; set; }
+// ReSharper disable UnusedParameter.Global
         void Update(GameTime gameTime);
+// ReSharper restore UnusedParameter.Global
         void Evaluate(GameTime gameTime, Control focused, UserInterface ui);
-        bool IsBlocked(ICollection<int> inputs);
+        bool IsBlocked(IEnumerable<int> inputs);
         void BlockInputs(IEnumerable<int> inputs);
     }
 }

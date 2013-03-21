@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Myre.Extensions;
 
@@ -12,22 +9,22 @@ namespace Myre.StateManagement
     /// </summary>
     public class Transition
     {
-        private TimeSpan onTime;
-        private TimeSpan offTime;
-        private float progress;
-        private bool targettingOn;
+        private TimeSpan _onTime;
+        private TimeSpan _offTime;
+        private float _progress;
+        private bool _targettingOn;
 
         /// <summary>
         /// The time taken to transition from 0 to 1.
         /// </summary>
         public TimeSpan OnDuration
         {
-            get { return onTime; }
+            get { return _onTime; }
             set
             {
                 if (value.Ticks < 0)
                     throw new ArgumentOutOfRangeException("value", "Cannot be less than 0.");
-                onTime = value;
+                _onTime = value;
             }
         }
 
@@ -36,12 +33,12 @@ namespace Myre.StateManagement
         /// </summary>
         public TimeSpan OffDuration
         {
-            get { return offTime; }
+            get { return _offTime; }
             set
             {
                 if (value.Ticks < 0)
                     throw new ArgumentOutOfRangeException("value", "Cannot be less than 0.");
-                offTime = value;
+                _offTime = value;
             }
         }
 
@@ -50,7 +47,7 @@ namespace Myre.StateManagement
         /// </summary>
         public float Progress
         {
-            get { return progress; }
+            get { return _progress; }
         }
 
         /// <summary>
@@ -60,8 +57,8 @@ namespace Myre.StateManagement
         /// <param name="offDuration">The time taken to transition from 1 to 0.</param>
         public Transition(TimeSpan onDuration, TimeSpan offDuration)
         {
-            this.onTime = onDuration;
-            this.offTime = offDuration;
+            _onTime = onDuration;
+            _offTime = offDuration;
         }
 
         /// <summary>
@@ -79,20 +76,20 @@ namespace Myre.StateManagement
         /// <param name="gameTime">Game time.</param>
         public void Update(GameTime gameTime)
         {
-            var dt = (float)gameTime.Seconds();
-            if (targettingOn)
+            var dt = gameTime.Seconds();
+            if (_targettingOn)
             {
-                if (onTime.Ticks == 0)
-                    progress = 1;
+                if (_onTime.Ticks == 0)
+                    _progress = 1;
                 else
-                    progress = MathHelper.Clamp(progress + (dt / (float)onTime.TotalSeconds), 0, 1);
+                    _progress = MathHelper.Clamp(_progress + (dt / (float)_onTime.TotalSeconds), 0, 1);
             }
             else
             {
-                if (offTime.Ticks == 0)
-                    progress = 0;
+                if (_offTime.Ticks == 0)
+                    _progress = 0;
                 else
-                    progress = MathHelper.Clamp(progress - (dt / (float)offTime.TotalSeconds), 0, 1);
+                    _progress = MathHelper.Clamp(_progress - (dt / (float)_offTime.TotalSeconds), 0, 1);
             }
         }
 
@@ -101,7 +98,7 @@ namespace Myre.StateManagement
         /// </summary>
         public void MoveOn()
         {
-            targettingOn = true;
+            _targettingOn = true;
         }
 
         /// <summary>
@@ -109,7 +106,7 @@ namespace Myre.StateManagement
         /// </summary>
         public void MoveOff()
         {
-            targettingOn = false;
+            _targettingOn = false;
         }
     }
 }

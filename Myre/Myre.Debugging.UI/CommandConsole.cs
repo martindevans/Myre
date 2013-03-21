@@ -2,36 +2,33 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.Linq;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Threading;
+using Microsoft.Xna.Framework.Input;
 using Myre.UI;
-using Myre.UI.Gestures;
 using Myre.UI.Controls;
-using Myre.Debugging;
-using System.Reflection;
-using Myre.UI.Text;
+using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+using Myre.UI.Text;
 
-namespace Myre.Debugging
+namespace Myre.Debugging.UI
 {
     public class CommandConsole
         : Control
     {
-        CommandEngine engine;
-        TextLog log;
-        TextBox textBox;
-        Label tabCompletion;
-        Label infoBox;
-        CommandHelp? help;
-        Texture2D background;
-        CommandStack commandStack;
+        readonly CommandEngine _engine;
+        readonly TextLog _log;
+        readonly TextBox _textBox;
+        readonly Label _tabCompletion;
+        readonly Label _infoBox;
+        CommandHelp? _help;
+        readonly Texture2D _background;
+        readonly CommandStack _commandStack;
 
 #if WINDOWS
         public TraceListener Listener;
@@ -41,7 +38,7 @@ namespace Myre.Debugging
         /// Gets the command engine.
         /// </summary>
         /// <value>The engine.</value>
-        public CommandEngine Engine { get { return engine; } }
+        public CommandEngine Engine { get { return _engine; } }
 
         /// <summary>
         /// Gets or sets the key used to toggle this <see cref="CommandConsole"/>.
@@ -84,12 +81,14 @@ namespace Myre.Debugging
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandConsole"/> class.
         /// </summary>
+        /// <param name="font"></param>
         /// <param name="parent">The parent.</param>
         /// <param name="assemblies">The assemblies containing commands and options to add to this <see cref="CommandConsole"/> instance.</param>
+        /// <param name="game"></param>
         public CommandConsole(Game game, SpriteFont font, Control parent, params Assembly[] assemblies)
             : base(parent)
         {
-            engine = new CommandEngine(assemblies);
+            _engine = new CommandEngine(assemblies);
 
             PresentationParameters pp = game.GraphicsDevice.PresentationParameters;
             SetSize(0, pp.BackBufferHeight / 3);
@@ -106,36 +105,33 @@ namespace Myre.Debugging
             //var font = Content.Load<SpriteFont>(game, "Consolas");
             //skin = Content.Load<Skin>(game, "Console");
             //skin.BackgroundColour = new Color(1f, 1f, 1f, 0.8f);
-            background = new Texture2D(game.GraphicsDevice, 1, 1);
-            background.SetData(new Color[] { Color.Black });
+            _background = new Texture2D(game.GraphicsDevice, 1, 1);
+            _background.SetData(new Color[] { Color.Black });
 
-            textBox = new TextBox(this, game, font, "Command Console", "Enter your command");
-            textBox.SetPoint(Points.Bottom, 0, -3);
-            textBox.SetPoint(Points.Left, 3, 0);
-            textBox.SetPoint(Points.Right, -3, 0);
-            textBox.FocusPriority = 1;
-            textBox.FocusedChanged += c => { if (c.IsFocused) textBox.BeginTyping(PlayerIndex.One); };
-            textBox.IgnoredCharacters.Add('`');
+            _textBox = new TextBox(this, game, font, "Command Console", "Enter your command");
+            _textBox.SetPoint(Points.Bottom, 0, -3);
+            _textBox.SetPoint(Points.Left, 3, 0);
+            _textBox.SetPoint(Points.Right, -3, 0);
+            _textBox.FocusPriority = 1;
+            _textBox.FocusedChanged += c => { if (c.IsFocused) _textBox.BeginTyping(PlayerIndex.One); };
+            _textBox.IgnoredCharacters.Add('`');
 
-            log = new TextLog(this, font, (int)(3 * Area.Height / (float)font.LineSpacing));
-            log.SetPoint(Points.TopLeft, 3, 3);
-            log.SetPoint(Points.TopRight, -3, 3);
-            log.SetPoint(Points.Bottom, 0, 0, textBox, Points.Top);
-            log.WriteLine("Hello world");
+            _log = new TextLog(this, font, (int)(3 * Area.Height / (float)font.LineSpacing));
+            _log.SetPoint(Points.TopLeft, 3, 3);
+            _log.SetPoint(Points.TopRight, -3, 3);
+            _log.SetPoint(Points.Bottom, 0, 0, _textBox, Points.Top);
+            _log.WriteLine("Hello world");
 
-            tabCompletion = new Label(this, font);
-            tabCompletion.SetSize(300, 0);
-            tabCompletion.SetPoint(Points.TopLeft, 3, 6, this, Points.BottomLeft);
+            _tabCompletion = new Label(this, font);
+            _tabCompletion.SetSize(300, 0);
+            _tabCompletion.SetPoint(Points.TopLeft, 3, 6, this, Points.BottomLeft);
 
-            infoBox = new Label(this, font);
-            infoBox.SetPoint(Points.TopRight, -3, 6, this, Points.BottomRight);
+            _infoBox = new Label(this, font);
+            _infoBox.SetPoint(Points.TopRight, -3, 6, this, Points.BottomRight);
 
-            AreaChanged += delegate(Frame c)
-            {
-                infoBox.SetSize(Math.Max(0, c.Area.Width - 311), 0);
-            };
+            AreaChanged += c => _infoBox.SetSize(Math.Max(0, c.Area.Width - 311), 0);
 
-            commandStack = new CommandStack(textBox, Gestures);
+            _commandStack = new CommandStack(_textBox, Gestures);
 
 #if WINDOWS
             ConsoleTraceListener cts = new ConsoleTraceListener(this);
@@ -155,12 +151,10 @@ namespace Myre.Debugging
 
         private static Control CreateUserInterface(Game game)
         {
-            UserInterface ui = new UserInterface(game.GraphicsDevice);
-            ui.DrawOrder = int.MaxValue;
+            UserInterface ui = new UserInterface(game.GraphicsDevice) { DrawOrder = int.MaxValue };
             game.Components.Add(ui);
 
-            var player = new InputActor(1);
-            player.Add(new KeyboardDevice(PlayerIndex.One));
+            var player = new InputActor(1) { new KeyboardDevice(PlayerIndex.One) };
             game.Components.Add(player);
             ui.Actors.Add(player);
 
@@ -173,7 +167,7 @@ namespace Myre.Debugging
         /// <param name="item">The item.</param>
         public void WriteLine(object item)
         {
-            log.WriteLine((item ?? "null").ToString());
+            _log.WriteLine((item ?? "null").ToString());
         }
 
         /// <summary>
@@ -182,70 +176,69 @@ namespace Myre.Debugging
         /// <param name="item">The item.</param>
         public void Write(object item)
         {
-            log.Write((item ?? "null").ToString());
+            _log.Write((item ?? "null").ToString());
         }
 
         protected void BindGestures()
         {
             Gestures.Bind(delegate(IGesture gesture, GameTime gameTime, IInputDevice device)
             {
-                if (textBox.Text.Length > 0)
+                if (_textBox.Text.Length > 0)
                 {
-                    commandStack.PushCommand(textBox.Text);
+                    _commandStack.PushCommand(_textBox.Text);
 
-                    log.WriteLine(">" + textBox.Text);
-                    var result = engine.Execute(textBox.Text);
+                    _log.WriteLine(">" + _textBox.Text);
+                    var result = _engine.Execute(_textBox.Text);
                     if (result.Result != null)
-                        log.WriteLine(result.Result.ToString());
+                        _log.WriteLine(result.Result.ToString());
                     else if (result.Error != null)
-                        log.WriteLine(result.Error);
+                        _log.WriteLine(result.Error);
                 }
-                textBox.Text = "";
+                _textBox.Text = "";
             }, new KeyPressed(Keys.Enter));
 
-            Gestures.Bind(OnAutocomplete, new KeyPressed(Keys.Tab));
+            Gestures.Bind((GestureHandler<IGesture>)OnAutocomplete, new KeyPressed(Keys.Tab));
         }
 
         private void OnAutocomplete(IGesture gesture, GameTime gameTime, IInputDevice device)
         {
-            if (help.HasValue && help.Value.PossibleCommands.Length > 0)
+            if (_help.HasValue && _help.Value.PossibleCommands.Length > 0)
             {
-                var h = help.Value;
+                var h = _help.Value;
                 string similarity = "";
 
                 int letter = 0;
                 bool b = true;
-                while (b)
+                while (true)
                 {
                     char c = ' ';
-                    for (int i = 0; i < help.Value.PossibleCommands.Length; i++)
+                    for (int i = 0; i < _help.Value.PossibleCommands.Length; i++)
                     {
-                        if (letter >= help.Value.PossibleCommands[i].Length)
+                        if (letter >= _help.Value.PossibleCommands[i].Length)
                         {
                             b = false;
                             break;
                         }
-                        else if (c == ' ')
-                            c = help.Value.PossibleCommands[i][letter];
+
+                        if (c == ' ')
+                            c = _help.Value.PossibleCommands[i][letter];
                         else
                         {
-                            if (c != help.Value.PossibleCommands[i][letter])
+                            if (c != _help.Value.PossibleCommands[i][letter])
                             {
                                 b = false;
                                 break;
                             }
                         }
                     }
-                    if (b)
-                    {
-                        similarity += c;
-                        letter++;
-                    }
-                    else
+                    if (!b)
                         break;
+
+                    similarity += c;
+                    letter++;
                 }
 
-                textBox.Text = h.Command.Substring(0, h.TabStart) + similarity;
+                _textBox.Text = h.Command.Substring(0, h.TabStart) + similarity;
             }
         }
 
@@ -253,15 +246,15 @@ namespace Myre.Debugging
         {
             //skin.Draw(batch, Area, Color.White);
             var colour = new Color(0.75f,0.75f, 0.75f, 0.75f);
-            batch.Draw(background, Area, colour);
+            batch.Draw(_background, Area, colour);
 
-            if (tabCompletion.IsVisible)
+            if (_tabCompletion.IsVisible)
             {
                 batch.Draw(
-                    background,
+                    _background,
                     new Rectangle(
-                        tabCompletion.Area.X - 3, tabCompletion.Area.Y - 3,
-                        tabCompletion.Area.Width + 6, tabCompletion.Area.Height + 6),
+                        _tabCompletion.Area.X - 3, _tabCompletion.Area.Y - 3,
+                        _tabCompletion.Area.Width + 6, _tabCompletion.Area.Height + 6),
                     colour);
                 //skin.Draw(batch, new Rectangle(
                 //    tabCompletion.Area.X - 3, tabCompletion.Area.Y - 3,
@@ -269,13 +262,13 @@ namespace Myre.Debugging
                 //    Color.White);
             }
 
-            if (infoBox.IsVisible)
+            if (_infoBox.IsVisible)
             {
                 batch.Draw(
-                    background,
+                    _background,
                     new Rectangle(
-                        infoBox.Area.X - 3, infoBox.Area.Y - 3,
-                        infoBox.Area.Width + 6, infoBox.Area.Height + 6),
+                        _infoBox.Area.X - 3, _infoBox.Area.Y - 3,
+                        _infoBox.Area.Width + 6, _infoBox.Area.Height + 6),
                     colour);
                 //skin.Draw(batch, new Rectangle(
                 //    infoBox.Area.X - 3, infoBox.Area.Y - 3,
@@ -313,19 +306,19 @@ namespace Myre.Debugging
                 return;
             }
 
-            if (!help.HasValue || textBox.Text != help.Value.Command)
+            if (!_help.HasValue || _textBox.Text != _help.Value.Command)
             {
-                help = engine.GetHelp(textBox.Text);
+                _help = _engine.GetHelp(_textBox.Text);
                 StringBuilder tab = new StringBuilder();
-                foreach (var item in help.Value.PossibleCommands.OrderBy(s => s))
+                foreach (var item in _help.Value.PossibleCommands.OrderBy(s => s))
                     tab.AppendLine(item);
-                tabCompletion.Text = tab.ToString(0, Math.Max(0, tab.Length - 1));
-                tabCompletion.IsVisible = !tabCompletion.Text.Equals((StringPart)"");
+                _tabCompletion.Text = tab.ToString(0, Math.Max(0, tab.Length - 1));
+                _tabCompletion.IsVisible = !_tabCompletion.Text.Equals((StringPart)"");
 
-                infoBox.Text = string.Format("[c:200:200:200]{0}[/c]{1}",
-                    help.Value.Definitions,
-                    help.Value.Description);
-                infoBox.IsVisible = !string.IsNullOrEmpty(help.Value.Definitions) || !string.IsNullOrEmpty(help.Value.Description);
+                _infoBox.Text = string.Format("[c:200:200:200]{0}[/c]{1}",
+                    _help.Value.Definitions,
+                    _help.Value.Description);
+                _infoBox.IsVisible = !string.IsNullOrEmpty(_help.Value.Definitions) || !string.IsNullOrEmpty(_help.Value.Description);
             }
         }
 
@@ -338,63 +331,63 @@ namespace Myre.Debugging
 
         private class CommandStack
         {
-            LinkedList<String> previousCommands = new LinkedList<string>();
-            LinkedListNode<String> commandScrollPointer = null;
+            readonly LinkedList<String> _previousCommands = new LinkedList<string>();
+            LinkedListNode<String> _commandScrollPointer = null;
 
-            private TextBox textBox;
+            private readonly TextBox _textBox;
 
             public CommandStack(TextBox textBox, GestureGroup gestures)
             {
                 if (textBox == null)
                     throw new NullReferenceException("textBox");
 
-                this.textBox = textBox;
+                _textBox = textBox;
 
-                gestures.Bind(OnPreviousCommand, new KeyPressed(Keys.Up));
-                gestures.Bind(OnNextCommand, new KeyPressed(Keys.Down));
+                gestures.Bind((GestureHandler<IGesture>) OnPreviousCommand, new KeyPressed(Keys.Up));
+                gestures.Bind((GestureHandler<IGesture>) OnNextCommand, new KeyPressed(Keys.Down));
             }
 
             private void OnPreviousCommand(IGesture gesture, GameTime gameTime, IInputDevice device)
             {
-                if (commandScrollPointer == null)
+                if (_commandScrollPointer == null)
                 {
-                    commandScrollPointer = previousCommands.Last;
+                    _commandScrollPointer = _previousCommands.Last;
                     WritePreviousCommand();
                 }
-                else if (commandScrollPointer.Previous != null)
+                else if (_commandScrollPointer.Previous != null)
                 {
-                    commandScrollPointer = commandScrollPointer.Previous;
+                    _commandScrollPointer = _commandScrollPointer.Previous;
                     WritePreviousCommand();
                 }
             }
 
             private void OnNextCommand(IGesture gesture, GameTime gameTime, IInputDevice device)
             {
-                if (commandScrollPointer != null)
+                if (_commandScrollPointer != null)
                 {
-                    if (commandScrollPointer.Next != null)
+                    if (_commandScrollPointer.Next != null)
                     {
-                        commandScrollPointer = commandScrollPointer.Next;
+                        _commandScrollPointer = _commandScrollPointer.Next;
                         WritePreviousCommand();
                     }
                     else
                     {
-                        textBox.Text = "";
-                        commandScrollPointer = null;
+                        _textBox.Text = "";
+                        _commandScrollPointer = null;
                     }
                 }
             }
 
             public void PushCommand(String s)
             {
-                previousCommands.AddLast(textBox.Text);
-                commandScrollPointer = null;
+                _previousCommands.AddLast(_textBox.Text);
+                _commandScrollPointer = null;
             }
 
             private void WritePreviousCommand()
             {
-                if (commandScrollPointer != null)
-                    textBox.Text = commandScrollPointer.Value;
+                if (_commandScrollPointer != null)
+                    _textBox.Text = _commandScrollPointer.Value;
             }
         }
 
@@ -402,7 +395,7 @@ namespace Myre.Debugging
         private class ConsoleTraceListener
             : TraceListener
         {
-            public readonly CommandConsole console;
+            private readonly CommandConsole _console;
 
 #if WINDOWS
             public readonly RegexTraceFilter RegexFilter;
@@ -410,11 +403,11 @@ namespace Myre.Debugging
 
             public ConsoleTraceListener(CommandConsole console)
             {
-                this.console = console;
+                _console = console;
 
 #if WINDOWS
-                this.RegexFilter = new RegexTraceFilter(console);
-                base.Filter = RegexFilter;
+                RegexFilter = new RegexTraceFilter(console);
+                Filter = RegexFilter;
 #endif
             }
 
@@ -424,7 +417,7 @@ namespace Myre.Debugging
             /// <param name="message">A message to write.</param>
             public override void Write(string message)
             {
-                console.WriteLine(message);
+                _console.WriteLine(message);
             }
 
             /// <summary>
@@ -433,38 +426,42 @@ namespace Myre.Debugging
             /// <param name="message">A message to write.</param>
             public override void WriteLine(string message)
             {
-                console.WriteLine(message);
+                _console.WriteLine(message);
             }
 
 #if WINDOWS
             public class RegexTraceFilter
                 : TraceFilter
             {
-                private List<Regex> filters = new List<Regex>();
-                private CommandConsole console;
+                private readonly List<Regex> _filters = new List<Regex>();
+                private readonly CommandConsole _console;
 
                 internal RegexTraceFilter(CommandConsole console)
                 {
-                    this.console = console;
+                    _console = console;
                 }
 
                 /// <summary>
                 /// Adds the a regular expression which will filter out any messages it matches
                 /// </summary>
                 /// <param name="s">The s.</param>
+// ReSharper disable UnusedMember.Local
                 public void AddFilter(string s)
+// ReSharper restore UnusedMember.Local
                 {
-                    filters.Add(new Regex(s));
+                    _filters.Add(new Regex(s));
                 }
 
                 /// <summary>
                 /// Lists the filters registered to the console
                 /// </summary>
+// ReSharper disable UnusedMember.Local
                 public void ListFilters()
+// ReSharper restore UnusedMember.Local
                 {
-                    console.WriteLine("Filters:");
-                    for (int i = 0; i < filters.Count; i++)
-                        console.WriteLine("\t " + i + " :> " + filters[i]);
+                    _console.WriteLine("Filters:");
+                    for (int i = 0; i < _filters.Count; i++)
+                        _console.WriteLine("\t " + i + " :> " + _filters[i]);
                 }
 
                 /// <summary>
@@ -474,8 +471,8 @@ namespace Myre.Debugging
                 /// <returns></returns>
                 public Regex RemoveAt(int index)
                 {
-                    Regex r = filters[index];
-                    filters.RemoveAt(index);
+                    Regex r = _filters[index];
+                    _filters.RemoveAt(index);
                     return r;
                 }
 
@@ -495,9 +492,9 @@ namespace Myre.Debugging
                 /// </returns>
                 public override bool ShouldTrace(TraceEventCache cache, string source, TraceEventType eventType, int id, string formatOrMessage, object[] args, object data1, object[] data)
                 {
-                    for (int i = 0; i < filters.Count; i++)
+                    for (int i = 0; i < _filters.Count; i++)
                     {
-                        if (filters[i].IsMatch(formatOrMessage))
+                        if (_filters[i].IsMatch(formatOrMessage))
                             return false;
                     }
                     return true;

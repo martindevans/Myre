@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Myre;
-using System.Reflection;
 
 namespace Myre.Entities.Behaviours
 {
@@ -25,21 +21,21 @@ namespace Myre.Entities.Behaviours
     public static class BehaviourManagerExtensions
     {
         //private static Dictionary<Type, Dictionary<Type, MethodInfo>> managerMethods = new Dictionary<Type, Dictionary<Type, MethodInfo>>();
-        private static Dictionary<Type, Type[]> managedTypes = new Dictionary<Type, Type[]>();
+        private static readonly Dictionary<Type, Type[]> _managedTypes = new Dictionary<Type, Type[]>();
 
         public static IEnumerable<Type> GetManagedTypes(this IBehaviourManager manager)
         {
             var managerType = manager.GetType();
 
-            Type[] behaviourTypes = null;
-            if (!managedTypes.TryGetValue(managerType, out behaviourTypes))
+            Type[] behaviourTypes;
+            if (!_managedTypes.TryGetValue(managerType, out behaviourTypes))
             {
                 var types = from i in managerType.GetInterfaces()
                             where i.FullName.StartsWith(typeof(IBehaviourManager<>).FullName)
                             select i.GetGenericArguments().First();
 
                 behaviourTypes = types.ToArray();
-                managedTypes[managerType] = behaviourTypes;
+                _managedTypes[managerType] = behaviourTypes;
             }
 
             return behaviourTypes;
@@ -54,7 +50,7 @@ namespace Myre.Entities.Behaviours
     /// Each scene contains an manager instance for each behaviour type, and these managers batch process all behaviours in the scene.</para>
     /// <para>Managers can utilise the services contained in the scene to register for updates or events.</para>
     /// </remarks>
-    public interface IBehaviourManager<T>
+    public interface IBehaviourManager<in T>
         : IBehaviourManager
         where T : Behaviour
     {
@@ -104,7 +100,7 @@ namespace Myre.Entities.Behaviours
         /// <summary>
         /// Initializes a new instance of the <see cref="BehaviourManager&lt;T&gt;"/> class.
         /// </summary>
-        public BehaviourManager()
+        protected BehaviourManager()
         {
             Behaviours = new List<T>();
         }
@@ -147,7 +143,9 @@ namespace Myre.Entities.Behaviours
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="disposeManagedResources"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+// ReSharper disable VirtualMemberNeverOverriden.Global
         protected virtual void Dispose(bool disposeManagedResources)
+// ReSharper restore VirtualMemberNeverOverriden.Global
         {
             if (IsDisposed)
                 return;

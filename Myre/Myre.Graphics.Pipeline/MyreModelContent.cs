@@ -1,30 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace Myre.Graphics.Pipeline
 {
     [ContentSerializerRuntimeType("Myre.Graphics.Geometry.ModelData, Myre.Graphics")]
     public class MyreModelContent
     {
-        private List<MyreMeshContent> meshes;
+        private readonly List<MyreMeshContent> _meshes;
 
-        public MyreMeshContent[] Meshes { get { return meshes.ToArray(); } }
+        public MyreMeshContent[] Meshes { get { return _meshes.ToArray(); } }
         //public BoneContent[] Skeleton { get; set; }
 
         public MyreModelContent()
         {
-            meshes = new List<MyreMeshContent>();
+            _meshes = new List<MyreMeshContent>();
         }
 
         internal void AddMesh(MyreMeshContent mesh)
         {
-            meshes.Add(mesh);
+            _meshes.Add(mesh);
         }
     }
 

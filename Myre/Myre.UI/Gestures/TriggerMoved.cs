@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
+﻿using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures
 {
@@ -19,7 +14,7 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add((int)Trigger + 25); //Enum.GetValues(typeof(Buttons)).Length);
         }
 
-        public override bool Test(GamepadDevice device)
+        protected override bool Test(GamepadDevice device)
         {
             if (Trigger == Side.Left)
                 return device.LeftTriggerMovement != 0;

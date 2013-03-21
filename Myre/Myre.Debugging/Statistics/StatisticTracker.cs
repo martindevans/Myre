@@ -1,52 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Debugging.Statistics
 {
     public class StatisticTracker
     {
-        Statistic stat;
-        DateTime lastAccess;
-        TimeSpan accessInterval;
-        float lastValue;
+        readonly Statistic _stat;
+        DateTime _lastAccess;
+        readonly TimeSpan _accessInterval;
+        float _lastValue;
 
         public Statistic Statistic
         {
-            get { return stat; }
+            get { return _stat; }
         }
 
         public StatisticTracker(Statistic statistic, TimeSpan accessInterval)
         {
-            this.stat = statistic;
-            this.accessInterval = accessInterval;
-            this.lastAccess = DateTime.Now;
-            this.lastValue = statistic.Value;
+            _stat = statistic;
+            _accessInterval = accessInterval;
+            _lastAccess = DateTime.Now;
+            _lastValue = statistic.Value;
         }
 
         public float GetValue(out bool read, out bool changed)
         {
-            if (stat.IsDisposed)
+            if (_stat.IsDisposed)
             {
                 read = false;
                 changed = false;
-                return lastValue;
+                return _lastValue;
             }
 
             changed = false;
             read = false;
             var now = DateTime.Now;
-            var dt = now - lastAccess;
-            if (dt >= accessInterval)
+            var dt = now - _lastAccess;
+            if (dt >= _accessInterval)
             {
-                changed = lastValue != stat.Value;
-                lastValue = stat.Value;
-                lastAccess += accessInterval;
+// ReSharper disable CompareOfFloatsByEqualityOperator
+                changed = _lastValue != _stat.Value;
+// ReSharper restore CompareOfFloatsByEqualityOperator
+                _lastValue = _stat.Value;
+                _lastAccess += _accessInterval;
                 read = true;
             }
 
-            return lastValue;
+            return _lastValue;
         }
     }
 }

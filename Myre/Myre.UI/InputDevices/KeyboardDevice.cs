@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.ObjectModel;
 using Myre.Extensions;
 
 namespace Myre.UI.InputDevices
@@ -12,13 +11,13 @@ namespace Myre.UI.InputDevices
     public class KeyboardDevice
         : IInputDevice
     {
-        private PlayerIndex player;
-        private KeyboardState previousState;
-        private KeyboardState currentState;
-        private List<char> newCharacters;
-        private List<char> characters;
-        private List<int> blocked;
-        private bool charactersBlocked;
+        private readonly PlayerIndex _player;
+        private KeyboardState _previousState;
+        private KeyboardState _currentState;
+        private readonly List<char> _newCharacters;
+        private readonly List<char> _characters;
+        private readonly List<int> _blocked;
+        private bool _charactersBlocked;
 
         /// <summary>
         /// Gets the owner of this keyboard device.
@@ -38,13 +37,13 @@ namespace Myre.UI.InputDevices
 
         public KeyboardDevice(PlayerIndex player, IntPtr windowHandle)
         {
-            this.player = player;
-            this.currentState = Keyboard.GetState(player);
-            this.previousState = currentState;
-            this.blocked = new List<int>();
-            this.newCharacters = new List<char>();
-            this.characters = new List<char>();
-            this.Characters = new ReadOnlyCollection<char>(characters);
+            _player = player;
+            _currentState = Keyboard.GetState(player);
+            _previousState = _currentState;
+            _blocked = new List<int>();
+            _newCharacters = new List<char>();
+            _characters = new List<char>();
+            Characters = new ReadOnlyCollection<char>(_characters);
 
 #if WINDOWS
             if (player == PlayerIndex.One)
@@ -57,8 +56,8 @@ namespace Myre.UI.InputDevices
                         if (char.IsControl(e.Character))
                             return;
 
-                        lock (newCharacters)
-                            newCharacters.Add(e.Character);
+                        lock (_newCharacters)
+                            _newCharacters.Add(e.Character);
                     };
             }
 #endif
@@ -66,21 +65,21 @@ namespace Myre.UI.InputDevices
 
         public void Update(GameTime gameTime)
         {
-            previousState = currentState;
-            currentState = Keyboard.GetState(player);
+            _previousState = _currentState;
+            _currentState = Keyboard.GetState(_player);
 
-            lock (newCharacters)
+            lock (_newCharacters)
             {
-                characters.Clear();
-                characters.AddRange(newCharacters);
-                newCharacters.Clear();
+                _characters.Clear();
+                _characters.AddRange(_newCharacters);
+                _newCharacters.Clear();
             }
         }
 
         public void Evaluate(GameTime gameTime, Control focused, UserInterface ui)
         {
             var type = typeof(KeyboardDevice);
-            charactersBlocked = false;
+            _charactersBlocked = false;
 
             for (var control = focused; control != null; control = control.Parent)
             {
@@ -90,26 +89,26 @@ namespace Myre.UI.InputDevices
                     break;
             }
 
-            ui.EvaluateGlobalGestures(gameTime, this, blocked);
+            ui.EvaluateGlobalGestures(gameTime, this);
 
-            blocked.Clear();
+            _blocked.Clear();
         }
 
         public void BlockInputs(IEnumerable<int> inputs)
         {
-            blocked.AddRange(inputs);
-            if (!charactersBlocked && inputs.Contains(-1))
-                charactersBlocked = true;
+            _blocked.AddRange(inputs);
+            if (!_charactersBlocked && inputs.Contains(-1))
+                _charactersBlocked = true;
         }
 
-        public bool IsBlocked(ICollection<int> inputs)
+        public bool IsBlocked(IEnumerable<int> inputs)
         {
             foreach (var item in inputs)
             {
-                if (charactersBlocked && (item == -1 || ((Keys)item).IsCharacterKey()))
+                if (_charactersBlocked && (item == -1 || ((Keys)item).IsCharacterKey()))
                     return true;
 
-                if (blocked.Contains(item))
+                if (_blocked.Contains(item))
                     return true;
             }
 
@@ -118,22 +117,22 @@ namespace Myre.UI.InputDevices
 
         public bool IsKeyDown(Keys key)
         {
-            return currentState.IsKeyDown(key);
+            return _currentState.IsKeyDown(key);
         }
 
         public bool IsKeyUp(Keys key)
         {
-            return currentState.IsKeyUp(key);
+            return _currentState.IsKeyUp(key);
         }
 
         public bool WasKeyDown(Keys key)
         {
-            return previousState.IsKeyDown(key);
+            return _previousState.IsKeyDown(key);
         }
 
         public bool WasKeyUp(Keys key)
         {
-            return previousState.IsKeyUp(key);
+            return _previousState.IsKeyUp(key);
         }
 
         public bool IsKeyNewlyDown(Keys key)

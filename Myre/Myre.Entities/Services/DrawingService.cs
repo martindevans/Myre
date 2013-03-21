@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Entities.Services
 {
@@ -28,7 +26,7 @@ namespace Myre.Entities.Services
     public class DrawingService
         : List<IDrawableObject>, IService
     {
-        private Comparison<IDrawableObject> comparison;
+        private readonly Comparison<IDrawableObject> _comparison;
 
         /// <summary>
         /// Gets a key on which services are sorted to determine update order.
@@ -40,7 +38,7 @@ namespace Myre.Entities.Services
         /// Gets a key on which services are sorted to determine draw order.
         /// </summary>
         /// <value></value>
-        public int DrawOrder {get;set;}
+        public int DrawOrder {get; set;}
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -53,7 +51,7 @@ namespace Myre.Entities.Services
         /// </summary>
         public DrawingService()
         {
-            comparison = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
+            _comparison = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
         }
 
         /// <summary>
@@ -77,7 +75,7 @@ namespace Myre.Entities.Services
         /// </summary>
         public void Draw()
         {
-            Sort(comparison);
+            Sort(_comparison);
             foreach (var item in this)
                 item.Draw();
         }
@@ -95,7 +93,9 @@ namespace Myre.Entities.Services
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="disposeManagedResources"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+// ReSharper disable UnusedParameter.Global
         protected virtual void Dispose(bool disposeManagedResources)
+// ReSharper restore UnusedParameter.Global
         {
             IsDisposed = true;
         }

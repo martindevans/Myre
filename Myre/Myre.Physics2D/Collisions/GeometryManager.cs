@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Physics2D;
 
 namespace Myre.Physics2D.Collisions
 {

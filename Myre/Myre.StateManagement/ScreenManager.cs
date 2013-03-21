@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Myre.StateManagement
@@ -11,21 +10,20 @@ namespace Myre.StateManagement
     /// </summary>
     public class ScreenManager
     {
-        Stack<Screen> screenStack;
-        List<Screen> screens;
-        List<Screen> oldScreens;
+        readonly Stack<Screen> _screenStack;
+        readonly List<Screen> _screens;
 
-        IEnumerable<Screen> transitioningOn;
-        IEnumerable<Screen> transitioningOff;
-        IEnumerable<Screen> visible;
+        readonly IEnumerable<Screen> _transitioningOn;
+        readonly IEnumerable<Screen> _transitioningOff;
+        readonly IEnumerable<Screen> _visible;
 
-        public TransitionType TransitionType { get; set; }
+        public TransitionType TransitionType { get; private set; }
 
         public int StackCount
         {
             get
             {
-                return screenStack.Count;
+                return _screenStack.Count;
             }
         }
 
@@ -34,18 +32,18 @@ namespace Myre.StateManagement
         /// </summary>
         public ScreenManager()
         {
-            screenStack = new Stack<Screen>();
-            screens = new List<Screen>();
+            _screenStack = new Stack<Screen>();
+            _screens = new List<Screen>();
 
-            transitioningOn = from s in screens
+            _transitioningOn = from s in _screens
                               where s.TransitionState == TransitionState.On
                               select s;
 
-            transitioningOff = from s in screens
+            _transitioningOff = from s in _screens
                                where s.TransitionState == TransitionState.Off
                                select s;
 
-            visible = from s in screens
+            _visible = from s in _screens
                       where s.TransitionState != TransitionState.Hidden
                       select s;
         }
@@ -56,14 +54,14 @@ namespace Myre.StateManagement
         /// <param name="screen">The screen.</param>
         public void Push(Screen screen)
         {
-            foreach (var s in screenStack)
+            foreach (var s in _screenStack)
             {
                 if (s.TransitionState == TransitionState.On || s.TransitionState == TransitionState.Shown)
                     s.TransitionState = TransitionState.Off;
             }
 
-            screens.Add(screen);
-            screenStack.Push(screen);
+            _screens.Add(screen);
+            _screenStack.Push(screen);
             screen.TransitionState = TransitionState.On;
             screen.Manager = this;
         }
@@ -74,15 +72,15 @@ namespace Myre.StateManagement
         /// <returns></returns>
         public Screen Pop()
         {
-            var oldScreen = screenStack.Pop();
+            var oldScreen = _screenStack.Pop();
             oldScreen.TransitionState = TransitionState.Off;
 
-            if (screenStack.Count > 0)
+            if (_screenStack.Count > 0)
             {
-                var newScreen = screenStack.Peek();
+                var newScreen = _screenStack.Peek();
                 newScreen.TransitionState = TransitionState.On;
-                if (!screens.Contains(newScreen))
-                    screens.Add(newScreen);
+                if (!_screens.Contains(newScreen))
+                    _screens.Add(newScreen);
             }
             
             return oldScreen;
@@ -97,35 +95,39 @@ namespace Myre.StateManagement
             //screens.AddRange(screenStack);
 
             bool screensAreTransitioningOff = false;
-            foreach (var screen in transitioningOff)
+            foreach (var screen in _transitioningOff)
             {
                 UpdateTransition(screen, gameTime);
 
+// ReSharper disable CompareOfFloatsByEqualityOperator
                 if (screen.TransitionProgress == 0)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                 {
                     screen.TransitionState = TransitionState.Hidden;
-                    if (!screenStack.Contains(screen))
+                    if (!_screenStack.Contains(screen))
                         screen.Dispose();
                 }
                 else
                     screensAreTransitioningOff = true;
             }
 
-            foreach (var screen in transitioningOn)
+            foreach (var screen in _transitioningOn)
             {
                 if (TransitionType == TransitionType.CrossFade || !screensAreTransitioningOff)
                     UpdateTransition(screen, gameTime);
 
+// ReSharper disable CompareOfFloatsByEqualityOperator
                 if (screen.TransitionProgress == 1)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                     screen.TransitionState = TransitionState.Shown;
             }
             
-            for (int i = screens.Count - 1; i >= 0; i--)
+            for (int i = _screens.Count - 1; i >= 0; i--)
             {
-                if (screens[i].TransitionState == TransitionState.Hidden)
-                    screens.RemoveAt(i);
+                if (_screens[i].TransitionState == TransitionState.Hidden)
+                    _screens.RemoveAt(i);
                 else
-                    screens[i].Update(gameTime);
+                    _screens[i].Update(gameTime);
             }
 
             //screens.Clear();
@@ -156,7 +158,7 @@ namespace Myre.StateManagement
         {
             //screens.AddRange(screenStack);
 
-            foreach (var screen in visible)
+            foreach (var screen in _visible)
             {
                 screen.PrepareDraw();
             }
@@ -172,7 +174,7 @@ namespace Myre.StateManagement
         {
             //screens.AddRange(screenStack);
 
-            foreach (var screen in screens)
+            foreach (var screen in _screens)
             {
                 if (screen.TransitionState != TransitionState.Hidden)
                     screen.Draw(gameTime);

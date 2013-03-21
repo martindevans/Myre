@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Myre.Entities.Services;
-using Myre;
 
 namespace Myre.Entities.Events
 {
@@ -19,7 +16,9 @@ namespace Myre.Entities.Events
     public interface IEventService
         : IService
     {
+// ReSharper disable UnusedMemberInSuper.Global
         Event<T> GetEvent<T>(object scope = null);
+// ReSharper restore UnusedMemberInSuper.Global
     }
 
     /// <summary>
@@ -31,22 +30,23 @@ namespace Myre.Entities.Events
         class Events
         {
             public object GlobalScope;
-            public Dictionary<object, object> LocalScopes = new Dictionary<object, object>();
+            public readonly Dictionary<object, object> LocalScopes = new Dictionary<object, object>();
         }
 
-        private Dictionary<Type, Events> events;
-        private Queue<IEventInvocation> waitingEvents;
-        private Queue<IEventInvocation> executingEvents;
-        private SpinLock spinLock;
+        private readonly Dictionary<Type, Events> _events;
+        private Queue<IEventInvocation> _waitingEvents;
+        private Queue<IEventInvocation> _executingEvents;
+        private SpinLock _spinLock;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventService"/> class.
         /// </summary>
-        public EventService()
+        public EventService(SpinLock spinLock)
         {
-            events = new Dictionary<Type, Events>();
-            waitingEvents = new Queue<IEventInvocation>();
-            executingEvents = new Queue<IEventInvocation>();
+            _spinLock = spinLock;
+            _events = new Dictionary<Type, Events>();
+            _waitingEvents = new Queue<IEventInvocation>();
+            _executingEvents = new Queue<IEventInvocation>();
         }
 
         /// <summary>
@@ -59,14 +59,13 @@ namespace Myre.Entities.Events
             var type = typeof(T);
 
             Events e;
-            if (!events.TryGetValue(type, out e))
+            if (!_events.TryGetValue(type, out e))
             {
-                e = new Events();
-                e.GlobalScope = new Event<T>(this);
-                events[type] = e;
+                e = new Events {GlobalScope = new Event<T>(this)};
+                _events[type] = e;
             }
 
-            object instance = null;
+            object instance;
             if (scope == null)
                 instance = e.GlobalScope;
             else
@@ -87,7 +86,7 @@ namespace Myre.Entities.Events
         /// <param name="elapsedTime">The elapsed time.</param>
         public override void Update(float elapsedTime)
         {
-            while (waitingEvents.Count > 0)
+            while (_waitingEvents.Count > 0)
             {
                 FlipBuffers();
                 ExecuteEvents();
@@ -98,20 +97,20 @@ namespace Myre.Entities.Events
         {
             try
             {
-                spinLock.Lock();
-                waitingEvents.Enqueue(eventInvocation);
+                _spinLock.Lock();
+                _waitingEvents.Enqueue(eventInvocation);
             }
             finally
             {
-                spinLock.Unlock();
+                _spinLock.Unlock();
             }
         }
 
         private void ExecuteEvents()
         {
-            while (executingEvents.Count > 0)
+            while (_executingEvents.Count > 0)
             {
-                IEventInvocation invocation = executingEvents.Dequeue();
+                IEventInvocation invocation = _executingEvents.Dequeue();
                 invocation.Execute();
                 invocation.Recycle();
             }
@@ -121,14 +120,14 @@ namespace Myre.Entities.Events
         {
             try
             {
-                spinLock.Lock();
-                var tmp = waitingEvents;
-                waitingEvents = executingEvents;
-                executingEvents = tmp;
+                _spinLock.Lock();
+                var tmp = _waitingEvents;
+                _waitingEvents = _executingEvents;
+                _executingEvents = tmp;
             }
             finally
             {
-                spinLock.Unlock();
+                _spinLock.Unlock();
             }
         }
     }

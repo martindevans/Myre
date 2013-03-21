@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Myre.UI.Text;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
+using Myre.UI.Text;
 
 namespace Myre.UI.Controls
 {
@@ -17,10 +13,11 @@ namespace Myre.UI.Controls
     public class TextMultiButton
         : MultiButton
     {
-        private string[] options;
-        private int arrowSize;
-        private Label leftArrow, rightArrow;
-        private Label centreText;
+        private readonly string[] _options;
+        private int _arrowSize;
+        private readonly Label _leftArrow;
+        private readonly Label _rightArrow;
+        private readonly Label _centreText;
 
         /// <summary>
         /// Gets or sets the text.
@@ -28,8 +25,8 @@ namespace Myre.UI.Controls
         /// <value>The text.</value>
         public StringPart Text
         {
-            get { return centreText.Text; }
-            set { centreText.Text = value; }
+            get { return _centreText.Text; }
+            set { _centreText.Text = value; }
         }
 
         /// <summary>
@@ -37,8 +34,8 @@ namespace Myre.UI.Controls
         /// </summary>
         public override Justification Justification
         {
-            get { return centreText.Justification; }
-            set { centreText.Justification = value; }
+            get { return _centreText.Justification; }
+            set { _centreText.Justification = value; }
         }
 
         /// <summary>
@@ -47,7 +44,7 @@ namespace Myre.UI.Controls
         /// <value></value>
         public string this[int i]
         {
-            get { return options[i]; }
+            get { return _options[i]; }
         }
 
         /// <summary>
@@ -66,7 +63,6 @@ namespace Myre.UI.Controls
         /// <param name="parent">This controls parent control.</param>
         /// <param name="font">The font.</param>
         /// <param name="options">The options.</param>
-        /// <param name="focusScope">The focus scope.</param>
         public TextMultiButton(Control parent, SpriteFont font, string[] options)
             : base(parent)
         {
@@ -75,25 +71,22 @@ namespace Myre.UI.Controls
             if (options.Length == 0)
                 throw new ArgumentException("There must be at least one option.", "options");
 
-            this.Colour = Color.White;
-            this.Highlight = Color.CornflowerBlue;
-            this.options = options;
-            this.OptionsCount = options.Length;
+            Colour = Color.White;
+            Highlight = Color.CornflowerBlue;
+            _options = options;
+            OptionsCount = options.Length;
 
-            this.leftArrow = new Label(this, font);
-            this.leftArrow.Text = "<";
-            this.leftArrow.SetPoint(Points.TopLeft, 0, 0);
-            this.rightArrow = new Label(this, font);
-            this.rightArrow.Text = ">";
-            this.rightArrow.SetPoint(Points.TopRight, 0, 0);
+            _leftArrow = new Label(this, font) {Text = "<"};
+            _leftArrow.SetPoint(Points.TopLeft, 0, 0);
+            _rightArrow = new Label(this, font) {Text = ">"};
+            _rightArrow.SetPoint(Points.TopRight, 0, 0);
 
-            this.centreText = new Label(this, font);
-            this.centreText.Justification = Justification.Centre;
-            this.centreText.SetPoint(Points.TopLeft, leftArrow.Area.Width, 0);
-            this.centreText.SetPoint(Points.TopRight, -rightArrow.Area.Width, 0);
-            this.centreText.Text = options[0];
+            _centreText = new Label(this, font) {Justification = Justification.Centre};
+            _centreText.SetPoint(Points.TopLeft, _leftArrow.Area.Width, 0);
+            _centreText.SetPoint(Points.TopRight, -_rightArrow.Area.Width, 0);
+            _centreText.Text = options[0];
 
-            ControlEventHandler recalcSize = delegate(Control c)
+            ControlEventHandler recalcSize = delegate
             {
                 Vector2 maxSize = Vector2.Zero;
                 for (int i = 0; i < options.Length; i++)
@@ -102,25 +95,24 @@ namespace Myre.UI.Controls
                     maxSize.X = Math.Max(maxSize.X, size.X);
                     maxSize.Y = Math.Max(maxSize.Y, size.Y);
                 }
-                arrowSize = (int)font.MeasureString("<").X;
-                maxSize.X += arrowSize * 2;
+                _arrowSize = (int)font.MeasureString("<").X;
+                maxSize.X += _arrowSize * 2;
                 SetSize((int)maxSize.X, (int)maxSize.Y);
-                leftArrow.SetSize(arrowSize, font.LineSpacing);
-                rightArrow.SetSize(arrowSize, font.LineSpacing);
+                _leftArrow.SetSize(_arrowSize, font.LineSpacing);
+                _rightArrow.SetSize(_arrowSize, font.LineSpacing);
             };
 
             ControlEventHandler highlight = delegate(Control c)
             {
-                (c as Label).Colour = (c.IsFocused || c.IsWarm) ? Highlight : Colour;
+                ((Label)c).Colour = (c.IsFocused || c.IsWarm) ? Highlight : Colour;
             };
 
-            leftArrow.WarmChanged += highlight;
-            rightArrow.WarmChanged += highlight;
+            _leftArrow.WarmChanged += highlight;
+            _rightArrow.WarmChanged += highlight;
             recalcSize(this);
 
-            SelectionChanged += delegate(Control c)
-            {
-                centreText.Text = this[SelectedOption];
+            SelectionChanged += delegate {
+                _centreText.Text = this[SelectedOption];
             };
 
             BindGestures();
@@ -131,10 +123,10 @@ namespace Myre.UI.Controls
         /// </summary>
         private void BindGestures()
         {
-            leftArrow.Gestures.Bind(PreviousOption,
+            _leftArrow.Gestures.Bind((GestureHandler<IGesture>)PreviousOption,
                 new MouseReleased(MouseButtons.Left));
 
-            rightArrow.Gestures.Bind(NextOption,
+            _rightArrow.Gestures.Bind((GestureHandler<IGesture>)NextOption,
                 new MouseReleased(MouseButtons.Left));
         }
 
@@ -154,7 +146,7 @@ namespace Myre.UI.Controls
         /// <param name="batch">An spritebactch already started for alpha blending with deferred sort mode.</param>
         public override void Draw(SpriteBatch batch)
         {
-            centreText.Colour = IsFocused ? Highlight : Colour;
+            _centreText.Colour = IsFocused ? Highlight : Colour;
         }
     }
 }

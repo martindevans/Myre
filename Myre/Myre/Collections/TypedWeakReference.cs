@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Collections
 {
@@ -11,7 +8,7 @@ namespace Myre.Collections
     /// <typeparam name="T"></typeparam>
     public class TypedWeakReference<T> where T : class
     {
-        private WeakReference Reference;
+        private readonly WeakReference _reference;
 
         /// <summary>
         /// Gets a value indicating whether this instance is alive.
@@ -21,7 +18,7 @@ namespace Myre.Collections
         {
             get
             {
-                return Reference.IsAlive;
+                return _reference.IsAlive;
             }
         }
 
@@ -33,11 +30,11 @@ namespace Myre.Collections
         {
             get
             {
-                return Reference.Target as T;
+                return _reference.Target as T;
             }
             set
             {
-                Reference.Target = value;
+                _reference.Target = value;
             }
         }
 
@@ -49,7 +46,7 @@ namespace Myre.Collections
         {
             get
             {
-                return Reference.TrackResurrection;
+                return _reference.TrackResurrection;
             }
         }
 
@@ -59,7 +56,7 @@ namespace Myre.Collections
         /// <param name="target">The target.</param>
         public TypedWeakReference(T target)
         {
-            Reference = new WeakReference(target);
+            _reference = new WeakReference(target);
         }
 
         /// <summary>
@@ -69,7 +66,7 @@ namespace Myre.Collections
         /// <param name="trackResurrection">if set to <c>true</c> the object referenced by this weak reference is tracked after finalisation.</param>
         public TypedWeakReference(T target, bool trackResurrection)
         {
-            Reference = new WeakReference(target, trackResurrection);
+            _reference = new WeakReference(target, trackResurrection);
         }
     }
 }

@@ -1,43 +1,16 @@
+#if !WINDOWS
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections;
 
 namespace Myre.Collections
 {
-    #if WINDOWS
-    public class HashSet<T>
-        : System.Collections.Generic.HashSet<T>
-    {
-        #region Constructors
-        public HashSet()
-            : base()
-        {
-        }
-
-        public HashSet(IEnumerable<T> collection)
-            : base(collection)
-        {
-        }
-
-        public HashSet(IEqualityComparer<T> comparer)
-            : base(comparer)
-        {
-        }
-
-        public HashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
-            : base(collection, comparer)
-        {
-        }
-        #endregion
-    }
-    #else
     //todo: Make the compact framework hashset a proper hashset instead of a list in disguise
     public class HashSet<T>
          : ICollection<T>, IEnumerable<T>
     {
-        List<T> set;
+        readonly List<T> _set;
 
         public bool IsReadOnly
         {
@@ -62,30 +35,30 @@ namespace Myre.Collections
         //
         // Returns:
         //     The number of elements that are contained in the set.
-        public int Count { get { return set.Count; } }
+        public int Count { get { return _set.Count; } }
 
         #region constructors
         public HashSet()
         {
-            set = new List<T>();
+            _set = new List<T>();
             Comparer = (IEqualityComparer<T>)EqualityComparer<T>.Default;
         }
 
         public HashSet(IEnumerable<T> collection)
         {
-            set = new List<T>(collection);
+            _set = new List<T>(collection);
             Comparer = (IEqualityComparer<T>)EqualityComparer<T>.Default;
         }
 
         public HashSet(IEqualityComparer<T> comparer)
         {
-            set = new List<T>();
+            _set = new List<T>();
             Comparer = comparer;
         }
 
         public HashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer)
         {
-            set = new List<T>(collection);
+            _set = new List<T>(collection);
             Comparer = comparer;
         }
         #endregion
@@ -104,7 +77,7 @@ namespace Myre.Collections
         {
             if (!Contains(item))
             {
-                set.Add(item);
+                _set.Add(item);
             }
 
         }
@@ -114,7 +87,7 @@ namespace Myre.Collections
         //     Removes all elements from a System.Collections.Generic.HashSet<T> object.
         public void Clear()
         {
-            set.Clear();
+            _set.Clear();
         }
 
         //
@@ -131,7 +104,7 @@ namespace Myre.Collections
         //     element; otherwise, false.
         public bool Contains(T item)
         {
-            return set.Contains(item, Comparer);
+            return _set.Contains(item, Comparer);
         }
 
         //
@@ -150,7 +123,7 @@ namespace Myre.Collections
         //     array is null.
         public void CopyTo(T[] array)
         {
-            set.CopyTo(array);
+            _set.CopyTo(array);
         }
 
         //
@@ -179,7 +152,7 @@ namespace Myre.Collections
         //     is larger than the size of the destination array.
         public void CopyTo(T[] array, int arrayIndex)
         {
-            set.CopyTo(array, arrayIndex);
+            _set.CopyTo(array, arrayIndex);
         }
 
         //
@@ -212,7 +185,7 @@ namespace Myre.Collections
         //     array.
         public void CopyTo(T[] array, int arrayIndex, int count)
         {
-            set.CopyTo(0, array, arrayIndex, count);
+            _set.CopyTo(0, array, arrayIndex, count);
         }
 
         //
@@ -262,10 +235,10 @@ namespace Myre.Collections
         //     other is null.
         public void IntersectWith(IEnumerable<T> other)
         {
-            for (int i = set.Count - 1; i >= 0; i--)
+            for (int i = _set.Count - 1; i >= 0; i--)
             {
-                if (!other.Contains(set[i]))
-                    set.RemoveAt(i);
+                if (!other.Contains(_set[i]))
+                    _set.RemoveAt(i);
             }
         }
 
@@ -398,7 +371,7 @@ namespace Myre.Collections
         //     object.
         public bool Remove(T item)
         {
-            return set.Remove(item);
+            return _set.Remove(item);
         }
 
         //
@@ -422,11 +395,11 @@ namespace Myre.Collections
         {
             int count = 0;
 
-            for (int i = set.Count - 1; i >= 0; i--)
+            for (int i = _set.Count - 1; i >= 0; i--)
             {
-                if (match(set[i]))
+                if (match(_set[i]))
                 {
-                    set.RemoveAt(i);
+                    _set.RemoveAt(i);
                     count++;
                 }
             }
@@ -475,7 +448,7 @@ namespace Myre.Collections
             foreach (var item in other)
             {
                 if (!Remove(item))
-                    set.Add(item);
+                    _set.Add(item);
             }
         }
 
@@ -486,7 +459,7 @@ namespace Myre.Collections
         //     value.
         public void TrimExcess()
         {
-            set.TrimExcess();
+            _set.TrimExcess();
         }
 
         //
@@ -512,13 +485,13 @@ namespace Myre.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-            return set.GetEnumerator();
+            return _set.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return set.GetEnumerator();
+            return _set.GetEnumerator();
         }
     }
-    #endif
 }
+#endif

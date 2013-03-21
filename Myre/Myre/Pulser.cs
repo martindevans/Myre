@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
 
 namespace Myre
 {
@@ -65,8 +62,8 @@ namespace Myre
         /// </summary>
         public event Action Signalled;
 
-        private DateTime lastPulsed;
-        private bool running;
+        private DateTime _lastPulsed;
+        private bool _running;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Pulser"/> class.
@@ -84,26 +81,15 @@ namespace Myre
         /// <param name="type">The type.</param>
         /// <param name="frequency">The frequency. This is the rate at which this instances pulses, after Delay has passed.</param>
         /// <param name="delay">The delay. This is the time after the pulsor is started or restarted, before it begins pulsing.</param>
-        public Pulser(PulserType type, TimeSpan frequency, TimeSpan delay)
-            : this(type, frequency, delay, false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Pulser"/> class.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="frequency">The frequency. This is the rate at which this instances pulses, after Delay has passed.</param>
-        /// <param name="delay">The delay. This is the time after the pulsor is started or restarted, before it begins pulsing.</param>
         /// <param name="initialState">if set to <c>true</c> IsSignalled will initially be <c>true</c>.</param>
-        public Pulser(PulserType type, TimeSpan frequency, TimeSpan delay, bool initialState)
+        public Pulser(PulserType type, TimeSpan frequency, TimeSpan delay, bool initialState = false)
         {
-            this.PulserType = type;
-            this.Frequency = frequency;
-            this.Delay = delay;
-            this.IsSignalled = initialState;
-            this.running = initialState;
-            this.lastPulsed = DateTime.Now;
+            PulserType = type;
+            Frequency = frequency;
+            Delay = delay;
+            IsSignalled = initialState;
+            _running = initialState;
+            _lastPulsed = DateTime.Now;
         }
 
         /// <summary>
@@ -114,8 +100,8 @@ namespace Myre
         public void Restart(bool initialState, bool resetDelay)
         {
             IsSignalled = initialState;
-            lastPulsed = DateTime.Now;
-            running = !resetDelay;
+            _lastPulsed = DateTime.Now;
+            _running = !resetDelay;
         }
 
         /// <summary>
@@ -125,13 +111,13 @@ namespace Myre
         {
             var now = DateTime.Now;
 
-            if (!running)
+            if (!_running)
             {
-                if (now - lastPulsed >= Delay)
+                if (now - _lastPulsed >= Delay)
                 {
-                    running = true;
+                    _running = true;
                     Pulse();
-                    lastPulsed = now;
+                    _lastPulsed = now;
                 }
                 else
                     return;
@@ -141,29 +127,27 @@ namespace Myre
             {
                 case PulserType.Simple:
                     IsSignalled = false;
-                    if (now - lastPulsed >= Frequency)
+                    if (now - _lastPulsed >= Frequency)
                         Pulse();
-                    while (now - lastPulsed >= Frequency)
-                        lastPulsed += Frequency;
+                    while (now - _lastPulsed >= Frequency)
+                        _lastPulsed += Frequency;
                     break;
                 case PulserType.Reliable:
                     IsSignalled = false;
-                    while (now - lastPulsed >= Frequency)
+                    while (now - _lastPulsed >= Frequency)
                     {
                         Pulse();
-                        lastPulsed += Frequency;
+                        _lastPulsed += Frequency;
                     }
                     break;
                 case PulserType.SquareWave:
-                    while (now - lastPulsed >= Frequency)
+                    while (now - _lastPulsed >= Frequency)
                     {
                         IsSignalled = !IsSignalled;
                         if (IsSignalled)
                             OnSignalled();
-                        lastPulsed += Frequency;
+                        _lastPulsed += Frequency;
                     }
-                    break;
-                default:
                     break;
             }
         }

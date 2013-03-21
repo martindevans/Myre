@@ -43,8 +43,8 @@ namespace Myre.Physics2D.Collisions
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             var prefix = Name != null ? Name + "_" : string.Empty;
-            _radius = context.CreateProperty<float>(prefix + "radius");
-            _centre = context.CreateProperty<Vector2>(prefix + "centre");
+            _radius = context.CreateProperty<float>(prefix + "radius", default(float));
+            _centre = context.CreateProperty<Vector2>(prefix + "centre", default(Vector2));
             _transform = context.CreateProperty<Matrix>("transform", Matrix.Identity);
             
             _radius.PropertySet += (p, o, n) => UpdateBounds();
@@ -56,7 +56,7 @@ namespace Myre.Physics2D.Collisions
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            var transform = Owner.GetBehaviour<Transform>();
+            var transform = Owner.GetBehaviour<Transform>(null);
             if (transform != null)
                 transform.CalculateTransform();
             

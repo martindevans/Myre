@@ -5,7 +5,7 @@ using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 
-namespace Myre.Physics2D.Dynamics.Constraints
+namespace Myre.Physics2D.Collisions
 {
     [DefaultManager(typeof(Manager))]
     public class Damping
@@ -24,16 +24,16 @@ namespace Myre.Physics2D.Dynamics.Constraints
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _velocity = context.CreateProperty<Vector3>("velocity");
-            _acceleration = context.CreateProperty<Vector3>("acceleration");
-            _inverseMass = context.CreateProperty<float>(InverseMassCalculator.INVERSE_MASS);
+            _velocity = context.CreateProperty<Vector3>("velocity", default(Vector3));
+            _acceleration = context.CreateProperty<Vector3>("acceleration", default(Vector3));
+            _inverseMass = context.CreateProperty<float>(InverseMassCalculator.INVERSE_MASS, default(float));
 
             base.CreateProperties(context);
         }
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            if (Owner.GetBehaviour<InverseMassCalculator>() == null)
+            if (Owner.GetBehaviour<InverseMassCalculator>(null) == null)
                 throw new InvalidOperationException("Inverse mass calculator must be attached");
             _damping = Owner.GetProperty<float>("damping");
 
@@ -43,7 +43,7 @@ namespace Myre.Physics2D.Dynamics.Constraints
         public class Manager
             : BehaviourManager<Damping>, IProcess
         {
-            public float DefaultDamping = 0;
+            public const float DEFAULT_DAMPING = 0;
 
             public bool IsComplete
             {
@@ -58,7 +58,7 @@ namespace Myre.Physics2D.Dynamics.Constraints
             public void Update(float elapsedTime)
             {
                 foreach (var p in Behaviours)
-                    p.Dampen(p._damping == null ? DefaultDamping : p._damping.Value);
+                    p.Dampen(p._damping == null ? DEFAULT_DAMPING : p._damping.Value);
             }
         }
     }

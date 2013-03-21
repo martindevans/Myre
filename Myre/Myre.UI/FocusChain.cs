@@ -1,39 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Myre.Collections;
 
 namespace Myre.UI
 {
     public class FocusChain
     {
         //private static Pool<WeakReference> weakReferencePool = new Pool<WeakReference>();
-        private static Predicate<FocusRecord> disposedRecords = delegate(FocusRecord record) { var c = record.Control; return c == null || c.IsDisposed; };
-        private static Func<Control, int> byFocusPriority = control => control.FocusPriority;
+        private static readonly Predicate<FocusRecord> _disposedRecords = delegate(FocusRecord record) { var c = record.Control; return c == null || c.IsDisposed; };
+        private static readonly Func<Control, int> _byFocusPriority = control => control.FocusPriority;
 
-        private int idCounter;
-        private List<FocusRecord> previous;
-        private Control focused;
-        private Control root;
-        private List<Control> unfocused;
-        private List<Control> newFocused;
+        private int _idCounter;
+        private readonly List<FocusRecord> _previous;
+        private Control _focused;
+        private Control _root;
+        private readonly List<Control> _unfocused;
+        private readonly List<Control> _newFocused;
 
         public Control FocusedControl
         {
-            get { return focused; }
+            get { return _focused; }
         }
 
         public Control FocusRoot
         {
-            get { return root; }
+            get { return _root; }
         }
 
         public FocusChain()
         {
-            previous = new List<FocusRecord>();
-            unfocused = new List<Control>();
-            newFocused = new List<Control>();
+            _previous = new List<FocusRecord>();
+            _unfocused = new List<Control>();
+            _newFocused = new List<Control>();
         }
 
         public FocusRecord? Focus(Control control)
@@ -45,17 +43,17 @@ namespace Myre.UI
         public void RestorePrevious(FocusRecord? hint)
         {
             FocusRecord record;
-            Control control = null;
+            Control control;
             do
             {
-                if (previous.Count == 0)
+                if (_previous.Count == 0)
                 {
                     control = null;
                     break;
                 }
 
-                record = previous[previous.Count - 1];
-                previous.RemoveAt(previous.Count - 1);
+                record = _previous[_previous.Count - 1];
+                _previous.RemoveAt(_previous.Count - 1);
                 control = record.Control;
             } while ((control == null || control.IsDisposed)
                   || (hint != null && hint.Value.ID < record.ID));
@@ -65,8 +63,8 @@ namespace Myre.UI
 
         protected FocusRecord? PreviousFocus()
         {
-            if (previous.Count > 0)
-                return previous[previous.Count - 1];
+            if (_previous.Count > 0)
+                return _previous[_previous.Count - 1];
             else
                 return null;
         }
@@ -77,16 +75,16 @@ namespace Myre.UI
 
         protected virtual void Focus(Control control, bool rememberPrevious)
         {
-            if (control == focused)
+            if (control == _focused)
                 return;
 
             // clear buffers
-            unfocused.Clear();
-            newFocused.Clear();
+            _unfocused.Clear();
+            _newFocused.Clear();
 
             if (control != null && !control.LikesHavingFocus)
             {
-                foreach (var item in control.Children.OrderBy(byFocusPriority))
+                foreach (var item in control.Children.OrderBy(_byFocusPriority))
                 {
                     if (item.LikesHavingFocus)
                     {
@@ -97,23 +95,23 @@ namespace Myre.UI
             }
 
             // find all old controls being unfocused
-            for (var c = focused; c != null; c = c.Parent)
-                unfocused.Add(c);
+            for (var c = _focused; c != null; c = c.Parent)
+                _unfocused.Add(c);
 
             // find all new controls being focused
             for (var c = control; c != null; c = c.Parent)
-                newFocused.Add(c);
+                _newFocused.Add(c);
 
-            var newRoot = newFocused.Count > 0 ? newFocused[newFocused.Count - 1] : null;
+            var newRoot = _newFocused.Count > 0 ? _newFocused[_newFocused.Count - 1] : null;
 
             // remove all the common controls
             // walk both lists backwards (from the shared root) until the trees diverge
-            for (int i = newFocused.Count - 1; i >= 0; i--)
+            for (int i = _newFocused.Count - 1; i >= 0; i--)
             {
-                if (unfocused.Count > 0 && newFocused[i] == unfocused[unfocused.Count - 1])
+                if (_unfocused.Count > 0 && _newFocused[i] == _unfocused[_unfocused.Count - 1])
                 {
-                    newFocused.RemoveAt(i);
-                    unfocused.RemoveAt(unfocused.Count - 1);
+                    _newFocused.RemoveAt(i);
+                    _unfocused.RemoveAt(_unfocused.Count - 1);
                 }
                 else
                 {
@@ -121,61 +119,59 @@ namespace Myre.UI
                 }
             }
 
-            var currentlyFocused = focused;
-
             // walk through the old controls, from leaf towards root, unfocusing them
-            for (int i = 0; i < unfocused.Count; i++)
+            for (int i = 0; i < _unfocused.Count; i++)
             {
-                var u = unfocused[i];
-                focused = u;
+                var u = _unfocused[i];
+                _focused = u;
 
                 RemoveFocus(u);
                 u.FocusedCount--;
 
                 // quit if FocusChanged focused another control
-                if (focused != u)
+                if (_focused != u)
                     return;
             }
 
             // walk through the new controls, from root to leaf, focusing them
-            for (int i = newFocused.Count - 1; i >= 0; i--)
+            for (int i = _newFocused.Count - 1; i >= 0; i--)
             {
-                var f = newFocused[i];
-                focused = f;
+                var f = _newFocused[i];
+                _focused = f;
 
-                AddFocus(newFocused[i]);
-                newFocused[i].FocusedCount++;
+                AddFocus(_newFocused[i]);
+                _newFocused[i].FocusedCount++;
 
                 // quit if FocusChanged focused another control
-                if (focused != f)
+                if (_focused != f)
                     return;
             }
 
             // push old control onto stack
-            if (rememberPrevious && focused != null)
+            if (rememberPrevious && _focused != null)
             {
                 unchecked
                 {
-                    idCounter++;
+                    _idCounter++;
                 }
 
-                var record = new FocusRecord() { ID = idCounter, Control = focused };
-                previous.Add(record);
+                var record = new FocusRecord() { ID = _idCounter, Control = _focused };
+                _previous.Add(record);
             }
 
             // remember new control
             //focused = control;
-            root = newRoot;
+            _root = newRoot;
 
             CompactPreviousList();
         }
 
         private void CompactPreviousList()
         {
-            for (int i = previous.Count - 1; i >= 0; i--)
+            for (int i = _previous.Count - 1; i >= 0; i--)
             {
-                if (disposedRecords(previous[i]))
-                    previous.RemoveAt(i);
+                if (_disposedRecords(_previous[i]))
+                    _previous.RemoveAt(i);
             }
             
             //previous.RemoveAll(disposedRecords);
@@ -183,14 +179,14 @@ namespace Myre.UI
 
         public struct FocusRecord
         {
-            private WeakReference reference;
+            private WeakReference _reference;
             public int ID;
             public Control Control
             {
-                get { return reference.Target as Control; }
+                get { return _reference.Target as Control; }
                 set
                 {
-                    reference = new WeakReference(value);
+                    _reference = new WeakReference(value);
                     //reference = weakReferencePool.Get();
                     //reference.Target = value;
                 }
