@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using Myre;
+using Myre.Debugging.UI;
 using Myre.StateManagement;
 using Myre.Debugging.Statistics;
 using Myre.UI;

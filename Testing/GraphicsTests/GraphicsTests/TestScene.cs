@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Myre.Debugging.UI;
 using Myre.Entities;
 using Ninject;
 using Microsoft.Xna.Framework;

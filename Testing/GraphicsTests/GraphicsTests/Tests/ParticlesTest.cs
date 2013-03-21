@@ -39,9 +39,9 @@ namespace GraphicsTests.Tests
 
             var renderer = scene.GetService<Renderer>();
             renderer.StartPlan()
-                .Then(new CreateTargetComponent(new RenderTargetInfo() { DepthFormat = DepthFormat.Depth24Stencil8 }))
-                .Then<ParticleComponent>()
-                .Apply();
+                    .Then(new CreateTargetComponent(new RenderTargetInfo(0, 0, default(SurfaceFormat), DepthFormat.Depth24Stencil8, default(int), default(bool), default(RenderTargetUsage))))
+                    .Then<ParticleComponent>()
+                    .Apply();
 
             var cameraPosition = new Vector3(0, 25, -200);
 

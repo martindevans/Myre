@@ -70,7 +70,7 @@ namespace GraphicsTests.Tests
 
                 var metadata = renderer.Data;
                 var resolution = renderer.Data.Get<Vector2>("resolution").Value;
-                var targetInfo = new RenderTargetInfo() { Width = (int)resolution.X, Height = (int)resolution.Y, SurfaceFormat = SurfaceFormat.Rgba64 };
+                var targetInfo = new RenderTargetInfo((int)resolution.X, (int)resolution.Y, SurfaceFormat.Rgba64, default(DepthFormat), default(int), default(bool), default(RenderTargetUsage));
                 var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
                 renderer.Device.SetRenderTarget(target);
 

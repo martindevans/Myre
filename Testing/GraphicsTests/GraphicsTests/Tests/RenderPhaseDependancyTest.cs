@@ -42,7 +42,7 @@ namespace GraphicsTests.Tests
 
             public override void Draw(Renderer renderer)
             {
-                var target = RenderTargetManager.GetTarget(renderer.Device, new RenderTargetInfo() { Height = 50, Width = 50 });
+                var target = RenderTargetManager.GetTarget(renderer.Device, new RenderTargetInfo(50, 50, default(SurfaceFormat), default(DepthFormat), default(int), default(bool), default(RenderTargetUsage)));
                 renderer.Device.SetRenderTarget(target);
                 renderer.Device.Clear(Color.White);
                 spriteBatch.Begin();
@@ -78,7 +78,7 @@ namespace GraphicsTests.Tests
 
             public override void Draw(Renderer renderer)
             {
-                var target = RenderTargetManager.GetTarget(renderer.Device, new RenderTargetInfo() { Height = 50, Width = 50 });
+                var target = RenderTargetManager.GetTarget(renderer.Device, new RenderTargetInfo(50, 50, default(SurfaceFormat), default(DepthFormat), default(int), default(bool), default(RenderTargetUsage)));
                 renderer.Device.SetRenderTarget(target);
                 spriteBatch.Begin();
                 spriteBatch.DrawString(font, "B", Vector2.Zero, Color.White);
