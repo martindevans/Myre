@@ -1,4 +1,5 @@
 *.cachefile
+*.cache
 *.suo
 *.user
 /Documentation
