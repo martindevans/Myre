@@ -52,10 +52,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "(x86) Myre.Serialisation", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Tests", "Myre.Tests\Myre.Tests.csproj", "{523C09C2-B475-4CCC-9CCE-C19B54E4C829}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{99FA1591-AF06-4EFB-809B-2CA546D5802D}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(CodealikeProperties) = postSolution
-		SolutionGuid = 20c0e23c-715a-46d9-b3da-81a12e264c29
-	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Myre.Testing.vsmdi
 	EndGlobalSection
@@ -494,5 +498,8 @@ Global
 		{518A150F-DB32-4106-9A57-D7A2FA2A6F1B} = {994F992F-D6C9-4152-85CF-E6D49E321BB4}
 		{0DFFBEA4-FB61-4C72-98C4-04030E9EE7EC} = {994F992F-D6C9-4152-85CF-E6D49E321BB4}
 		{73911D37-4250-40BD-8F15-20824D586319} = {994F992F-D6C9-4152-85CF-E6D49E321BB4}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 20c0e23c-715a-46d9-b3da-81a12e264c29
 	EndGlobalSection
 EndGlobal

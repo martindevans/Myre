@@ -41,9 +41,9 @@ namespace Myre.Entities.Events
         /// <summary>
         /// Initializes a new instance of the <see cref="EventService"/> class.
         /// </summary>
-        public EventService(SpinLock spinLock)
+        public EventService()
         {
-            _spinLock = spinLock;
+            _spinLock = new SpinLock();
             _events = new Dictionary<Type, Events>();
             _waitingEvents = new Queue<IEventInvocation>();
             _executingEvents = new Queue<IEventInvocation>();

@@ -16,6 +16,8 @@
     <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>1c01db33-fb9b-43e5-a06c-44423c24c2ce</XnaCrossPlatformGroupID>
     <XnaOutputType>Library</XnaOutputType>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Windows Phone' ">
     <OutputPath>bin\Windows Phone\Debug</OutputPath>
@@ -58,6 +60,7 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Collections\Box.cs" />
     <Compile Include="Collections\INamedDataProvider.cs" />
+    <Compile Include="Collections\Octree.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
@@ -112,6 +115,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!--
       To modify your build process, add your task inside one of the targets below and uncomment it. 
       Other similar extension points exist, see Microsoft.Common.targets.
