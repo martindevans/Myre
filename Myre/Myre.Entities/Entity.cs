@@ -256,6 +256,9 @@ namespace Myre.Entities
         }
 
         bool _delayPropertyShutdown = false;
+        /// <summary>
+        /// Delays shutting down the properties of this entity by 1 frame
+        /// </summary>
         public void DelayPropertyShutdown()
         {
             _delayPropertyShutdown = true;

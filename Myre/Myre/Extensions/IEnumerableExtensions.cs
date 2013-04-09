@@ -72,6 +72,22 @@ namespace Myre.Extensions
         }
 
         /// <summary>
+        /// enumerates the start then the end
+        /// </summary>
+        /// <param name="end"></param>
+        /// <param name="start"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static IEnumerable<T> Prepend<T>(this IEnumerable<T> end, IEnumerable<T> start)
+        {
+            foreach (var item in start)
+                yield return item;
+
+            foreach (var item in end)
+                yield return item;
+        }
+
+        /// <summary>
         /// Appends the given items onto this enumeration
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -81,6 +97,18 @@ namespace Myre.Extensions
         public static IEnumerable<T> Append<T>(this IEnumerable<T> start, params T[] end)
         {
             return Append(start, end as IEnumerable<T>);
+        }
+
+        /// <summary>
+        /// Prepends the given items onto this enumeration
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="start">The start.</param>
+        /// <param name="end">The end.</param>
+        /// <returns></returns>
+        public static IEnumerable<T> Prepend<T>(this IEnumerable<T> end, params T[] start)
+        {
+            return Prepend(end, start as IEnumerable<T>);
         }
 
         /// <summary>

@@ -99,17 +99,15 @@ namespace Myre.Collections
         public Box<T> Get<T>(Key key, T defaultValue = default(T), bool create = true)
         {
             IBox box = Get(key);
-            if (box != null)
+            if (box as Box<T> != null)
                 return (Box<T>)box;
-            else if (!create)
+            
+            if (!create)
                 return null;
-            else
-            {
-                var value = new Box<T> { Value = defaultValue };
 
-                _values[key] = value;
-                return value;
-            }
+            var value = new Box<T> { Value = defaultValue };
+            _values[key] = value;
+            return value;
         }
 
         /// <summary>

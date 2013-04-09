@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Myre.Extensions
 {
@@ -72,6 +73,22 @@ namespace Myre.Extensions
                 return null;
 
             return c.Invoke(parameters);
+        }
+
+        /// <summary>
+        /// Attempts to parse the given string with the default static Parse method for the given type
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static object Parse(this Type t, string s)
+        {
+            if (t == typeof(string))
+                return s;
+
+            var parseMethod = t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null);
+
+            return parseMethod.Invoke(null, new object[] {s});
         }
     }
 }
