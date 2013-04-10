@@ -15,15 +15,11 @@ namespace Myre.Collections
         /// <summary>
         /// Triggered every time a node is split
         /// </summary>
-// ReSharper disable EventNeverSubscribedTo.Global
         public event Action<Node> NodeSplit;
-// ReSharper restore EventNeverSubscribedTo.Global
         /// <summary>
         /// Triggered every time a node is modified
         /// </summary>
-// ReSharper disable EventNeverSubscribedTo.Global
         public event Action<Node> NodeModified;
-// ReSharper restore EventNeverSubscribedTo.Global
 
         private readonly Func<Octree, Node, BoundingBox, Node> _childFactory;
 

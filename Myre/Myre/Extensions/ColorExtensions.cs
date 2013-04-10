@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 
@@ -25,8 +26,6 @@ namespace Myre.Extensions
             return new Color(aVec * bVec);
         }
 
-        // I think this code came from an article from Ziggyware.com, modified slightly.
-        // Unfortunately, ziggyware is no longer running, so I can't go back and find the source.
         /// <summary>
         /// Parses this string into a Color.
         /// </summary>
@@ -52,7 +51,8 @@ namespace Myre.Extensions
                     colour = new Color(components[0], components[0], components[0]);
                     return true;
                 }
-                else if (values[0].StartsWith("0x", StringComparison.Ordinal))
+                
+                if (values[0].StartsWith("0x", StringComparison.Ordinal))
                 {
                     values[0] = values[0].Remove(0, 2);
 
@@ -146,6 +146,7 @@ namespace Myre.Extensions
                 InitialiseColours();
 
             name = name.ToUpper();
+            Debug.Assert(_colours != null, "_colours != null");
             if (!_colours.ContainsKey(name))
             {
                 colour = Color.White;

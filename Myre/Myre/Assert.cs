@@ -15,7 +15,9 @@ namespace Myre
         /// <param name="message"></param>
         /// <exception cref="Exception"></exception>
         [Conditional("DEBUG")]
+// ReSharper disable UnusedParameter.Global
         public static void IsTrue(bool value, string message)
+// ReSharper restore UnusedParameter.Global
         {
             if (!value)
                 throw new Exception(message);
@@ -28,7 +30,9 @@ namespace Myre
         /// <param name="value"></param>
         /// <exception cref="ArgumentNullException"></exception>
         [Conditional("DEBUG")]
+// ReSharper disable UnusedParameter.Global
         public static void ArgumentNotNull(string name, object value)
+// ReSharper restore UnusedParameter.Global
         {
             if (value == null)
                 throw new ArgumentNullException(name);
@@ -44,7 +48,9 @@ namespace Myre
         /// <typeparam name="T"></typeparam>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [Conditional("DEBUG")]
+// ReSharper disable UnusedParameter.Global
         public static void ArgumentInRange<T>(string name, T value, T min, T max)
+// ReSharper restore UnusedParameter.Global
             where T : IComparable<T>
         {
             if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
@@ -60,7 +66,9 @@ namespace Myre
         /// <typeparam name="T"></typeparam>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [Conditional("DEBUG")]
+// ReSharper disable UnusedParameter.Global
         public static void ArgumentGreaterThan<T>(string name, T value, T min)
+// ReSharper restore UnusedParameter.Global
             where T : IComparable<T>
         {
             if (value.CompareTo(min) < 0)
@@ -76,7 +84,9 @@ namespace Myre
         /// <typeparam name="T"></typeparam>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         [Conditional("DEBUG")]
+// ReSharper disable UnusedParameter.Global
         public static void ArgumentLessThan<T>(string name, T value, T max)
+// ReSharper restore UnusedParameter.Global
             where T : IComparable<T>
         {
             if (value.CompareTo(max) > 0)

@@ -26,7 +26,7 @@ namespace Myre.Entities
     /// <summary>
     /// A class which represents a collection of related properties and behaviours.
     /// </summary>
-    public class Entity
+    public sealed class Entity
         : IDisposableObject, IRecycleable
     {
         public sealed class ConstructionContext
@@ -201,7 +201,7 @@ namespace Myre.Entities
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
         /// <param name="disposeManagedResources"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposeManagedResources)
+        public void Dispose(bool disposeManagedResources)
         {
             IsDisposed = true;
         }

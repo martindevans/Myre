@@ -5,6 +5,10 @@ using Microsoft.Xna.Framework;
 
 namespace Myre.Collections
 {
+    /// <summary>
+    /// Allows efficient position/range queries
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ProximityOctreeDatabase<T>
     {
         private readonly int _xSize;
@@ -14,6 +18,13 @@ namespace Myre.Collections
 
         readonly ConcurrentDictionary<int, ConcurrentDictionary<int, ConcurrentDictionary<int, TokenOctree<ProximityToken>>>> _roots = new ConcurrentDictionary<int, ConcurrentDictionary<int, ConcurrentDictionary<int, TokenOctree<ProximityToken>>>>();
 
+        /// <summary>
+        /// Construct a new octree
+        /// </summary>
+        /// <param name="xSize">The size of the tree on the XAxis</param>
+        /// <param name="ySize">The size of the tree on the YAxis</param>
+        /// <param name="zSize">The size of the tree on the ZAxis</param>
+        /// <param name="octreeSplitThreshold"></param>
         public ProximityOctreeDatabase(int xSize, int ySize, int zSize, int octreeSplitThreshold)
         {
             _xSize = xSize;
@@ -22,6 +33,12 @@ namespace Myre.Collections
             _octreeSplitThreshold = octreeSplitThreshold;
         }
 
+        /// <summary>
+        /// Insert a new item at the given position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="item"></param>
+        /// <returns>A token which represents this item in the database</returns>
         public ProximityToken Insert(Vector3 position, T item)
         {
             return new ProximityToken(item, position, this);
@@ -49,7 +66,7 @@ namespace Myre.Collections
             return GetOctree(coords);
         }
 
-        private TokenOctree<ProximityToken> GetOctree(Int3 coords, bool create = true)
+        private TokenOctree<ProximityToken> GetOctree(Int3 coords)
         {
             var yDict = _roots.GetOrAdd(coords.X, i => new ConcurrentDictionary<int, ConcurrentDictionary<int, TokenOctree<ProximityToken>>>());
             var zDict = yDict.GetOrAdd(coords.Y, i => new ConcurrentDictionary<int, TokenOctree<ProximityToken>>());
@@ -62,6 +79,11 @@ namespace Myre.Collections
             return octree;
         }
 
+        /// <summary>
+        /// Fetches all items in the given bounds
+        /// </summary>
+        /// <param name="box"></param>
+        /// <returns></returns>
         public IEnumerable<KeyValuePair<Vector3,T>> ItemsInBounds(BoundingBox box)
         {
             Int3 min = GetCoordinate(box.Min);
@@ -73,7 +95,7 @@ namespace Myre.Collections
                 {
                     for (int k = min.Z; k <= max.Z; k++)
                     {
-                        var oct = GetOctree(new Int3(i, j, k), false);
+                        var oct = GetOctree(new Int3(i, j, k));
                         if (oct == null)
                             continue;
                         foreach (var item in oct.ItemsInBounds(box))
@@ -83,6 +105,9 @@ namespace Myre.Collections
             }
         }
 
+        /// <summary>
+        /// A token which represents an item with a position
+        /// </summary>
         public sealed class ProximityToken
             :IDisposable
         {
@@ -90,12 +115,18 @@ namespace Myre.Collections
             TokenOctree<ProximityToken>.TokenNode _currentNode = null;
 
             private Vector3 _position;
+            /// <summary>
+            /// The position of the item
+            /// </summary>
             public Vector3 Position
             {
                 get { return _position; }
                 set { UpdatePosition(value); }
             }
 
+            /// <summary>
+            /// The item
+            /// </summary>
             public T Item { get; private set; }
 
             internal ProximityToken(T item, Vector3 initialPosition, ProximityOctreeDatabase<T> db)

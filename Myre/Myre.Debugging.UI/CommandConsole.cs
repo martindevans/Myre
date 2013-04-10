@@ -469,7 +469,9 @@ namespace Myre.Debugging.UI
                 /// </summary>
                 /// <param name="index">The index.</param>
                 /// <returns></returns>
+// ReSharper disable UnusedMember.Local
                 public Regex RemoveAt(int index)
+// ReSharper restore UnusedMember.Local
                 {
                     Regex r = _filters[index];
                     _filters.RemoveAt(index);

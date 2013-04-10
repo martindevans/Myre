@@ -63,8 +63,8 @@ namespace Myre.Debugging
                             optionAtt.Name = property.Name;
                         if (_options.ContainsKey(optionAtt.Name))
                             throw new Exception(string.Format("Multiple options with the name {0} found. Each option must have a unique name.", optionAtt.Name));
-                        _options.Add(optionAtt.Name, new OptionInfo() { Attribute = optionAtt, Property = property });
-                        _help.Add(optionAtt.Name, new CommandHelpInfo()
+                        _options.Add(optionAtt.Name, new OptionInfo { Attribute = optionAtt, Property = property });
+                        _help.Add(optionAtt.Name, new CommandHelpInfo
                         {
                             Name = optionAtt.Name,
                             Description = optionAtt.Description,
@@ -88,8 +88,8 @@ namespace Myre.Debugging
                             commandAtt.Name = method.Name;
                         if (_commands.ContainsKey(commandAtt.Name))
                             throw new Exception(string.Format("Multiple commands with the name {0} found. Each command must have a unique name.", commandAtt.Name));
-                        _commands.Add(commandAtt.Name, new CommandInfo() { Attribute = commandAtt, Command = method });
-                        _help.Add(commandAtt.Name, new CommandHelpInfo()
+                        _commands.Add(commandAtt.Name, new CommandInfo { Attribute = commandAtt, Command = method });
+                        _help.Add(commandAtt.Name, new CommandHelpInfo
                         {
                             Name = commandAtt.Name,
                             Description = commandAtt.Description,
@@ -122,12 +122,11 @@ namespace Myre.Debugging
         {
             if (property.CanRead && property.CanWrite)
                 return "read write";
-            else if (property.CanRead)
+            if (property.CanRead)
                 return "read";
-            else if (property.CanWrite)
+            if (property.CanWrite)
                 return "write";
-            else
-                return "";
+            return "";
         }
 
         /// <summary>
@@ -163,14 +162,14 @@ namespace Myre.Debugging
             if (method == null)
                 throw new ArgumentException(string.Format("{0} could not be found.", methodName));
 
-            _commands.Add(commandName, new CommandInfo()
+            _commands.Add(commandName, new CommandInfo
             {
                 Command = method,
-                Attribute = new CommandAttribute() { Name = commandName },
+                Attribute = new CommandAttribute { Name = commandName },
                 Target = target
             });
 
-            _help.Add(commandName, new CommandHelpInfo()
+            _help.Add(commandName, new CommandHelpInfo
             {
                 Name = commandName,
                 Description = description,
@@ -308,7 +307,7 @@ namespace Myre.Debugging
                 if (!AppendDefinition(command, ref help))
                 {
                     string validType = help.ValidType;
-                    help.PossibleCommands = this._help.Keys.Where(
+                    help.PossibleCommands = _help.Keys.Where(
                         n => n.StartsWith(command, StringComparison.InvariantCultureIgnoreCase)
                             && (validType == null || validType == GetReturnType(n))
                     ).ToArray();
@@ -374,7 +373,7 @@ namespace Myre.Debugging
                 commandHelp.Description = i.Description;
                 if (_options.ContainsKey(item))
                 {
-                    commandHelp.Description += string.Format("\n\"{0}\"", _options[item].Property.GetValue(_options[item].Target, null).ToString());
+                    commandHelp.Description += string.Format("\n\"{0}\"", _options[item].Property.GetValue(_options[item].Target, null));
                     commandHelp.ValidType = "";
                 }
                 return true;
@@ -429,8 +428,7 @@ namespace Myre.Debugging
 
             if (_error == null)
                 return new CommandResult() { Result = result };
-            else
-                return new CommandResult() { Error = _error };
+            return new CommandResult { Error = _error };
         }
 
         private object RunExpression(string commandString)
@@ -514,8 +512,7 @@ namespace Myre.Debugging
                 var option = _options[optionName].Property;
                 if (option.CanRead)
                     return _options[optionName].Property.GetValue(null, null);
-                else
-                    _error = string.Format("Option \"{0}\" cannot be read.", optionName);
+                _error = string.Format("Option \"{0}\" cannot be read.", optionName);
             }
             else
                 _error = string.Format("Option \"{0}\" not found.", optionName);

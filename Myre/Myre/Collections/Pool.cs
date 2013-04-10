@@ -63,7 +63,13 @@ namespace Myre.Collections
             {
                 T item = _items.Pop();
                 if (_isResetableType)
-                    (item as IRecycleable).Recycle();
+                {
+                    var recycleable = item as IRecycleable;
+                    if (recycleable != null)
+                    {
+                        recycleable.Recycle();
+                    }
+                }
                 return item;
             }
 

@@ -19,7 +19,7 @@ namespace Myre
         /// <param name="delay">The delay before the action is executed.</param>
         public static void Action(Action action, float delay)
         {
-            _buffer.Add(new Event()
+            _buffer.Add(new Event
             {
                 Start = DateTime.Now,
                 Duration = delay,
@@ -63,7 +63,9 @@ namespace Myre
                 if (e.Transition != null)
                     e.Transition(e.Progress);
 
+// ReSharper disable CompareOfFloatsByEqualityOperator
                 if (e.Progress == 1)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                 {
                     if (e.Completed != null)
                         e.Completed();
