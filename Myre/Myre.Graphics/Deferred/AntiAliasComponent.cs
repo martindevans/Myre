@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Materials;
+using Ninject;
 
 namespace Myre.Graphics.Deferred
 {
@@ -10,6 +11,15 @@ namespace Myre.Graphics.Deferred
         private readonly Material _edgeBlur;
         private readonly Quad _quad;
         private string _inputResource;
+
+        [Inject]
+// This method is needed for dependency injection
+// ReSharper disable RedundantOverload.Global
+        public AntiAliasComponent(GraphicsDevice device)
+// ReSharper restore RedundantOverload.Global
+            : this(device, null)
+        {
+        }
 
         public AntiAliasComponent(GraphicsDevice device, string inputResource = null)
         {
