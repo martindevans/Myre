@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
+using Myre.Graphics.Geometry;
 using Ninject;
 
 namespace Myre.Graphics.Translucency.Particles
@@ -136,7 +138,7 @@ namespace Myre.Graphics.Translucency.Particles
         }
 
         public class Manager
-            : BehaviourManager<ParticleEmitter>, IProcess, ITranslucencyManager
+            : BehaviourManager<ParticleEmitter>, IProcess, IGeometryProvider
         {
             public bool IsComplete { get { return false; } }
 
@@ -168,6 +170,13 @@ namespace Myre.Graphics.Translucency.Particles
                 {
                     item.Draw(renderer.Data);
                 }
+            }
+
+            public void Draw(string phase, BoxedValueStore<string> metadata)
+            {
+                if (phase == "translucent")
+                    foreach (var particleSystem in _systems)
+                        particleSystem.Draw(metadata);
             }
         }
     }

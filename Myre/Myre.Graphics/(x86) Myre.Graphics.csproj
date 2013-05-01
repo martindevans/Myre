@@ -126,7 +126,6 @@
     <Compile Include="Materials\MaterialReader.cs" />
     <Compile Include="Translucency\Particles\EllipsoidParticleEmitter.cs" />
     <Compile Include="Translucency\Particles\ParticleEmitter.cs" />
-    <Compile Include="Translucency\ITranslucencyManager.cs" />
     <Compile Include="Translucency\TranslucentComponent.cs" />
     <Compile Include="Translucency\Particles\ParticleSystem.cs" />
     <Compile Include="Translucency\Particles\ParticleSystemDescription.cs" />

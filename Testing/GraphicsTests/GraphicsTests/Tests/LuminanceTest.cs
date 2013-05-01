@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Myre.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Graphics.Translucency;
 using Ninject;
 using Myre.Entities;
 using Microsoft.Xna.Framework.Content;
@@ -148,7 +149,7 @@ namespace GraphicsTests.Tests
                 .Then(toneMap)
                 .Then(new Phase(this, device, toneMap))
                 //.Then<RestoreDepthPhase>()
-                .Then<ParticleComponent>()
+                .Then<TranslucentComponent>()
                 //.Then<AntiAliasComponent>()
                 .Apply();
 

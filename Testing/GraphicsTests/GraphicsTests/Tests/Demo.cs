@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Myre.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Graphics.Translucency;
 using Ninject;
 using Myre.Entities;
 using Microsoft.Xna.Framework.Content;
@@ -68,7 +69,7 @@ namespace GraphicsTests.Tests
                 .Then<Ssao>()
                 .Then<LightingComponent>()
                 .Then<ToneMapComponent>()
-                .Then<ParticleComponent>();
+                .Then<TranslucentComponent>();
 
             ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
@@ -79,7 +80,7 @@ namespace GraphicsTests.Tests
                 .Then<GeometryBufferComponent>()
                 .Then<Ssao>()
                 .Then<LightingComponent>()
-                .Then<ParticleComponent>();
+                .Then<TranslucentComponent>();
                 //.Show("lightbuffer");
 
             edgeDetectPlan = renderer.StartPlan()

@@ -1,16 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Translucency
 {
     public class TranslucentComponent
         : RendererComponent
     {
-        private ReadOnlyCollection<ITranslucencyManager> _managers;
+        private ReadOnlyCollection<IGeometryProvider> _geometryProviders;
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
-            _managers = renderer.Scene.FindManagers<ITranslucencyManager>();
+            _geometryProviders = renderer.Scene.FindManagers<IGeometryProvider>();
 
             // define inputs
             if (context.AvailableResources.Any(r => r.Name == "gbuffer_depth"))
@@ -25,8 +26,8 @@ namespace Myre.Graphics.Translucency
 
         public override void Draw(Renderer renderer)
         {
-            foreach (var item in _managers)
-                item.Draw(renderer);
+            foreach (var geometryProvider in _geometryProviders)
+                geometryProvider.Draw("translucent", renderer.Data);
         }
     }
 }

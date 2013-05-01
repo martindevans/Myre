@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using Myre.Collections;
 using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Translucency.Particles
@@ -158,7 +159,7 @@ namespace Myre.Graphics.Translucency.Particles
             }
         }
 
-        public void Draw(RendererMetadata data)
+        public void Draw(BoxedValueStore<string> data)
         {
             Debug.Assert(Description.Texture != null, "Particle systems must be initialised before they can be drawn.");
             //Debug.WriteLine(string.Format("retired: {0}, active: {1}, new: {2}, free: {3}", finished, active, newlyCreated, free));

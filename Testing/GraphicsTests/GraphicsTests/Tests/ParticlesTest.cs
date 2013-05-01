@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Myre.Entities;
 using Myre.Graphics.Particles;
+using Myre.Graphics.Translucency;
 using Ninject;
 using Myre.Graphics;
 using Microsoft.Xna.Framework;
@@ -40,7 +41,7 @@ namespace GraphicsTests.Tests
             var renderer = scene.GetService<Renderer>();
             renderer.StartPlan()
                     .Then(new CreateTargetComponent(new RenderTargetInfo(0, 0, default(SurfaceFormat), DepthFormat.Depth24Stencil8, default(int), default(bool), default(RenderTargetUsage))))
-                    .Then<ParticleComponent>()
+                    .Then<TranslucentComponent>()
                     .Apply();
 
             var cameraPosition = new Vector3(0, 25, -200);

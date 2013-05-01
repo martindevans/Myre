@@ -7,6 +7,7 @@ using Myre.Debugging.Statistics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Materials;
+using System.Linq;
 
 namespace Myre.Graphics.Geometry
 {
@@ -18,6 +19,8 @@ namespace Myre.Graphics.Geometry
         private Property<Matrix> _transform;
         private Property<bool> _isStatic;
         private Property<bool> _isInvisible;
+
+        private IRenderDataSupplier[] _renderDataSuppliers;
 
         public ModelData Model
         {
@@ -95,6 +98,8 @@ namespace Myre.Graphics.Geometry
                 ModelDataChanged(this);
             };
 
+            _renderDataSuppliers = Owner.Behaviours.OfType<IRenderDataSupplier>().ToArray();
+
             base.Initialise(initialisationData);
         }
 
@@ -105,6 +110,12 @@ namespace Myre.Graphics.Geometry
             base.Shutdown(shutdownData);
         }
 
+        private void ApplyRendererData(BoxedValueStore<string> metadata)
+        {
+            if (_renderDataSuppliers != null)
+                for (int i = 0; i < _renderDataSuppliers.Length; i++)
+                    _renderDataSuppliers[i].SetRenderData(metadata);
+        }
 
 // ReSharper disable MemberCanBePrivate.Global
         public class Manager
@@ -324,6 +335,8 @@ namespace Myre.Graphics.Geometry
                     worldView.Value = instance.WorldView;
                     Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
 
+                    instance.Instance.ApplyRendererData(metadata);
+
                     foreach (var pass in data.Material.Begin(metadata))
                     {
                         //Loop through mesh, drawing as many primitives as possible per batch
@@ -402,6 +415,11 @@ namespace Myre.Graphics.Geometry
                     });
                 }
             }
+        }
+
+        public interface IRenderDataSupplier
+        {
+            void SetRenderData(BoxedValueStore<string> metadata);
         }
     }
 }

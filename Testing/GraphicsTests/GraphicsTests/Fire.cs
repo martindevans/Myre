@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Myre.Graphics.Translucency.Particles;
 using Ninject;
 using Myre.Entities;
 using Microsoft.Xna.Framework.Content;

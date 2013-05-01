@@ -219,15 +219,15 @@ namespace GraphicsTests
             var console = kernel.Get<CommandConsole>();
             renderer.Settings.BindCommandEngine(console.Engine);
 
-            //var fire1 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, -55f));
-            //var fire2 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, 35f));
-            //var fire3 = Fire.Create(kernel, content, new Vector3(-157f, 30f, 35f));
-            //var fire4 = Fire.Create(kernel, content, new Vector3(-157f, 30f, -55f));
+            var fire1 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, -55f));
+            var fire2 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, 35f));
+            var fire3 = Fire.Create(kernel, content, new Vector3(-157f, 30f, 35f));
+            var fire4 = Fire.Create(kernel, content, new Vector3(-157f, 30f, -55f));
 
-            //scene.Add(fire1);
-            //scene.Add(fire2);
-            //scene.Add(fire3);
-            //scene.Add(fire4);
+            scene.Add(fire1);
+            scene.Add(fire2);
+            scene.Add(fire3);
+            scene.Add(fire4);
 
             cameraScript = new CameraScript(camera);
             cameraScript.AddWaypoint(0, new Vector3(218, 160, 104), new Vector3(0, 150, 0));
