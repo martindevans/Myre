@@ -6,7 +6,7 @@ using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Ninject;
 
-namespace Myre.Graphics.Particles
+namespace Myre.Graphics.Translucency.Particles
 {
     [DefaultManager(typeof(Manager))]
     public abstract class ParticleEmitter
@@ -136,7 +136,7 @@ namespace Myre.Graphics.Particles
         }
 
         public class Manager
-            : BehaviourManager<ParticleEmitter>, IProcess
+            : BehaviourManager<ParticleEmitter>, IProcess, ITranslucencyManager
         {
             public bool IsComplete { get { return false; } }
 

@@ -26,7 +26,7 @@ namespace Myre.Graphics
                 _resource = resource;
                 _target = resource.RenderTarget;
             }
-            
+
             public void Finalise()
             {
                 _resource.Finalise(_renderer, _target);
@@ -63,7 +63,7 @@ namespace Myre.Graphics
         {
             _kernel = previous._kernel;
             _renderer = previous._renderer;
-            _resources = new Dictionary<string,Resource>(previous._resources);
+            _resources = new Dictionary<string, Resource>(previous._resources);
             _resourceLastUsed = new Dictionary<string, int>(previous._resourceLastUsed);
             _components = Append(previous._components, next);
 
@@ -71,7 +71,7 @@ namespace Myre.Graphics
             next.Initialise(_renderer, context);
 
             foreach (var resource in context.Inputs)
-		        _resourceLastUsed[resource] = _components.Length - 1;
+                _resourceLastUsed[resource] = _components.Length - 1;
 
             foreach (var resource in context.Outputs)
             {
@@ -94,13 +94,13 @@ namespace Myre.Graphics
         private void Initialise()
         {
             _freePoints = (from resource in _resourceLastUsed
-                          orderby resource.Value ascending
-                          select new FreePoint { Name = resource.Key, Index = resource.Value }).ToArray();
+                           orderby resource.Value ascending
+                           select new FreePoint {Name = resource.Key, Index = resource.Value}).ToArray();
         }
 
-        private static RendererComponent[] Append(RendererComponent[] components,RendererComponent next)
+        private static RendererComponent[] Append(RendererComponent[] components, RendererComponent next)
         {
- 	        Array.Resize(ref components, components.Length + 1);
+            Array.Resize(ref components, components.Length + 1);
             components[components.Length - 1] = next;
 
             return components;
@@ -108,7 +108,7 @@ namespace Myre.Graphics
 
         private ResourceContext CreateContext(ResourceContext previousContext)
         {
- 	        var available = _resources.Values.Select(r => new ResourceInfo(r.Name, r.Format)).ToArray();
+            var available = _resources.Values.Select(r => new ResourceInfo(r.Name, r.Format)).ToArray();
             var setTargets = previousContext == null ? new ResourceInfo[0] : previousContext.Outputs.Where(r => r.IsLeftSet).Select(r => new ResourceInfo(r.Name, r.Format)).ToArray();
 
             return new ResourceContext(available, setTargets);
@@ -179,5 +179,10 @@ namespace Myre.Graphics
         {
             get { return _resources.Keys; }
         }
-    }
+
+        public IEnumerable<RendererComponent> Components
+        {
+            get { return _components; }
+        }
+}
 }

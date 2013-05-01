@@ -124,12 +124,13 @@
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialParameter.cs" />
     <Compile Include="Materials\MaterialReader.cs" />
-    <Compile Include="Particles\EllipsoidParticleEmitter.cs" />
-    <Compile Include="Particles\ParticleEmitter.cs" />
-    <Compile Include="Particles\ParticleComponent.cs" />
-    <Compile Include="Particles\ParticleSystem.cs" />
-    <Compile Include="Particles\ParticleSystemDescription.cs" />
-    <Compile Include="Particles\ParticleVertex.cs" />
+    <Compile Include="Translucency\Particles\EllipsoidParticleEmitter.cs" />
+    <Compile Include="Translucency\Particles\ParticleEmitter.cs" />
+    <Compile Include="Translucency\ITranslucencyManager.cs" />
+    <Compile Include="Translucency\TranslucentComponent.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystem.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystemDescription.cs" />
+    <Compile Include="Translucency\Particles\ParticleVertex.cs" />
     <Compile Include="PostProcessing\Gaussian.cs" />
     <Compile Include="PostProcessing\Scale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -196,6 +197,7 @@
     <None Include="bin\x86\Debug\Myre.Graphics.Content\ToneMap.xnb" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

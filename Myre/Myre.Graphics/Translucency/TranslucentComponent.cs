@@ -1,16 +1,16 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Myre.Graphics.Particles
+namespace Myre.Graphics.Translucency
 {
-    public class ParticleComponent
+    public class TranslucentComponent
         : RendererComponent
     {
-        private ReadOnlyCollection<ParticleEmitter.Manager> _managers;
+        private ReadOnlyCollection<ITranslucencyManager> _managers;
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
-            _managers = renderer.Scene.FindManagers<ParticleEmitter.Manager>();
+            _managers = renderer.Scene.FindManagers<ITranslucencyManager>();
 
             // define inputs
             if (context.AvailableResources.Any(r => r.Name == "gbuffer_depth"))

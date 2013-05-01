@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 
-namespace Myre.Graphics.Particles
+namespace Myre.Graphics.Translucency.Particles
 {
     struct ParticleVertex
     {

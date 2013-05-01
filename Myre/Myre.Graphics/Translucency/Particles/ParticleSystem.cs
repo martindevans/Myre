@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Myre.Graphics.Materials;
 
-namespace Myre.Graphics.Particles
+namespace Myre.Graphics.Translucency.Particles
 {
     /// <summary>
     /// A class which manages and updating and rendering of particles.

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Myre.Entities;
+using Myre.Graphics.Translucency.Particles;
 using Ninject;
 
 namespace Myre.Graphics.Particles

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Myre.Graphics.Particles
+namespace Myre.Graphics.Translucency.Particles
 {
     ///// <summary>
     ///// Describes blend modes for particles.
