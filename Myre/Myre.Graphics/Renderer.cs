@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Debugging.Statistics;
 using Myre.Entities;
@@ -56,7 +57,7 @@ namespace Myre.Graphics
             _viewResults = new Queue<RenderPlan.Output>();
             _spriteBatch = new SpriteBatch(device);
 
-            Content.Initialise(services);
+            Content.Initialise(kernel.Get<ContentManager>(), services);
         }
 
         public override void Initialise(Scene scene)

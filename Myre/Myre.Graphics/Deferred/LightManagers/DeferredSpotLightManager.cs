@@ -170,6 +170,12 @@ namespace Myre.Graphics.Deferred.LightManagers
                     light.ShadowMap = null;
                 }
 
+                light.View = Matrix.CreateLookAt(
+                    light.Light.Position,
+                    light.Light.Position + light.Light.Direction,
+                    light.Light.Direction == Vector3.Up || light.Light.Direction == Vector3.Down ? Vector3.Right : Vector3.Up);
+                light.Projection = Matrix.CreatePerspectiveFieldOfView(light.Light.Angle, 1, 1, light.Light.Range);
+
                 if (light.Light.ShadowResolution > 0)
                     DrawShadowMap(renderer, light);
             }
@@ -194,12 +200,6 @@ namespace Myre.Graphics.Deferred.LightManagers
             var view = renderer.Data.Get<View>("activeview");
             var previousView = view.Value;
             view.Value = _shadowView;
-
-            data.View = Matrix.CreateLookAt(
-                light.Position,
-                light.Position + light.Direction,
-                light.Direction == Vector3.Up || light.Direction == Vector3.Down ? Vector3.Right : Vector3.Up);
-            data.Projection = Matrix.CreatePerspectiveFieldOfView(light.Angle, 1, 1, light.Range);
 
             _shadowView.Camera.View = data.View;
             _shadowView.Camera.Projection = data.Projection;

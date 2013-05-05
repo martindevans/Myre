@@ -49,8 +49,24 @@ namespace GraphicsTests
             get { return camera; }
         }
 
-        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device)
+        public class SceneConfiguration
         {
+            public bool Skybox = true;
+            public int RandomPointLights = 0;
+            public bool Spotlight = true;
+            public bool AmbientLight = true;
+            public bool Fire = true;
+        }
+
+        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device)
+            : this(kernel, game, content, device, null)
+        {
+        }
+
+        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device, SceneConfiguration config)
+        {
+            config = config ?? new SceneConfiguration();
+
             scene = new Scene(kernel);
             this.game = game;
 
@@ -74,14 +90,17 @@ namespace GraphicsTests
             cameraEntity.GetProperty<Viewport>("viewport").Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
             scene.Add(cameraEntity);
 
-            var skyboxDesc = kernel.Get<EntityDescription>();
-            skyboxDesc.AddBehaviour<Skybox>();
-            var skybox = skyboxDesc.Create();
-            skybox.GetProperty<TextureCube>("texture").Value= content.Load<TextureCube>("StormCubeMap");
-            skybox.GetProperty<float>("brightness").Value = 0.5f;
-            skybox.GetProperty<bool>("gamma_correct").Value = false;
-            scene.Add(skybox);
-            
+            if (config.Skybox)
+            {
+                var skyboxDesc = kernel.Get<EntityDescription>();
+                skyboxDesc.AddBehaviour<Skybox>();
+                var skybox = skyboxDesc.Create();
+                skybox.GetProperty<TextureCube>("texture").Value = content.Load<TextureCube>("StormCubeMap");
+                skybox.GetProperty<float>("brightness").Value = 0.5f;
+                skybox.GetProperty<bool>("gamma_correct").Value = false;
+                scene.Add(skybox);
+            }
+
             //var sunEntity = kernel.Get<EntityDescription>();
             //sunEntity.AddProperty<Vector3>("direction", Vector3.Normalize(new Vector3(-.2f, -1f, .3f)));
             //sunEntity.AddProperty<Vector3>("colour", new Vector3(5f));
@@ -104,7 +123,7 @@ namespace GraphicsTests
 
             lights = new List<PointLight>();
             var rng = new Random();
-            for (int i = 0; i < 0; i++)
+            for (int i = 0; i < config.RandomPointLights; i++)
             {
                 var entity = pointLight.Create();
                 scene.Add(entity);
@@ -118,36 +137,42 @@ namespace GraphicsTests
                 lights.Add(light);
             }
 
-            var spotLight = kernel.Get<EntityDescription>();
-            spotLight.AddProperty<Vector3>("position");
-            spotLight.AddProperty<Vector3>("colour");
-            spotLight.AddProperty<Vector3>("direction");
-            spotLight.AddProperty<float>("angle");
-            spotLight.AddProperty<float>("range");
-            spotLight.AddProperty<Texture2D>("mask");
-            spotLight.AddProperty<int>("shadow_resolution");
-            spotLight.AddBehaviour<SpotLight>();
-            var spotLightEntity = spotLight.Create();
-            spotLightEntity.GetProperty<Vector3>("position").Value = new Vector3(-180, 250, 0);
-            spotLightEntity.GetProperty<Vector3>("colour").Value = new Vector3(10);
-            spotLightEntity.GetProperty<Vector3>("direction").Value = new Vector3(0, -1, 0);
-            spotLightEntity.GetProperty<float>("angle").Value = MathHelper.PiOver2;
-            spotLightEntity.GetProperty<float>("range").Value = 500;
-            spotLightEntity.GetProperty<Texture2D>("mask").Value = null; //content.Load<Texture2D>("Chrysanthemum"));
-            spotLightEntity.GetProperty<int>("shadow_resolution").Value = 512; //content.Load<Texture2D>("Chrysanthemum"));
-            this.spotLight = spotLightEntity.GetBehaviour<SpotLight>();
-            scene.Add(spotLightEntity);
+            if (config.Spotlight)
+            {
+                var spotLight = kernel.Get<EntityDescription>();
+                spotLight.AddProperty<Vector3>("position");
+                spotLight.AddProperty<Vector3>("colour");
+                spotLight.AddProperty<Vector3>("direction");
+                spotLight.AddProperty<float>("angle");
+                spotLight.AddProperty<float>("range");
+                spotLight.AddProperty<Texture2D>("mask");
+                spotLight.AddProperty<int>("shadow_resolution");
+                spotLight.AddBehaviour<SpotLight>();
+                var spotLightEntity = spotLight.Create();
+                spotLightEntity.GetProperty<Vector3>("position").Value = new Vector3(-180, 250, 0);
+                spotLightEntity.GetProperty<Vector3>("colour").Value = new Vector3(10);
+                spotLightEntity.GetProperty<Vector3>("direction").Value = new Vector3(0, -1, 0);
+                spotLightEntity.GetProperty<float>("angle").Value = MathHelper.PiOver2;
+                spotLightEntity.GetProperty<float>("range").Value = 500;
+                spotLightEntity.GetProperty<Texture2D>("mask").Value = content.Load<Texture2D>("Chrysanthemum");
+                spotLightEntity.GetProperty<int>("shadow_resolution").Value = 0;//512;
+                this.spotLight = spotLightEntity.GetBehaviour<SpotLight>();
+                scene.Add(spotLightEntity);
+            }
 
-            var ambientLight = kernel.Get<EntityDescription>();
-            ambientLight.AddProperty<Vector3>("sky_colour");
-            ambientLight.AddProperty<Vector3>("ground_colour");
-            ambientLight.AddProperty<Vector3>("up");
-            ambientLight.AddBehaviour<AmbientLight>();
-            var ambientLightEntity = ambientLight.Create();
-            ambientLightEntity.GetProperty<Vector3>("sky_colour").Value = new Vector3(0.04f);
-            ambientLightEntity.GetProperty<Vector3>("ground_colour").Value = new Vector3(0.04f, 0.05f, 0.04f);
-            ambientLightEntity.GetProperty<Vector3>("up").Value = Vector3.Up;
-            scene.Add(ambientLightEntity);
+            if (config.AmbientLight)
+            {
+                var ambientLight = kernel.Get<EntityDescription>();
+                ambientLight.AddProperty<Vector3>("sky_colour");
+                ambientLight.AddProperty<Vector3>("ground_colour");
+                ambientLight.AddProperty<Vector3>("up");
+                ambientLight.AddBehaviour<AmbientLight>();
+                var ambientLightEntity = ambientLight.Create();
+                ambientLightEntity.GetProperty<Vector3>("sky_colour").Value = new Vector3(0.04f);
+                ambientLightEntity.GetProperty<Vector3>("ground_colour").Value = new Vector3(0.04f, 0.05f, 0.04f);
+                ambientLightEntity.GetProperty<Vector3>("up").Value = Vector3.Up;
+                scene.Add(ambientLightEntity);
+            }
 
             //var floor = content.Load<ModelData>(@"Models\Ground");
             //var floorEntity = kernel.Get<EntityDescription>();
@@ -219,15 +244,18 @@ namespace GraphicsTests
             var console = kernel.Get<CommandConsole>();
             renderer.Settings.BindCommandEngine(console.Engine);
 
-            var fire1 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, -55f));
-            var fire2 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, 35f));
-            var fire3 = Fire.Create(kernel, content, new Vector3(-157f, 30f, 35f));
-            var fire4 = Fire.Create(kernel, content, new Vector3(-157f, 30f, -55f));
+            if (config.Fire)
+            {
+                var fire1 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, -55f));
+                var fire2 = Fire.Create(kernel, content, new Vector3(123.5f, 30f, 35f));
+                var fire3 = Fire.Create(kernel, content, new Vector3(-157f, 30f, 35f));
+                var fire4 = Fire.Create(kernel, content, new Vector3(-157f, 30f, -55f));
 
-            scene.Add(fire1);
-            scene.Add(fire2);
-            scene.Add(fire3);
-            scene.Add(fire4);
+                scene.Add(fire1);
+                scene.Add(fire2);
+                scene.Add(fire3);
+                scene.Add(fire4);
+            }
 
             cameraScript = new CameraScript(camera);
             cameraScript.AddWaypoint(0, new Vector3(218, 160, 104), new Vector3(0, 150, 0));

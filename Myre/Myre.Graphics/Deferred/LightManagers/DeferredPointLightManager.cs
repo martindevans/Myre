@@ -143,8 +143,7 @@ namespace Myre.Graphics.Deferred.LightManagers
                 material.Parameters["Range"].SetValue(light.Range);
             }
 
-            var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
-                        * Matrix.CreateTranslation(light.Position);
+            var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius) * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
             Matrix.Multiply(ref world, ref metadata.Get<Matrix>("view").Value, out metadata.Get<Matrix>("worldview").Value);
             Matrix.Multiply(ref metadata.Get<Matrix>("worldview").Value, ref metadata.Get<Matrix>("projection").Value, out metadata.Get<Matrix>("worldviewprojection").Value);

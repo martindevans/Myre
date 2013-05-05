@@ -19,6 +19,8 @@ namespace Myre.Graphics.Geometry
         private Property<Matrix> _transform;
         private Property<bool> _isStatic;
         private Property<bool> _isInvisible;
+        private Property<bool> _ignoreViewMatrix;
+        private Property<bool> _ignoreProjectionMatrix;
 
         private IRenderDataSupplier[] _renderDataSuppliers;
 
@@ -84,6 +86,8 @@ namespace Myre.Graphics.Geometry
             _transform = context.CreateProperty<Matrix>("transform" + append);
             _isStatic = context.CreateProperty<bool>("is_static" + append);
             _isInvisible = context.CreateProperty<bool>("is_invisible" + append);
+            _ignoreViewMatrix = context.CreateProperty<bool>("ignore_view_matrix" + append, false);
+            _ignoreProjectionMatrix = context.CreateProperty<bool>("ignore_projection_matrix" + append, false);
 
             base.CreateProperties(context);
         }
@@ -288,7 +292,7 @@ namespace Myre.Graphics.Geometry
                 return a.Instances.Count.CompareTo(b.Instances.Count);
             }
 
-            private void CalculateWorldViews(List<MeshRenderData> batches, ref Matrix view)
+            private void CalculateWorldViews(List<MeshRenderData> batches, ref Matrix cameraView)
             {
                 for (int b = 0; b < batches.Count; b++)
                 {
@@ -297,7 +301,10 @@ namespace Myre.Graphics.Geometry
                     {
                         var instance = meshInstances[i];
                         Matrix world = instance.Instance.Transform;
-                        Matrix.Multiply(ref world, ref view, out instance.WorldView);
+                        if (instance.Instance._ignoreViewMatrix.Value)
+                            instance.WorldView = world;
+                        else
+                            Matrix.Multiply(ref world, ref cameraView, out instance.WorldView);
                     }
                 }
             }
@@ -307,7 +314,8 @@ namespace Myre.Graphics.Geometry
                 foreach (var item in _dynamicMeshInstances)
                 {
                     item.UpdateBounds();
-                    if (volume.Intersects(item.Bounds))
+                    //If this item ignores the view and projection matrices all bets are off. Just pass it and let the graphics device deal with it
+                    if (item.Instance._ignoreViewMatrix.Value || item.Instance._ignoreProjectionMatrix.Value || volume.Intersects(item.Bounds))
                         meshInstances.Add(item);
                 }
             }
@@ -333,7 +341,10 @@ namespace Myre.Graphics.Geometry
 
                     world.Value = instance.Instance.Transform;
                     worldView.Value = instance.WorldView;
-                    Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
+                    if (instance.Instance._ignoreProjectionMatrix.Value)
+                        worldViewProjection.Value = worldView.Value;
+                    else
+                        Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
 
                     instance.Instance.ApplyRendererData(metadata);
 

@@ -1,7 +1,7 @@
-#include "EncodeNormals.fxh"
-#include "GammaCorrection.fxh"
-#include "FullScreenQuad.fxh"
-#include "Shadows.fxh"
+#include "../EncodeNormals.fxh"
+#include "../GammaCorrection.fxh"
+#include "../FullScreenQuad.fxh"
+#include "../Shadows.fxh"
 
 float3 Colour;
 float3 LightPosition;
@@ -107,8 +107,8 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 
 		if (EnableShadows)
 		{
-			//float depth = (dot(viewPosition, LightNearPlane.xyz) + LightNearPlane.w) / LightFarClip;
-			float depth = length(LightPosition - viewPosition) / LightFarClip;
+			float depth = (dot(viewPosition, LightNearPlane.xyz) + LightNearPlane.w) / LightFarClip;
+			depth = length(LightPosition - viewPosition) / LightFarClip;
 			light *= CalculateShadow(depth, projectedTexCoord.xy, 9, LightFarClip);
 		}
 		

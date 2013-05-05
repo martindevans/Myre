@@ -9,8 +9,10 @@ namespace Myre.Graphics
         private static ResourceContentManager _manager;
         private static ContentManager _content;
 
-        public static void Initialise(IServiceProvider services)
+        public static void Initialise(ContentManager content, IServiceProvider services)
         {
+            _content = content;
+
 #if WINDOWS
             _manager = new ResourceContentManager(services, x86Resources.ResourceManager);
 #else

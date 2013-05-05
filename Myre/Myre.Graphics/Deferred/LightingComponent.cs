@@ -50,6 +50,7 @@ namespace Myre.Graphics.Deferred
             scene.GetManager<DeferredSkyboxManager>();
             scene.GetManager<DeferredSpotLightManager>();
             scene.GetManager<DeferredSunLightManager>();
+            scene.GetManager<DeferredPlaneLightManager>();
 
             // get lights
             _directLights = scene.FindManagers<IDirectLight>();

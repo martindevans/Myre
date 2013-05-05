@@ -223,7 +223,7 @@
       <Processor>MyreModelProcessor</Processor>
       <ProcessorParameters_DiffuseTexture>sponza_floor_a_diff.tga</ProcessorParameters_DiffuseTexture>
     </Compile>
-    <Compile Include="SpotLight.fx">
+    <Compile Include="Myre.Graphics\SpotLight.fx">
       <Name>SpotLight</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
@@ -340,6 +340,20 @@
       <Project>{65716E12-A629-449B-91A3-BF1A1ABEB56A}</Project>
       <Name>Myre.Graphics.Pipeline</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Myre.Graphics\PlaneLight.fx">
+      <Name>PlaneLight</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Kitty128.jpg">
+      <Name>Kitty128</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

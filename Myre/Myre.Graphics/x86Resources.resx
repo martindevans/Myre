@@ -181,13 +181,13 @@
   <data name="sphere" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bin\x86\Debug\Myre.Graphics.Content\sphere.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="SpotLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\SpotLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="SSAO" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bin\x86\Debug\Myre.Graphics.Content\SSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ToneMap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bin\x86\Debug\Myre.Graphics.Content\ToneMap.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="SpotLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SpotLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
