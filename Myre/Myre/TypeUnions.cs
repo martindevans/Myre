@@ -82,4 +82,51 @@ namespace Myre
         [CLSCompliant(false)]
         public uint UIntValue;
     }
+
+    /// <summary>
+    /// Provides a safe way of converting an Int32 to a UInt32
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    public struct ByteSbyteUnion
+    {
+        /// <summary>
+        /// The value of this union, interpreted as a sbyte
+        /// </summary>
+        [FieldOffset(0)]
+        public sbyte SbyteValue;
+
+        /// <summary>
+        /// The value of this union, interpreted as a byte
+        /// </summary>
+        [FieldOffset(0)]
+        [CLSCompliant(false)]
+        public byte ByteValue;
+    }
+
+    /// <summary>
+    /// Provides a safe way of converting an Int32 to a UInt32
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    public struct DecimalUlong2Union
+    {
+        /// <summary>
+        /// The value of this union, interpreted as a decimal
+        /// </summary>
+        [FieldOffset(0)]
+        public decimal DecimalValue;
+
+        /// <summary>
+        /// The value of the first 64 bits of this union, interpreted as a ulong
+        /// </summary>
+        [FieldOffset(0)]
+        [CLSCompliant(false)]
+        public ulong UlongValue1;
+
+        /// <summary>
+        /// The value of the last 64 bits of this union, interpreted as a ulong
+        /// </summary>
+        [FieldOffset(sizeof(ulong))]
+        [CLSCompliant(false)]
+        public ulong UlongValue2;
+    }
 }

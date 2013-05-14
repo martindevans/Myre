@@ -209,6 +209,7 @@ namespace Myre.Entities
         /// <summary>
         /// Initialises this instance.
         /// </summary>
+        /// <param name="initialisationData">Initialisation data to pass to behaviours</param>
         internal void Initialise(INamedDataProvider initialisationData)
         {
             BehavioursShutdown = false;
