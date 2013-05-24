@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace Myre.Extensions
 {
@@ -38,6 +39,26 @@ namespace Myre.Extensions
         public static float Cross(this Vector2 a, Vector2 b)
         {
             return a.X * b.Y - a.Y * b.X;
+        }
+
+        /// <summary>
+        /// Determines the length of a vector using the manhattan length function
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static float ManhattanLength(this Vector2 v)
+        {
+            return Math.Abs(v.X) + Math.Abs(v.Y);
+        }
+
+        /// <summary>
+        /// Returns the largest element in the vector
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static float LargestElement(this Vector2 v)
+        {
+            return Math.Max(v.X, v.Y);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Ninject;
 
@@ -13,10 +14,10 @@ namespace Myre.Entities.Services
         /// <summary>
         /// The numbers of seconds which have passed since this scene was constructed or the time was last reset
         /// </summary>
+        private double _time;
         public double Time
         {
-            get;
-            private set;
+            get { return _time; }
         }
         /// <summary>
         /// The number of frames which have passed since the scene was constucted or the time was last reset
@@ -47,7 +48,7 @@ namespace Myre.Entities.Services
 
         public override void Update(float elapsedTime)
         {
-            Time += elapsedTime;
+            Interlocked.Exchange(ref _time, _time + elapsedTime);
             Tick++;
 
             base.Update(elapsedTime);
@@ -78,13 +79,13 @@ namespace Myre.Entities.Services
         public void Reset()
         {
             Tick = 0;
-            Time = 0;
+            Interlocked.Exchange(ref _time, 0);
         }
 
         public void SetTime(double time)
         {
             Tick = (uint)(time / TargetElapsedTime.TotalSeconds);
-            Time = Tick * TargetElapsedTime.TotalSeconds;
+            Interlocked.Exchange(ref _time, Tick * TargetElapsedTime.TotalSeconds);
         }
     }
 }

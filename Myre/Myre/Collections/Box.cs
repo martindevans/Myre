@@ -33,8 +33,19 @@ namespace Myre.Collections
         object IBox.Value
         {
             get { return Value; }
-            set { Value = (T)value; }
+            set
+            {
+                var old = Value;
+                Value = (T)value;
+                if (BoxChanged != null)
+                    BoxChanged(this, old, Value);
+            }
         }
+
+        /// <summary>
+        /// An event which is triggered whenever the value in this box changes. Args are The box, the old value, and the new value.
+        /// </summary>
+        public event Action<Box<T>, T, T> BoxChanged;
     }
 
     /// <summary>

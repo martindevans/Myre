@@ -97,6 +97,7 @@
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
     <Compile Include="Extensions\BoundingSphereExtensions.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\GameTimeExtensions.cs" />
     <Compile Include="Extensions\GraphicsDeviceExtensions.cs" />
     <Compile Include="Extensions\IDictionaryExtensions.cs" />

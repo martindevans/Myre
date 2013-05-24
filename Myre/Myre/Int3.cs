@@ -1,4 +1,7 @@
 ﻿
+using System.Diagnostics.Contracts;
+using Microsoft.Xna.Framework;
+
 namespace Myre
 {
     /// <summary>
@@ -34,6 +37,16 @@ namespace Myre
             Z = z;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [Pure]
+        public Vector3 ToVector3()
+        {
+            return new Vector3(X, Y, Z);
+        }
+
         public override int GetHashCode()
         {
             unchecked
@@ -67,6 +80,28 @@ namespace Myre
         public override string ToString()
         {
             return X + "," + Y + "," + Z;
+        }
+
+        /// <summary>
+        /// Add together the members of two Int3s
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Int3 operator +(Int3 a, Int3 b)
+        {
+            return new Int3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+        }
+
+        /// <summary>
+        /// Subtract the members of one Int3 off another
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Int3 operator -(Int3 a, Int3 b)
+        {
+            return new Int3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         }
     }
 }

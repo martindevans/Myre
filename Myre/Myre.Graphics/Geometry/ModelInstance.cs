@@ -179,7 +179,8 @@ namespace Myre.Graphics.Geometry
 
             public override void Add(ModelInstance behaviour)
             {
-                MeshesAdded(behaviour, behaviour.Model.Meshes);
+                if (behaviour.Model != null)
+                    MeshesAdded(behaviour, behaviour.Model.Meshes);
                 behaviour.ModelDataChanged += Changed;
                 behaviour.ModelMeshAdded += AddMesh;
                 behaviour.ModelMeshAdded += RemoveMesh;
@@ -233,7 +234,8 @@ namespace Myre.Graphics.Geometry
 
             public override bool Remove(ModelInstance behaviour)
             {
-                MeshesRemoved(behaviour, behaviour.Model.Meshes);
+                if (behaviour.Model != null)
+                    MeshesRemoved(behaviour, behaviour.Model.Meshes);
                 behaviour.ModelDataChanged -= Changed;
                 behaviour.ModelMeshAdded -= AddMesh;
                 behaviour.ModelMeshRemoved -= RemoveMesh;
