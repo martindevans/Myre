@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Myre.Extensions
 {
@@ -121,6 +122,32 @@ namespace Myre.Extensions
             if (i < s.Length - 1)
                 words.Add(s.Substring(i, s.Length - i));
             return words;
+        }
+
+        /// <summary>
+        /// Checks if the given string ends with the given character
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool EndsWith(this string s, char c)
+        {
+            if (String.IsNullOrEmpty(s))
+                return false;
+            return s[s.Length - 1] == c;
+        }
+
+        /// <summary>
+        /// Checks if the given string ends with the given character
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool StartsWith(this string s, char c)
+        {
+            if (String.IsNullOrEmpty(s))
+                return false;
+            return s[0] == c;
         }
     }
 }

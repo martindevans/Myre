@@ -28,7 +28,7 @@ namespace Myre.Graphics.Deferred
             // define settings
             var settings = renderer.Settings;
             settings.Add("edge_normalthreshold", "Threshold used to decide between an edge and a non-edge by normal.", 0.7f);
-            settings.Add("edge_depththreshold", "Threshold used to decide between an edge and a non-edge by depth.", 0.001f);
+            settings.Add("edge_depththreshold", "Threshold used to decide between an edge and a non-edge by depth.", 0.01f);
             settings.Add("edge_normalweight", "Weighting used for edges detected via normals in the output.", 0.15f);
             settings.Add("edge_depthweight", "Weighting used for edges detected via depth in the output.", 0.2f);
 
