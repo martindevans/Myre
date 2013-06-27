@@ -1,9 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Myre.Graphics.Pipeline
 {
@@ -16,10 +21,11 @@ namespace Myre.Graphics.Pipeline
     [ContentProcessor(DisplayName = "Myre Model Processor")]
     public class MyreModelProcessor : ContentProcessor<NodeContent, MyreModelContent>
     {
-
         ContentProcessorContext _context;
         MyreModelContent _outputModel;
         string _directory;
+
+        public const long TICKS_PER_60_FPS = TimeSpan.TicksPerSecond / 60;
 
         // A single material may be reused on more than one piece of geometry.
         // This dictionary keeps track of materials we have already converted,
@@ -31,21 +37,27 @@ namespace Myre.Graphics.Pipeline
         public string DiffuseTexture
         {
             get;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
             set;
+// ReSharper restore UnusedAutoPropertyAccessor.Global
         }
 
         [DisplayName("Specular Texture")]
         public string SpecularTexture
         {
             get;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
             set;
+// ReSharper restore UnusedAutoPropertyAccessor.Global
         }
 
         [DisplayName("Normal Texture")]
         public string NormalTexture
         {
             get;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
             set;
+// ReSharper restore UnusedAutoPropertyAccessor.Global
         }
         
         [DisplayName("Allow null diffuse textures")]
@@ -53,15 +65,16 @@ namespace Myre.Graphics.Pipeline
         public bool AllowNullDiffuseTexture
         {
             get;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
             set;
+// ReSharper restore UnusedAutoPropertyAccessor.Global
         }
 
-
+        private IList<BoneContent> _bones;
         /// <summary>
         /// Converts incoming graphics data into our custom model format.
         /// </summary>
-        public override MyreModelContent Process(NodeContent input,
-                                                   ContentProcessorContext context)
+        public override MyreModelContent Process(NodeContent input, ContentProcessorContext context)
         {
             _context = context;
 
@@ -76,12 +89,20 @@ namespace Myre.Graphics.Pipeline
 
             _outputModel = new MyreModelContent();
 
-            //if (skeleton != null)
-            //    outputModel.Skeleton = MeshHelper.FlattenSkeleton(skeleton).ToArray();
-            //else
-            //    outputModel.Skeleton = new BoneContent[0];
+            //Extract skeleton data from the input
+            ReadSkinningData(input, skeleton, context);
 
-            ProcessNode(input);
+            //Process meshes
+            List<MeshContent> meshes = new List<MeshContent>();
+            FindMeshes(input, meshes);
+            foreach (var mesh in meshes)
+                ProcessMesh(mesh, context);
+
+            //Process animations
+            Dictionary<string, AnimationContent> animations = new Dictionary<string, AnimationContent>();
+            FindAnimations(input, animations);
+            foreach (var animation in animations)
+                ProcessAnimation(animation.Value, context);
 
             return _outputModel;
         }
@@ -110,72 +131,124 @@ namespace Myre.Graphics.Pipeline
             }
         }
 
-        /// <summary>
-        /// Recursively processes a node from the input data tree.
-        /// </summary>
-        private void ProcessNode(NodeContent node)
+        #region animation processing
+
+        private void ReadSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context)
         {
-            // Is this node in fact a mesh?
-            MeshContent mesh = node as MeshContent;
-
-            if (mesh != null)
+            if (skeleton == null)
             {
-                MeshHelper.OptimizeForCache(mesh);
-
-                // create texture coordinates of 0 if none are present
-                var texCoord0 = VertexChannelNames.TextureCoordinate(0);
-                foreach (var item in mesh.Geometry)
-                {
-                    if (!item.Vertices.Channels.Contains(texCoord0))
-                        item.Vertices.Channels.Add<Vector2>(texCoord0, null);
-                }
-
-                // calculate tangent frames for normal mapping
-                var hasTangents = GeometryContainsChannel(mesh.Geometry, VertexChannelNames.Tangent(0));
-                var hasBinormals = GeometryContainsChannel(mesh.Geometry, VertexChannelNames.Binormal(0));
-                if (!hasTangents || !hasBinormals)
-                {
-                    var tangentName = hasTangents ? null : VertexChannelNames.Tangent(0);
-                    var binormalName = hasBinormals ? null : VertexChannelNames.Binormal(0);
-                    MeshHelper.CalculateTangentFrames(mesh, VertexChannelNames.TextureCoordinate(0), tangentName, binormalName);
-                }
-
-                //var outputMesh = new MyreMeshContent();
-                //outputMesh.Parent = mesh.Parent;
-                //outputMesh.BoundingSphere = BoundingSphere.CreateFromPoints(mesh.Positions);
-
-                // Process all the geometry in the mesh.
-                foreach (GeometryContent geometry in mesh.Geometry)
-                {
-                    ProcessGeometry(geometry, _outputModel);
-                }
-
-                //outputModel.AddMesh(outputMesh);
+                _outputModel.SkinningData = null;
+                return;
             }
 
-            // Recurse over any child nodes.
-            foreach (NodeContent child in node.Children)
+            _bones = MeshHelper.FlattenSkeleton(skeleton);
+
+            List<Matrix> bindPose = new List<Matrix>();
+            List<Matrix> inverseBindPose = new List<Matrix>();
+            List<int> skeletonHierarchy = new List<int>();
+
+            foreach (BoneContent bone in _bones)
             {
-                ProcessNode(child);
+                bindPose.Add(bone.Transform);
+                inverseBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
+                skeletonHierarchy.Add(_bones.IndexOf(bone.Parent as BoneContent));
             }
+
+            _outputModel.SkinningData = new MyreSkinningDataContent(
+                bindPose,
+                inverseBindPose,
+                skeletonHierarchy
+            );
         }
 
-        private bool GeometryContainsChannel(GeometryContentCollection geometry, string channel)
+        private void ProcessAnimation(AnimationContent anim, ContentProcessorContext context)
         {
-            foreach (var item in geometry)
+            const string errorMsg = "One or more AnimationContent objects have an extremely small duration.  If the animation "
+                                    + "was intended to last more than one frame, please add \n AnimTicksPerSecond \n{0} \nY; \n{1}\n to your .X "
+                                    + "file, where Y is a positive integer.";
+            if (anim.Duration.Ticks < TICKS_PER_60_FPS)
             {
-                if (item.Vertices.Channels.Contains(channel))
-                    return true;
+                context.Logger.LogWarning("", anim.Identity, errorMsg, "{", "}");
+                return;
             }
 
-            return false;
+            //TODO:: Resample the animation to some set FPS?
+
+            _outputModel.SkinningData.Animations.Add(ProcessAnimationClip(anim));
+        }
+
+        private MyreClipContent ProcessAnimationClip(AnimationContent anim)
+        {
+            MyreClipContent animationClip = new MyreClipContent(anim.Name);
+
+            foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
+            {
+                // Look up what bone this channel is controlling.
+                int boneIndex = FindBoneIndex(channel.Key);
+
+                // Convert the keyframe data.
+                foreach (AnimationKeyframe keyframe in channel.Value)
+                    animationClip.Keyframes.Add(new MyreKeyframeContent(boneIndex, keyframe.Time, keyframe.Transform));
+            }
+
+            // Sort the merged keyframes by time.
+            animationClip.Keyframes.Sort((a, b) => a.Time.CompareTo(b.Time));
+
+            if (animationClip.Keyframes.Count == 0)
+                throw new InvalidContentException("Animation has no keyframes.");
+
+            if (anim.Duration <= TimeSpan.Zero)
+                throw new InvalidContentException("Animation has a zero duration.");
+
+            return animationClip;
+        }
+        #endregion
+
+        #region geometry processing
+        private void ProcessMesh(MeshContent mesh, ContentProcessorContext context)
+        {
+            MeshHelper.OptimizeForCache(mesh);
+
+            // create texture coordinates of 0 if none are present
+            var texCoord0 = VertexChannelNames.TextureCoordinate(0);
+            foreach (var item in mesh.Geometry)
+            {
+                if (!item.Vertices.Channels.Contains(texCoord0))
+                    item.Vertices.Channels.Add<Vector2>(texCoord0, null);
+            }
+
+            // calculate tangent frames for normal mapping
+            var hasTangents = GeometryContainsChannel(mesh.Geometry, VertexChannelNames.Tangent(0));
+            var hasBinormals = GeometryContainsChannel(mesh.Geometry, VertexChannelNames.Binormal(0));
+            if (!hasTangents || !hasBinormals)
+            {
+                var tangentName = hasTangents ? null : VertexChannelNames.Tangent(0);
+                var binormalName = hasBinormals ? null : VertexChannelNames.Binormal(0);
+                MeshHelper.CalculateTangentFrames(mesh, VertexChannelNames.TextureCoordinate(0), tangentName, binormalName);
+            }
+
+            //var outputMesh = new MyreMeshContent();
+            //outputMesh.Parent = mesh.Parent;
+            //outputMesh.BoundingSphere = BoundingSphere.CreateFromPoints(mesh.Positions);
+
+            // Process all the geometry in the mesh.
+            foreach (GeometryContent geometry in mesh.Geometry)
+            {
+                ProcessGeometry(geometry, _outputModel, context);
+            }
+
+            //outputModel.AddMesh(outputMesh);
         }
 
         /// <summary>
         /// Converts a single piece of input geometry into our custom format.
         /// </summary>
-        void ProcessGeometry(GeometryContent geometry, MyreModelContent model)
+        void ProcessGeometry(GeometryContent geometry, MyreModelContent model, ContentProcessorContext context)
         {
+            var channels = geometry.Vertices.Channels.ToArray();
+            foreach (var channel in channels)
+                ProcessChannel(geometry, channel, context);
+
             int triangleCount = geometry.Indices.Count / 3;
             int vertexCount = geometry.Vertices.VertexCount;
 
@@ -189,7 +262,7 @@ namespace Myre.Graphics.Pipeline
             var boundingSphere = BoundingSphere.CreateFromPoints(geometry.Vertices.Positions);
             
             // Add the new piece of geometry to our output model.
-            model.AddMesh(new MyreMeshContent()
+            model.AddMesh(new MyreMeshContent
             {
                 //Parent = geometry.Parent,
                 Name = geometry.Parent.Name,
@@ -201,8 +274,76 @@ namespace Myre.Graphics.Pipeline
                 TriangleCount = triangleCount
             });
         }
+        #endregion
 
+        #region vertex channel processing
+        private void ProcessChannel(GeometryContent geometry, VertexChannel channel, ContentProcessorContext context)
+        {
+            if (channel.Name == VertexChannelNames.Weights())
+                ProcessWeightsChannel(geometry, (VertexChannel<BoneWeightCollection>)channel, context);
+        }
 
+        /// <summary>
+        /// Replace this vertex channel (BoneWeightCollection) with weight and index channels
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <param name="channel"></param>
+        /// <param name="context"></param>
+        private void ProcessWeightsChannel(GeometryContent geometry, VertexChannel<BoneWeightCollection> channel, ContentProcessorContext context)
+        {
+            bool boneCollectionsWithZeroWeights = false;
+
+            // and indices as packed 4byte vectors.
+            Vector4[] weightsToAdd = new Vector4[channel.Count];
+            Vector4[] indicesToAdd = new Vector4[channel.Count];
+
+            // Go through the BoneWeightCollections and create a new
+            // weightsToAdd and indicesToAdd array for each BoneWeightCollection.
+            for (int i = 0; i < channel.Count; i++)
+            {
+                BoneWeightCollection bwc = channel[i];
+
+                if (bwc.Count == 0)
+                {
+                    boneCollectionsWithZeroWeights = true;
+                    continue;
+                }
+
+                bwc.NormalizeWeights(4);
+                int count = bwc.Count;
+
+                // Add the appropriate bone indices based on the bone names in the
+                // BoneWeightCollection
+                Vector4 bi = new Vector4(
+                    count > 0 ? FindBoneIndex(bwc[0].BoneName) : 0,
+                    count > 1 ? FindBoneIndex(bwc[1].BoneName) : 0,
+                    count > 2 ? FindBoneIndex(bwc[2].BoneName) : 0,
+                    count > 3 ? FindBoneIndex(bwc[3].BoneName) : 0
+                );
+                indicesToAdd[i] = bi;
+
+                Vector4 bw = new Vector4
+                {
+                    X = count > 0 ? bwc[0].Weight : 0,
+                    Y = count > 1 ? bwc[1].Weight : 0,
+                    Z = count > 2 ? bwc[2].Weight : 0,
+                    W = count > 3 ? bwc[3].Weight : 0
+                };
+                weightsToAdd[i] = bw;
+            }
+
+            // Remove the old BoneWeightCollection channel
+            geometry.Vertices.Channels.Remove(channel);
+            // Add the new channels
+            geometry.Vertices.Channels.Add<Vector4>(VertexElementUsage.BlendIndices.ToString(), indicesToAdd);
+            geometry.Vertices.Channels.Add<Vector4>(VertexElementUsage.BlendWeight.ToString(), weightsToAdd);
+
+            if (boneCollectionsWithZeroWeights)
+                context.Logger.LogWarning("", geometry.Identity, "BonesWeightCollections with zero weights found in geometry.");
+        }
+        #endregion
+
+        #region material processing
         /// <summary>
         /// Creates default materials suitable for rendering in the myre deferred renderer.
         /// The current material is searched for diffuse, normal and specular textures.
@@ -218,29 +359,30 @@ namespace Myre.Graphics.Pipeline
             {
                 // If not, process it now.
                 _processedMaterials[material] = new Dictionary<string, MyreMaterialContent>();
-                CreateGBufferMaterial(material, mesh);
-                CreateShadowMaterial(material);
+
+                bool animatedMaterials = MeshHelper.FindSkeleton(mesh) != null;
+                CreateGBufferMaterial(material, mesh, animatedMaterials);
+                CreateShadowMaterial(material, animatedMaterials);
             }
 
             return _processedMaterials[material];
         }
 
-        private void CreateShadowMaterial(MaterialContent material)
+        private void CreateShadowMaterial(MaterialContent material, bool animated)
         {
-            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = "ViewLength"};
+            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = animated ? "AnimatedViewLength" : "ViewLength"};
 
             var shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewlength", shadowMaterial);
 
-            materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = "ViewZ"};
+            materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = animated ? "AnimatedViewZ" : "ViewZ"};
 
             shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewz", shadowMaterial);
         }
 
-        private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh)
+        private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated)
         {
-            //System.Diagnostics.Debugger.Launch();
             var diffuseTexture = FindDiffuseTexture(mesh, material);
             var normalTexture = FindNormalTexture(mesh, material);
             var specularTexture = FindSpecularTexture(mesh, material);
@@ -248,7 +390,7 @@ namespace Myre.Graphics.Pipeline
             if (diffuseTexture == null)
                 return;
 
-            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultGBuffer.fx"), Technique = "ClipAlpha"};
+            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultGBuffer.fx"), Technique = animated ? "Animated" : "Default"};
             materialData.Textures.Add("DiffuseMap", diffuseTexture);
             materialData.Textures.Add("NormalMap", normalTexture);
             materialData.Textures.Add("SpecularMap", specularTexture);
@@ -256,29 +398,9 @@ namespace Myre.Graphics.Pipeline
             var gbufferMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("gbuffer", gbufferMaterial);
         }
+        #endregion
 
-        //private bool IsOpaque(string textureFilename)
-        //{
-        //    var processorParameters = new OpaqueDataDictionary();
-        //    processorParameters.Add("PremultiplyAlpha", false);
-
-        //    var reference = new ExternalReference<TextureContent>(textureFilename);
-        //    var texture = (Texture2DContent)context.BuildAndLoadAsset<TextureContent, TextureContent>(reference, "SpriteTextureProcessor", processorParameters, null);
-        //    var bitmap = (PixelBitmapContent<Color>)texture.Mipmaps[0];
-
-        //    for (int x = 0; x < bitmap.Width; x++)
-        //    {
-        //        for (int y = 0; y < bitmap.Height; y++)
-        //        {
-        //            var colour = bitmap.GetPixel(x, y);
-        //            if (colour.A != 255)
-        //                return false;
-        //        }
-        //    }
-
-        //    return true;
-        //}
-
+        #region find texture resources
         private string FindDiffuseTexture(MeshContent mesh, MaterialContent material)
         {
             if (string.IsNullOrEmpty(DiffuseTexture))
@@ -293,27 +415,32 @@ namespace Myre.Graphics.Pipeline
 
                 return null;
             }
-            else
-                return Path.Combine(_directory, DiffuseTexture);
+            return Path.Combine(_directory, DiffuseTexture);
         }
 
         private string FindNormalTexture(MeshContent mesh, MaterialContent material)
         {
             if (string.IsNullOrEmpty(NormalTexture))
                 return FindTexture(mesh, material, "normalmap", "normal", "norm", "n", "bumpmap", "bump", "b") ?? "null_normal.tga";
-            else
-                return Path.Combine(_directory, NormalTexture);
+            return Path.Combine(_directory, NormalTexture);
         }
 
         private string FindSpecularTexture(MeshContent mesh, MaterialContent material)
         {
             if (string.IsNullOrEmpty(SpecularTexture))
                 return FindTexture(mesh, material, "specularmap", "specular", "spec", "s") ?? "null_specular.tga";
-            else
-                return Path.Combine(_directory, SpecularTexture);
+            return Path.Combine(_directory, SpecularTexture);
         }
 
         private string FindTexture(MeshContent mesh, MaterialContent material, params string[] possibleKeys)
+        {
+            var path = FindTexturePath(mesh, material, possibleKeys);
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                return null;
+            return path;
+        }
+
+        private string FindTexturePath(MeshContent mesh, MaterialContent material, string[] possibleKeys)
         {
             foreach (var key in possibleKeys)
             {
@@ -361,5 +488,61 @@ namespace Myre.Graphics.Pipeline
             // cant find anything
             return null;
         }
+        #endregion
+
+        #region static helpers
+        private static void FindMeshes(NodeContent root, ICollection<MeshContent> meshes)
+        {
+            var content = root as MeshContent;
+            if (content != null)
+            {
+                MeshContent mesh = content;
+                mesh.OpaqueData.Add("MeshIndex", meshes.Count);
+                meshes.Add(mesh);
+            }
+            foreach (NodeContent child in root.Children)
+                FindMeshes(child, meshes);
+        }
+
+        private static void FindAnimations(NodeContent node, Dictionary<string, AnimationContent> animations)
+        {
+            foreach (KeyValuePair<string, AnimationContent> k in node.Animations)
+            {
+                if (animations.ContainsKey(k.Key))
+                {
+                    foreach (KeyValuePair<string, AnimationChannel> c in k.Value.Channels)
+                    {
+                        animations[k.Key].Channels.Add(c.Key, c.Value);
+                    }
+                }
+                else
+                {
+                    animations.Add(k.Key, k.Value);
+                }
+            }
+
+            foreach (NodeContent child in node.Children)
+                FindAnimations(child, animations);
+        }
+
+        private static bool GeometryContainsChannel(IEnumerable<GeometryContent> geometry, string channel)
+        {
+            return geometry.Any(item => item.Vertices.Channels.Contains(channel));
+        }
+
+        private int FindBoneIndex(string name)
+        {
+            for (int i = 0; i < _bones.Count; i++)
+            {
+                var bone = _bones[i];
+                if (bone.Name == name)
+                {
+                    return i;
+                }
+            }
+            
+            throw new InvalidContentException(string.Format("Found animation for bone '{0}', which is not part of the skeleton.", name));
+        }
+        #endregion
     }
 }

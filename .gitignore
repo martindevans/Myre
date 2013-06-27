@@ -27,6 +27,8 @@
 /Myre/Myre.Serialisation/obj
 /Testing/Myre.Serialisation.Tests/bin
 /Testing/Myre.Serialisation.Tests/obj
+/Testing/DebugContentPipeline/bin
+/Testing/DebugContentPipeline/obj
 /Testing/GraphicsTests/GraphicsTests/obj
 /Testing/GraphicsTests/GraphicsTests/bin
 /Testing/GraphicsTests/GraphicsTestsContent/obj

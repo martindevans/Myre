@@ -41,6 +41,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoneIndexer.cs" />
+    <Compile Include="MyreAnimationContent.cs" />
     <Compile Include="MyreMaterialContent.cs" />
     <Compile Include="MyreMaterialData.cs" />
     <Compile Include="MyreMaterialProcessor.cs" />

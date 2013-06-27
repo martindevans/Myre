@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{99FA15
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugContentPipeline", "DebugContentPipeline\DebugContentPipeline.csproj", "{60D4BE86-3E37-4219-9AFB-786884E90D30}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Myre.Testing.vsmdi
@@ -477,6 +479,24 @@ Global
 		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|x86.ActiveCfg = Release|Any CPU
 		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Release|Xbox 360.ActiveCfg = Release|Any CPU
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Debug|x86.ActiveCfg = Debug|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Debug|x86.Build.0 = Debug|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Profile|Any CPU.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Profile|Mixed Platforms.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Profile|Mixed Platforms.Build.0 = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Profile|x86.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Profile|x86.Build.0 = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Profile|Xbox 360.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Release|Any CPU.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Release|Mixed Platforms.Build.0 = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Release|x86.ActiveCfg = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Release|x86.Build.0 = Release|x86
+		{60D4BE86-3E37-4219-9AFB-786884E90D30}.Release|Xbox 360.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

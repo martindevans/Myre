@@ -42,13 +42,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultGBuffer.fx">
-      <Name>DefaultGBuffer</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="DirectionalLight.fx">
       <Name>DirectionalLight</Name>
       <Importer>EffectImporter</Importer>
@@ -98,6 +91,11 @@
       <Name>CopyTexture</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="dude.fbx">
+      <Name>dude</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>MyreModelProcessor</Processor>
     </Compile>
     <None Include="EncodeNormals.fxh">
       <Name>EncodeNormals</Name>
@@ -236,7 +234,7 @@
     <Compile Include="tank.fbx">
       <Name>tank</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>MyreModelProcessor</Processor>
     </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
@@ -353,6 +351,42 @@
       <Name>Kitty128</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="head.tga">
+      <Name>head</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="jacket.tga">
+      <Name>jacket</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="pants.tga">
+      <Name>pants</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="upBodyC.tga">
+      <Name>upBodyC</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SkinningHeader.fxh">
+      <Name>SkinningHeader</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DefaultGBuffer.fx">
+      <Name>DefaultGBuffer</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

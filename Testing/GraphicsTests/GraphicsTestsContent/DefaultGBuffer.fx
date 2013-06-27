@@ -1,12 +1,13 @@
+#include "SkinningHeader.fxh"
 #include "EncodeNormals.fxh"
 
-float4x4 WorldView : WORLDVIEW;
-float4x4 Projection : PROJECTION;
-float FarClip : FARCLIP;
+uniform float4x4 WorldView : WORLDVIEW;
+uniform float4x4 Projection : PROJECTION;
+uniform float FarClip : FARCLIP;
 
-texture DiffuseMap;
-texture NormalMap;
-texture SpecularMap;
+uniform texture DiffuseMap;
+uniform texture NormalMap;
+uniform texture SpecularMap;
 
 sampler diffuseSampler = sampler_state
 {
@@ -38,7 +39,7 @@ sampler specularSampler = sampler_state
 	MagFilter = Linear;
 };
 
-struct VertexShaderInput
+struct DefaultVertexShaderInput
 {
     float4 Position : POSITION0;
 	float2 TexCoord : TEXCOORD0;
@@ -47,7 +48,7 @@ struct VertexShaderInput
 	float3 Tangent : TANGENT;
 };
 
-struct VertexShaderOutput
+struct DefaultVertexShaderOutput
 {
     float4 PositionCS : POSITION0;
 	float2 TexCoord : TEXCOORD0;
@@ -55,9 +56,9 @@ struct VertexShaderOutput
 	float3x3 TangentToView : TEXCOORD2;
 };
 
-VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
+DefaultVertexShaderOutput DefaultVertexShaderFunction(DefaultVertexShaderInput input)
 {
-    VertexShaderOutput output;
+    DefaultVertexShaderOutput output;
 
     float4 viewPosition = mul(input.Position, WorldView);
     
@@ -72,8 +73,8 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     return output;
 }
 
-void PixelShaderFunction(uniform bool ClipAlpha,
-						 in VertexShaderOutput input,
+void DefaultPixelShaderFunction(uniform bool ClipAlpha,
+						 in DefaultVertexShaderOutput input,
 						 out float4 out_depth : COLOR0,
 						 out float4 out_normal : COLOR1,
 						 out float4 out_diffuse : COLOR2)
@@ -97,20 +98,47 @@ void PixelShaderFunction(uniform bool ClipAlpha,
 	out_diffuse = float4(diffuseSample.rgb, specularSample.a);
 }
 
-technique Default
+struct AnimatedVertexShaderInput
 {
-    pass Pass1
-    {
-        VertexShader = compile vs_3_0 VertexShaderFunction();
-        PixelShader = compile ps_3_0 PixelShaderFunction(false);
-    }
+    float4 Position : POSITION0;
+	float2 TexCoord : TEXCOORD0;
+	float3 Normal : NORMAL;
+	float3 Binormal : BINORMAL;
+	float3 Tangent : TANGENT;
+
+	float4 Indices  : BLENDINDICES0;
+    float4 Weights  : BLENDWEIGHT0;
+};
+
+DefaultVertexShaderOutput AnimatedVertexShaderFunction(AnimatedVertexShaderInput input)
+{
+	//Apply animation effects and convert data into a form the default vertex shader can understand
+	DefaultVertexShaderInput postAnimation;
+	float4x3 skinning = CalculateSkinMatrix(input.Indices, input.Weights, WeightsPerVertex);
+	postAnimation.Position = SkinTransformPosition(input.Position, skinning);
+	postAnimation.TexCoord = input.TexCoord;
+	postAnimation.Tangent = SkinTransformNormal(input.Tangent, skinning);
+	postAnimation.Binormal = SkinTransformNormal(input.Binormal, skinning);
+	postAnimation.Normal = SkinTransformNormal(input.Normal, skinning);
+
+	//Do normal vertex shader stuff
+	return DefaultVertexShaderFunction(postAnimation);
 }
 
-technique ClipAlpha
+technique Default
 {
-    pass Pass1
-    {
-        VertexShader = compile vs_3_0 VertexShaderFunction();
-        PixelShader = compile ps_3_0 PixelShaderFunction(true);
-    }
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 DefaultVertexShaderFunction();
+		PixelShader = compile ps_3_0 DefaultPixelShaderFunction(true);
+	}
+}
+
+technique Animated
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 AnimatedVertexShaderFunction();
+		PixelShader = compile ps_3_0 DefaultPixelShaderFunction(true);
+	}
 }

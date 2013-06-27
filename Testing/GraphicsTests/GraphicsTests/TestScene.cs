@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Myre.Debugging.UI;
 using Myre.Entities;
+using Myre.Graphics.Animation;
 using Ninject;
 using Microsoft.Xna.Framework;
 using Myre.Graphics;
@@ -155,7 +156,7 @@ namespace GraphicsTests
                 spotLightEntity.GetProperty<float>("angle").Value = MathHelper.PiOver2;
                 spotLightEntity.GetProperty<float>("range").Value = 500;
                 spotLightEntity.GetProperty<Texture2D>("mask").Value = content.Load<Texture2D>("Chrysanthemum");
-                spotLightEntity.GetProperty<int>("shadow_resolution").Value = 0;//512;
+                spotLightEntity.GetProperty<int>("shadow_resolution").Value = 1024;
                 this.spotLight = spotLightEntity.GetBehaviour<SpotLight>();
                 scene.Add(spotLightEntity);
             }
@@ -209,13 +210,25 @@ namespace GraphicsTests
             hebe.AddProperty<Matrix>("transform");
             hebe.AddProperty<bool>("is_static");
             hebe.AddBehaviour<ModelInstance>();
-            var hebeEntity = hebe.Create();
-            hebeEntity.GetProperty<ModelData>("model").Value = hebeModel;
-            hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
-                                                                    * Matrix.CreateRotationY(MathHelper.PiOver2)
-                                                                    * Matrix.CreateTranslation(-150, 20, 0);
-            hebeEntity.GetProperty<bool>("is_static").Value = true;
-            scene.Add(hebeEntity);
+            //var hebeEntity = hebe.Create();
+            //hebeEntity.GetProperty<ModelData>("model").Value = hebeModel;
+            //hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
+            //                                                        * Matrix.CreateRotationY(MathHelper.PiOver2)
+            //                                                        * Matrix.CreateTranslation(-150, 20, 0);
+            //hebeEntity.GetProperty<bool>("is_static").Value = true;
+            //scene.Add(hebeEntity);
+
+            var dudeModel = content.Load<ModelData>(@"dude");
+            var dude = kernel.Get<EntityDescription>();
+            dude.AddProperty<ModelData>("model", dudeModel);
+            dude.AddProperty<Matrix>("transform", Matrix.CreateScale(0.75f) * Matrix.CreateTranslation(-50, 0, 0));
+            dude.AddProperty<bool>("is_static", true);
+            dude.AddBehaviour<ModelInstance>();
+            dude.AddBehaviour<Animated>();
+            var dudeEntity = dude.Create();
+            scene.Add(dudeEntity);
+            var animated = dudeEntity.GetBehaviour<Animated>();
+            animated.StartClip(animated.Clips.First().Value);
 
             var lightBlocker = hebe.Create();
             hebeTransform = lightBlocker.GetProperty<Matrix>("transform");

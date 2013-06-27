@@ -54,7 +54,7 @@ namespace Myre.Graphics.Materials
             { typeof(Vector2).Name,   typeof(Vector2MaterialParameterSetter)      },
             { typeof(Vector3).Name,   typeof(Vector3MaterialParameterSetter)      },
             { typeof(Vector4).Name,   typeof(Vector4MaterialParameterSetter)      },
-            { typeof(Matrix).Name,    typeof(MatrixMaterialParameterSetter)       },
+            { typeof(Matrix).Name,    typeof(Matrix4X4MaterialParameterSetter)    },
             { typeof(String).Name,    typeof(StringMaterialParameterSetter)       },
             { typeof(Boolean[]).Name, typeof(BooleanArrayMaterialParameterSetter) },
             { typeof(Int32[]).Name,   typeof(Int32ArrayMaterialParameterSetter)   },
@@ -62,7 +62,7 @@ namespace Myre.Graphics.Materials
             { typeof(Vector2[]).Name, typeof(Vector2ArrayMaterialParameterSetter) },
             { typeof(Vector3[]).Name, typeof(Vector3ArrayMaterialParameterSetter) },
             { typeof(Vector4[]).Name, typeof(Vector4ArrayMaterialParameterSetter) },
-            { typeof(Matrix[]).Name,  typeof(MatrixArrayMaterialParameterSetter)  },
+            { typeof(Matrix[]).Name,  typeof(Matrix4X4ArrayMaterialParameterSetter)  },
         };
 
         internal static readonly Dictionary<ParameterType, Type> ParameterTypeMappings = new Dictionary<ParameterType, Type>()
@@ -378,13 +378,13 @@ namespace Myre.Graphics.Materials
         }
     }
 
-    class MatrixMaterialParameterSetter
+    class Matrix4X4MaterialParameterSetter
         : MaterialParameterSetter
     {
         private Box<Matrix> _value;
         private BoxedValueStore<string> _previousGlobals;
 
-        public MatrixMaterialParameterSetter(EffectParameter parameter)
+        public Matrix4X4MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
@@ -570,13 +570,13 @@ namespace Myre.Graphics.Materials
         }
     }
 
-    class MatrixArrayMaterialParameterSetter
+    class Matrix4X4ArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
         private Box<Matrix[]> _value;
         private BoxedValueStore<string> _previousGlobals;
 
-        public MatrixArrayMaterialParameterSetter(EffectParameter parameter)
+        public Matrix4X4ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }

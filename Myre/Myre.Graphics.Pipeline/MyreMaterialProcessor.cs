@@ -8,11 +8,6 @@ namespace Myre.Graphics.Pipeline
     /// to apply custom processing to content data, converting an object of
     /// type TInput to TOutput. The input and output types may be the same if
     /// the processor wishes to alter data without changing its type.
-    ///
-    /// This should be part of a Content Pipeline Extension Library project.
-    ///
-    /// TODO: change the ContentProcessor attribute to specify the correct
-    /// display name for this processor.
     /// </summary>
     [ContentProcessor(DisplayName = "Myre Material Processor")]
     public class MyreMaterialProcessor : ContentProcessor<MyreMaterialData, MyreMaterialContent>
@@ -29,8 +24,10 @@ namespace Myre.Graphics.Pipeline
             foreach (var item in input.OpaqueData)
                 material.OpaqueData.Add(item.Key, item.Value);
 
-            var processorParameters = new OpaqueDataDictionary();
-            processorParameters.Add("PremultiplyTextureAlpha", false);
+            var processorParameters = new OpaqueDataDictionary
+            {
+                {"PremultiplyTextureAlpha", false}
+            };
             output.Material = context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", processorParameters);
 
             return output;

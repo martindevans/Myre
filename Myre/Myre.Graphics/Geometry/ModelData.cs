@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework.Content;
+using Myre.Graphics.Animation;
 
 namespace Myre.Graphics.Geometry
 {
@@ -13,12 +15,24 @@ namespace Myre.Graphics.Geometry
             get { return _meshes; }
         }
 
+        private readonly SkinningData _skinningData;
+        public SkinningData SkinningData
+        {
+            get { return _skinningData; }
+        }
+
         public event Action<ModelData, Mesh> MeshAdded;
         public event Action<ModelData, Mesh> MeshRemoved;
 
         public ModelData(IEnumerable<Mesh> meshes)
+            :this(meshes, null)
+        {
+        }
+
+        public ModelData(IEnumerable<Mesh> meshes, SkinningData skinningData)
         {
             _meshes = new List<Mesh>(meshes);
+            _skinningData = skinningData;
         }
 
         public void Add(Mesh m)
@@ -76,12 +90,19 @@ namespace Myre.Graphics.Geometry
     {
         protected override ModelData Read(ContentReader input, ModelData existingInstance)
         {
-            var size = input.ReadInt32();
-            var meshes = new Mesh[size];
-            for (int i = 0; i < size; i++)
+            //Read meshes
+            var meshCount = input.ReadInt32();
+            var meshes = new Mesh[meshCount];
+            for (int i = 0; i < meshCount; i++)
                 meshes[i] = input.ReadObject<Mesh>();
 
-            var model = existingInstance ?? new ModelData(meshes);
+            //Read animations
+            SkinningData skinning = null;
+            bool isAnimated = input.ReadBoolean();
+            if (isAnimated)
+                skinning = input.ReadObject<SkinningData>();
+
+            var model = existingInstance ?? new ModelData(meshes, skinning);
 
             return model;
         }
