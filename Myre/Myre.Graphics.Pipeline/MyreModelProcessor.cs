@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Myre.Graphics.Pipeline
 {
@@ -34,40 +32,43 @@ namespace Myre.Graphics.Pipeline
                             new Dictionary<MaterialContent, Dictionary<string, MyreMaterialContent>>();
 
         [DisplayName("Diffuse Texture")]
-        public string DiffuseTexture
-        {
-            get;
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-            set;
-// ReSharper restore UnusedAutoPropertyAccessor.Global
-        }
+        public string DiffuseTexture { get; set; }
 
         [DisplayName("Specular Texture")]
-        public string SpecularTexture
-        {
-            get;
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-            set;
-// ReSharper restore UnusedAutoPropertyAccessor.Global
-        }
+        public string SpecularTexture { get; set; }
 
         [DisplayName("Normal Texture")]
-        public string NormalTexture
-        {
-            get;
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-            set;
-// ReSharper restore UnusedAutoPropertyAccessor.Global
-        }
+        public string NormalTexture { get; set; }
         
         [DisplayName("Allow null diffuse textures")]
         [DefaultValue(true)]
-        public bool AllowNullDiffuseTexture
+        public bool AllowNullDiffuseTexture { get; set; }
+
+        private string _gbufferEffectName = "DefaultGBuffer.fx";
+        [DisplayName("GBuffer Effect")]
+        [DefaultValue("DefaultGBuffer.fx")]
+        public string GBufferEffectName
         {
-            get;
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-            set;
-// ReSharper restore UnusedAutoPropertyAccessor.Global
+            get { return _gbufferEffectName; }
+            set { _gbufferEffectName = value; }
+        }
+
+        private string _shadowEffectName = "DefaultShadows.fx";
+        [DisplayName("GBuffer Shadow Effect")]
+        [DefaultValue("DefaultShadows.fx")]
+        public string ShadowEffectName
+        {
+            get { return _shadowEffectName; }
+            set { _shadowEffectName = value; }
+        }
+
+        private string _gbufferTechnique = null;
+        [DisplayName("GBuffer Technique")]
+        [DefaultValue(null)]
+        public string GBufferTechnique
+        {
+            get { return _gbufferTechnique; }
+            set { _gbufferTechnique = value; }
         }
 
         private IList<BoneContent> _bones;
@@ -370,12 +371,12 @@ namespace Myre.Graphics.Pipeline
 
         private void CreateShadowMaterial(MaterialContent material, bool animated)
         {
-            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = animated ? "AnimatedViewLength" : "ViewLength"};
+            var materialData = new MyreMaterialData { EffectName = Path.GetFullPath(ShadowEffectName), Technique = animated ? "AnimatedViewLength" : "ViewLength" };
 
             var shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewlength", shadowMaterial);
 
-            materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultShadows.fx"), Technique = animated ? "AnimatedViewZ" : "ViewZ"};
+            materialData = new MyreMaterialData { EffectName = Path.GetFullPath(ShadowEffectName), Technique = animated ? "AnimatedViewZ" : "ViewZ" };
 
             shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewz", shadowMaterial);
@@ -390,7 +391,7 @@ namespace Myre.Graphics.Pipeline
             if (diffuseTexture == null)
                 return;
 
-            var materialData = new MyreMaterialData {EffectName = Path.GetFullPath("DefaultGBuffer.fx"), Technique = animated ? "Animated" : "Default"};
+            var materialData = new MyreMaterialData { EffectName = Path.GetFullPath(GBufferEffectName), Technique = GBufferTechnique ?? (animated ? "Animated" : "Default") };
             materialData.Textures.Add("DiffuseMap", diffuseTexture);
             materialData.Textures.Add("NormalMap", normalTexture);
             materialData.Textures.Add("SpecularMap", specularTexture);

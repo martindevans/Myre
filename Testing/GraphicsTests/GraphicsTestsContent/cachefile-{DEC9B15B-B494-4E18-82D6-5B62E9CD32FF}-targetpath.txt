@@ -1,9 +1,0 @@
-Content\dude.xnb
-Content\head_0.xnb
-Content\null_normal_0.xnb
-Content\null_specular_0.xnb
-Content\DefaultGBuffer_0.xnb
-Content\DefaultShadows_0.xnb
-Content\jacket_0.xnb
-Content\pants_0.xnb
-Content\upBodyC_0.xnb

@@ -20,6 +20,7 @@ namespace GraphicsTests.Tests
         : TestScreen
     {
         private readonly Scene _scene;
+        private ModelInstance _dude;
 
         public AnimatedDude(IKernel kernel, ContentManager content, GraphicsDevice device)
             :base("Animated Dude", kernel)
@@ -36,6 +37,7 @@ namespace GraphicsTests.Tests
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
             var animated = dudeEntity.GetBehaviour<Animated>();
+            _dude = dudeEntity.GetBehaviour<ModelInstance>();
             animated.StartClip(animated.Clips.First().Value);
 
             var camera = new Camera();
@@ -53,15 +55,30 @@ namespace GraphicsTests.Tests
             _scene.Add(cameraEntity);
 
             var ambientLight = kernel.Get<EntityDescription>();
-            ambientLight.AddProperty<Vector3>("sky_colour");
-            ambientLight.AddProperty<Vector3>("ground_colour");
-            ambientLight.AddProperty<Vector3>("up");
+            ambientLight.AddProperty<Vector3>("sky_colour", new Vector3(0.44f));
+            ambientLight.AddProperty<Vector3>("ground_colour", new Vector3(0.24f, 0.35f, 0.24f));
+            ambientLight.AddProperty<Vector3>("up", Vector3.Up);
             ambientLight.AddBehaviour<AmbientLight>();
-            var ambientLightEntity = ambientLight.Create();
-            ambientLightEntity.GetProperty<Vector3>("sky_colour").Value = new Vector3(0.24f);
-            ambientLightEntity.GetProperty<Vector3>("ground_colour").Value = new Vector3(0.14f, 0.15f, 0.14f);
-            ambientLightEntity.GetProperty<Vector3>("up").Value = Vector3.Up;
-            _scene.Add(ambientLightEntity);
+            _scene.Add(ambientLight.Create());
+
+            var sponza = kernel.Get<EntityDescription>();
+            sponza.AddProperty<ModelData>("model", content.Load<ModelData>(@"Sponza"));
+            sponza.AddProperty<Matrix>("transform", Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-350, 0, 0));
+            sponza.AddProperty<bool>("is_static", true);
+            sponza.AddBehaviour<ModelInstance>();
+            _scene.Add(sponza.Create());
+
+            var spotLight = kernel.Get<EntityDescription>();
+            spotLight.AddProperty<Vector3>("position", new Vector3(150, 0, 0));
+            spotLight.AddProperty<Vector3>("colour", new Vector3(5));
+            spotLight.AddProperty<Vector3>("direction", new Vector3(-1, 0, 0));
+            spotLight.AddProperty<float>("angle", MathHelper.PiOver2);
+            spotLight.AddProperty<float>("range", 1000);
+            spotLight.AddProperty<Texture2D>("mask", content.Load<Texture2D>("Chrysanthemum"));
+            spotLight.AddProperty<int>("shadow_resolution", 1024);
+            spotLight.AddBehaviour<SpotLight>();
+            var spotLightEntity = spotLight.Create();
+            _scene.Add(spotLightEntity);
 
             _scene.GetService<Renderer>().StartPlan()
                   .Then<GeometryBufferComponent>()
@@ -77,6 +94,8 @@ namespace GraphicsTests.Tests
         {
             _scene.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
+
+            _dude.Transform = Matrix.CreateRotationY((float) gameTime.TotalGameTime.TotalSeconds * 0.8f);
         }
 
         public override void Draw(GameTime gameTime)
