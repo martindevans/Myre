@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,6 +18,7 @@ namespace GraphicsTests.Tests
     {
         private readonly Scene _scene;
         private ModelInstance _dude;
+        private Animated _animation;
 
         public AnimatedDude(IKernel kernel, ContentManager content, GraphicsDevice device)
             :base("Animated Dude", kernel)
@@ -36,9 +34,9 @@ namespace GraphicsTests.Tests
             dude.AddBehaviour<Animated>();
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
-            var animated = dudeEntity.GetBehaviour<Animated>();
+            _animation = dudeEntity.GetBehaviour<Animated>();
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
-            animated.StartClip(animated.Clips.First().Value);
+            _animation.StartClip(_animation.Clips.First().Value);
 
             var camera = new Camera();
             camera.NearClip = 1;
