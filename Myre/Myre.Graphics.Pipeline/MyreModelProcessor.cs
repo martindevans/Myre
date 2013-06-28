@@ -23,8 +23,6 @@ namespace Myre.Graphics.Pipeline
         MyreModelContent _outputModel;
         string _directory;
 
-        public const long TICKS_PER_60_FPS = TimeSpan.TicksPerSecond / 60;
-
         // A single material may be reused on more than one piece of geometry.
         // This dictionary keeps track of materials we have already converted,
         // to make sure we only bother processing each of them once.
@@ -39,10 +37,15 @@ namespace Myre.Graphics.Pipeline
 
         [DisplayName("Normal Texture")]
         public string NormalTexture { get; set; }
-        
+
+        private bool _allowNullDiffuseTexture = true;
         [DisplayName("Allow null diffuse textures")]
         [DefaultValue(true)]
-        public bool AllowNullDiffuseTexture { get; set; }
+        public bool AllowNullDiffuseTexture
+        {
+            get { return _allowNullDiffuseTexture; }
+            set { _allowNullDiffuseTexture = value; }
+        }
 
         private string _gbufferEffectName = "DefaultGBuffer.fx";
         [DisplayName("GBuffer Effect")]
@@ -91,19 +94,13 @@ namespace Myre.Graphics.Pipeline
             _outputModel = new MyreModelContent();
 
             //Extract skeleton data from the input
-            ReadSkinningData(input, skeleton, context);
+            ProcessSkinningData(input, skeleton, context);
 
             //Process meshes
             List<MeshContent> meshes = new List<MeshContent>();
             FindMeshes(input, meshes);
             foreach (var mesh in meshes)
                 ProcessMesh(mesh, context);
-
-            //Process animations
-            Dictionary<string, AnimationContent> animations = new Dictionary<string, AnimationContent>();
-            FindAnimations(input, animations);
-            foreach (var animation in animations)
-                ProcessAnimation(animation.Value, context);
 
             return _outputModel;
         }
@@ -133,8 +130,7 @@ namespace Myre.Graphics.Pipeline
         }
 
         #region animation processing
-
-        private void ReadSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context)
+        private void ProcessSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context)
         {
             if (skeleton == null)
             {
@@ -160,48 +156,6 @@ namespace Myre.Graphics.Pipeline
                 inverseBindPose,
                 skeletonHierarchy
             );
-        }
-
-        private void ProcessAnimation(AnimationContent anim, ContentProcessorContext context)
-        {
-            const string errorMsg = "One or more AnimationContent objects have an extremely small duration.  If the animation "
-                                    + "was intended to last more than one frame, please add \n AnimTicksPerSecond \n{0} \nY; \n{1}\n to your .X "
-                                    + "file, where Y is a positive integer.";
-            if (anim.Duration.Ticks < TICKS_PER_60_FPS)
-            {
-                context.Logger.LogWarning("", anim.Identity, errorMsg, "{", "}");
-                return;
-            }
-
-            //TODO:: Resample the animation to some set FPS?
-
-            _outputModel.SkinningData.Animations.Add(ProcessAnimationClip(anim));
-        }
-
-        private MyreClipContent ProcessAnimationClip(AnimationContent anim)
-        {
-            MyreClipContent animationClip = new MyreClipContent(anim.Name);
-
-            foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
-            {
-                // Look up what bone this channel is controlling.
-                int boneIndex = FindBoneIndex(channel.Key);
-
-                // Convert the keyframe data.
-                foreach (AnimationKeyframe keyframe in channel.Value)
-                    animationClip.Keyframes.Add(new MyreKeyframeContent(boneIndex, keyframe.Time, keyframe.Transform));
-            }
-
-            // Sort the merged keyframes by time.
-            animationClip.Keyframes.Sort((a, b) => a.Time.CompareTo(b.Time));
-
-            if (animationClip.Keyframes.Count == 0)
-                throw new InvalidContentException("Animation has no keyframes.");
-
-            if (anim.Duration <= TimeSpan.Zero)
-                throw new InvalidContentException("Animation has a zero duration.");
-
-            return animationClip;
         }
         #endregion
 
@@ -316,10 +270,10 @@ namespace Myre.Graphics.Pipeline
                 // Add the appropriate bone indices based on the bone names in the
                 // BoneWeightCollection
                 Vector4 bi = new Vector4(
-                    count > 0 ? FindBoneIndex(bwc[0].BoneName) : 0,
-                    count > 1 ? FindBoneIndex(bwc[1].BoneName) : 0,
-                    count > 2 ? FindBoneIndex(bwc[2].BoneName) : 0,
-                    count > 3 ? FindBoneIndex(bwc[3].BoneName) : 0
+                    count > 0 ? FindBoneIndex(bwc[0].BoneName, _bones) : 0,
+                    count > 1 ? FindBoneIndex(bwc[1].BoneName, _bones) : 0,
+                    count > 2 ? FindBoneIndex(bwc[2].BoneName, _bones) : 0,
+                    count > 3 ? FindBoneIndex(bwc[3].BoneName, _bones) : 0
                 );
                 indicesToAdd[i] = bi;
 
@@ -505,41 +459,18 @@ namespace Myre.Graphics.Pipeline
                 FindMeshes(child, meshes);
         }
 
-        private static void FindAnimations(NodeContent node, Dictionary<string, AnimationContent> animations)
-        {
-            foreach (KeyValuePair<string, AnimationContent> k in node.Animations)
-            {
-                if (animations.ContainsKey(k.Key))
-                {
-                    foreach (KeyValuePair<string, AnimationChannel> c in k.Value.Channels)
-                    {
-                        animations[k.Key].Channels.Add(c.Key, c.Value);
-                    }
-                }
-                else
-                {
-                    animations.Add(k.Key, k.Value);
-                }
-            }
-
-            foreach (NodeContent child in node.Children)
-                FindAnimations(child, animations);
-        }
-
         private static bool GeometryContainsChannel(IEnumerable<GeometryContent> geometry, string channel)
         {
             return geometry.Any(item => item.Vertices.Channels.Contains(channel));
         }
 
-        private int FindBoneIndex(string name)
+        public static int FindBoneIndex(string name, IList<BoneContent> bones)
         {
-            for (int i = 0; i < _bones.Count; i++)
+            for (int i = 0; i < bones.Count; i++)
             {
-                var bone = _bones[i];
+                var bone = bones[i];
                 if (bone.Name == name)
-                {
                     return i;
-                }
             }
             
             throw new InvalidContentException(string.Format("Found animation for bone '{0}', which is not part of the skeleton.", name));

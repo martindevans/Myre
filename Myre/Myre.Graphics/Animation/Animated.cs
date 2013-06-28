@@ -15,16 +15,6 @@ namespace Myre.Graphics.Animation
         #region fields
         private ModelInstance _model;
 
-        public Dictionary<string, Clip> Clips
-        {
-            get
-            {
-                if (_model == null || _model.Model == null || _model.Model.SkinningData == null)
-                    return null;
-                return _model.Model.SkinningData.AnimationClips;
-            }
-        }
-
         // Information about the currently playing animation clip.
         private readonly List<PlayingClip> _activeAnimations = new List<PlayingClip>();
 
@@ -73,12 +63,17 @@ namespace Myre.Graphics.Animation
         }
         #endregion
 
-        public void StartClip(Clip clip)
+        public void StartClip(Clip clip, float timeFactor = 1, float weight = 1)
         {
             if (clip == null)
                 throw new ArgumentNullException("clip");
 
-            _activeAnimations.Add(PlayingClip.Create(clip, skinningData.SkeletonHierarchy.Length));
+            var instance = PlayingClip.Create(clip, skinningData.SkeletonHierarchy.Length);
+
+            instance.TimeFactor = timeFactor;
+            instance.Weight = weight;
+
+            _activeAnimations.Add(instance);
         }
 
         protected override void Update(float elapsedTime)
@@ -86,7 +81,6 @@ namespace Myre.Graphics.Animation
             UpdateKeyframes(TimeSpan.FromSeconds(elapsedTime));
             UpdateBoneTransforms();
             UpdateWorldTransforms();
-            UpdateSkinTransforms();
         }
 
         private void UpdateKeyframes(TimeSpan dt)
@@ -103,6 +97,7 @@ namespace Myre.Graphics.Animation
             for (int boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
             {
                 float totalWeight = 0;
+                int activeAnimationsForBone = 0;
                 _keyframes.Clear();
                 foreach (var animation in _activeAnimations)
                 {
@@ -111,8 +106,13 @@ namespace Myre.Graphics.Animation
                     {
                         _keyframes.Add(new WeightedKeyframe(k, animation.Weight));
                         totalWeight += animation.Weight;
+                        activeAnimationsForBone++;
                     }
                 }
+
+                //Normalize the weight if it's really small (give equal weighting to all animations)
+                if (Math.Abs(totalWeight) < float.Epsilon)
+                    totalWeight = activeAnimationsForBone;
 
                 if (_keyframes.Count == 0)
                     _boneTransforms[boneIndex] = skinningData.BindPose[boneIndex];
@@ -143,15 +143,8 @@ namespace Myre.Graphics.Animation
             {
                 int parentBone = skinningData.SkeletonHierarchy[bone];
 
-                _worldTransforms[bone] = _boneTransforms[bone] * _worldTransforms[parentBone];
-            }
-        }
-
-        public void UpdateSkinTransforms()
-        {
-            for (int bone = 0; bone < _skinTransforms.Length; bone++)
-            {
-                _skinTransforms[bone] = skinningData.InverseBindPose[bone] * _worldTransforms[bone];
+                Matrix.Multiply(ref _boneTransforms[bone], ref _worldTransforms[parentBone], out _worldTransforms[bone]);
+                Matrix.Multiply(ref skinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
             }
         }
 

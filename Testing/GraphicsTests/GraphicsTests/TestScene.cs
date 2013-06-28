@@ -227,8 +227,6 @@ namespace GraphicsTests
             dude.AddBehaviour<Animated>();
             var dudeEntity = dude.Create();
             scene.Add(dudeEntity);
-            var animated = dudeEntity.GetBehaviour<Animated>();
-            animated.StartClip(animated.Clips.First().Value);
 
             var lightBlocker = hebe.Create();
             hebeTransform = lightBlocker.GetProperty<Matrix>("transform");

@@ -253,11 +253,21 @@
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_PremultiplyAlpha>False</ProcessorParameters_PremultiplyAlpha>
     </Compile>
+    <Compile Include="t-pose.fbx">
+      <Name>t-pose</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>MyreModelProcessor</Processor>
+    </Compile>
     <None Include="ToneMapFunctions.fxh">
       <Name>ToneMapFunctions</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </None>
+    <Compile Include="uppercut.fbx">
+      <Name>uppercut</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="null_normal.tga">

@@ -18,6 +18,7 @@ namespace Myre.Graphics.Animation
         }
 
         public float Weight { get; set; }
+        public float TimeFactor { get; set; }
 
         private void ClearKeyframes(int size)
         {
@@ -41,6 +42,7 @@ namespace Myre.Graphics.Animation
         public bool Update(TimeSpan elapsedTime)
         {
             // Update the animation position.
+            elapsedTime = TimeSpan.FromSeconds(elapsedTime.TotalSeconds * TimeFactor);
             elapsedTime += _currentTimeValue;
 
             // If we reached the end, loop back to the start.

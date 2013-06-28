@@ -25,7 +25,7 @@ namespace GraphicsTests.Tests
         {
             _scene = kernel.Get<Scene>();
 
-            var model = content.Load<ModelData>(@"dude");
+            var model = content.Load<ModelData>(@"t-pose");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty<ModelData>("model", model);
             dude.AddProperty<Matrix>("transform", Matrix.Identity);
@@ -36,7 +36,8 @@ namespace GraphicsTests.Tests
             _scene.Add(dudeEntity);
             _animation = dudeEntity.GetBehaviour<Animated>();
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
-            _animation.StartClip(_animation.Clips.First().Value);
+            
+            _animation.StartClip(content.Load<Clip>("uppercut"), 1f);
 
             var camera = new Camera();
             camera.NearClip = 1;
@@ -67,7 +68,7 @@ namespace GraphicsTests.Tests
             _scene.Add(sponza.Create());
 
             var spotLight = kernel.Get<EntityDescription>();
-            spotLight.AddProperty<Vector3>("position", new Vector3(150, 0, 0));
+            spotLight.AddProperty<Vector3>("position", new Vector3(150, 50, 0));
             spotLight.AddProperty<Vector3>("colour", new Vector3(5));
             spotLight.AddProperty<Vector3>("direction", new Vector3(-1, 0, 0));
             spotLight.AddProperty<float>("angle", MathHelper.PiOver2);
@@ -83,7 +84,7 @@ namespace GraphicsTests.Tests
                   .Then<EdgeDetectComponent>()
                   .Then<Ssao>()
                   .Then<LightingComponent>()
-                  .Then<ToneMapComponent>()
+                  //.Then<ToneMapComponent>()
                   .Then<TranslucentComponent>()
                   .Apply();
         }

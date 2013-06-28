@@ -87,14 +87,12 @@ namespace Myre.Graphics.Pipeline
     [ContentSerializerRuntimeType("Myre.Graphics.Animation.SkinningData, Myre.Graphics")]
     public class MyreSkinningDataContent
     {
-        public List<MyreClipContent> Animations { get; private set; }
         public List<Matrix> BindPose { get; private set; }
         public List<Matrix> InverseBindPose { get; private set; }
         public List<int> Hierarchy { get; private set; }
 
         public MyreSkinningDataContent(List<Matrix> bindPose, List<Matrix> inverseBindPose, List<int> hierarchy)
         {
-            Animations = new List<MyreClipContent>();
             BindPose = bindPose;
             InverseBindPose = inverseBindPose;
             Hierarchy = hierarchy;
@@ -106,11 +104,6 @@ namespace Myre.Graphics.Pipeline
     {
         protected override void Write(ContentWriter output, MyreSkinningDataContent value)
         {
-            //Write animations
-            output.Write(value.Animations.Count);
-            foreach (var animation in value.Animations)
-                output.WriteObject(animation);
-
             //Write bind pose
             output.Write(value.BindPose.Count);
             foreach (var matrix in value.BindPose)
