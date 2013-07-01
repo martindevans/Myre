@@ -1,10 +1,11 @@
-﻿using System.Linq;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
 using Myre.Graphics;
 using Myre.Graphics.Animation;
+using Myre.Graphics.Animation.Clips;
 using Myre.Graphics.Deferred;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
@@ -17,15 +18,28 @@ namespace GraphicsTests.Tests
         : TestScreen
     {
         private readonly Scene _scene;
-        private ModelInstance _dude;
-        private Animated _animation;
+        private readonly ModelInstance _dude;
+        private readonly Animated _animation;
+
+        private readonly string[] _sequence = new string[]
+        {
+            "walk01","walk01","walk01","walk03","walk03",
+            "death02", "get-up",
+            "run01","run02","run03","run01",
+            "run-jump","roll-forward","run01",
+            "run_ready-shoot","run_ready-shoot",
+            "run_shooting","run_shooting", "run_shooting",
+            "firing01","firing02","firing03","firing03","walk_shooting",
+            "walk01", "walk02", "walk01", "walk03",
+            "emo03", "walk03", "chat01"
+        };
 
         public AnimatedDude(IKernel kernel, ContentManager content, GraphicsDevice device)
             :base("Animated Dude", kernel)
         {
             _scene = kernel.Get<Scene>();
 
-            var model = content.Load<ModelData>(@"t-pose");
+            var model = content.Load<ModelData>(@"models/zoe_fbx");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty<ModelData>("model", model);
             dude.AddProperty<Matrix>("transform", Matrix.Identity);
@@ -36,13 +50,30 @@ namespace GraphicsTests.Tests
             _scene.Add(dudeEntity);
             _animation = dudeEntity.GetBehaviour<Animated>();
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
-            
-            _animation.StartClip(content.Load<Clip>("uppercut"), 1f);
 
-            var camera = new Camera();
-            camera.NearClip = 1;
-            camera.FarClip = 700;
-            camera.View = Matrix.CreateTranslation(0, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up);
+            _animation.DefaultClip = new Animated.ClipPlaybackParameters
+            {
+                Clip = new RandomClip(
+                    content.Load<Clip>("Models/ZoeAnimations/idle02"),
+                    content.Load<Clip>("Models/ZoeAnimations/idle01")
+                    ),
+                FadeInTime = TimeSpan.FromSeconds(1f),
+                FadeOutTime = TimeSpan.FromSeconds(0.5f),
+                Loop = false,
+            };
+
+            foreach (var name in _sequence)
+            {
+                _animation.EnqueueClip(new Animated.ClipPlaybackParameters
+                {
+                    Clip = content.Load<Clip>("Models/ZoeAnimations/" + name),
+                    FadeInTime = TimeSpan.FromSeconds(0.1f),
+                    FadeOutTime = TimeSpan.FromSeconds(0.0f),
+                    Loop = false,
+                });
+            }
+
+            var camera = new Camera {NearClip = 1, FarClip = 700, View = Matrix.CreateTranslation(0, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up)};
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
             var cameraDesc = kernel.Get<EntityDescription>();
             cameraDesc.AddProperty<Camera>("camera");
@@ -94,7 +125,7 @@ namespace GraphicsTests.Tests
             _scene.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
 
-            _dude.Transform = Matrix.CreateRotationY((float) gameTime.TotalGameTime.TotalSeconds * 0.8f);
+            _dude.Transform = Matrix.CreateRotationY(MathHelper.Pi);
         }
 
         public override void Draw(GameTime gameTime)

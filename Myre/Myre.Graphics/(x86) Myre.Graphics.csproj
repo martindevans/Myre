@@ -91,8 +91,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\Animated.cs" />
+    <Compile Include="Animation\Clips\BlendedAnimation.cs" />
+    <Compile Include="Animation\Clips\IClip.cs" />
+    <Compile Include="Animation\Clips\RandomClip.cs" />
+    <Compile Include="Animation\Clips\SequenceClip.cs" />
     <Compile Include="Animation\PlayingClip.cs" />
-    <Compile Include="Animation\Clip.cs" />
+    <Compile Include="Animation\Clips\Clip.cs" />
     <Compile Include="Animation\Keyframe.cs" />
     <Compile Include="Animation\SkinningData.cs" />
     <Compile Include="Camera.cs" />

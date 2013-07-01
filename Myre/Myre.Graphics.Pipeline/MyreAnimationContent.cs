@@ -35,12 +35,12 @@ namespace Myre.Graphics.Pipeline
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            return "Myre.Graphics.Animation.ClipReader, Myre.Graphics";
+            return "Myre.Graphics.Animation.Clips.ClipReader, Myre.Graphics";
         }
 
         public override string GetRuntimeType(TargetPlatform targetPlatform)
         {
-            return "Myre.Graphics.Animation.Clip, Myre.Graphics";
+            return "Myre.Graphics.Animation.Clips.Clip, Myre.Graphics";
         }
     }
     #endregion

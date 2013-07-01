@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Myre.Collections;
+using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Graphics.Animation.Clips;
 using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Animation
@@ -15,11 +16,17 @@ namespace Myre.Graphics.Animation
         #region fields
         private ModelInstance _model;
 
+        private readonly Queue<ClipPlaybackParameters> _animationQueue = new Queue<ClipPlaybackParameters>();
+
         // Information about the currently playing animation clip.
-        private readonly List<PlayingClip> _activeAnimations = new List<PlayingClip>();
+        private TimeSpan _crossfadeDuration;
+        private TimeSpan _crossfadeElapsed;
+        private float _crossfadeProgress = 0;
+        private PlayingClip _fadingOut;
+        private PlayingClip _fadingIn;
 
         // Current animation transform matrices.
-        readonly List<WeightedKeyframe> _keyframes = new List<WeightedKeyframe>();
+        Matrix[] _boneTransformTargets;
         Matrix[] _boneTransforms;
         Matrix[] _worldTransforms;
         Matrix[] _skinTransforms;
@@ -28,9 +35,30 @@ namespace Myre.Graphics.Animation
         {
             get { return _model.Model.SkinningData; }
         }
+
+        private int BonesCount
+        {
+            get { return skinningData.SkeletonHierarchy.Length; }
+        }
+
+        public Action<string> OnAnimationCompleted;
+
+        /// <summary>
+        /// The clip to play while there are no other active animations
+        /// </summary>
+        public ClipPlaybackParameters DefaultClip { get; set; }
+
+        private Property<float> _animationSmoothing;
         #endregion
 
         #region initialise
+        public override void CreateProperties(Entity.ConstructionContext context)
+        {
+            _animationSmoothing = context.CreateProperty<float>("animation_smoothing", 0.5f);
+
+            base.CreateProperties(context);
+        }
+
         public override void Initialise(INamedDataProvider initialisationData)
         {
             base.Initialise(initialisationData);
@@ -50,7 +78,11 @@ namespace Myre.Graphics.Animation
         {
             if (model != null && model.Model != null && model.Model.SkinningData != null)
             {
+                _boneTransformTargets = new Matrix[_model.Model.SkinningData.BindPose.Length];
+                Array.Copy(_model.Model.SkinningData.BindPose, _boneTransformTargets, _boneTransformTargets.Length);
                 _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
+                Array.Copy(_model.Model.SkinningData.BindPose, _boneTransforms, _boneTransforms.Length);
+
                 _worldTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 _skinTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
             }
@@ -63,73 +95,114 @@ namespace Myre.Graphics.Animation
         }
         #endregion
 
-        public void StartClip(Clip clip, float timeFactor = 1, float weight = 1)
+        /// <summary>
+        /// Enqueues the givem clip, to be played once the previous clip reaches it's fade out time
+        /// </summary>
+        /// <param name="parameters"></param>
+        public void EnqueueClip(ClipPlaybackParameters parameters)
         {
-            if (clip == null)
-                throw new ArgumentNullException("clip");
+            _animationQueue.Enqueue(parameters);
+        }
 
-            var instance = PlayingClip.Create(clip, skinningData.SkeletonHierarchy.Length);
+        /// <summary>
+        /// Instantly begins the specified clip
+        /// </summary>
+        /// <param name="parameters"></param>
+        /// <param name="clearQueue"></param>
+        public void InterruptClip(ClipPlaybackParameters parameters, bool clearQueue = true)
+        {
+            if (clearQueue)
+                _animationQueue.Clear();
 
-            instance.TimeFactor = timeFactor;
-            instance.Weight = weight;
+            parameters.Clip.Start();
 
-            _activeAnimations.Add(instance);
+            _fadingIn = PlayingClip.Create(parameters.Clip, BonesCount);
+            _fadingIn.TimeFactor = 1;
+            _fadingIn.Loop = parameters.Loop;
+            _fadingIn.FadeOutTime = parameters.FadeOutTime;
+
+            _crossfadeProgress = 0;
+            var fadeOutTime = _fadingOut == null ? 0 : _fadingOut.FadeOutTime.Ticks;
+            _crossfadeDuration = TimeSpan.FromTicks(Math.Max(parameters.FadeInTime.Ticks, fadeOutTime));
+            _crossfadeElapsed = TimeSpan.Zero;
         }
 
         protected override void Update(float elapsedTime)
         {
-            UpdateKeyframes(TimeSpan.FromSeconds(elapsedTime));
+            UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime));
+            UpdateBoneTransformTargets();
             UpdateBoneTransforms();
             UpdateWorldTransforms();
         }
 
-        private void UpdateKeyframes(TimeSpan dt)
+        private void UpdateActiveAnimations(TimeSpan dt)
         {
-            for (int i = _activeAnimations.Count - 1; i >= 0; i--)
+            if (_fadingOut == null && _fadingIn == null)
+                InterruptClip(NextClip(), false);
+
+            if (_fadingOut == null && _fadingIn != null)
             {
-                if (_activeAnimations[i].Update(dt))
-                    _activeAnimations.RemoveAt(i);
+                //DO NOT merge this into the if check above.
+                //The above can change the state of _fadingOut so we do need to check it twice!
+                _fadingOut = _fadingIn;
+                _fadingIn = null;
+            }
+
+            if (_fadingOut != null)
+            {
+                _fadingOut.Update(dt);
+
+                //Check if this animation is entering it's final phase. If so, look for another animation in the queue to start playing
+                if (_fadingIn == null && _fadingOut.ElapsedTime >= _fadingOut.Animation.Duration - _fadingOut.FadeOutTime)
+                    InterruptClip(NextClip(), false);
+            }
+
+            if (_fadingIn != null)
+            {
+                _fadingIn.Update(dt);
+
+                _crossfadeElapsed += dt;
+                _crossfadeProgress = (float)_crossfadeElapsed.TotalSeconds / (float)_crossfadeDuration.TotalSeconds;
+
+                if (_crossfadeProgress >= 1)
+                {
+                    _fadingOut = _fadingIn;
+                    _fadingIn = null;
+                }
+            }
+        }
+
+        private ClipPlaybackParameters NextClip()
+        {
+            if (_animationQueue.Count > 0)
+                return _animationQueue.Dequeue();
+            else
+                return DefaultClip;
+        }
+
+        private void UpdateBoneTransformTargets()
+        {
+            for (int boneIndex = 0; boneIndex < _boneTransformTargets.Length; boneIndex++)
+            {
+                Keyframe fadeOut = _fadingOut[boneIndex];
+                Keyframe fadeIn = null;
+                if (_fadingIn != null)
+                    fadeIn = _fadingIn[boneIndex];
+
+                if (fadeOut != null && fadeIn == null)
+                    _boneTransformTargets[boneIndex] = fadeOut.Transform;
+                if (fadeOut == null && fadeIn != null)
+                    _boneTransformTargets[boneIndex] = SlerpMatrix(_boneTransforms[boneIndex], fadeIn.Transform, _crossfadeProgress);
+                if (fadeOut != null && fadeIn != null)
+                    _boneTransformTargets[boneIndex] = SlerpMatrix(fadeOut.Transform, fadeIn.Transform, _crossfadeProgress);
             }
         }
 
         private void UpdateBoneTransforms()
         {
-            for (int boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
+            for (int i = 0; i < _boneTransforms.Length; i++)
             {
-                float totalWeight = 0;
-                int activeAnimationsForBone = 0;
-                _keyframes.Clear();
-                foreach (var animation in _activeAnimations)
-                {
-                    var k = animation[boneIndex];
-                    if (k != null)
-                    {
-                        _keyframes.Add(new WeightedKeyframe(k, animation.Weight));
-                        totalWeight += animation.Weight;
-                        activeAnimationsForBone++;
-                    }
-                }
-
-                //Normalize the weight if it's really small (give equal weighting to all animations)
-                if (Math.Abs(totalWeight) < float.Epsilon)
-                    totalWeight = activeAnimationsForBone;
-
-                if (_keyframes.Count == 0)
-                    _boneTransforms[boneIndex] = skinningData.BindPose[boneIndex];
-                else if (_keyframes.Count == 1)
-                    _boneTransforms[boneIndex] = _keyframes[0].Transform;
-                else
-                {
-                    //Weight each transform separately by the normalized weight
-                    for (int i = 0; i < _keyframes.Count; i++)
-                    {
-                        var k = _keyframes[i];
-                        Matrix.Multiply(ref k.Transform, k.Weight / totalWeight, out k.Transform);
-                    }
-
-                    //Sum the transforms together
-                    _boneTransforms[boneIndex] = _keyframes.Select(a => a.Transform).Aggregate(Matrix.Add);
-                }
+                _boneTransforms[i] = SlerpMatrix(_boneTransforms[i], _boneTransformTargets[i], (1 - _animationSmoothing.Value));
             }
         }
 
@@ -153,16 +226,39 @@ namespace Myre.Graphics.Animation
             metadata.Get<Matrix[]>("bones").Value = _skinTransforms;
         }
 
-        private struct WeightedKeyframe
+        public struct ClipPlaybackParameters
         {
-            public Matrix Transform;
-            public readonly float Weight;
+            public IClip Clip;
+            public TimeSpan FadeInTime;
+            public TimeSpan FadeOutTime;
+            public bool Loop;
+        }
 
-            public WeightedKeyframe(Keyframe keyframe, float weight)
-            {
-                Transform = keyframe.Transform;
-                Weight = weight;
-            }
+        private static Matrix SlerpMatrix(Matrix start, Matrix end, float slerpAmount)
+        {
+            slerpAmount = MathHelper.Clamp(slerpAmount, 0, 1);
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            if (slerpAmount == 1)
+                return end;
+            if (slerpAmount == 0)
+                return start;
+// ReSharper restore CompareOfFloatsByEqualityOperator
+
+            Vector3 startScale;
+            Quaternion startRotation;
+            Vector3 startTranslation;
+            start.Decompose(out startScale, out startRotation, out startTranslation);
+
+            Vector3 endScale;
+            Quaternion endRotation;
+            Vector3 endTranslation;
+            end.Decompose(out endScale, out endRotation, out endTranslation);
+
+            Quaternion interpolatedRotation = Quaternion.Slerp(startRotation, endRotation, slerpAmount);
+            Vector3 interpolatedScale = Vector3.SmoothStep(startScale, endScale, slerpAmount);
+            Vector3 interpolatedTranslation = Vector3.SmoothStep(startTranslation, endTranslation, slerpAmount);
+
+            return Matrix.CreateScale(interpolatedScale) * Matrix.CreateFromQuaternion(interpolatedRotation) * Matrix.CreateTranslation(interpolatedTranslation);
         }
     }
 }

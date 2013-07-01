@@ -55,5 +55,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Myre\Myre.Graphics.Pipeline\Myre.Graphics.Pipeline.csproj">
+      <Project>{65716E12-A629-449B-91A3-BF1A1ABEB56A}</Project>
+      <Name>Myre.Graphics.Pipeline</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

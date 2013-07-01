@@ -74,6 +74,10 @@ namespace Myre.Graphics.Geometry
             mesh.VertexBuffer = input.ReadObject<VertexBuffer>();
             mesh.IndexBuffer = input.ReadObject<IndexBuffer>();
 
+            mesh.StartIndex = input.ReadInt32();
+            mesh.BaseVertex = input.ReadInt32();
+            mesh.MinVertexIndex = input.ReadInt32();
+
             var size = input.ReadInt32();
             mesh.Materials = new Dictionary<string, Material>(size);
             for (int i = 0; i < size; i++)

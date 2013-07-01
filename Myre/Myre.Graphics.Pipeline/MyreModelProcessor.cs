@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -226,7 +227,7 @@ namespace Myre.Graphics.Pipeline
                 IndexBuffer = geometry.Indices,
                 VertexBuffer = vertexBufferContent,
                 VertexCount = vertexCount,
-                TriangleCount = triangleCount
+                TriangleCount = triangleCount,
             });
         }
         #endregion

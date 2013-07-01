@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline">
+  <Asset Type="Pipeline:EmbeddedAnimationDefinition">
+    
+    <AnimationSourceFile>Models/zoe_fbx.fbx</AnimationSourceFile>
+    <SourceTakeName>Take 001</SourceTakeName>
+    <StartFrame>885</StartFrame>
+    <EndFrame>930</EndFrame>
+    <Name>death02</Name>
+  </Asset>
+</XnaContent>

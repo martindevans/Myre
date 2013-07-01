@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BoneIndexer.cs" />
     <Compile Include="MyreAnimationClipProcessor.cs" />
+    <Compile Include="AnimationDefinition.cs" />
     <Compile Include="MyreAnimationContent.cs" />
     <Compile Include="MyreMaterialContent.cs" />
     <Compile Include="MyreMaterialData.cs" />

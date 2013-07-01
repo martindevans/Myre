@@ -19,6 +19,10 @@ namespace Myre.Graphics.Pipeline
         public int VertexCount { get; set; }
         public VertexBufferContent VertexBuffer { get; set; }
         public IndexCollection IndexBuffer { get; set; }
+
+        public int StartIndex { get; set; }
+        public int BaseVertex { get; set; }
+        public int MinVertexIndex { get; set; }
     }
 
     [ContentTypeWriter]
@@ -39,6 +43,9 @@ namespace Myre.Graphics.Pipeline
             output.Write(value.TriangleCount);
             output.WriteObject(value.VertexBuffer);
             output.WriteObject(value.IndexBuffer);
+            output.Write(value.StartIndex);
+            output.Write(value.BaseVertex);
+            output.Write(value.MinVertexIndex);
 
             // manually write out the dictionary, as the dictionary reader class DOES NOT EXIST
             output.Write(value.Materials.Count);

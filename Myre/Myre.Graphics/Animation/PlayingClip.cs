@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Myre.Collections;
+using Myre.Graphics.Animation.Clips;
 
 namespace Myre.Graphics.Animation
 {
@@ -8,8 +10,9 @@ namespace Myre.Graphics.Animation
     {
         private readonly List<Keyframe> _keyframes = new List<Keyframe>();
 
-        Clip _currentClip;
-        TimeSpan _currentTimeValue;
+        public IClip Animation { get; private set; }
+
+        public TimeSpan ElapsedTime { get; private set; }
         int _currentKeyframe;
 
         public Keyframe this[int boneIndex]
@@ -17,8 +20,9 @@ namespace Myre.Graphics.Animation
             get { return _keyframes[boneIndex]; }
         }
 
-        public float Weight { get; set; }
         public float TimeFactor { get; set; }
+        public bool Loop { get; set; }
+        public TimeSpan FadeOutTime { get; set; }
 
         private void ClearKeyframes(int size)
         {
@@ -28,51 +32,40 @@ namespace Myre.Graphics.Animation
                 _keyframes.Add(null);
         }
 
-        private void Play(Clip animation, int bones)
+        private void Play(IClip animation, int bones)
         {
             if (animation == null)
                 throw new ArgumentNullException("animation");
 
             ClearKeyframes(bones);
-            _currentClip = animation;
-            _currentTimeValue = TimeSpan.Zero;
+            Animation = animation;
+            ElapsedTime = TimeSpan.Zero;
             _currentKeyframe = 0;
         }
 
-        public bool Update(TimeSpan elapsedTime)
+        public void Update(TimeSpan elapsedTime)
         {
             // Update the animation position.
-            elapsedTime = TimeSpan.FromSeconds(elapsedTime.TotalSeconds * TimeFactor);
-            elapsedTime += _currentTimeValue;
+            ElapsedTime += TimeSpan.FromSeconds(elapsedTime.TotalSeconds * TimeFactor);
 
-            // If we reached the end, loop back to the start.
-            bool loopback = false;
-            while (elapsedTime >= _currentClip.Duration)
+            if (ElapsedTime >= Animation.Duration)
             {
-                loopback = true;
-                elapsedTime -= _currentClip.Duration;
-            }
+                if (!Loop)
+                    return;
 
-            if (loopback)
-            {
+                Animation.Start();
                 _currentKeyframe = 0;
-                ClearKeyframes(_keyframes.Count);
+                ElapsedTime = TimeSpan.Zero;
             }
-
-            if ((elapsedTime < TimeSpan.Zero) || (elapsedTime >= _currentClip.Duration))
-                throw new ArgumentOutOfRangeException("elapsedTime");
-
-            _currentTimeValue = elapsedTime;
 
             // Read keyframe matrices.
-            Keyframe[] keyframes = _currentClip.Keyframes;
-
+            Keyframe[] keyframes = Animation.Keyframes;
             while (_currentKeyframe < keyframes.Length)
             {
                 Keyframe keyframe = keyframes[_currentKeyframe];
 
                 // Stop when we've read up to the current time position.
-                if (keyframe.Time > _currentTimeValue)
+                if (keyframe.Time > ElapsedTime)
                     break;
 
                 // Use this keyframe.
@@ -80,12 +73,10 @@ namespace Myre.Graphics.Animation
 
                 _currentKeyframe++;
             }
-
-            return false;   //TODO: Return when animation ends
         }
 
         private static readonly Pool<PlayingClip> _pool = new Pool<PlayingClip>();
-        internal static PlayingClip Create(Clip clip, int bones)
+        internal static PlayingClip Create(IClip clip, int bones)
         {
             PlayingClip instance;
             lock (_pool)
@@ -98,7 +89,7 @@ namespace Myre.Graphics.Animation
         internal static void Return(PlayingClip playing)
         {
             playing._keyframes.Clear();
-            playing._currentClip = null;
+            playing.Animation = null;
             _pool.Return(playing);
         }
     }

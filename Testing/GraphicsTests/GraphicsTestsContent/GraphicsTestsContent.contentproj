@@ -236,6 +236,12 @@
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
     </Compile>
+    <Compile Include="Models\zoe_fbx.FBX">
+      <Name>zoe_fbx</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>MyreModelProcessor</Processor>
+      <ProcessorParameters_DiffuseTexture>zoe_01.jpg</ProcessorParameters_DiffuseTexture>
+    </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
       <Importer>EffectImporter</Importer>
@@ -266,7 +272,7 @@
     <Compile Include="uppercut.fbx">
       <Name>uppercut</Name>
       <Importer>FbxImporter</Importer>
-      <Processor>MyreAnimationClipProcessor</Processor>
+      <Processor>PassThroughProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -397,6 +403,280 @@
       <Name>DefaultGBuffer</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\zoe_01.jpg">
+      <Name>zoe_01</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\ZoeAnimations\attack01.xml">
+      <Name>attack01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\attack02.xml">
+      <Name>attack02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\attack03.xml">
+      <Name>attack03</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\attack04.xml">
+      <Name>attack04</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\attack05.xml">
+      <Name>attack05</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\chat01.xml">
+      <Name>chat01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\chat02.xml">
+      <Name>chat02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\chat03.xml">
+      <Name>chat03</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\chat04.xml">
+      <Name>chat04</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\death01.xml">
+      <Name>death01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\death02.xml">
+      <Name>death02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\emo01.xml">
+      <Name>emo01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\emo02.xml">
+      <Name>emo02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\emo03.xml">
+      <Name>emo03</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\everything.xml">
+      <Name>everything</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\fall01.xml">
+      <Name>fall01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\fall02.xml">
+      <Name>fall02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\fall_death.xml">
+      <Name>fall_death</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\firing01.xml">
+      <Name>firing01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\firing02.xml">
+      <Name>firing02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\firing03.xml">
+      <Name>firing03</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\firing04.xml">
+      <Name>firing04</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\firing05.xml">
+      <Name>firing05</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\get-up.xml">
+      <Name>get-up</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\hit01.xml">
+      <Name>hit01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\hit02.xml">
+      <Name>hit02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\idle01.xml">
+      <Name>idle01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\idle02.xml">
+      <Name>idle02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\jump.xml">
+      <Name>jump</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\reload.xml">
+      <Name>reload</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\roll-backward.xml">
+      <Name>roll-backward</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\roll-forward.xml">
+      <Name>roll-forward</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\roll-left.xml">
+      <Name>roll-left</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\roll-right.xml">
+      <Name>roll-right</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\run-jump.xml">
+      <Name>run-jump</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\run01.xml">
+      <Name>run01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\run02.xml">
+      <Name>run02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\run03.xml">
+      <Name>run03</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\run_ready-shoot.xml">
+      <Name>run_ready-shoot</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\run_shooting.xml">
+      <Name>run_shooting</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\sitting.xml">
+      <Name>sitting</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\sitting_on_ground.xml">
+      <Name>sitting_on_ground</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\sleep_on_ground.xml">
+      <Name>sleep_on_ground</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\strafe-left.xml">
+      <Name>strafe-left</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\strafe-right.xml">
+      <Name>strafe-right</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\swim.xml">
+      <Name>swim</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\T-pose.xml">
+      <Name>T-pose</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\walk-back.xml">
+      <Name>walk-back</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\walk01.xml">
+      <Name>walk01</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\walk02.xml">
+      <Name>walk02</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\walk03.xml">
+      <Name>walk03</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\walk_ready-shoot.xml">
+      <Name>walk_ready-shoot</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ZoeAnimations\walk_shooting.xml">
+      <Name>walk_shooting</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreAnimationClipProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
