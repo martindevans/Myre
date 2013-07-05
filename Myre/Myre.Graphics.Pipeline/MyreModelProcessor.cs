@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Graphics.Pipeline
@@ -339,9 +340,9 @@ namespace Myre.Graphics.Pipeline
 
         private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated)
         {
-            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material));
-            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material));
-            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material));
+            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material), true);
+            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material), false);
+            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material), true);
 
             if (diffuseTexture == null)
                 return;
@@ -359,12 +360,17 @@ namespace Myre.Graphics.Pipeline
 
         #region find texture resources
 
-        private string CanonicalizeTexturePath(string texturePath)
+        private string CanonicalizeTexturePath(string texturePath, bool dxt)
         {
             if (texturePath == null)
                 return null;
 
-            var contentItem = _context.BuildAsset<TextureContent, TextureContent>(new ExternalReference<TextureContent>(texturePath), null);
+            var contentItem = _context.BuildAsset<TextureContent, TextureContent>(new ExternalReference<TextureContent>(texturePath), "TextureProcessor", new OpaqueDataDictionary
+            {
+                { "GenerateMipmaps", true },
+                { "TextureFormat", dxt ? TextureProcessorOutputFormat.DxtCompressed : TextureProcessorOutputFormat.Color },
+
+            }, null, null);
 
             Uri from = new Uri(_context.OutputDirectory);
             Uri to = new Uri(contentItem.Filename);

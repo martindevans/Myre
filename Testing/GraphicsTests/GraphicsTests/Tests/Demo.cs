@@ -70,6 +70,7 @@ namespace GraphicsTests.Tests
                 .Then<Ssao>()
                 .Then<LightingComponent>()
                 .Then<ToneMapComponent>()
+                .Then<AntiAliasComponent>()
                 .Then<TranslucentComponent>();
 
             ssaoPlan = renderer.StartPlan()
@@ -91,7 +92,9 @@ namespace GraphicsTests.Tests
 
             normalPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
-                .Show("gbuffer_normals");
+                .Then<EdgeDetectComponent>()
+                .Then(new AntiAliasComponent(kernel.Get<GraphicsDevice>(), "gbuffer_normals"))
+                .Show("antialiased");
 
             fullPlan.Apply();
 
