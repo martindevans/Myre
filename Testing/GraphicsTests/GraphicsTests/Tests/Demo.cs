@@ -34,6 +34,7 @@ namespace GraphicsTests.Tests
         private RenderPlan ssaoPlan;
         private RenderPlan lightingPlan;
         private RenderPlan edgeDetectPlan;
+        private RenderPlan normalPlan;
 
         public Demo(
             IKernel kernel,
@@ -88,6 +89,10 @@ namespace GraphicsTests.Tests
                 .Then<EdgeDetectComponent>()
                 .Show("edges");
 
+            normalPlan = renderer.StartPlan()
+                .Then<GeometryBufferComponent>()
+                .Show("gbuffer_normals");
+
             fullPlan.Apply();
 
             base.OnShown();
@@ -106,6 +111,8 @@ namespace GraphicsTests.Tests
                 edgeDetectPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D4))
                 lightingPlan.Apply();
+            else if (keyboard.IsKeyDown(Keys.D5))
+                normalPlan.Apply();
             else
                 fullPlan.Apply();
 

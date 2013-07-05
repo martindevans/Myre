@@ -53,7 +53,7 @@ namespace GraphicsTests
             : base()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreparingDeviceSettings += new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
+            graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
             graphics.PreferredBackBufferWidth = 1440;
             graphics.PreferredBackBufferHeight = 900;
             graphics.SynchronizeWithVerticalRetrace = !false;

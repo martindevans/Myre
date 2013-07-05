@@ -51,8 +51,8 @@ namespace Myre.Graphics.Pipeline
             output.Write(value.Materials.Count);
             foreach (var item in value.Materials)
             {
-                output.WriteObject(item.Key);
-                output.WriteSharedResource(item.Value);
+                output.Write(item.Key);
+                output.WriteObject<MyreMaterialContent>(item.Value);
             }
 
             output.WriteObject(value.BoundingSphere);

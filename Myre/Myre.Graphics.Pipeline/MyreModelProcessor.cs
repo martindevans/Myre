@@ -326,12 +326,12 @@ namespace Myre.Graphics.Pipeline
 
         private void CreateShadowMaterial(MaterialContent material, bool animated)
         {
-            var materialData = new MyreMaterialData { EffectName = Path.GetFullPath(ShadowEffectName), Technique = animated ? "AnimatedViewLength" : "ViewLength" };
+            var materialData = new MyreMaterialData { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewLength" : "ViewLength" };
 
             var shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewlength", shadowMaterial);
 
-            materialData = new MyreMaterialData { EffectName = Path.GetFullPath(ShadowEffectName), Technique = animated ? "AnimatedViewZ" : "ViewZ" };
+            materialData = new MyreMaterialData { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewZ" : "ViewZ" };
 
             shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewz", shadowMaterial);
@@ -339,14 +339,15 @@ namespace Myre.Graphics.Pipeline
 
         private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated)
         {
-            var diffuseTexture = FindDiffuseTexture(mesh, material);
-            var normalTexture = FindNormalTexture(mesh, material);
-            var specularTexture = FindSpecularTexture(mesh, material);
+            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material));
+            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material));
+            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material));
 
             if (diffuseTexture == null)
                 return;
 
-            var materialData = new MyreMaterialData { EffectName = Path.GetFullPath(GBufferEffectName), Technique = GBufferTechnique ?? (animated ? "Animated" : "Default") };
+            var materialData = new MyreMaterialData { EffectName = Path.GetFileNameWithoutExtension(GBufferEffectName), Technique = GBufferTechnique ?? (animated ? "Animated" : "Default") };
+
             materialData.Textures.Add("DiffuseMap", diffuseTexture);
             materialData.Textures.Add("NormalMap", normalTexture);
             materialData.Textures.Add("SpecularMap", specularTexture);
@@ -357,6 +358,26 @@ namespace Myre.Graphics.Pipeline
         #endregion
 
         #region find texture resources
+
+        private string CanonicalizeTexturePath(string texturePath)
+        {
+            if (texturePath == null)
+                return null;
+
+            var contentItem = _context.BuildAsset<TextureContent, TextureContent>(new ExternalReference<TextureContent>(texturePath), null);
+
+            Uri from = new Uri(_context.OutputDirectory);
+            Uri to = new Uri(contentItem.Filename);
+
+            Uri relative = from.MakeRelativeUri(to);
+            string path = Uri.UnescapeDataString(relative.ToString()).Replace('/', Path.DirectorySeparatorChar);
+
+            var filename = Path.GetFileNameWithoutExtension(path);
+            var dirname = Path.GetDirectoryName(path);
+
+            return Path.Combine(dirname, filename);
+        }
+
         private string FindDiffuseTexture(MeshContent mesh, MaterialContent material)
         {
             if (string.IsNullOrEmpty(DiffuseTexture))

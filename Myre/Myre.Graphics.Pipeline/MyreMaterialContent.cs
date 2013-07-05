@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content.Pipeline;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
@@ -7,8 +8,10 @@ namespace Myre.Graphics.Pipeline
     //[ContentSerializerRuntimeType("Myre.Graphics.Materials.Material, Myre.Graphics")]
     public class MyreMaterialContent
     {
-        //[ContentSerializer(SharedResource=true)]
-        public MaterialContent Material;
+        public Dictionary<string, string> Textures = new Dictionary<string, string>();
+        public Dictionary<string, object> OpaqueData = new Dictionary<string, object>();
+
+        public string EffectName;
         public string Technique;
     }
 
@@ -18,7 +21,21 @@ namespace Myre.Graphics.Pipeline
         protected override void Write(ContentWriter output, MyreMaterialContent value)
         {
             output.Write(value.Technique ?? "");
-            output.WriteObject(value.Material);
+            output.Write(value.EffectName ?? "");
+
+            output.Write(value.Textures.Count);
+            foreach (var kvp in value.Textures)
+            {
+                output.Write(kvp.Key);
+                output.Write(kvp.Value);
+            }
+
+            output.Write(value.OpaqueData.Count);
+            foreach (var kvp in value.OpaqueData)
+            {
+                output.Write(kvp.Key);
+                output.WriteObject(kvp.Value);
+            }
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

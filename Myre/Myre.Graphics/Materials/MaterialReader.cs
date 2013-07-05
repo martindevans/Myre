@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -19,9 +20,31 @@ namespace Myre.Graphics.Materials
             if (technique == "")
                 technique = null;
 
-            Effect effect = input.ReadObject<Effect>();
+            string effectName = input.ReadString();
+            Effect effect = input.ContentManager.Load<Effect>(effectName).Clone();
 
-            return new Material(effect, technique);
+            var material = new Material(effect, technique);
+
+            int count = input.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                var name = input.ReadString();
+                var path = input.ReadString();
+
+                material.Parameters[name].SetValue(input.ContentManager.Load<Texture2D>(path));
+            }
+
+            Dictionary<string, object> opaqueData = new Dictionary<string, object>();
+            int opaqueCount = input.ReadInt32();
+            for (int i = 0; i < opaqueCount; i++)
+            {
+                var key = input.ReadString();
+                var data = input.ReadObject<object>();
+
+                opaqueData[key] = data;
+            }
+
+            return material;
         }
     }
 }

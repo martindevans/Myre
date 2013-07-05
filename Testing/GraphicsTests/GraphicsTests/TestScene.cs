@@ -218,15 +218,15 @@ namespace GraphicsTests
             //hebeEntity.GetProperty<bool>("is_static").Value = true;
             //scene.Add(hebeEntity);
 
-            var dudeModel = content.Load<ModelData>(@"dude");
-            var dude = kernel.Get<EntityDescription>();
-            dude.AddProperty<ModelData>("model", dudeModel);
-            dude.AddProperty<Matrix>("transform", Matrix.CreateScale(0.75f) * Matrix.CreateTranslation(-50, 0, 0));
-            dude.AddProperty<bool>("is_static", true);
-            dude.AddBehaviour<ModelInstance>();
-            dude.AddBehaviour<Animated>();
-            var dudeEntity = dude.Create();
-            scene.Add(dudeEntity);
+            //var dudeModel = content.Load<ModelData>(@"dude");
+            //var dude = kernel.Get<EntityDescription>();
+            //dude.AddProperty<ModelData>("model", dudeModel);
+            //dude.AddProperty<Matrix>("transform", Matrix.CreateScale(0.75f) * Matrix.CreateTranslation(-50, 0, 0));
+            //dude.AddProperty<bool>("is_static", true);
+            //dude.AddBehaviour<ModelInstance>();
+            //dude.AddBehaviour<Animated>();
+            //var dudeEntity = dude.Create();
+            //scene.Add(dudeEntity);
 
             var lightBlocker = hebe.Create();
             hebeTransform = lightBlocker.GetProperty<Matrix>("transform");

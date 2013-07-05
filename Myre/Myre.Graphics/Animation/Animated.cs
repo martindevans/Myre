@@ -114,6 +114,9 @@ namespace Myre.Graphics.Animation
             if (clearQueue)
                 _animationQueue.Clear();
 
+            if (parameters.Clip == null)
+                return;
+
             parameters.Clip.Start();
 
             _fadingIn = PlayingClip.Create(parameters.Clip, BonesCount);

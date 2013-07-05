@@ -35,7 +35,7 @@ namespace GraphicsTests.Tests
         };
 
         public AnimatedDude(IKernel kernel, ContentManager content, GraphicsDevice device)
-            :base("Animated Dude", kernel)
+            : base("Animated Dude", kernel)
         {
             _scene = kernel.Get<Scene>();
 
@@ -73,7 +73,7 @@ namespace GraphicsTests.Tests
                 });
             }
 
-            var camera = new Camera {NearClip = 1, FarClip = 700, View = Matrix.CreateTranslation(0, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up)};
+            var camera = new Camera { NearClip = 1, FarClip = 700, View = Matrix.CreateTranslation(0, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up) };
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
             var cameraDesc = kernel.Get<EntityDescription>();
             cameraDesc.AddProperty<Camera>("camera");
@@ -115,14 +115,14 @@ namespace GraphicsTests.Tests
                   .Then<EdgeDetectComponent>()
                   .Then<Ssao>()
                   .Then<LightingComponent>()
-                  //.Then<ToneMapComponent>()
+                //.Then<ToneMapComponent>()
                   .Then<TranslucentComponent>()
                   .Apply();
         }
 
         public override void Update(GameTime gameTime)
         {
-            _scene.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
+            _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
 
             _dude.Transform = Matrix.CreateRotationY(MathHelper.Pi);

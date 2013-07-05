@@ -82,8 +82,9 @@ namespace Myre.Graphics.Geometry
             mesh.Materials = new Dictionary<string, Material>(size);
             for (int i = 0; i < size; i++)
             {
-                var key = input.ReadObject<string>();
-                input.ReadSharedResource<Material>(m => mesh.Materials.Add(key, m));
+                var key = input.ReadString();
+                var material = input.ReadObject<Material>();
+                mesh.Materials.Add(key, material);
             }
 
             mesh.BoundingSphere = input.ReadObject<BoundingSphere>();

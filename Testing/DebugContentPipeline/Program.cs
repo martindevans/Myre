@@ -99,7 +99,7 @@ namespace DebugContentPipeline
         ///       Example:
         ///               private const string SingleItem = @"dude.fbx";
         /// </summary>
-        private const string SingleItem = @"Models/ZoeAnimations/jump.xml";
+        private const string SingleItem = @"Sponza.fbx";
 
         /// <summary>
         /// TODO: Set the XnaProfile to HiDef or Reach, depending on your target graphics profile.

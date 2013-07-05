@@ -14,21 +14,17 @@ namespace Myre.Graphics.Pipeline
     {
         public override MyreMaterialContent Process(MyreMaterialData input, ContentProcessorContext context)
         {
-            MyreMaterialContent output = new MyreMaterialContent {Technique = input.Technique};
-
-            EffectMaterialContent material = new EffectMaterialContent {Effect = new ExternalReference<EffectContent>(input.EffectName)};
+            MyreMaterialContent output = new MyreMaterialContent
+            {
+                Technique = input.Technique,
+                EffectName = input.EffectName,
+            };
 
             foreach (var texture in input.Textures)
-                material.Textures.Add(texture.Key, new ExternalReference<TextureContent>(texture.Value));
+                output.Textures.Add(texture.Key, texture.Value);
 
             foreach (var item in input.OpaqueData)
-                material.OpaqueData.Add(item.Key, item.Value);
-
-            var processorParameters = new OpaqueDataDictionary
-            {
-                {"PremultiplyTextureAlpha", false}
-            };
-            output.Material = context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor", processorParameters);
+                output.OpaqueData.Add(item.Key, item.Value);
 
             return output;
         }
