@@ -13,6 +13,7 @@ namespace Myre.Entities.Behaviours
     /// This manager performs any updating or drawing for all behaviours of the relevant type.</para>
     /// </remarks>
     public abstract class Behaviour
+        :MarshalByRefObject
     {
         internal struct ManagerBinding
         {
