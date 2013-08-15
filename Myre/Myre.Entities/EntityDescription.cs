@@ -154,7 +154,7 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(BehaviourData behaviour)
         {
-            Assert.ArgumentNotNull("behaviour.Type", behaviour.Type);
+            Assert.ArgumentNotNull("behaviour.TypeAndFactory", (object)behaviour.Type ?? behaviour.Factory);
 
             if (_behaviours.Contains(behaviour))
                 return false;
