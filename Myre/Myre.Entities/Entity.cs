@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
@@ -139,15 +138,24 @@ namespace Myre.Entities
         private void CatagoriseBehaviour(Dictionary<Type, List<Behaviour>> catagorised, Behaviour behaviour)
         {
             Type type = behaviour.GetType();
-            Debug.Assert(type != null);
-            do
-            {
-                LazyGetCategoryList(type, catagorised).Add(behaviour);
 
-                type = type.BaseType;
-                Debug.Assert(type != null, "type != null");
-            }
-            while (type != typeof(Behaviour).BaseType);
+            foreach (var t in GetImplementedTypes(type).Distinct())
+                LazyGetCategoryList(t, catagorised).Add(behaviour);
+        }
+
+        private IEnumerable<Type> GetImplementedTypes(Type t)
+        {
+            //A type obviously is itself
+            yield return t;
+
+            //All the interfaces this type implements
+            foreach (var typeInterface in t.GetInterfaces())
+                yield return typeInterface;
+
+            //Recurse for base type
+            if (t.BaseType != null)
+                foreach (var implementedType in GetImplementedTypes(t.BaseType))
+                    yield return implementedType;
         }
 
         private List<Behaviour> LazyGetCategoryList(Type type, Dictionary<Type, List<Behaviour>> catagorised)
@@ -351,9 +359,8 @@ namespace Myre.Entities
         /// <param name="name">The name.</param>
         /// <returns></returns>
         public T GetBehaviour<T>(string name = null)
-            where T : Behaviour
         {
-            return GetBehaviour(typeof(T), name) as T;
+            return (T)(object)GetBehaviour(typeof(T), name);
         }
 
         /// <summary>
@@ -362,7 +369,6 @@ namespace Myre.Entities
         /// <typeparam name="T">The type.</typeparam>
         /// <returns></returns>
         public T[] GetBehaviours<T>()
-            where T : Behaviour
         {
             //return GetBehaviours(typeof(T)) as T[];
             var v = GetBehaviours(typeof(T));

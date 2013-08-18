@@ -44,7 +44,7 @@ namespace Myre.Entities.Services
     /// An abstract class implementation of IService.
     /// </summary>
     public abstract class Service
-        : IService
+        : MarshalByRefObject, IService
     {
         /// <summary>
         /// Gets or sets a key on which services are sorted to determine update order.
