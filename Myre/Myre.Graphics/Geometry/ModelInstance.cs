@@ -258,7 +258,7 @@ namespace Myre.Graphics.Geometry
                     item.IsVisible = !item.Instance.IsInvisible;
 
                 var view = metadata.Get<Matrix>("view");
-                CalculateWorldViews(meshes, ref view.Value);    //Calculate WorldView for all mesh instances
+                CalculateWorldViews(meshes, view.Value);    //Calculate WorldView for all mesh instances
 
                 DepthSortMeshes(meshes);                        //Sort batches by first item in batch
 
@@ -294,7 +294,7 @@ namespace Myre.Graphics.Geometry
                 return a.Instances.Count.CompareTo(b.Instances.Count);
             }
 
-            private void CalculateWorldViews(List<MeshRenderData> batches, ref Matrix cameraView)
+            private void CalculateWorldViews(List<MeshRenderData> batches, Matrix cameraView)
             {
                 for (int b = 0; b < batches.Count; b++)
                 {

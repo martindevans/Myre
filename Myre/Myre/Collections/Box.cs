@@ -19,7 +19,7 @@ namespace Myre.Collections
     /// </summary>
     /// <typeparam name="T">The type of the value to box.</typeparam>
     public class Box<T>
-        : IBox
+        : MarshalByRefObject, IBox
     {
         /// <summary>
         /// The value this box contains.
@@ -53,7 +53,7 @@ namespace Myre.Collections
     /// </summary>
     /// <typeparam name="Key">The type of the Key.</typeparam>
     public class BoxedValueStore<Key>
-        :IEnumerable<KeyValuePair<Key, IBox>>
+        :MarshalByRefObject, IEnumerable<KeyValuePair<Key, IBox>>
     {
         private readonly Dictionary<Key, IBox> _values;
 

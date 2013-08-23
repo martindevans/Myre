@@ -108,5 +108,10 @@ namespace Myre.Entities.Behaviours
         {
             IsReady = false;
         }
+
+        protected string AppendName()
+        {
+            return Name == null ? "" : "_" + Name;
+        }
     }
 }
