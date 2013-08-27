@@ -5,7 +5,7 @@ namespace Myre.Collections
     /// 
     /// </summary>
     public class NamedBoxCollection
-        :BoxedValueStore<string>, INamedDataProvider
+        :BoxedValueStore<string>, INamedDataProvider, INamedDataConsumer
     {
         /// <summary>
         /// 
