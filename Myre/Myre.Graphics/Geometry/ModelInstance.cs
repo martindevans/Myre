@@ -99,7 +99,8 @@ namespace Myre.Graphics.Geometry
             {
                 UnhookEvents(o);
                 HookEvents(n);
-                ModelDataChanged(this);
+                if (ModelDataChanged != null)
+                    ModelDataChanged(this);
             };
 
             _renderDataSuppliers = Owner.Behaviours.OfType<IRenderDataSupplier>().ToArray();
