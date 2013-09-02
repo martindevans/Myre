@@ -18,6 +18,11 @@ namespace Myre.Entities.Extensions
             return TryCopyValue<T>(dataProvider, name, v => property.Value = v);
         }
 
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, Property<T> property)
+        {
+            return dataProvider.TryCopyValue<T>(property.Name, property);
+        }
+
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string name, Action<T> action)
         {
             if (dataProvider == null)

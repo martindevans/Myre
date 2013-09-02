@@ -4,6 +4,6 @@ namespace Myre.Graphics.Geometry
 {
     public interface IGeometryProvider
     {
-        void Draw(string phase, BoxedValueStore<string> metadata);
+        void Draw(string phase, NamedBoxCollection metadata);
     }
 }

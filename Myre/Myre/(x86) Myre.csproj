@@ -79,6 +79,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionDisposable.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="Collections\Box.cs" />
     <Compile Include="Collections\Hashset.cs">

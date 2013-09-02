@@ -224,7 +224,7 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        public void SetRenderData(BoxedValueStore<string> metadata)
+        public void SetRenderData(NamedBoxCollection metadata)
         {
             metadata.Get<Matrix[]>("bones").Value = _skinTransforms;
         }

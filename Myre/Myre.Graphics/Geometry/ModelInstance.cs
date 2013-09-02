@@ -115,7 +115,7 @@ namespace Myre.Graphics.Geometry
             base.Shutdown(shutdownData);
         }
 
-        private void ApplyRendererData(BoxedValueStore<string> metadata)
+        private void ApplyRendererData(NamedBoxCollection metadata)
         {
             if (_renderDataSuppliers != null)
                 for (int i = 0; i < _renderDataSuppliers.Length; i++)
@@ -244,7 +244,7 @@ namespace Myre.Graphics.Geometry
                 return base.Remove(behaviour);
             }
 
-            public void Draw(string phase, BoxedValueStore<string> metadata)
+            public void Draw(string phase, NamedBoxCollection metadata)
             {
                 List<MeshRenderData> meshes;
                 if (!_phases.TryGetValue(phase, out meshes))
@@ -323,7 +323,7 @@ namespace Myre.Graphics.Geometry
                 }
             }
 
-            private void DrawMesh(MeshRenderData data, BoxedValueStore<string> metadata)
+            private void DrawMesh(MeshRenderData data, NamedBoxCollection metadata)
             {
                 var mesh = data.Mesh;
                 _device.SetVertexBuffer(mesh.VertexBuffer);
@@ -347,18 +347,25 @@ namespace Myre.Graphics.Geometry
                     if (instance.Instance._ignoreProjectionMatrix.Value)
                         worldViewProjection.Value = worldView.Value;
                     else
+                    {
+//This warning is about the boxes being marshal-by-ref and using a ref with them.
+//This is only a problem if the renderer is running in a different domain to where these three boxes were created. This will never happen (famous last words).
+#pragma warning disable 197
                         Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
+#pragma warning restore 197
+                    }
 
                     instance.Instance.ApplyRendererData(metadata);
 
                     foreach (var pass in data.Material.Begin(metadata))
                     {
-                        //Loop through mesh, drawing as many primitives as possible per batch
+                        //Skip this if it has no vertices or triangles
                         if (mesh.TriangleCount == 0 || mesh.VertexCount == 0)
                             continue;
 
                         pass.Apply();
 
+                        //Loop through mesh, drawing as many primitives as possible per batch
                         int primitives = mesh.TriangleCount;
                         int offset = 0;
                         while (primitives > 0)
@@ -385,7 +392,7 @@ namespace Myre.Graphics.Geometry
                     meshInstances.Sort(InstanceComparator);
             }
 
-            private int InstanceComparator(MeshInstance a, MeshInstance b)
+            private static int InstanceComparator(MeshInstance a, MeshInstance b)
             {
                 return CompareWorldViews(ref a.WorldView, ref b.WorldView);
             }
@@ -433,7 +440,7 @@ namespace Myre.Graphics.Geometry
 
         public interface IRenderDataSupplier
         {
-            void SetRenderData(BoxedValueStore<string> metadata);
+            void SetRenderData(NamedBoxCollection metadata);
         }
     }
 }

@@ -172,7 +172,7 @@ namespace Myre.Graphics.Translucency.Particles
                 }
             }
 
-            public void Draw(string phase, BoxedValueStore<string> metadata)
+            public void Draw(string phase, NamedBoxCollection metadata)
             {
                 if (phase == "translucent")
                     foreach (var particleSystem in _systems)
