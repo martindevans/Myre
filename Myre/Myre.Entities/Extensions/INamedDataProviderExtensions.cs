@@ -28,10 +28,10 @@ namespace Myre.Entities.Extensions
             if (dataProvider == null)
                 return false;
 
-            var box = dataProvider.Get<T>(name, false);
-            if (box != null)
+            T value;
+            if (dataProvider.TryGetValue<T>(name, out value))
             {
-                action(box.Value);
+                action(value);
                 return true;
             }
 

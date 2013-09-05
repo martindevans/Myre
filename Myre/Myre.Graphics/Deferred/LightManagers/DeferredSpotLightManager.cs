@@ -127,7 +127,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _touchesBothPlanes.Clear();
             _touchesNeitherPlane.Clear();
 
-            var frustum = renderer.Data.Get<BoundingFrustum>("viewfrustum").Value;
+            var frustum = renderer.Data.GetValue<BoundingFrustum>("viewfrustum");
 
             float falloffFactor = renderer.Data.Get("lighting_attenuationscale", 100).Value;
             _geometryLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
@@ -189,7 +189,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.SetRenderTarget(target);
             renderer.Device.Clear(Color.Black);
 
-            var resolution = renderer.Data.Get<Vector2>("resolution");
+            var resolution = renderer.Data.Get<Vector2>("resolution", default(Vector2), true);
             var previousResolution = resolution.Value;
             resolution.Value = new Vector2(light.ShadowResolution);
 
@@ -197,7 +197,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.BlendState = BlendState.Opaque;
             renderer.Device.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            var view = renderer.Data.Get<View>("activeview");
+            var view = renderer.Data.Get<View>("activeview", default(View), true);
             var previousView = view.Value;
             view.Value = _shadowView;
 
@@ -285,10 +285,10 @@ namespace Myre.Graphics.Deferred.LightManagers
         private void SetupLight(RendererMetadata metadata, Material material, LightData data)
         {
             var light = data.Light;
+            Matrix view = metadata.GetValue<Matrix>("view");
 
             if (material != null)
             {
-                Matrix view = metadata.Get<Matrix>("view").Value;
                 Vector3 position = light.Position;
                 Vector3 direction = light.Direction;
                 Vector3.Transform(ref position, ref view, out position);
@@ -297,7 +297,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
                 if (light.Mask != null || light.ShadowResolution > 0)
                 {
-                    var inverseView = metadata.Get<Matrix>("inverseview").Value;
+                    var inverseView = metadata.GetValue<Matrix>("inverseview");
                     var cameraToLightProjection = inverseView * data.View * data.Projection;
                     material.Parameters["CameraViewToLightProjection"].SetValue(cameraToLightProjection);
                 }
@@ -323,8 +323,13 @@ namespace Myre.Graphics.Deferred.LightManagers
             var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
                         * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
-            Matrix.Multiply(ref world, ref metadata.Get<Matrix>("view").Value, out metadata.Get<Matrix>("worldview").Value);
-            Matrix.Multiply(ref metadata.Get<Matrix>("worldview").Value, ref metadata.Get<Matrix>("projection").Value, out metadata.Get<Matrix>("worldviewprojection").Value);
+
+            var worldview = metadata.Get<Matrix>("worldview", default(Matrix), true);
+            var projection = metadata.GetValue<Matrix>("projection");
+            var worldviewprojection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
+
+            Matrix.Multiply(ref world, ref view, out worldview.Value);
+            Matrix.Multiply(ref worldview.Value, ref projection, out worldviewprojection.Value);
         }
     }
 }

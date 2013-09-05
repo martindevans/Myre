@@ -226,7 +226,7 @@ namespace Myre.Graphics.Animation
 
         public void SetRenderData(NamedBoxCollection metadata)
         {
-            metadata.Get<Matrix[]>("bones").Value = _skinTransforms;
+            metadata.Set<Matrix[]>("bones", _skinTransforms);
         }
 
         public struct ClipPlaybackParameters

@@ -91,7 +91,7 @@ namespace Myre.Collections
             IBox box;
             if (_values.TryGetValue(key, out box))
             {
-                value =  box as Box<T>;
+                value =  (Box<T>)box;
                 return true;
             }
 
@@ -141,14 +141,13 @@ namespace Myre.Collections
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         /// <returns>The box containing the value at the specified key.</returns>
-        public Box<T> Set<T>(Key key, T value)
+        public void Set<T>(Key key, T value)
         {
             var box = Get<T>(key);
             if (box == null)
                 throw new InvalidOperationException("The value at key " + key + " is of the wrong type");
 
             box.Value = value;
-            return box;
         }
 
         public IEnumerator<KeyValuePair<Key, IBox>> GetEnumerator()

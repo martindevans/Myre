@@ -103,7 +103,7 @@ namespace Myre.Graphics.Geometry
                     ModelDataChanged(this);
             };
 
-            _renderDataSuppliers = Owner.Behaviours.OfType<IRenderDataSupplier>().ToArray();
+            _renderDataSuppliers = Owner.Behaviours.OfType<IRenderDataSupplier>().Where(s => s.Name == Name).ToArray();
 
             base.Initialise(initialisationData);
         }
@@ -250,7 +250,7 @@ namespace Myre.Graphics.Geometry
                 if (!_phases.TryGetValue(phase, out meshes))
                     return;
 
-                var viewFrustum = metadata.Get<BoundingFrustum>("viewfrustum").Value;
+                var viewFrustum = metadata.GetValue<BoundingFrustum>("viewfrustum");
                 _bounds.Clear();
                 _bounds.Add(viewFrustum);
                 QueryVisible(_bounds, _buffer);
@@ -258,8 +258,8 @@ namespace Myre.Graphics.Geometry
                 foreach (var item in _buffer)
                     item.IsVisible = !item.Instance.IsInvisible;
 
-                var view = metadata.Get<Matrix>("view");
-                CalculateWorldViews(meshes, view.Value);    //Calculate WorldView for all mesh instances
+                var view = metadata.GetValue<Matrix>("view");
+                CalculateWorldViews(meshes, view);              //Calculate WorldView for all mesh instances
 
                 DepthSortMeshes(meshes);                        //Sort batches by first item in batch
 
@@ -329,10 +329,10 @@ namespace Myre.Graphics.Geometry
                 _device.SetVertexBuffer(mesh.VertexBuffer);
                 _device.Indices = mesh.IndexBuffer;
 
-                var world = metadata.Get<Matrix>("world");
-                var projection = metadata.Get<Matrix>("projection");
-                var worldView = metadata.Get<Matrix>("worldview");
-                var worldViewProjection = metadata.Get<Matrix>("worldviewprojection");
+                var world = metadata.Get<Matrix>("world", default(Matrix), true);
+                var projection = metadata.Get<Matrix>("projection", default(Matrix), true);
+                var worldView = metadata.Get<Matrix>("worldview", default(Matrix), true);
+                var worldViewProjection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
 
                 DepthSortInstances(_visibleInstances);
 
@@ -441,6 +441,8 @@ namespace Myre.Graphics.Geometry
         public interface IRenderDataSupplier
         {
             void SetRenderData(NamedBoxCollection metadata);
+
+            string Name { get; }
         }
     }
 }

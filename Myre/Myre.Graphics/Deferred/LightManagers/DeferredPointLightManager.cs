@@ -57,7 +57,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _touchesBothPlanes.Clear();
             _doesntTouchNear.Clear();
 
-            var frustum = renderer.Data.Get<BoundingFrustum>("viewfrustum").Value;
+            var frustum = renderer.Data.GetValue<BoundingFrustum>("viewfrustum");
             
             foreach (var light in Behaviours)
             {
@@ -137,16 +137,21 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             if (material != null)
             {
-                Vector3 position = Vector3.Transform(light.Position, metadata.Get<Matrix>("view").Value);
+                Vector3 position = Vector3.Transform(light.Position, metadata.GetValue<Matrix>("view"));
                 material.Parameters["LightPosition"].SetValue(position);
                 material.Parameters["Colour"].SetValue(light.Colour);
                 material.Parameters["Range"].SetValue(light.Range);
             }
 
+            var view = metadata.GetValue<Matrix>("view");
+            var worldview = metadata.Get<Matrix>("worldview", default(Matrix), true);
+            var projection = metadata.GetValue<Matrix>("projection");
+            var worldviewprojection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
+
             var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius) * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
-            Matrix.Multiply(ref world, ref metadata.Get<Matrix>("view").Value, out metadata.Get<Matrix>("worldview").Value);
-            Matrix.Multiply(ref metadata.Get<Matrix>("worldview").Value, ref metadata.Get<Matrix>("projection").Value, out metadata.Get<Matrix>("worldviewprojection").Value);
+            Matrix.Multiply(ref world, ref view, out worldview.Value);
+            Matrix.Multiply(ref worldview.Value, ref projection, out worldviewprojection.Value);
         }
     }
 }

@@ -99,7 +99,7 @@ namespace Myre.Graphics
             _isDirty = false;
         }
 
-        public void SetMetadata(BoxedValueStore<string> metadata)
+        public void SetMetadata(NamedBoxCollection metadata)
         {
             metadata.Set("camera", this);
             metadata.Set("view", View);

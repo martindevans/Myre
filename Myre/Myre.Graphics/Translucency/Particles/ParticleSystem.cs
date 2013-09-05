@@ -159,7 +159,7 @@ namespace Myre.Graphics.Translucency.Particles
             }
         }
 
-        public void Draw(BoxedValueStore<string> data)
+        public void Draw(NamedBoxCollection data)
         {
             Debug.Assert(Description.Texture != null, "Particle systems must be initialised before they can be drawn.");
             //Debug.WriteLine(string.Format("retired: {0}, active: {1}, new: {2}, free: {3}", finished, active, newlyCreated, free));
@@ -181,7 +181,7 @@ namespace Myre.Graphics.Translucency.Particles
 
                 // Set an effect parameter describing the viewport size. This is
                 // needed to convert particle sizes into screen space point sizes.
-                _viewportScaleParameter.SetValue(new Vector2(0.5f / data.Get<Viewport>("viewport").Value.AspectRatio, -0.5f));
+                _viewportScaleParameter.SetValue(new Vector2(0.5f / data.GetValue<Viewport>("viewport").AspectRatio, -0.5f));
 
                 // Set an effect parameter describing the current time. All the vertex
                 // shader particle animation is keyed off this value.

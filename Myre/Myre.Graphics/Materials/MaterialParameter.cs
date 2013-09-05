@@ -95,7 +95,7 @@ namespace Myre.Graphics.Materials
             _setter = CreateSetter(parameter);
         }
 
-        public void Apply(BoxedValueStore<string> data)
+        public void Apply(NamedBoxCollection data)
         {
             if (_setter != null)
                 _setter.Apply(data);
@@ -140,6 +140,9 @@ namespace Myre.Graphics.Materials
             Semantic = parameter.Semantic.ToLower();
         }
 
+        //Why does this take a BoxedValueStore<string> and not a NamedValueCollection?
+        //Because I don't *want* named values, I want boxed values!
+
         public abstract void Apply(BoxedValueStore<string> globals);
     }
 
@@ -151,7 +154,7 @@ namespace Myre.Graphics.Materials
         : MaterialParameterSetter
     {
         private Box<[Type]> value;
-        private BoxedValueStore<string> previousGlobals;
+        private NamedBoxCollection previousGlobals;
 
         public [ClassPrefix]MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)

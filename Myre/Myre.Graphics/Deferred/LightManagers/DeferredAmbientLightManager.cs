@@ -25,8 +25,8 @@ namespace Myre.Graphics.Deferred.LightManagers
         public void Draw(Renderer renderer)
         {
             var metadata = renderer.Data;
-            var view = metadata.Get<Matrix>("view").Value;
-            var ssao = metadata.Get<Texture2D>("ssao").Value;
+            var view = metadata.GetValue<Matrix>("view");
+            var ssao = metadata.GetValue<Texture2D>("ssao");
 
             _lightingMaterial.CurrentTechnique = ssao != null ? _lightingMaterial.Techniques["AmbientSSAO"] : _lightingMaterial.Techniques["Ambient"];
 

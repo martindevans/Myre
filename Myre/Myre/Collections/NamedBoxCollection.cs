@@ -5,18 +5,30 @@ namespace Myre.Collections
     /// 
     /// </summary>
     public class NamedBoxCollection
-        :BoxedValueStore<string>, INamedDataProvider, INamedDataConsumer
+        :BoxedValueStore<string>, INamedDataCollection
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="create"></param>
+        /// <param name="useDefaultValue"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public Box<T> Get<T>(string name, bool create = true)
+        public T GetValue<T>(string name, bool useDefaultValue = true)
         {
-            return Get<T>(name, default(T), create);
+            var box = Get<T>(name, default(T), useDefaultValue);
+            return box.Value;
+        }
+
+        public bool TryGetValue<T>(string name, out T value)
+        {
+            Box<T> box;
+            if (TryGet<T>(name, out box))
+                value = box.Value;
+            else
+                value = default(T);
+
+            return box != null;
         }
     }
 }

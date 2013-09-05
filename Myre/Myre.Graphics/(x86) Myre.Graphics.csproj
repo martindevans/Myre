@@ -109,7 +109,6 @@
     <Compile Include="Deferred\ILightProvider.cs" />
     <Compile Include="Deferred\LightingComponent.cs" />
     <Compile Include="Deferred\LightManagers\DeferredAmbientLightManager.cs" />
-    <Compile Include="Deferred\LightManagers\DeferredPlaneLightManager.cs" />
     <Compile Include="Deferred\LightManagers\DeferredPointLightManager.cs" />
     <Compile Include="Deferred\LightManagers\DeferredSkyboxManager.cs" />
     <Compile Include="Deferred\LightManagers\DeferredSpotLightManager.cs" />
@@ -126,7 +125,6 @@
     <Compile Include="Geometry\OrientedBoundingBox.cs" />
     <Compile Include="IRenderable.cs" />
     <Compile Include="Lighting\AmbientLight.cs" />
-    <Compile Include="Lighting\PlaneLight.cs" />
     <Compile Include="Lighting\PointLight.cs" />
     <Compile Include="Lighting\Skybox.cs" />
     <Compile Include="Lighting\SpotLight.cs" />

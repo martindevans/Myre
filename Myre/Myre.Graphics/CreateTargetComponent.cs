@@ -31,7 +31,7 @@ namespace Myre.Graphics
             var info = _targetInfo;
             if (info.Width == 0 || info.Height == 0)
             {
-                var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+                var resolution = renderer.Data.GetValue<Vector2>("resolution");
                 info = new RenderTargetInfo(
                     (int) resolution.X,
                     (int) resolution.Y,

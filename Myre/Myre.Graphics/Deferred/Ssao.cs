@@ -94,13 +94,13 @@ namespace Myre.Graphics.Deferred
 
         public override void Draw(Renderer renderer)
         {
-            var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+            var resolution = renderer.Data.GetValue<Vector2>("resolution");
 
             //if (renderer.Data.Get<float>("ssao_radiosityintensity").Value > 0)
             //    ssaoMaterial.CurrentTechnique = ssaoMaterial.Techniques["SSGI"];
             //else
             //{
-                _ssaoMaterial.CurrentTechnique = renderer.Data.Get<bool>("ssao_highquality").Value ? _ssaoMaterial.Techniques["HQ_SSAO"] : _ssaoMaterial.Techniques["LQ_SSAO"];
+                _ssaoMaterial.CurrentTechnique = renderer.Data.GetValue<bool>("ssao_highquality") ? _ssaoMaterial.Techniques["HQ_SSAO"] : _ssaoMaterial.Techniques["LQ_SSAO"];
             //}
 
             var unblured = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, surfaceFormat: SurfaceFormat.HalfVector4, name: "ssao unblurred");//, SurfaceFormat.HalfVector4);

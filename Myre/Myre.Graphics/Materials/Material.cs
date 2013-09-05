@@ -35,7 +35,7 @@ namespace Myre.Graphics.Materials
                            select new MaterialParameter(p)).ToArray();
         }
 
-        public IEnumerable<EffectPass> Begin(BoxedValueStore<string> parameterValues)
+        public IEnumerable<EffectPass> Begin(NamedBoxCollection parameterValues)
         {
             for (int i = 0; i < _parameters.Length; i++)
                 _parameters[i].Apply(parameterValues);

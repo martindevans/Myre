@@ -10,9 +10,18 @@ namespace Myre.Collections
         /// 
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="create"></param>
+        /// <param name="useDefaultValue"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Box<T> Get<T>(string name, bool create = true);
+        T GetValue<T>(string name, bool useDefaultValue = true);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        bool TryGetValue<T>(string name, out T value);
     }
 }

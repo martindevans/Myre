@@ -34,7 +34,7 @@ namespace Myre.Debugging
             public Box<T> Target { private get; set; }
         }
 
-        private readonly BoxedValueStore<string> _data;
+        private readonly NamedBoxCollection _data;
         private CommandEngine _engine;
         private readonly List<ISetting> _settings;
 
@@ -50,7 +50,7 @@ namespace Myre.Debugging
         /// Construct a new Settings instance
         /// </summary>
         /// <param name="data">Where this instance reads and writes its value to</param>
-        public ConsoleBoundSettings(BoxedValueStore<string> data)
+        public ConsoleBoundSettings(NamedBoxCollection data)
         {
             _data = data;
             _settings = new List<ISetting>();
@@ -67,7 +67,7 @@ namespace Myre.Debugging
         public Box<T> Add<T>(string name, string description = null, T defaultValue = default(T))
         {
             var box = _data.Get(name, defaultValue);
-            var setting = new Setting<T>()
+            var setting = new Setting<T>
             {
                 Name = name,
                 Description = description,

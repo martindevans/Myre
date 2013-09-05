@@ -92,7 +92,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             if (_material != null)
             {
-                Matrix view = metadata.Get<Matrix>("view").Value;
+                Matrix view = metadata.GetValue<Matrix>("view");
                 Vector3 direction = light.Direction;
                 Vector3.TransformNormal(ref direction, ref view, out direction);
 
@@ -104,7 +104,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
                 if (shadowsEnabled)
                 {
-                    _material.Parameters["ShadowProjection"].SetValue(metadata.Get<Matrix>("inverseview").Value * data.View * data.Projection);
+                    _material.Parameters["ShadowProjection"].SetValue(metadata.GetValue<Matrix>("inverseview") * data.View * data.Projection);
                     _material.Parameters["ShadowMapSize"].SetValue(new Vector2(light.ShadowResolution, light.ShadowResolution));
                     _material.Parameters["ShadowMap"].SetValue(data.ShadowMap);
                     _material.Parameters["LightFarClip"].SetValue(data.FarClip);
@@ -115,7 +115,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
         public void Prepare(Renderer renderer)
         {
-            renderer.Data.Get<BoundingFrustum>("viewfrustum").Value.GetCorners(_frustumCornersWs);
+            renderer.Data.GetValue<BoundingFrustum>("viewfrustum").GetCorners(_frustumCornersWs);
 
             for (int i = 0; i < _lights.Count; i++)
             {
@@ -173,7 +173,8 @@ namespace Myre.Graphics.Deferred.LightManagers
             var nearPlane = new Plane(light.Direction, depthOffset);
             nearPlane.Normalize();
             Plane transformedNearPlane;
-            Plane.Transform(ref nearPlane, ref renderer.Data.Get<Matrix>("view").Value, out transformedNearPlane);
+            var view = renderer.Data.GetValue<Matrix>("view");
+            Plane.Transform(ref nearPlane, ref view, out transformedNearPlane);
             data.NearClip = new Vector4(transformedNearPlane.Normal, transformedNearPlane.D);
         }
 
@@ -185,7 +186,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.SetRenderTarget(target);
             renderer.Device.Clear(Color.Black);
 
-            var resolution = renderer.Data.Get<Vector2>("resolution");
+            var resolution = renderer.Data.Get<Vector2>("resolution", default(Vector2), true);
             var previousResolution = resolution.Value;
             resolution.Value = new Vector2(light.ShadowResolution);
 
@@ -193,7 +194,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.BlendState = BlendState.Opaque;
             renderer.Device.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            var view = renderer.Data.Get<View>("activeview");
+            var view = renderer.Data.Get<View>("activeview", default(View), true);
             var previousView = view.Value;
             view.Value = _shadowView;
 

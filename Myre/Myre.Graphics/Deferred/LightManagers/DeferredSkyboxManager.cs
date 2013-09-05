@@ -47,8 +47,8 @@ namespace Myre.Graphics.Deferred.LightManagers
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
 
-            _skyboxEffect.Parameters["View"].SetValue(renderer.Data.Get<Matrix>("view").Value);
-            _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.Get<Matrix>("projection").Value);
+            _skyboxEffect.Parameters["View"].SetValue(renderer.Data.GetValue<Matrix>("view"));
+            _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.GetValue<Matrix>("projection"));
 
             for (int i = 0; i < Behaviours.Count; i++)
             {

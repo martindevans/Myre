@@ -82,9 +82,11 @@
     <Compile Include="ActionDisposable.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="Collections\Box.cs" />
+    <Compile Include="Collections\CascadingBoxCollection.cs" />
     <Compile Include="Collections\Hashset.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Collections\INamedDataCollection.cs" />
     <Compile Include="Collections\INamedDataConsumer.cs" />
     <Compile Include="Collections\INamedDataProvider.cs" />
     <Compile Include="Collections\NamedBoxCollection.cs" />

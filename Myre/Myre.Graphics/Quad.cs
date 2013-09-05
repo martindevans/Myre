@@ -150,7 +150,7 @@ namespace Myre.Graphics
             }
         }
 
-        public void Draw(Material material, BoxedValueStore<string> parameters)
+        public void Draw(Material material, NamedBoxCollection parameters)
         {
             foreach (var pass in material.Begin(parameters))
             {

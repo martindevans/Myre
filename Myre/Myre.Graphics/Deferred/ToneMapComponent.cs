@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Collections;
 using Myre.Graphics.Materials;
 using Myre.Graphics.PostProcessing;
 
@@ -71,15 +70,15 @@ namespace Myre.Graphics.Deferred
             var metadata = renderer.Data;
             var device = renderer.Device;
 
-            var lightBuffer = metadata.Get<Texture2D>("lightbuffer").Value;
-            var resolution = metadata.Get<Vector2>("resolution");
+            var lightBuffer = metadata.GetValue<Texture2D>("lightbuffer");
+            var resolution = metadata.GetValue<Vector2>("resolution");
 
             CalculateLuminance(renderer, resolution, device, lightBuffer);
             Bloom(renderer, resolution, device, lightBuffer);
             ToneMap(renderer, resolution, device, lightBuffer);
         }
 
-        private void CalculateLuminance(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
+        private void CalculateLuminance(Renderer renderer, Vector2 resolution, GraphicsDevice device, Texture2D lightBuffer)
         {
             if (_previous == -1)
             {
@@ -117,9 +116,9 @@ namespace Myre.Graphics.Deferred
             RenderTargetManager.RecycleTarget(_averageLuminance);
         }
 
-        private void Bloom(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
+        private void Bloom(Renderer renderer, Vector2 resolution, GraphicsDevice device, Texture2D lightBuffer)
         {
-            var screenResolution = resolution.Value;
+            var screenResolution = resolution;
             var halfResolution = screenResolution / 2;
             var quarterResolution = halfResolution / 2;
 
@@ -127,9 +126,9 @@ namespace Myre.Graphics.Deferred
             var thresholded = RenderTargetManager.GetTarget(device, (int)halfResolution.X, (int)halfResolution.Y, SurfaceFormat.Rgba64, name:"bloom thresholded");
             device.SetRenderTarget(thresholded);
             _bloom.Parameters["Resolution"].SetValue(halfResolution);
-            _bloom.Parameters["Threshold"].SetValue(renderer.Data.Get<float>("hdr_bloomthreshold").Value);
-            _bloom.Parameters["MinExposure"].SetValue(renderer.Data.Get<float>("hdr_minexposure").Value);
-            _bloom.Parameters["MaxExposure"].SetValue(renderer.Data.Get<float>("hdr_maxexposure").Value);
+            _bloom.Parameters["Threshold"].SetValue(renderer.Data.GetValue<float>("hdr_bloomthreshold"));
+            _bloom.Parameters["MinExposure"].SetValue(renderer.Data.GetValue<float>("hdr_minexposure"));
+            _bloom.Parameters["MaxExposure"].SetValue(renderer.Data.GetValue<float>("hdr_maxexposure"));
             _bloom.Parameters["Texture"].SetValue(lightBuffer);
             _bloom.Parameters["Luminance"].SetValue(_adaptedLuminance[_current]);
             _bloom.CurrentTechnique = _bloom.Techniques["ThresholdDownsample2X"];
@@ -145,7 +144,7 @@ namespace Myre.Graphics.Deferred
 
             // blur the target
             var blurred = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom blurred");
-            _gaussian.Blur(downsample, blurred, renderer.Data.Get<float>("hdr_bloomblurammount").Value);
+            _gaussian.Blur(downsample, blurred, renderer.Data.GetValue<float>("hdr_bloomblurammount"));
 
             // upscale back to half resolution
             device.SetRenderTarget(thresholded);
@@ -161,9 +160,9 @@ namespace Myre.Graphics.Deferred
             RenderTargetManager.RecycleTarget(blurred);
         }
 
-        private void ToneMap(Renderer renderer, Box<Vector2> resolution, GraphicsDevice device, Texture2D lightBuffer)
+        private void ToneMap(Renderer renderer, Vector2 resolution, GraphicsDevice device, Texture2D lightBuffer)
         {
-            var toneMapped = RenderTargetManager.GetTarget(device, (int)resolution.Value.X, (int)resolution.Value.Y, SurfaceFormat.Color, depthFormat: DepthFormat.Depth24Stencil8, name:"tone mapped");
+            var toneMapped = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.Color, depthFormat: DepthFormat.Depth24Stencil8, name:"tone mapped");
             device.SetRenderTarget(toneMapped);
             device.Clear(Color.Transparent);
             device.DepthStencilState = DepthStencilState.None;
@@ -171,8 +170,8 @@ namespace Myre.Graphics.Deferred
 
             _toneMap.Parameters["Texture"].SetValue(lightBuffer);
             _toneMap.Parameters["Luminance"].SetValue(_adaptedLuminance[_current]);
-            _toneMap.Parameters["MinExposure"].SetValue(renderer.Data.Get<float>("hdr_minexposure").Value);
-            _toneMap.Parameters["MaxExposure"].SetValue(renderer.Data.Get<float>("hdr_maxexposure").Value);
+            _toneMap.Parameters["MinExposure"].SetValue(renderer.Data.GetValue<float>("hdr_minexposure"));
+            _toneMap.Parameters["MaxExposure"].SetValue(renderer.Data.GetValue<float>("hdr_maxexposure"));
             _quad.Draw(_toneMap, renderer.Data);
             Output("tonemapped", toneMapped);
         }
