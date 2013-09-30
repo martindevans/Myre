@@ -27,6 +27,11 @@ namespace Myre.StateManagement
             }
         }
 
+        public IEnumerable<Screen> Screens
+        {
+            get { return _screenStack; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScreenManager"/> class.
         /// </summary>

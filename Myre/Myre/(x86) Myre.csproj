@@ -95,12 +95,14 @@
     <Compile Include="Collections\ProximityOctree.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\ReadOnlyDictionary.cs" />
+    <Compile Include="Collections\RingBuffer.cs" />
     <Compile Include="Collections\TokenOctree.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
     <Compile Include="Delayed.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
     <Compile Include="Extensions\BoundingSphereExtensions.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Extensions\INamedDataCollectionExtensions.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
     <Compile Include="Extensions\GameTimeExtensions.cs" />
     <Compile Include="Extensions\GraphicsDeviceExtensions.cs" />

@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ninject;
-using Myre.Graphics.Materials;
-using Microsoft.Xna.Framework.Content;
-using Myre.Graphics;
-using Myre.Collections;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System.Diagnostics;
-using System.Xml;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Myre.Collections;
+using Myre.Graphics;
+using Myre.Graphics.Materials;
+using Ninject;
 
-namespace GraphicsTests
+namespace GraphicsTests.Tests
 {
     public class MyreMaterialData
     {
@@ -25,11 +21,11 @@ namespace GraphicsTests
     class MaterialParametersTest
         : TestScreen
     {
-        private Material material;
-        private Quad quad;
-        private BoxedValueStore<string> metadata;
-        private ContentManager content;
-        private GraphicsDevice device;
+        private Material _material;
+        private Quad _quad;
+        private NamedBoxCollection _metadata;
+        private readonly ContentManager _content;
+        private readonly GraphicsDevice _device;
 
         public MaterialParametersTest(
             IKernel kernel,
@@ -37,32 +33,32 @@ namespace GraphicsTests
             GraphicsDevice device)
             : base("Material Parameters", kernel)
         {
-            this.content = content;
-            this.device = device;
+            _content = content;
+            _device = device;
         }
 
         protected override void BeginTransitionOn()
         {
-            material = new Material(content.Load<Effect>("Basic"), null);
-            quad = new Quad(device);
-            metadata = new BoxedValueStore<string>();
+            _material = new Material(_content.Load<Effect>("Basic"), null);
+            _quad = new Quad(_device);
+            _metadata = new NamedBoxCollection();
 
-            metadata.Set("colour", Color.White.ToVector4());
+            _metadata.Set("colour", Color.White.ToVector4());
 
             base.OnShown();
         }
 
-        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             var time = gameTime.TotalGameTime.TotalSeconds;
-            metadata.Set("colour", new Vector4((float)Math.Sin(time), (float)Math.Sin(time * 2), (float)Math.Sin(time * 3), 1f));
+            _metadata.Set("colour", new Vector4((float)Math.Sin(time), (float)Math.Sin(time * 2), (float)Math.Sin(time * 3), 1f));
             
             base.Update(gameTime);
         }
 
-        public override void Draw(Microsoft.Xna.Framework.GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
-            quad.Draw(material, metadata);
+            _quad.Draw(_material, _metadata);
 
             base.Draw(gameTime);
         }

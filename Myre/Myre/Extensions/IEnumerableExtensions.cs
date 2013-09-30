@@ -124,5 +124,34 @@ namespace Myre.Extensions
             foreach (var item in enumerable)
                 yield return new KeyValuePair<int, T>(index++, item);
         }
+
+        /// <summary>
+        /// Drop the last N items from a collection
+        /// </summary>
+        /// <param name="enumerable"></param>
+        /// <param name="drop"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public static IEnumerable<T> DropLast<T>(this IEnumerable<T> enumerable, int drop)
+        {
+            if (enumerable == null)
+                throw new ArgumentNullException("source");
+
+            if (drop < 0)
+                throw new ArgumentOutOfRangeException("drop",
+                    "Argument drop should be non-negative.");
+
+            Queue<T> buffer = new Queue<T>(drop + 1);
+
+            foreach (T x in enumerable)
+            {
+                buffer.Enqueue(x);
+
+                if (buffer.Count == drop + 1)
+                    yield return buffer.Dequeue();
+            }
+        }
     }
 }

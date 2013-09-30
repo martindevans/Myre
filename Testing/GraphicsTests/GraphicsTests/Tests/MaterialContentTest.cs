@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ninject;
+﻿using Ninject;
 using Myre.Graphics.Materials;
 using Microsoft.Xna.Framework.Content;
 using Myre.Graphics;
 using Myre.Collections;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using System.Diagnostics;
 
-namespace GraphicsTests
+namespace GraphicsTests.Tests
 {
     class MaterialContentTest
         : TestScreen
     {
-        private Material material;
-        private Quad quad;
-        private BoxedValueStore<string> metadata;
-        private ContentManager content;
-        private GraphicsDevice device;
+        private Material _material;
+        private Quad _quad;
+        private NamedBoxCollection _metadata;
+        private readonly ContentManager _content;
+        private readonly GraphicsDevice _device;
 
         public MaterialContentTest(
             IKernel kernel,
@@ -28,22 +23,22 @@ namespace GraphicsTests
             GraphicsDevice device)
             : base("Material Content Loading", kernel)
         {
-            this.content = content;
-            this.device = device;
+            _content = content;
+            _device = device;
         }
 
         protected override void BeginTransitionOn()
         {
-            material = content.Load<Material>("Red");
-            quad = new Quad(device);
-            metadata = new BoxedValueStore<string>();
+            _material = _content.Load<Material>("Red");
+            _quad = new Quad(_device);
+            _metadata = new NamedBoxCollection();
 
             base.OnShown();
         }
 
-        public override void Draw(Microsoft.Xna.Framework.GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
-            quad.Draw(material, metadata);
+            _quad.Draw(_material, _metadata);
 
             base.Draw(gameTime);
         }
