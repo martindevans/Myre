@@ -509,9 +509,11 @@ namespace Myre.Debugging
         {
             if (_options.ContainsKey(optionName))
             {
-                var option = _options[optionName].Property;
-                if (option.CanRead)
-                    return _options[optionName].Property.GetValue(null, null);
+                var option = _options[optionName];
+                if (option.Property.CanRead)
+                {
+                    return option.Property.GetValue(option.Target, null);
+                }
                 _error = string.Format("Option \"{0}\" cannot be read.", optionName);
             }
             else
