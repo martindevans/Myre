@@ -81,6 +81,10 @@
     <Compile Include="StatisticTextLog.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Myre.Debugging\%28x86%29 Myre.Debugging.csproj">
+      <Project>{F987DEC5-E12F-4566-A200-DE18D6044E21}</Project>
+      <Name>%28x86%29 Myre.Debugging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Myre.UI\%28x86%29 Myre.UI.csproj">
       <Project>{ADFDCC4A-8805-4BCA-9FBA-FB04920AFA33}</Project>
       <Name>%28x86%29 Myre.UI</Name>
