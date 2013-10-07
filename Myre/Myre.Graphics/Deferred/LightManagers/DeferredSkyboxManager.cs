@@ -12,6 +12,13 @@ namespace Myre.Graphics.Deferred.LightManagers
         readonly Effect _skyboxEffect;
         readonly Quad _quad;
 
+        private readonly DepthStencilState _depthState = new DepthStencilState
+        {
+            DepthBufferEnable = true,
+            DepthBufferWriteEnable = false,
+            DepthBufferFunction = CompareFunction.LessEqual
+        };
+
         public DeferredSkyboxManager(GraphicsDevice device)
         {
             _skyboxEffect = Content.Load<Effect>("Skybox");
@@ -29,25 +36,18 @@ namespace Myre.Graphics.Deferred.LightManagers
             var device = renderer.Device;
 
             var previousDepthState = device.DepthStencilState;
-            //device.DepthStencilState = DepthStencilState.DepthRead;
-            device.DepthStencilState = new DepthStencilState()
-            {
-                DepthBufferEnable = true,
-                DepthBufferWriteEnable = false,
-                DepthBufferFunction = CompareFunction.LessEqual
-            };
+            device.DepthStencilState = _depthState;
 
             var previousRasterState = device.RasterizerState;
-            device.RasterizerState = RasterizerState.CullCounterClockwise;
-
-            //device.SetVertexBuffer(vertices);
-            //device.Indices = indices;
+            device.RasterizerState = RasterizerState.CullNone;
 
             var part = _model.Meshes[0].MeshParts[0];
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
 
-            _skyboxEffect.Parameters["View"].SetValue(renderer.Data.GetValue<Matrix>("view"));
+            var view = renderer.Data.GetValue<Matrix>("view");
+            view.Translation = Vector3.Zero;
+            _skyboxEffect.Parameters["View"].SetValue(view);
             _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.GetValue<Matrix>("projection"));
 
             for (int i = 0; i < Behaviours.Count; i++)

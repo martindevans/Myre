@@ -8,7 +8,7 @@ namespace Myre.Graphics
 {
     [DefaultManager(typeof(Manager))]
     public class View
-        : Behaviour
+        : ProcessBehaviour
     {
         private Property<Camera> _camera;
         private Property<Viewport> _viewport;
@@ -41,9 +41,12 @@ namespace Myre.Graphics
             _camera.Value.SetMetadata(metadata);
         }
 
+        protected override void Update(float elapsedTime)
+        {
+        }
 
         public class Manager
-            : BehaviourManager<View>
+            : Manager<View>
         {
             public IEnumerable<View> Views
             {
