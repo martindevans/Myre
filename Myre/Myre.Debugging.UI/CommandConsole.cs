@@ -2,11 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -29,10 +27,6 @@ namespace Myre.Debugging.UI
         CommandHelp? _help;
         readonly Texture2D _background;
         readonly CommandStack _commandStack;
-
-#if WINDOWS
-        public TraceListener Listener;
-#endif
 
         /// <summary>
         /// Gets the command engine.
@@ -132,16 +126,6 @@ namespace Myre.Debugging.UI
             AreaChanged += c => _infoBox.SetSize(Math.Max(0, c.Area.Width - 311), 0);
 
             _commandStack = new CommandStack(_textBox, Gestures);
-
-#if WINDOWS
-            ConsoleTraceListener cts = new ConsoleTraceListener(this);
-            Listener = cts;
-            Trace.Listeners.Add(cts);
-
-            Engine.AddCommand(cts.RegexFilter, "AddFilter", "Console.Trace.AddFilter");
-            Engine.AddCommand(cts.RegexFilter, "ListFilters", "Console.Trace.ListFilters");
-            Engine.AddCommand(cts.RegexFilter, "RemoveAt", "Console.Trace.RemoveFilter");
-#endif
 
             BindGestures();
 
@@ -390,120 +374,5 @@ namespace Myre.Debugging.UI
                     _textBox.Text = _commandScrollPointer.Value;
             }
         }
-
-#if WINDOWS
-        private class ConsoleTraceListener
-            : TraceListener
-        {
-            private readonly CommandConsole _console;
-
-#if WINDOWS
-            public readonly RegexTraceFilter RegexFilter;
-#endif
-
-            public ConsoleTraceListener(CommandConsole console)
-            {
-                _console = console;
-
-#if WINDOWS
-                RegexFilter = new RegexTraceFilter(console);
-                Filter = RegexFilter;
-#endif
-            }
-
-            /// <summary>
-            /// When overridden in a derived class, writes the specified message to the listener you create in the derived class.
-            /// </summary>
-            /// <param name="message">A message to write.</param>
-            public override void Write(string message)
-            {
-                _console.WriteLine(message);
-            }
-
-            /// <summary>
-            /// When overridden in a derived class, writes a message to the listener you create in the derived class, followed by a line terminator.
-            /// </summary>
-            /// <param name="message">A message to write.</param>
-            public override void WriteLine(string message)
-            {
-                _console.WriteLine(message);
-            }
-
-#if WINDOWS
-            public class RegexTraceFilter
-                : TraceFilter
-            {
-                private readonly List<Regex> _filters = new List<Regex>();
-                private readonly CommandConsole _console;
-
-                internal RegexTraceFilter(CommandConsole console)
-                {
-                    _console = console;
-                }
-
-                /// <summary>
-                /// Adds the a regular expression which will filter out any messages it matches
-                /// </summary>
-                /// <param name="s">The s.</param>
-// ReSharper disable UnusedMember.Local
-                public void AddFilter(string s)
-// ReSharper restore UnusedMember.Local
-                {
-                    _filters.Add(new Regex(s));
-                }
-
-                /// <summary>
-                /// Lists the filters registered to the console
-                /// </summary>
-// ReSharper disable UnusedMember.Local
-                public void ListFilters()
-// ReSharper restore UnusedMember.Local
-                {
-                    _console.WriteLine("Filters:");
-                    for (int i = 0; i < _filters.Count; i++)
-                        _console.WriteLine("\t " + i + " :> " + _filters[i]);
-                }
-
-                /// <summary>
-                /// Removes the filter at the specified index
-                /// </summary>
-                /// <param name="index">The index.</param>
-                /// <returns></returns>
-// ReSharper disable UnusedMember.Local
-                public Regex RemoveAt(int index)
-// ReSharper restore UnusedMember.Local
-                {
-                    Regex r = _filters[index];
-                    _filters.RemoveAt(index);
-                    return r;
-                }
-
-                /// <summary>
-                /// When overridden in a derived class, determines whether the trace listener should trace the event.
-                /// </summary>
-                /// <param name="cache">The <see cref="T:System.Diagnostics.TraceEventCache"/> that contains information for the trace event.</param>
-                /// <param name="source">The name of the source.</param>
-                /// <param name="eventType">One of the <see cref="T:System.Diagnostics.TraceEventType"/> values specifying the type of event that has caused the trace.</param>
-                /// <param name="id">A trace identifier number.</param>
-                /// <param name="formatOrMessage">Either the format to use for writing an array of arguments specified by the <paramref name="args"/> parameter, or a message to write.</param>
-                /// <param name="args">An array of argument objects.</param>
-                /// <param name="data1">A trace data object.</param>
-                /// <param name="data">An array of trace data objects.</param>
-                /// <returns>
-                /// true to trace the specified event; otherwise, false.
-                /// </returns>
-                public override bool ShouldTrace(TraceEventCache cache, string source, TraceEventType eventType, int id, string formatOrMessage, object[] args, object data1, object[] data)
-                {
-                    for (int i = 0; i < _filters.Count; i++)
-                    {
-                        if (_filters[i].IsMatch(formatOrMessage))
-                            return false;
-                    }
-                    return true;
-                }
-            }
-#endif
-        }
-#endif
     }
 }

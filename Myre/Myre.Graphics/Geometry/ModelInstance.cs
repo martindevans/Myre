@@ -342,6 +342,8 @@ namespace Myre.Graphics.Geometry
                 {
                     var instance = _visibleInstances[i];
 
+                    instance.Instance.ApplyRendererData(metadata);
+
                     world.Value = instance.Instance.Transform;
                     worldView.Value = instance.WorldView;
                     if (instance.Instance._ignoreProjectionMatrix.Value)
@@ -354,8 +356,6 @@ namespace Myre.Graphics.Geometry
                         Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
 #pragma warning restore 197
                     }
-
-                    instance.Instance.ApplyRendererData(metadata);
 
                     foreach (var pass in data.Material.Begin(metadata))
                     {
