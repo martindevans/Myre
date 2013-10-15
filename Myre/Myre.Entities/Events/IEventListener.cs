@@ -5,8 +5,8 @@ namespace Myre.Entities.Events
     /// An interface which defines method for listening to events of the specified type.
     /// </summary>
     /// <typeparam name="EventData">The type of the event data.</typeparam>
-    public interface IEventListener<in EventData>
+    public interface IEventListener<EventData>
     {
-        void HandleEvent(EventData data, object scope);
+        EventData HandleEvent(EventData data, object scope);
     }
 }

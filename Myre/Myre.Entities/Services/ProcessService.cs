@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Myre.Entities.Services
 {
@@ -25,6 +27,20 @@ namespace Myre.Entities.Services
         private readonly List<IProcess> _processes;
         private readonly List<IProcess> _buffer;
 
+#if WINDOWS
+        readonly Stopwatch _timer = new Stopwatch();
+        private readonly List<KeyValuePair<IProcess, TimeSpan>> _executionTimes;
+        private readonly ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>> _readonlyExecutionTimes;
+
+        /// <summary>
+        /// A collection of diagnostic data about service execution time
+        /// </summary>
+        public ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>> ProcessExecutionTimes
+        {
+            get { return _readonlyExecutionTimes; }
+        }
+#endif
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessService"/> class.
         /// </summary>
@@ -32,6 +48,9 @@ namespace Myre.Entities.Services
         {
             _processes = new List<IProcess>();
             _buffer = new List<IProcess>();
+
+            _executionTimes = new List<KeyValuePair<IProcess, TimeSpan>>();
+            _readonlyExecutionTimes = new ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>>(_executionTimes);
         }
 
         /// <summary>
@@ -40,13 +59,15 @@ namespace Myre.Entities.Services
         /// <param name="elapsedTime">The number of seconds which have elapsed since the previous frame.</param>
         public override void Update(float elapsedTime)
         {
-            var startTime = DateTime.Now;
-
             lock (_buffer)
             {
                 _processes.AddRange(_buffer);
                 _buffer.Clear();
             }
+
+#if WINDOWS
+            _executionTimes.Clear();
+#endif
 
             for (int i = _processes.Count - 1; i >= 0; i--)
             {
@@ -58,7 +79,14 @@ namespace Myre.Entities.Services
                     continue;
                 }
 
+#if WINDOWS
+                _timer.Restart();
+#endif
                 process.Update(elapsedTime);
+#if WINDOWS
+                _timer.Stop();
+                _executionTimes.Add(new KeyValuePair<IProcess, TimeSpan>(process, _timer.Elapsed));
+#endif
             }
         }
 

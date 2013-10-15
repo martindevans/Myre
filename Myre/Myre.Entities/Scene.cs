@@ -16,7 +16,7 @@ namespace Myre.Entities
         : IDisposableObject
     {
         private static readonly Dictionary<Type, Type> _defaultManagers = new Dictionary<Type, Type>();
-        
+
         private readonly ServiceContainer _services;
         private readonly BehaviourManagerContainer _managers;
         private readonly List<Entity> _entities;
@@ -37,20 +37,29 @@ namespace Myre.Entities
         /// Gets the services.
         /// </summary>
         /// <value>The services.</value>
-        public IEnumerable<IService> Services { get { return _services; } }
+        public IEnumerable<IService> Services
+        {
+            get { return _services; }
+        }
 
 #if WINDOWS
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
-        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes { get { return _services.ExecutionTimes; } }
+        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes
+        {
+            get { return _services.ExecutionTimes; }
+        }
 #endif
 
         /// <summary>
         /// Gets the managers.
         /// </summary>
         /// <value>The managers.</value>
-        public IEnumerable<IBehaviourManager> Managers { get { return _managers; } }
+        public IEnumerable<IBehaviourManager> Managers
+        {
+            get { return _managers; }
+        }
 
         /// <summary>
         /// Gets the Ninject kernel used to instantiate services and behaviour managers.

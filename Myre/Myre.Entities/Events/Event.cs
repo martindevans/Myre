@@ -37,7 +37,7 @@ namespace Myre.Entities.Events
                 //Loop over event listeners backwards so most recent handlers are executed first
                 //This makes events compatible with using them as a chained system where more recent handlers can temporarily block lower handlers (by modifying the event data)
                 for (int i = Event._listeners.Count - 1; i >= 0; i--)
-                    Event._listeners[i].HandleEvent(Data, Event.Scope);
+                    Data = Event._listeners[i].HandleEvent(Data, Event.Scope);
 
                 Event.TriggerEvent(Data);
             }
