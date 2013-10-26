@@ -1,6 +1,6 @@
-#include "EncodeNormals.fxh"
-#include "GammaCorrection.fxh"
-#include "FullScreenQuad.fxh"
+#include "../EncodeNormals.fxh"
+#include "../GammaCorrection.fxh"
+#include "../FullScreenQuad.fxh"
 
 float3 Up;
 float3 SkyColour;
@@ -48,21 +48,37 @@ sampler ssaoSampler = sampler_state
 	MagFilter = Point;
 };
 
-float4 ReadSsao(float2 texCoord)
+float ReadSsao(float2 texCoord)
 {
-	//return tex2D(ssaoSampler, texCoord);
+	//return tex2D(ssaoSampler, texCoord).a;
     
-	float4 ao = 0;
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			float2 coord = texCoord + float2(i / Resolution.x, j / Resolution.y);
-			ao += tex2D(ssaoSampler, coord);
-		}
-	}
+	float ao = 0;
 
-	return ao / 16;
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	for (int j = 0; j < 4; j++)
+	//	{
+	//		float2 coord = texCoord + float2(i / Resolution.x, j / Resolution.y);
+	//		ao += tex2D(ssaoSampler, coord);
+	//	}
+	//}
+	//return ao.a / 16;
+
+	float2 halfTexel = 0.5 / Resolution;
+
+	ao = tex2D(ssaoSampler, texCoord + halfTexel * float2(-1, -1)).a
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(1, -1)).a
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(3, -1)).a
+
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(-1, 1)).a
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(1, 1)).a
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(3, 1)).a
+
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(-1, 3)).a
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(1, 3)).a
+	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(3, 3)).a;
+
+	return ao / 9;
 }
 
 void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
@@ -78,8 +94,8 @@ void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
 
 	if (enableSsao)
 	{
-		float4 ssao = ReadSsao(in_TexCoord);
-		colour *= ssao.a;
+		float ssao = ReadSsao(in_TexCoord);
+		colour *= ssao;
 		//colour += ssao.rgb;
 	}
 

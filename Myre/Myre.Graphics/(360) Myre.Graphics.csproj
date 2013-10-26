@@ -76,7 +76,6 @@
     <Compile Include="IRenderable.cs" />
     <Compile Include="Lighting\AmbientLight.cs" />
     <Compile Include="Deferred\GammaCorrectionPhase.cs" />
-    <Compile Include="Lighting\PlaneLight.cs" />
     <Compile Include="Lighting\PointLight.cs" />
     <Compile Include="Lighting\Skybox.cs" />
     <Compile Include="Lighting\SpotLight.cs" />
