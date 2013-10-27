@@ -57,11 +57,6 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="Myre.Graphics\AmbientLight.fx">
-      <Name>AmbientLight</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="Downsample.fx">
       <Name>Downsample</Name>
       <Importer>EffectImporter</Importer>

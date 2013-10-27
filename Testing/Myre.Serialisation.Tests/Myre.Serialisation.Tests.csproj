@@ -67,12 +67,6 @@
   <ItemGroup>
     <Shadow Include="Test References\Myre.Serialisation.accessor" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Myre\Myre.Serialisation\%28x86%29 Myre.Serialisation.csproj">
-      <Project>{73911D37-4250-40BD-8F15-20824D586319}</Project>
-      <Name>%28x86%29 Myre.Serialisation</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

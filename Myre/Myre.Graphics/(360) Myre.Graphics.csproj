@@ -208,6 +208,7 @@
     <None Include="bin\Xbox 360\Debug\Myre.Graphics.Content\SSAO.xnb" />
     <None Include="bin\Xbox 360\Debug\Myre.Graphics.Content\ToneMap.xnb" />
     <None Include="packages.config" />
+    <None Include="Resources\AmbientLight.xnb" />
     <None Include="Resources\SpotLight.xnb" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

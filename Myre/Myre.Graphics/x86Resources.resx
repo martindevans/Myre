@@ -118,9 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="AmbientLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\AmbientLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="Bloom" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bin\x86\Debug\Myre.Graphics.Content\Bloom.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -189,5 +186,8 @@
   </data>
   <data name="SpotLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\SpotLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="AmbientLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\AmbientLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

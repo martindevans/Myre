@@ -53,6 +53,7 @@ namespace Myre.Extensions
                     return 2;
                 case SurfaceFormat.Rgba64:
                 case SurfaceFormat.HalfVector4:
+                case SurfaceFormat.HdrBlendable:
                 case SurfaceFormat.Vector2:
                     return 8;
                 case SurfaceFormat.Vector4:
