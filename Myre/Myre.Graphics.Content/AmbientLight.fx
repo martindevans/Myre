@@ -1,6 +1,6 @@
-#include "../EncodeNormals.fxh"
-#include "../GammaCorrection.fxh"
-#include "../FullScreenQuad.fxh"
+#include "EncodeNormals.fxh"
+#include "GammaCorrection.fxh"
+#include "FullScreenQuad.fxh"
 
 float3 Up;
 float3 SkyColour;
