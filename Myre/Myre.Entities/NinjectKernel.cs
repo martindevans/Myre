@@ -47,7 +47,7 @@ namespace Myre.Entities
         /// <param name="bindGraphicsDevice">if set to <c>true</c> binds game.GraphicsDevice.</param>
         /// <param name="bindContentManager">if set to <c>true</c> binds game.Content.</param>
         /// <param name="bindServiceContainer">if set to <c>true</c> binds game.Services.</param>
-        public static void BindGame(Game game, IKernel kernel, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true)
+        public static void BindGame(Game game, IKernel kernel, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true, bool bindComponentCollection = true)
         {
             // bind the game to a singleton instance
             var thisType = game.GetType();
@@ -67,6 +67,11 @@ namespace Myre.Entities
             {
                 kernel.Bind<GameServiceContainer>().ToMethod(c => game.Services);
                 kernel.Bind<IServiceProvider>().ToMethod(c => game.Services);
+            }
+
+            if (bindComponentCollection)
+            {
+                kernel.Bind<GameComponentCollection>().ToMethod(c => game.Components);
             }
         }
     }

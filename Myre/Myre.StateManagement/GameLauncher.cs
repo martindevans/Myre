@@ -8,15 +8,15 @@ namespace Myre.StateManagement
     {
         public static void Run<T>() where T : Game, new()
         {
-            Run(new T());
+            Run(() => new GameWrapper(new T()));
         }
 
         public static void Run(Game instance)
         {
-            Run(new GameWrapper(instance));
+            Run(() => new GameWrapper(instance));
         }
 
-        public static void Run(ILaunchable launchable
+        public static void Run(Func<ILaunchable> createGame
 #if WINDOWS
             , params Action<Exception>[] exceptionHandlers
 #endif
@@ -24,13 +24,19 @@ namespace Myre.StateManagement
         {
             if (Debugger.IsAttached)
             {
+                Trace.TraceInformation("Debugger is attached, running with no global exception handler");
+
+                var launchable = createGame();
                 using (launchable)
                     launchable.Run();
             }
             else
             {
+                Trace.TraceInformation("No debugger is attached, running with global exception handler");
+
                 try
                 {
+                    var launchable = createGame();
                     using (launchable)
                         launchable.Run();
                 }
