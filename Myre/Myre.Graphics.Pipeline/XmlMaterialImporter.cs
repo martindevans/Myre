@@ -10,7 +10,6 @@ namespace Myre.Graphics.Pipeline
     /// 
     /// This should be part of a Content Pipeline Extension Library project.
     /// 
-    /// TODO: change the ContentImporter attribute to specify the correct file
     /// extension, display name, and default processor for this importer.
     /// </summary>
     [ContentImporter(".mat", DisplayName = "Xml Myre Material Importer", DefaultProcessor = "MyreMaterialProcessor")]
