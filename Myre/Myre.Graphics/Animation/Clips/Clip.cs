@@ -18,6 +18,15 @@ namespace Myre.Graphics.Animation.Clips
         public void Start()
         {
         }
+
+        internal Clip()
+        {
+        }
+
+        public Clip(Keyframe[] keyframes)
+        {
+            Keyframes = keyframes;
+        }
     }
 
     public class ClipReader : ContentTypeReader<Clip>

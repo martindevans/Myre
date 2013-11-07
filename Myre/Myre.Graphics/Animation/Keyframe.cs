@@ -9,6 +9,17 @@ namespace Myre.Graphics.Animation
         public int Bone { get; set; }
         public TimeSpan Time { get; set; }
         public Matrix Transform { get; set; }
+
+        internal Keyframe()
+        {
+        }
+
+        public Keyframe(int bone, TimeSpan time, Matrix transform)
+        {
+            Bone = bone;
+            Time = time;
+            Transform = transform;
+        }
     }
 
     public class KeyframeReader : ContentTypeReader<Keyframe>
