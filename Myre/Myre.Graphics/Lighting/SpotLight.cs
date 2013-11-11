@@ -2,12 +2,22 @@
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Lighting
 {
     public class SpotLight
         : Behaviour
     {
+        private const string COLOUR_NAME = "colour";
+        private const string POSITION_NAME = "position";
+        private const string DIRECTION_NAME = "direction";
+        private const string ANGLE_NAME = "angle";
+        private const string RANGE_NAME = "range";
+        private const string MASK_NAME = "mask";
+        private const string SHADOW_RESOLUTION_NAME = "shadow_resolution";
+        private const string ACTIVE_NAME = "spotlight_active";
+
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
         private Property<Vector3> _direction;
@@ -67,16 +77,30 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty<Vector3>("colour");
-            _position = context.CreateProperty<Vector3>("position");
-            _direction = context.CreateProperty<Vector3>("direction");
-            _angle = context.CreateProperty<float>("angle");
-            _range = context.CreateProperty<float>("range");
-            _mask = context.CreateProperty<Texture2D>("mask");
-            _shadowResolution = context.CreateProperty<int>("shadow_resolution");
-            _active = context.CreateProperty<bool>("spotlight_active", true);
+            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName());
+            _position = context.CreateProperty<Vector3>(POSITION_NAME + AppendName());
+            _direction = context.CreateProperty<Vector3>(DIRECTION_NAME + AppendName());
+            _angle = context.CreateProperty<float>(ANGLE_NAME + AppendName());
+            _range = context.CreateProperty<float>(RANGE_NAME + AppendName());
+            _mask = context.CreateProperty<Texture2D>(MASK_NAME + AppendName());
+            _shadowResolution = context.CreateProperty<int>(SHADOW_RESOLUTION_NAME + AppendName());
+            _active = context.CreateProperty<bool>(ACTIVE_NAME + AppendName(), true);
 
             base.CreateProperties(context);
+        }
+
+        public override void Initialise(Collections.INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue(COLOUR_NAME + AppendName(), _colour);
+            initialisationData.TryCopyValue(POSITION_NAME + AppendName(), _position);
+            initialisationData.TryCopyValue(DIRECTION_NAME + AppendName(), _direction);
+            initialisationData.TryCopyValue(ANGLE_NAME + AppendName(), _angle);
+            initialisationData.TryCopyValue(RANGE_NAME + AppendName(), _range);
+            initialisationData.TryCopyValue(MASK_NAME + AppendName(), _mask);
+            initialisationData.TryCopyValue(SHADOW_RESOLUTION_NAME + AppendName(), _shadowResolution);
+            initialisationData.TryCopyValue(ACTIVE_NAME + AppendName(), _active);
         }
     }
 }

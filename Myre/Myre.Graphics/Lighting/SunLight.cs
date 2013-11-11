@@ -8,6 +8,10 @@ namespace Myre.Graphics.Lighting
     public class SunLight
         : Behaviour
     {
+        private const string COLOUR_NAME = "colour";
+        private const string DIRECTION_NAME = "direction";
+        private const string SHADOW_RESOLUTION_NAME = "shadow_resolution";
+
         private Property<Vector3> _colour;
         private Property<Vector3> _direction;
         private Property<int> _shadowResolution;
@@ -32,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty<Vector3>("colour");
-            _direction = context.CreateProperty<Vector3>("direction");
-            _shadowResolution = context.CreateProperty<int>("shadow_resolution");
+            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName());
+            _direction = context.CreateProperty<Vector3>(DIRECTION_NAME + AppendName());
+            _shadowResolution = context.CreateProperty<int>(SHADOW_RESOLUTION_NAME + AppendName());
 
             base.CreateProperties(context);
         }
@@ -43,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue("colour", _colour);
-            initialisationData.TryCopyValue("direction", _direction);
-            initialisationData.TryCopyValue("shadow_resolution", _shadowResolution);
+            initialisationData.TryCopyValue(COLOUR_NAME + AppendName(), _colour);
+            initialisationData.TryCopyValue(DIRECTION_NAME + AppendName(), _direction);
+            initialisationData.TryCopyValue(SHADOW_RESOLUTION_NAME + AppendName(), _shadowResolution);
         }
     }
 }

@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty<Vector3>(COLOUR_NAME);
-            _position = context.CreateProperty<Vector3>(POSITION_NAME);
-            _range = context.CreateProperty<float>(RANGE_NAME);
+            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName());
+            _position = context.CreateProperty<Vector3>(POSITION_NAME + AppendName());
+            _range = context.CreateProperty<float>(RANGE_NAME + AppendName());
             
             base.CreateProperties(context);
         }
@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(COLOUR_NAME, _colour);
-            initialisationData.TryCopyValue(POSITION_NAME, _position);
-            initialisationData.TryCopyValue(RANGE_NAME, _range);
+            initialisationData.TryCopyValue(COLOUR_NAME + AppendName(), _colour);
+            initialisationData.TryCopyValue(POSITION_NAME + AppendName(), _position);
+            initialisationData.TryCopyValue(RANGE_NAME + AppendName(), _range);
         }
     }
 }
