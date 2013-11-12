@@ -349,13 +349,7 @@ namespace Myre.Graphics.Geometry
                     if (instance.Instance._ignoreProjectionMatrix.Value)
                         worldViewProjection.Value = worldView.Value;
                     else
-                    {
-//This warning is about the boxes being marshal-by-ref and using a ref with them.
-//This is only a problem if the renderer is running in a different domain to where these three boxes were created. This will never happen (famous last words).
-#pragma warning disable 197
-                        Matrix.Multiply(ref worldView.Value, ref projection.Value, out worldViewProjection.Value);
-#pragma warning restore 197
-                    }
+                        worldViewProjection.Value = worldView.Value * projection.Value;
 
                     foreach (var pass in data.Material.Begin(metadata))
                     {

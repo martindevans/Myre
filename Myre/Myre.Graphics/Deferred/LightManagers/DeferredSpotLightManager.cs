@@ -328,8 +328,8 @@ namespace Myre.Graphics.Deferred.LightManagers
             var projection = metadata.GetValue<Matrix>("projection");
             var worldviewprojection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
 
-            Matrix.Multiply(ref world, ref view, out worldview.Value);
-            Matrix.Multiply(ref worldview.Value, ref projection, out worldviewprojection.Value);
+            worldview.Value = world * view;
+            worldviewprojection.Value = worldview.Value * projection;
         }
     }
 }

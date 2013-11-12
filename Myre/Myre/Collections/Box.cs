@@ -15,16 +15,16 @@ namespace Myre.Collections
     }
 
     /// <summary>
-    /// A class which boxes a value.
+    /// An object which contains a value
     /// </summary>
-    /// <typeparam name="T">The type of the value to box.</typeparam>
-    public class Box<T>
+    /// <typeparam name="T"></typeparam>
+    public abstract class BaseBox<T>
         : MarshalByRefObject, IBox
     {
         /// <summary>
         /// The value this box contains.
         /// </summary>
-        public T Value;
+        public abstract T Value { get; set; }
 
         /// <summary>
         /// Gets or sets the value this box contains.
@@ -45,7 +45,20 @@ namespace Myre.Collections
         /// <summary>
         /// An event which is triggered whenever the value in this box changes. Args are The box, the old value, and the new value.
         /// </summary>
-        public event Action<Box<T>, T, T> BoxChanged;
+        public event Action<BaseBox<T>, T, T> BoxChanged;
+    }
+
+    /// <summary>
+    /// A class which boxes a value.
+    /// </summary>
+    /// <typeparam name="T">The type of the value to box.</typeparam>
+    public class Box<T>
+        : BaseBox<T>
+    {
+        /// <summary>
+        /// The value this box contains.
+        /// </summary>
+        public override T Value { get; set; }
     }
 
     /// <summary>
