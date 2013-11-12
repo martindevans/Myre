@@ -36,8 +36,8 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName());
-            _direction = context.CreateProperty<Vector3>(DIRECTION_NAME + AppendName());
+            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName(), Color.LightBlue.ToVector3());
+            _direction = context.CreateProperty<Vector3>(DIRECTION_NAME + AppendName(), Vector3.Down);
             _shadowResolution = context.CreateProperty<int>(SHADOW_RESOLUTION_NAME + AppendName());
 
             base.CreateProperties(context);
