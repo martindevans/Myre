@@ -2,6 +2,7 @@
 *.cache
 *.suo
 *.user
+*.nupkg
 /Documentation
 /Myre/Myre/obj
 /Myre/Myre/bin

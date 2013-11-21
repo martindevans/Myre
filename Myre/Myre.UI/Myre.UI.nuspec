@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Myre.Debugging</id>
+    <id>Myre.UI</id>
     <version>1.0.1</version>
     <authors>Martin Evans, Thomas Gillen</authors>
     <owners>Martin Evans</owners>
     <licenseUrl>https://github.com/martindevans/Myre/blob/master/License.md</licenseUrl>
     <projectUrl>https://github.com/martindevans/Myre</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Debugging tools for games</description>
+    <description>Basic UI framework for XNA games</description>
     <copyright>Copyright 2013</copyright>    
     <dependencies>
         <dependency id="Myre" version="1.0.0.1" />
     </dependencies>
     <references>
-      <reference file="Myre.Debugging.dll" /> 
+      <reference file="Myre.UI.dll" /> 
     </references>
   </metadata>
   
   <files>
-    <file src="bin\x86\Release\Myre.Debugging.dll" target="lib" /> 
+    <file src="bin\x86\Release\Myre.UI.dll" target="lib" /> 
   </files>
 </package>

@@ -1,4 +1,4 @@
-nuget pack "(x86) Myre.csproj" -Prop Configuration=Release
+nuget pack "(x86) Myre.csproj" -Prop Configuration=Release -IncludeReferencedProjects
 
 REM This looks for all nupkg files in the directory, regardless of version
 REM There should only be one

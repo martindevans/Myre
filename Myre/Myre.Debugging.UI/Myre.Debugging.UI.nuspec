@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Myre.Debugging</id>
-    <version>1.0.1</version>
+    <id>Myre.Debugging.UI</id>
+    <version>1.0.2</version>
     <authors>Martin Evans, Thomas Gillen</authors>
     <owners>Martin Evans</owners>
     <licenseUrl>https://github.com/martindevans/Myre/blob/master/License.md</licenseUrl>
@@ -12,13 +12,15 @@
     <copyright>Copyright 2013</copyright>    
     <dependencies>
         <dependency id="Myre" version="1.0.0.1" />
+        <dependency id="Myre.Debugging" version="1.0.1" />
+        <dependency id="Myre.UI" version="1.0.1" />
     </dependencies>
     <references>
-      <reference file="Myre.Debugging.dll" /> 
+      <reference file="Myre.Debugging.UI.dll" /> 
     </references>
   </metadata>
   
   <files>
-    <file src="bin\x86\Release\Myre.Debugging.dll" target="lib" /> 
+    <file src="bin\x86\Release\Myre.Debugging.UI.dll" target="lib" /> 
   </files>
 </package>

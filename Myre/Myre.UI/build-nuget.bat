@@ -1,4 +1,4 @@
-nuget pack Myre.Debugging.nuspec -verbosity detailed
+nuget pack Myre.UI.nuspec -verbosity detailed
 
 REM This looks for all nupkg files in the directory, regardless of version
 REM There should only be one
