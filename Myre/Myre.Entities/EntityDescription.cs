@@ -78,7 +78,8 @@ namespace Myre.Entities
         public bool Equals(BehaviourData data)
         {
             return Name == data.Name
-                && Type == data.Type;
+                && Type == data.Type
+                && Factory == data.Factory;
         }
     }
 
