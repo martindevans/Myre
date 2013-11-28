@@ -93,6 +93,11 @@ namespace Myre.Entities
         /// <value></value>
         public bool IsDisposed { get; private set; }
 
+        /// <summary>
+        /// A map of type to behaviour which maps from *any* type in the type hierarchy to all the behaviours which implement that type
+        /// </summary>
+        public ReadOnlyDictionary<Type, Behaviour[]> BehavioursIndex { get; private set; }
+
         private INamedDataProvider _shutdownData;
 
         /// <summary>
@@ -127,6 +132,8 @@ namespace Myre.Entities
             _behaviours = new Dictionary<Type, Behaviour[]>();
             foreach (var item in catagorised)
                 _behaviours.Add(item.Key, item.Value.ToArray());
+
+            BehavioursIndex = new ReadOnlyDictionary<Type, Behaviour[]>(_behaviours);
 
             // create initialisation context
             _constructionContext = new ConstructionContext(this);
