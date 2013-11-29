@@ -49,6 +49,8 @@ namespace GraphicsTests.Tests
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
             _animation = dudeEntity.GetBehaviour<Animated>();
+            _animation.EnableRootBoneTranslationY = true;
+
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
 
             _animation.DefaultClip = new Animated.ClipPlaybackParameters
@@ -73,7 +75,7 @@ namespace GraphicsTests.Tests
                 });
             }
 
-            var camera = new Camera { NearClip = 1, FarClip = 700, View = Matrix.CreateTranslation(0, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up) };
+            var camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateTranslation(-20, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up) };
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
             var cameraDesc = kernel.Get<EntityDescription>();
             cameraDesc.AddProperty<Camera>("camera");
@@ -125,7 +127,13 @@ namespace GraphicsTests.Tests
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
 
-            _dude.Transform = Matrix.CreateRotationY(MathHelper.Pi);
+            var anim = _dude.Owner.GetBehaviour<Animated>();
+
+            Vector3 position, scale;
+            Quaternion rotation;
+            anim.RootBoneTransfomation.Decompose(out scale, out rotation, out position);
+
+            _dude.Transform = Matrix.CreateTranslation(new Vector3(position.X, 0, 0 * position.Z));
         }
 
         public override void Draw(GameTime gameTime)

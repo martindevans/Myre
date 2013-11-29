@@ -43,11 +43,56 @@ namespace Myre.Graphics.Animation
 
         public Action<string> OnAnimationCompleted;
 
+        private Property<Matrix> _rootBoneTransform;
+        /// <summary>
+        /// The transformation of the root bone
+        /// </summary>
+        public Matrix RootBoneTransfomation
+        {
+            get { return _rootBoneTransform.Value; }
+            set { _rootBoneTransform.Value = value; }
+        }
+
+        private Property<bool> _enableRootBoneTranslationX;
+        /// <summary>
+        /// Whether or not to include the X translation part of the root bone in the transform
+        /// </summary>
+        public bool EnableRootBoneTranslationX
+        {
+            get { return _enableRootBoneTranslationX.Value; }
+            set { _enableRootBoneTranslationX.Value = value; }
+        }
+
+        private Property<bool> _enableRootBoneTranslationY;
+        /// <summary>
+        /// Whether or not to include the Y translation part of the root bone in the transform
+        /// </summary>
+        public bool EnableRootBoneTranslationY
+        {
+            get { return _enableRootBoneTranslationY.Value; }
+            set { _enableRootBoneTranslationY.Value = value; }
+        }
+
+        private Property<bool> _enableRootBoneTranslationZ;
+        /// <summary>
+        /// Whether or not to include the Z translation part of the root bone in the transform
+        /// </summary>
+        public bool EnableRootBoneTranslationZ
+        {
+            get { return _enableRootBoneTranslationZ.Value; }
+            set { _enableRootBoneTranslationZ.Value = value; }
+        }
+
         /// <summary>
         /// The clip to play while there are no other active animations
         /// </summary>
-        public ClipPlaybackParameters DefaultClip { get; set; }
+        public ClipPlaybackParameters DefaultClip
+        {
+            get { return _defaultClip.Value; }
+            set { _defaultClip.Value = value; }
+        }
 
+        private Property<ClipPlaybackParameters> _defaultClip;
         private Property<float> _animationSmoothing;
         #endregion
 
@@ -55,6 +100,11 @@ namespace Myre.Graphics.Animation
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             _animationSmoothing = context.CreateProperty<float>("animation_smoothing", 0.5f);
+            _defaultClip = context.CreateProperty<ClipPlaybackParameters>("animation_default_clip");
+            _rootBoneTransform = context.CreateProperty<Matrix>("animation_root_transform", Matrix.Identity);
+            _enableRootBoneTranslationX = context.CreateProperty<bool>("animation_enable_root_translation_x", false);
+            _enableRootBoneTranslationY = context.CreateProperty<bool>("animation_enable_root_translation_y", false);
+            _enableRootBoneTranslationZ = context.CreateProperty<bool>("animation_enable_root_translation_z", false);
 
             base.CreateProperties(context);
         }
@@ -204,8 +254,20 @@ namespace Myre.Graphics.Animation
         private void UpdateBoneTransforms()
         {
             for (int i = 0; i < _boneTransforms.Length; i++)
-            {
                 _boneTransforms[i] = SlerpMatrix(_boneTransforms[i], _boneTransformTargets[i], (1 - _animationSmoothing.Value));
+
+            _rootBoneTransform.Value = _boneTransforms[0];
+            if (!EnableRootBoneTranslationX || !EnableRootBoneTranslationY || !EnableRootBoneTranslationZ)
+            {
+                Vector3 translation, scale;
+                Quaternion rotation;
+                _boneTransforms[0].Decompose(out scale, out rotation, out translation);
+
+                _boneTransforms[0] = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(new Vector3(
+                    EnableRootBoneTranslationX ? translation.X : 0,
+                    EnableRootBoneTranslationY ? translation.Y : 0,
+                    EnableRootBoneTranslationZ ? translation.Z : 0)
+                );
             }
         }
 
