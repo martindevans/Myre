@@ -57,6 +57,7 @@ namespace GraphicsTests
             public bool Spotlight = true;
             public bool AmbientLight = true;
             public bool Fire = true;
+            public bool SunLight = false;
         }
 
         public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device)
@@ -173,6 +174,17 @@ namespace GraphicsTests
                 ambientLightEntity.GetProperty<Vector3>("ground_colour").Value = new Vector3(0.04f, 0.05f, 0.04f);
                 ambientLightEntity.GetProperty<Vector3>("up").Value = Vector3.Up;
                 scene.Add(ambientLightEntity);
+            }
+
+            if (config.SunLight)
+            {
+                var sunlight = kernel.Get<EntityDescription>();
+                sunlight.AddBehaviour<SunLight>();
+                var sunlightEntity = sunlight.Create();
+                sunlightEntity.GetProperty<Vector3>("colour").Value = new Vector3(1, 0.75f, 0.6f);
+                sunlightEntity.GetProperty<Vector3>("direction").Value = Vector3.Down;
+                sunlightEntity.GetProperty<int>("shadow_resolution").Value = 1024;
+                scene.Add(sunlightEntity);
             }
 
             //var floor = content.Load<ModelData>(@"Models\Ground");
