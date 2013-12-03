@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Animation.Clips
 {
+    [Serializable]
     public class Clip
         :IClip
     {

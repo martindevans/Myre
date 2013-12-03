@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Lighting
 {
@@ -36,6 +37,15 @@ namespace Myre.Graphics.Lighting
             _gammaCorrect = context.CreateProperty<bool>("gamma_correct");
 
             base.CreateProperties(context);
+        }
+
+        public override void Initialise(Collections.INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue("texture" + AppendName(), _texture);
+            initialisationData.TryCopyValue("brightness" + AppendName(), _brightness);
+            initialisationData.TryCopyValue("gamma_correct" + AppendName(), _gammaCorrect);
         }
     }
 }

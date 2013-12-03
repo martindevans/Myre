@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Animation
 {
+    [Serializable]
     public class Keyframe
     {
         public int Bone { get; set; }

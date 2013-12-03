@@ -38,7 +38,10 @@ namespace Myre.Collections
 
         public bool TryGetValue<T>(string name, out T value)
         {
-            return _values.TryGetValue<T>(name, out value);
+            if (_values.TryGetValue<T>(name, out value))
+                return true;
+
+            return _parent.TryGetValue<T>(name, out value);
         }
     }
 }
