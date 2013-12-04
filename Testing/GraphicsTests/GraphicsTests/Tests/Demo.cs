@@ -14,7 +14,6 @@ using System.IO;
 using Myre.Graphics.Lighting;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI.Gestures;
-using Myre.Graphics.Particles;
 using Myre.Collections;
 using Myre.Graphics.Deferred;
 

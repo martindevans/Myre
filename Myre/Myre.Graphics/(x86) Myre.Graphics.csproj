@@ -119,7 +119,15 @@
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialParameter.cs" />
     <Compile Include="Materials\MaterialReader.cs" />
-    <Compile Include="Translucency\Particles\EllipsoidParticleEmitter.cs" />
+    <Compile Include="Translucency\Particles\EntityParticleEmitter.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Colour\RandomEndColour.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Colour\RandomStartColour.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\IInitialiser.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Lifetime\RandomLifetime.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Position\Ellipsoid.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Size\RandomSize.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Velocity\RandomVelocity.cs" />
     <Compile Include="Translucency\Particles\ParticleEmitter.cs" />
     <Compile Include="Translucency\TranslucentComponent.cs" />
     <Compile Include="Translucency\Particles\ParticleSystem.cs" />

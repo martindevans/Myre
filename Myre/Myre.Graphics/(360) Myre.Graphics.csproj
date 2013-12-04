@@ -103,6 +103,14 @@
     <Compile Include="RenderPlan.cs" />
     <Compile Include="RenderTargetManager.cs" />
     <Compile Include="Deferred\RestoreDepthPhase.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Colour\RandomEndColour.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Colour\RandomStartColour.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\IInitialiser.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Lifetime\RandomLifetime.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Position\Ellipsoid.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Size\RandomSize.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Velocity\RandomVelocity.cs" />
     <Compile Include="View.cs" />
     <Compile Include="XboxResources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -211,6 +219,7 @@
     <None Include="Resources\AmbientLight.xnb" />
     <None Include="Resources\SpotLight.xnb" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

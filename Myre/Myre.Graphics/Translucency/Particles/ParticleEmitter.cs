@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
@@ -6,22 +8,35 @@ using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Myre.Graphics.Geometry;
+using Myre.Graphics.Translucency.Particles.Initialisers;
 using Ninject;
 
 namespace Myre.Graphics.Translucency.Particles
 {
     [DefaultManager(typeof(Manager))]
     public abstract class ParticleEmitter
-        : Behaviour
+        : ProcessBehaviour
     {
-        private static readonly List<ParticleSystem> _systems = new List<ParticleSystem>();
-
         private readonly IKernel _kernel;
         private ParticleSystem _system;
         private ParticleSystemDescription _description;
         private bool _dirty;
+        private Random _random = new Random();
 
         public bool Enabled { get; set; }
+
+        private int _capacity;
+        public int Capacity
+        {
+            get { return _capacity; }
+            set { _capacity = value; _dirty = true; }
+        }
+
+        public Random Random
+        {
+            get { return _random; }
+            set { _random = value; }
+        }
 
         public ParticleType Type
         {
@@ -93,6 +108,14 @@ namespace Myre.Graphics.Translucency.Particles
             }
         }
 
+        private readonly List<IInitialiser> _initialisers = new List<IInitialiser>();
+
+        public IEnumerable<IInitialiser> Initialisers
+        {
+            get { return _initialisers; }
+        }
+
+
         protected ParticleSystem System
         {
             get { return _system; }
@@ -104,44 +127,56 @@ namespace Myre.Graphics.Translucency.Particles
             set { _dirty = value; }
         }
 
-        protected bool UsingUniqueSystem { get; set; }
-
-        public ParticleEmitter(IKernel kernel)
+        protected ParticleEmitter(IKernel kernel)
         {
             _kernel = kernel;
             _dirty = true;
         }
 
-        protected abstract void Update(float dt);
-
-        protected void CreateParticleSystem()//bool unique)
+        public void AddInitialiser(IInitialiser initialiser)
         {
-            //if (unique)
-            //{
-                _system = _kernel.Get<ParticleSystem>();
-                _system.Initialise(_description);
-                _systems.Add(_system);
-            //}
-            //else
-            //{
-            //    if (!systemsDictionary.TryGetValue(description, out system))
-            //    {
-            //        system = kernel.Get<ParticleSystem>();
-            //        system.Initialise(description);
+            _initialisers.Add(initialiser);
+        }
 
-            //        systems.Add(system);
-            //        systemsDictionary[description] = system;
-            //    }
-            //}
+        protected override void Update(float dt)
+        {
+            if (Dirty)
+            {
+                if (System == null)
+                    CreateParticleSystem();
+                Debug.Assert(System != null);
 
-            //UsingUniqueSystem = unique;
+                System.GrowCapacity(Capacity);
+                Dirty = false;
+            }
+
+            if (Enabled)
+                _system.Update(dt);
+        }
+
+        protected void CreateParticleSystem()
+        {
+            _system = _kernel.Get<ParticleSystem>();
+            _system.Initialise(_description);
+        }
+
+        protected virtual void Draw(NamedBoxCollection metadata)
+        {
+            if (_system != null)
+                _system.Draw(metadata);
+        }
+
+        protected void Spawn(Particle particle)
+        {
+            foreach (var initialiser in _initialisers)
+                initialiser.Initialise(_random, ref particle);
+
+            System.Spawn(particle.Position, particle.Velocity, particle.AngularVelocity, particle.Size, particle.LifetimeScale, particle.StartColour, particle.EndColour);
         }
 
         public class Manager
-            : BehaviourManager<ParticleEmitter>, IProcess, IGeometryProvider
+            : Manager<ParticleEmitter>, IGeometryProvider
         {
-            public bool IsComplete { get { return false; } }
-
             public override void Initialise(Scene scene)
             {
                 var processes = scene.GetService<ProcessService>();
@@ -150,33 +185,11 @@ namespace Myre.Graphics.Translucency.Particles
                 base.Initialise(scene);
             }
 
-            public void Update(float elapsedTime)
-            {
-                foreach (var item in Behaviours)
-                {
-                    if (item.Enabled)
-                        item.Update(elapsedTime);
-                }
-
-                foreach (var item in _systems)
-                {
-                    item.Update(elapsedTime);
-                }
-            }
-
-            public void Draw(Renderer renderer)
-            {
-                foreach (var item in _systems)
-                {
-                    item.Draw(renderer.Data);
-                }
-            }
-
             public void Draw(string phase, NamedBoxCollection metadata)
             {
                 if (phase == "translucent")
-                    foreach (var particleSystem in _systems)
-                        particleSystem.Draw(metadata);
+                    foreach (var particleEmitter in Behaviours)
+                        particleEmitter.Draw(metadata);
             }
         }
     }

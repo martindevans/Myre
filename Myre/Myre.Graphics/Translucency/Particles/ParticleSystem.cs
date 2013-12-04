@@ -15,7 +15,6 @@ namespace Myre.Graphics.Translucency.Particles
     /// </summary>
     public class ParticleSystem
     {
-
         private readonly GraphicsDevice _device;
         private readonly Material _material;
         private EffectParameter _currentTimeParameter;
@@ -73,6 +72,7 @@ namespace Myre.Graphics.Translucency.Particles
             _device = device;
             _material = new Material(Content.Load<Effect>("ParticleSystem").Clone());
             Capacity = 5;
+            Transform = Matrix.Identity;
         }
 
         /// <summary>

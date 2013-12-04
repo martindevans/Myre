@@ -17,7 +17,6 @@ using Myre.Debugging;
 using Myre.UI.InputDevices;
 using Microsoft.Xna.Framework.Input;
 using Myre.Collections;
-using Myre.Graphics.Particles;
 
 namespace GraphicsTests
 {
