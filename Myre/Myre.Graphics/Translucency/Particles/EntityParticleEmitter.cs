@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Myre.Entities;
 using Myre.Graphics.Translucency.Particles.Initialisers;
 using Ninject;

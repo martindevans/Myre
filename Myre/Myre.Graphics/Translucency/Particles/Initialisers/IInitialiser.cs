@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers
 {
-    public interface IInitialiser
+    public interface IInitialiser : ICloneable
     {
         void Initialise(Random random, ref Particle particle);
     }

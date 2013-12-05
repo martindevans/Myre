@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
 {
@@ -19,6 +20,19 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
         {
             var angularVelocity = MathHelper.Lerp(MinAngularVelocity, MaxAngularVelocity, (float)random.NextDouble());
             particle.AngularVelocity += angularVelocity;
+        }
+
+        public object Clone()
+        {
+            return new RandomAngularVelocity(MinAngularVelocity, MaxAngularVelocity);
+        }
+    }
+
+    public class RandomAngularVelocityReader : ContentTypeReader<RandomAngularVelocity>
+    {
+        protected override RandomAngularVelocity Read(ContentReader input, RandomAngularVelocity existingInstance)
+        {
+            return new RandomAngularVelocity(input.ReadSingle(), input.ReadSingle());
         }
     }
 }

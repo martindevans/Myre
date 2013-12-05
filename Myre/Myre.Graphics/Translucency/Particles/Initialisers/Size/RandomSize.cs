@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
 {
@@ -19,6 +20,19 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
         {
             var size = MathHelper.Lerp(MinSize, MaxSize, (float)random.NextDouble());
             particle.Size += size;
+        }
+
+        public object Clone()
+        {
+            return new RandomSize(MinSize, MaxSize);
+        }
+    }
+
+    public class RandomSizeReader : ContentTypeReader<RandomSize>
+    {
+        protected override RandomSize Read(ContentReader input, RandomSize existingInstance)
+        {
+            return new RandomSize(input.ReadSingle(), input.ReadSingle());
         }
     }
 }

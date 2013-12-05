@@ -75,30 +75,17 @@ namespace GraphicsTests.Tests
             particleEntityDesc.AddProperty<Vector3>("position");
             particleEntityDesc.AddBehaviour<EntityParticleEmitter>();
             var entity = particleEntityDesc.Create();
-            _emitter = entity.GetBehaviour<EntityParticleEmitter>();
             entity.GetProperty<Vector3>("position").Value = Vector3.Zero;
             _scene.Add(entity);
 
             var white = new Texture2D(_device, 1, 1);
             white.SetData(new Color[] { Color.White });
 
-            _emitter.AddInitialiser(new Ellipsoid(new Vector3(10, 100, 100), 75));
-            _emitter.AddInitialiser(new RandomVelocity(new Vector3(20, 20, 20)));
-            _emitter.AddInitialiser(new RandomAngularVelocity(-MathHelper.PiOver4, MathHelper.PiOver4));
-            _emitter.AddInitialiser(new RandomSize(30, 40));
-            _emitter.AddInitialiser(new RandomStartColour(Color.Red, Color.White));
-            _emitter.AddInitialiser(new RandomEndColour(Color.White, Color.Blue));
-            _emitter.AddInitialiser(new RandomLifetime(0.7f, 1f));
+            _emitter = entity.GetBehaviour<EntityParticleEmitter>();
+            _content.Load<ParticleSystemGenerator>("Particles/TestSystem1").Setup(_emitter);
 
-            _emitter.BlendState = BlendState.Additive;
             _emitter.Enabled = true;
-            _emitter.EndLinearVelocity = 0.25f;
-            _emitter.EndScale = 1.75f;
-            _emitter.Gravity = new Vector3(0, 0, 0);
-            _emitter.Lifetime = 5f;
-            _emitter.Texture = _content.Load<Texture2D>("fire");
             _emitter.EmitPerSecond = 1000;
-            _emitter.Capacity = (int)(_emitter.Lifetime * _emitter.EmitPerSecond + 1);
             _emitter.VelocityBleedThrough = 0;
             
             base.OnShown();

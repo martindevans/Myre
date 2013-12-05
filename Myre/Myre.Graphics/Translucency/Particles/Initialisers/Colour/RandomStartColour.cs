@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
 {
@@ -18,6 +19,19 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
         public void Initialise(Random random, ref Particle particle)
         {
             particle.StartColour = new Color(particle.StartColour.ToVector4() + Color.Lerp(MinStartColour, MaxStartColour, (float) random.NextDouble()).ToVector4());
+        }
+
+        public object Clone()
+        {
+            return new RandomStartColour(MinStartColour, MaxStartColour);
+        }
+    }
+
+    public class RandomStartColourReader : ContentTypeReader<RandomStartColour>
+    {
+        protected override RandomStartColour Read(ContentReader input, RandomStartColour existingInstance)
+        {
+            return new RandomStartColour(input.ReadColor(), input.ReadColor());
         }
     }
 }

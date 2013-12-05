@@ -87,6 +87,7 @@
     <Compile Include="Animation\SkinningData.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Content.cs" />
+    <Compile Include="ContentPipeline\BlendStateReader.cs" />
     <Compile Include="CreateTargetComponent.cs" />
     <Compile Include="Deferred\AntiAliasComponent.cs" />
     <Compile Include="Deferred\EdgeDetectComponent.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Translucency\Particles\Initialisers\Size\RandomSize.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Velocity\RandomVelocity.cs" />
     <Compile Include="Translucency\Particles\ParticleEmitter.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystemGenerator.cs" />
     <Compile Include="Translucency\TranslucentComponent.cs" />
     <Compile Include="Translucency\Particles\ParticleSystem.cs" />
     <Compile Include="Translucency\Particles\ParticleSystemDescription.cs" />
@@ -173,30 +175,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\AmbientLight.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\Bloom.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\BlurSSAO.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\CalculateLuminance.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\ClearGBuffer.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\CopyTexture.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\DirectionalLight.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\Downsample.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\EdgeBlur.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\EdgeDetect.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\Gamma.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\Gaussian.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\MarkGeometry.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\Nothing.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\ParticleSystem.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\PointLight.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\randomnormals.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\RestoreDepth.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\Skybox.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\SkyboxModel.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\sphere.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\SpotLight.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\SSAO.xnb" />
-    <None Include="bin\x86\Debug\Myre.Graphics.Content\ToneMap.xnb" />
     <None Include="packages.config" />
     <None Include="Resources\AmbientLight.xnb" />
     <None Include="Resources\SpotLight.xnb" />

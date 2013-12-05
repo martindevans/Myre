@@ -19,9 +19,20 @@ namespace Myre.Graphics.Translucency.Particles
     {
         private readonly IKernel _kernel;
         private ParticleSystem _system;
-        private ParticleSystemDescription _description;
         private bool _dirty;
         private Random _random = new Random();
+
+        private ParticleSystemDescription _description;
+
+        public ParticleSystemDescription Description
+        {
+            get { return _description; }
+            set
+            {
+                _description = value;
+                _dirty = true;
+            }
+        }
 
         public bool Enabled { get; set; }
 

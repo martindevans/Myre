@@ -64,5 +64,10 @@ namespace Myre.Graphics.Translucency.Particles
         /// Gets or sets a force to be constantly applied to particles.
         /// </summary>
         public Vector3 Gravity { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of particles this system can hold
+        /// </summary>
+        public int Capacity { get; set; }
     }
 }

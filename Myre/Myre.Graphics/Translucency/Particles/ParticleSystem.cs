@@ -45,11 +45,6 @@ namespace Myre.Graphics.Translucency.Particles
         public Matrix Transform { get; set; }
 
         /// <summary>
-        /// Gets the maximum number of particles this system can maintain at a time.
-        /// </summary>
-        public int Capacity { get; private set; }
-
-        /// <summary>
         /// Gets the number of active particles.
         /// </summary>
         public int ActiveCount
@@ -59,7 +54,7 @@ namespace Myre.Graphics.Translucency.Particles
                 if (_active < _newlyCreated)
                     return _newlyCreated - _active;
 
-                return _newlyCreated + (Capacity - _active);
+                return _newlyCreated + (Description.Capacity - _active);
             }
         }
 
@@ -71,7 +66,6 @@ namespace Myre.Graphics.Translucency.Particles
         {
             _device = device;
             _material = new Material(Content.Load<Effect>("ParticleSystem").Clone());
-            Capacity = 5;
             Transform = Matrix.Identity;
         }
 
@@ -101,7 +95,17 @@ namespace Myre.Graphics.Translucency.Particles
         /// <param name="size">The amount by which to increase the capacity.</param>
         public void GrowCapacity(int size)
         {
-            Capacity += size;
+            Description = new ParticleSystemDescription
+            {
+                BlendState = Description.BlendState,
+                EndLinearVelocity = Description.EndLinearVelocity,
+                EndScale = Description.EndScale,
+                Gravity = Description.Gravity,
+                Lifetime = Description.Lifetime,
+                Texture = Description.Texture,
+                Type = Description.Type,
+                Capacity = Description.Capacity + size,
+            };
             _dirty = true;
         }
 
@@ -121,7 +125,7 @@ namespace Myre.Graphics.Translucency.Particles
                 InitialiseBuffer();
 
             // exit if we have run out of capacity
-            int nextFreeParticle = (_free + 1) % Capacity;
+            int nextFreeParticle = (_free + 1) % Description.Capacity;
             if (nextFreeParticle == _finished)
                 return;
 
@@ -218,8 +222,8 @@ namespace Myre.Graphics.Translucency.Particles
                         // If the active particle range wraps past the end of the queue
                         // back to the start, we must split them over two draw calls.
                         _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                                                     _active * 4, (Capacity - _active) * 4,
-                                                     _active * 6, (Capacity - _active) * 2);
+                                                     _active * 4, (Description.Capacity - _active) * 4,
+                                                     _active * 6, (Description.Capacity - _active) * 2);
 
                         if (_free > 0)
                         {
@@ -261,11 +265,11 @@ namespace Myre.Graphics.Translucency.Particles
                 _indices.Dispose();
 
             // create new vertex buffer
-            _vertices = new DynamicVertexBuffer(_device, ParticleVertex.VertexDeclaration, Capacity * 4, BufferUsage.WriteOnly);
+            _vertices = new DynamicVertexBuffer(_device, ParticleVertex.VertexDeclaration, Description.Capacity * 4, BufferUsage.WriteOnly);
             
             // set up quad corners
-            var particles = new ParticleVertex[Capacity * 4];
-            for (int i = 0; i < Capacity; i++)
+            var particles = new ParticleVertex[Description.Capacity * 4];
+            for (int i = 0; i < Description.Capacity; i++)
             {
                 particles[i * 4 + 0].Corner = new Short2(-1, -1);
                 particles[i * 4 + 1].Corner = new Short2(1, -1);
@@ -285,8 +289,8 @@ namespace Myre.Graphics.Translucency.Particles
             _particles = particles;
 
             // create new index buffer
-            ushort[] indices = new ushort[Capacity * 6];
-            for (int i = 0; i < Capacity; i++)
+            ushort[] indices = new ushort[Description.Capacity * 6];
+            for (int i = 0; i < Description.Capacity; i++)
             {
                 indices[i * 6 + 0] = (ushort)(i * 4 + 0);
                 indices[i * 6 + 1] = (ushort)(i * 4 + 1);
@@ -325,7 +329,7 @@ namespace Myre.Graphics.Translucency.Particles
                 _particles[_active * 4].Time = _frameCounter;
 
                 // Move the particle from the active to the retired queue.
-                _active = (_active + 1) % Capacity;
+                _active = (_active + 1) % Description.Capacity;
             }
         }
 
@@ -353,7 +357,7 @@ namespace Myre.Graphics.Translucency.Particles
                     break;
 
                 // Move the particle from the retired to the free queue.
-                _finished = (_finished + 1) % Capacity;
+                _finished = (_finished + 1) % Description.Capacity;
             }
         }
 
@@ -380,7 +384,7 @@ namespace Myre.Graphics.Translucency.Particles
                 // back to the start, we must split them over two upload calls.
                 _vertices.SetData(_newlyCreated * stride * 4, _particles,
                                  _newlyCreated * 4,
-                                 (Capacity - _newlyCreated) * 4,
+                                 (Description.Capacity - _newlyCreated) * 4,
                                  stride, SetDataOptions.NoOverwrite);
 
                 if (_free > 0)

@@ -111,6 +111,7 @@
     <Compile Include="Translucency\Particles\Initialisers\Position\Ellipsoid.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Size\RandomSize.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Velocity\RandomVelocity.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystemGenerator.cs" />
     <Compile Include="View.cs" />
     <Compile Include="XboxResources.Designer.cs">
       <AutoGen>True</AutoGen>
