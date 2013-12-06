@@ -22,7 +22,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             BatchSize = batchSize;
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new InterpolatedEntityPosition(BatchSize);
         }

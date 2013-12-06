@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Pipeline.Particles.Initialisers;
+using Myre.Graphics.Pipeline.Particles.Triggers;
 
 namespace Myre.Graphics.Pipeline.Particles
 {
@@ -13,6 +14,8 @@ namespace Myre.Graphics.Pipeline.Particles
         public float Lifetime;
         public string Texture;
         public int Capacity;
+
+        public ITrigger[] Triggers;
 
         public IInitialiser[] Initialisers;
     }

@@ -26,7 +26,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
         {
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new RandomAngularVelocity(MinAngularVelocity, MaxAngularVelocity);
         }

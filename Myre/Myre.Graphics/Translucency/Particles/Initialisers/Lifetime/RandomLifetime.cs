@@ -26,7 +26,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Lifetime
         {
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new RandomLifetime(MinLifetimeScale, MaxLifetimeScale);
         }

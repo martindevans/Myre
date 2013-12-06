@@ -37,7 +37,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
             base.Update(dt);
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new EntityVelocity(VelocityBleedThrough);
         }

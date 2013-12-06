@@ -37,7 +37,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             return Vector3.Lerp(min, max, (float)random.NextDouble());
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new Ellipsoid(Shape, MinEmitDistance);
         }

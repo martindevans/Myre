@@ -18,10 +18,10 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
 
         public override void Initialise(Random random, ref Particle particle)
         {
-            particle.StartColour = new Color(particle.StartColour.ToVector4() + Color.Lerp(MinEndColour, MaxEndColour, (float)random.NextDouble()).ToVector4());
+            particle.EndColour = new Color(particle.StartColour.ToVector4() + Color.Lerp(MinEndColour, MaxEndColour, (float)random.NextDouble()).ToVector4());
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new RandomEndColour(MinEndColour, MaxEndColour);
         }

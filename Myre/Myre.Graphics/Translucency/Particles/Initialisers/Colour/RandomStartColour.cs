@@ -25,7 +25,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
         {
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new RandomStartColour(MinStartColour, MaxStartColour);
         }

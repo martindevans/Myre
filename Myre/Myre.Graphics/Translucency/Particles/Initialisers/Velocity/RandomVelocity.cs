@@ -21,7 +21,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
             particle.Velocity += randomVector;
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new RandomVelocity(VelocityVariance);
         }

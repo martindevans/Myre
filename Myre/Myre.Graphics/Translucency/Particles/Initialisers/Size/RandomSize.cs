@@ -22,7 +22,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
             particle.Size += size;
         }
 
-        public override object Clone()
+        public override object Copy()
         {
             return new RandomSize(MinSize, MaxSize);
         }

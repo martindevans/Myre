@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
@@ -9,16 +8,16 @@ using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Translucency.Particles.Initialisers;
+using Myre.Graphics.Translucency.Particles.Triggers;
 using Ninject;
 
 namespace Myre.Graphics.Translucency.Particles
 {
     [DefaultManager(typeof(Manager))]
-    public abstract class ParticleEmitter
+    public class ParticleEmitter
         : ProcessBehaviour
     {
         private readonly IKernel _kernel;
-        private ParticleSystem _system;
         private bool _dirty;
         private Random _random = new Random();
 
@@ -36,11 +35,11 @@ namespace Myre.Graphics.Translucency.Particles
 
         public bool Enabled { get; set; }
 
-        private int _capacity;
+        private int _extraCapacity;
         public int Capacity
         {
-            get { return _capacity; }
-            set { _capacity = value; _dirty = true; }
+            get { return _description.Capacity; }
+            set { _extraCapacity = Math.Max(0, value - _description.Capacity); _dirty = true; }
         }
 
         public Random Random
@@ -126,18 +125,22 @@ namespace Myre.Graphics.Translucency.Particles
             get { return _initialisers; }
         }
 
-        protected ParticleSystem System
+        private readonly List<ITrigger> _triggers = new List<ITrigger>();
+
+        public IEnumerable<ITrigger> Triggers
         {
-            get { return _system; }
+            get { return _triggers; }
         }
 
-        protected bool Dirty
+        private ParticleSystem System { get; set; }
+
+        private bool Dirty
         {
             get { return _dirty; }
             set { _dirty = value; }
         }
 
-        protected ParticleEmitter(IKernel kernel)
+        public ParticleEmitter(IKernel kernel)
         {
             _kernel = kernel;
             _dirty = true;
@@ -145,7 +148,7 @@ namespace Myre.Graphics.Translucency.Particles
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            initialisationData.GetValue<ParticleSystemGenerator>("particlesystem", false).Setup(this);
+            initialisationData.GetValue<ParticleSystemGenerator>("particlesystem" + AppendName(), false).Setup(this);
 
             base.Initialise(initialisationData);
         }
@@ -156,22 +159,40 @@ namespace Myre.Graphics.Translucency.Particles
             _initialisers.Add(initialiser);
         }
 
+        public void AddTrigger(ITrigger trigger)
+        {
+            trigger.Attach(this);
+            _triggers.Add(trigger);
+        }
+
+        /// <summary>
+        /// Reset all triggers
+        /// </summary>
+        public void Reset()
+        {
+            foreach (var trigger in Triggers)
+                trigger.Reset();
+        }
+
         protected override void Update(float dt)
         {
             if (Dirty)
             {
                 if (System == null)
                     CreateParticleSystem();
-                Debug.Assert(System != null);
-
-                System.GrowCapacity(Capacity);
+                else
+                {
+                    System.GrowCapacity(_extraCapacity);
+                    _extraCapacity = 0;
+                }
                 Dirty = false;
             }
 
             if (Enabled)
-                _system.Update(dt);
+                System.Update(dt);
 
-            //Run spawners
+            foreach (var trigger in Triggers)
+                trigger.Update(dt);
 
             foreach (var baseParticleInitialiser in _initialisers)
                 baseParticleInitialiser.Update(dt);
@@ -179,17 +200,17 @@ namespace Myre.Graphics.Translucency.Particles
 
         protected void CreateParticleSystem()
         {
-            _system = _kernel.Get<ParticleSystem>();
-            _system.Initialise(_description);
+            System = _kernel.Get<ParticleSystem>();
+            System.Initialise(_description);
         }
 
         protected virtual void Draw(NamedBoxCollection metadata)
         {
-            if (_system != null)
-                _system.Draw(metadata);
+            if (System != null)
+                System.Draw(metadata);
         }
 
-        protected void Spawn(Particle particle)
+        public void Spawn(Particle particle)
         {
             foreach (var initialiser in _initialisers)
                 initialiser.Initialise(_random, ref particle);
