@@ -6,7 +6,7 @@ using Myre.Extensions;
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
 {
     public class Ellipsoid
-        :IInitialiser
+        :BaseParticleInitialiser
     {
         public Vector3 Shape { get; set; }
         public float MinEmitDistance { get; set; }
@@ -17,7 +17,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             MinEmitDistance = minEmitDistance;
         }
 
-        public void Initialise(Random random, ref Particle particle)
+        public override void Initialise(Random random, ref Particle particle)
         {
             particle.Position += RandomPositionOffset(random);
         }
@@ -37,7 +37,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             return Vector3.Lerp(min, max, (float)random.NextDouble());
         }
 
-        public object Clone()
+        public override object Clone()
         {
             return new Ellipsoid(Shape, MinEmitDistance);
         }

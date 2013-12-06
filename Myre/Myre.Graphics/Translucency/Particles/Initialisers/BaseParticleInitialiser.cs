@@ -3,9 +3,19 @@ using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers
 {
-    public interface IInitialiser : ICloneable
+    public abstract class BaseParticleInitialiser : ICloneable
     {
-        void Initialise(Random random, ref Particle particle);
+        public virtual void Attach(ParticleEmitter emitter)
+        {
+        }
+
+        public virtual void Update(float dt)
+        {
+        }
+
+        public abstract void Initialise(Random random, ref Particle particle);
+
+        public abstract object Clone();
     }
 
     public struct Particle

@@ -7,10 +7,10 @@ namespace Myre.Graphics.Translucency.Particles
 {
     public class ParticleSystemGenerator
     {
-        private readonly IInitialiser[] _initialisers;
+        private readonly BaseParticleInitialiser[] _initialisers;
         public ParticleSystemDescription Description;
 
-        public ParticleSystemGenerator(BlendState blend, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, Texture2D texture, int capacity, IInitialiser[] initialisers)
+        public ParticleSystemGenerator(BlendState blend, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, Texture2D texture, int capacity, BaseParticleInitialiser[] initialisers)
         {
             _initialisers = initialisers;
             Description = new ParticleSystemDescription
@@ -30,7 +30,7 @@ namespace Myre.Graphics.Translucency.Particles
             emitter.Description = Description;
 
             foreach (var initialiser in _initialisers)
-                emitter.AddInitialiser((IInitialiser)initialiser.Clone());
+                emitter.AddInitialiser((BaseParticleInitialiser)initialiser.Clone());
         }
     }
 
@@ -51,12 +51,12 @@ namespace Myre.Graphics.Translucency.Particles
             );
         }
 
-        private IInitialiser[] ReadInitialisers(ContentReader input)
+        private BaseParticleInitialiser[] ReadInitialisers(ContentReader input)
         {
             int length = input.ReadInt32();
-            IInitialiser[] initialisers = new IInitialiser[length];
+            BaseParticleInitialiser[] initialisers = new BaseParticleInitialiser[length];
             for (int i = 0; i < length; i++)
-                initialisers[i] = input.ReadObject<IInitialiser>();
+                initialisers[i] = input.ReadObject<BaseParticleInitialiser>();
 
             return initialisers;
         }

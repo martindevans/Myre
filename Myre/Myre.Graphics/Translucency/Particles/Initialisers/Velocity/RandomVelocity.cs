@@ -6,7 +6,7 @@ using Myre.Extensions;
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
 {
     public class RandomVelocity
-        :IInitialiser
+        :BaseParticleInitialiser
     {
         public Vector3 VelocityVariance { get; set; }
 
@@ -15,13 +15,13 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
             VelocityVariance = variance;
         }
 
-        public void Initialise(Random random, ref Particle particle)
+        public override void Initialise(Random random, ref Particle particle)
         {
             var randomVector = random.RandomNormalVector() * VelocityVariance;
             particle.Velocity += randomVector;
         }
 
-        public object Clone()
+        public override object Clone()
         {
             return new RandomVelocity(VelocityVariance);
         }

@@ -55,7 +55,9 @@
     <Compile Include="Particles\Initialisers\IInitialiser.cs" />
     <Compile Include="Particles\Initialisers\Lifetime\RandomLifetime.cs" />
     <Compile Include="Particles\Initialisers\Position\Ellipsoid.cs" />
+    <Compile Include="Particles\Initialisers\Position\InterpolatedEntityPosition.cs" />
     <Compile Include="Particles\Initialisers\Size\RandomSize.cs" />
+    <Compile Include="Particles\Initialisers\Velocity\EntityVelocity.cs" />
     <Compile Include="Particles\Initialisers\Velocity\RandomVelocity.cs" />
     <Compile Include="Particles\MyreParticleContent.cs" />
     <Compile Include="Particles\MyreParticleSystemProcessor.cs" />

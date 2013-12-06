@@ -124,10 +124,12 @@
     <Compile Include="Translucency\Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Colour\RandomEndColour.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Colour\RandomStartColour.cs" />
-    <Compile Include="Translucency\Particles\Initialisers\IInitialiser.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\BaseParticleInitialiser.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Lifetime\RandomLifetime.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Position\Ellipsoid.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Position\InterpolatedEntityPosition.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Size\RandomSize.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Velocity\EntityVelocity.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Velocity\RandomVelocity.cs" />
     <Compile Include="Translucency\Particles\ParticleEmitter.cs" />
     <Compile Include="Translucency\Particles\ParticleSystemGenerator.cs" />

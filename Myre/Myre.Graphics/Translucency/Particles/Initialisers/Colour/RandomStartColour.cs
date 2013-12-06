@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
 {
     public class RandomStartColour
-        :IInitialiser
+        :BaseParticleInitialiser
     {
         public Color MinStartColour { get; set; }
         public Color MaxStartColour { get; set; }
@@ -16,12 +16,16 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
             MaxStartColour = maxStartColour;
         }
 
-        public void Initialise(Random random, ref Particle particle)
+        public override void Initialise(Random random, ref Particle particle)
         {
             particle.StartColour = new Color(particle.StartColour.ToVector4() + Color.Lerp(MinStartColour, MaxStartColour, (float) random.NextDouble()).ToVector4());
         }
 
-        public object Clone()
+        public override void Attach(ParticleEmitter emitter)
+        {
+        }
+
+        public override object Clone()
         {
             return new RandomStartColour(MinStartColour, MaxStartColour);
         }

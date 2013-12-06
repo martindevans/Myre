@@ -119,13 +119,12 @@ namespace Myre.Graphics.Translucency.Particles
             }
         }
 
-        private readonly List<IInitialiser> _initialisers = new List<IInitialiser>();
+        private readonly List<BaseParticleInitialiser> _initialisers = new List<BaseParticleInitialiser>();
 
-        public IEnumerable<IInitialiser> Initialisers
+        public IEnumerable<BaseParticleInitialiser> Initialisers
         {
             get { return _initialisers; }
         }
-
 
         protected ParticleSystem System
         {
@@ -144,8 +143,16 @@ namespace Myre.Graphics.Translucency.Particles
             _dirty = true;
         }
 
-        public void AddInitialiser(IInitialiser initialiser)
+        public override void Initialise(INamedDataProvider initialisationData)
         {
+            initialisationData.GetValue<ParticleSystemGenerator>("particlesystem", false).Setup(this);
+
+            base.Initialise(initialisationData);
+        }
+
+        public void AddInitialiser(BaseParticleInitialiser initialiser)
+        {
+            initialiser.Attach(this);
             _initialisers.Add(initialiser);
         }
 
@@ -163,6 +170,11 @@ namespace Myre.Graphics.Translucency.Particles
 
             if (Enabled)
                 _system.Update(dt);
+
+            //Run spawners
+
+            foreach (var baseParticleInitialiser in _initialisers)
+                baseParticleInitialiser.Update(dt);
         }
 
         protected void CreateParticleSystem()

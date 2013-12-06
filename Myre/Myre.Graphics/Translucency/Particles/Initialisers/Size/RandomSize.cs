@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
 {
     public class RandomSize
-        :IInitialiser
+        :BaseParticleInitialiser
     {
         public float MinSize { get; set; }
         public float MaxSize { get; set; }
@@ -16,15 +16,19 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
             MaxSize = maxSize;
         }
 
-        public void Initialise(Random random, ref Particle particle)
+        public override void Initialise(Random random, ref Particle particle)
         {
             var size = MathHelper.Lerp(MinSize, MaxSize, (float)random.NextDouble());
             particle.Size += size;
         }
 
-        public object Clone()
+        public override object Clone()
         {
             return new RandomSize(MinSize, MaxSize);
+        }
+
+        public override void Attach(ParticleEmitter emitter)
+        {
         }
     }
 

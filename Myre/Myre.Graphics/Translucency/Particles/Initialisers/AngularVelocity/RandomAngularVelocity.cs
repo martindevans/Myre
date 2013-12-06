@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
 {
     public class RandomAngularVelocity
-        :IInitialiser
+        :BaseParticleInitialiser
     {
         public float MinAngularVelocity { get; set; }
         public float MaxAngularVelocity { get; set; }
@@ -16,13 +16,17 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
             MaxAngularVelocity = maxAngularVelocity;
         }
 
-        public void Initialise(Random random, ref Particle particle)
+        public override void Initialise(Random random, ref Particle particle)
         {
             var angularVelocity = MathHelper.Lerp(MinAngularVelocity, MaxAngularVelocity, (float)random.NextDouble());
             particle.AngularVelocity += angularVelocity;
         }
 
-        public object Clone()
+        public override void Attach(ParticleEmitter emitter)
+        {
+        }
+
+        public override object Clone()
         {
             return new RandomAngularVelocity(MinAngularVelocity, MaxAngularVelocity);
         }

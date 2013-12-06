@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Lifetime
 {
     public class RandomLifetime
-        :IInitialiser
+        :BaseParticleInitialiser
     {
         public float MinLifetimeScale { get; set; }
         public float MaxLifetimeScale { get; set; }
@@ -16,13 +16,17 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Lifetime
             MaxLifetimeScale = maxLifetimeScale;
         }
 
-        public void Initialise(Random random, ref Particle particle)
+        public override void Initialise(Random random, ref Particle particle)
         {
             var lifetime = MathHelper.Lerp(MinLifetimeScale, MaxLifetimeScale, (float)random.NextDouble());
             particle.LifetimeScale += lifetime;
         }
 
-        public object Clone()
+        public override void Attach(ParticleEmitter emitter)
+        {
+        }
+
+        public override object Clone()
         {
             return new RandomLifetime(MinLifetimeScale, MaxLifetimeScale);
         }
