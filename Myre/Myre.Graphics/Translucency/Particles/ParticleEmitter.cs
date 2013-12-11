@@ -142,6 +142,7 @@ namespace Myre.Graphics.Translucency.Particles
 
         public ParticleEmitter(IKernel kernel)
         {
+            Enabled = true;
             _kernel = kernel;
             _dirty = true;
         }

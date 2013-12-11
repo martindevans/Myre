@@ -55,8 +55,33 @@ namespace Myre.Entities.Behaviours
                 Update(elapsedTime);
             }
 
+            private readonly List<B> _toAdd = new List<B>();
+            public override void Add(B behaviour)
+            {
+                _toAdd.Add(behaviour);
+            }
+
+            private readonly List<B> _toRemove = new List<B>();
+            public override bool Remove(B behaviour)
+            {
+                if (base.Behaviours.Contains(behaviour))
+                {
+                    _toRemove.Add(behaviour);
+                    return true;
+                }
+                return false;
+            }
+
             protected virtual void Update(float elapsedTime)
             {
+                for (int i = 0; i < _toAdd.Count; i++)
+                    base.Add(_toAdd[i]);
+                _toAdd.Clear();
+
+                for (int i = 0; i < _toRemove.Count; i++)
+                    base.Remove(_toRemove[i]);
+                _toRemove.Clear();
+
                 foreach (var item in Behaviours)
                 {
                     if (item.Owner != null && !item.Owner.IsDisposed)
