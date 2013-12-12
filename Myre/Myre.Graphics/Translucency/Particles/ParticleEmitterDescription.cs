@@ -1,38 +1,25 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Content;
 using Myre.Graphics.Translucency.Particles.Initialisers;
 using Myre.Graphics.Translucency.Particles.Triggers;
 
 namespace Myre.Graphics.Translucency.Particles
 {
-    public class ParticleSystemGenerator
+    public class ParticleEmitterDescription
     {
         private readonly ITrigger[] _triggers;
         private readonly BaseParticleInitialiser[] _initialisers;
         public ParticleSystemDescription Description;
 
-        public ParticleSystemGenerator(BlendState blend, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, Texture2D texture, int capacity, ITrigger[] triggers, BaseParticleInitialiser[] initialisers)
+        public ParticleEmitterDescription(ParticleSystemDescription description, ITrigger[] triggers, BaseParticleInitialiser[] initialisers)
         {
             _triggers = triggers;
             _initialisers = initialisers;
 
-            Description = new ParticleSystemDescription
-            {
-                BlendState = blend,
-                EndLinearVelocity = endLinearVelocity,
-                EndScale = endScale,
-                Gravity = gravity,
-                Lifetime = lifetime,
-                Texture = texture,
-                Capacity = capacity
-            };
+            Description = description;
         }
 
         public void Setup(ParticleEmitter emitter)
         {
-            emitter.Description = Description;
-
             foreach (var trigger in _triggers)
                 emitter.AddTrigger((ITrigger)trigger.Copy());
 
@@ -41,19 +28,13 @@ namespace Myre.Graphics.Translucency.Particles
         }
     }
 
-    public class ParticleSystemGeneratorReader
-        :ContentTypeReader<ParticleSystemGenerator>
+    public class ParticleEmitterDescriptionReader
+        :ContentTypeReader<ParticleEmitterDescription>
     {
-        protected override ParticleSystemGenerator Read(ContentReader input, ParticleSystemGenerator existingInstance)
+        protected override ParticleEmitterDescription Read(ContentReader input, ParticleEmitterDescription existingInstance)
         {
-            return new ParticleSystemGenerator(
-                input.ReadObject<BlendState>(),
-                input.ReadSingle(),
-                input.ReadSingle(),
-                input.ReadVector3(),
-                input.ReadSingle(),
-                input.ContentManager.Load<Texture2D>(input.ReadString()),
-                input.ReadInt32(),
+            return new ParticleEmitterDescription(
+                input.ContentManager.Load<ParticleSystemDescription>(input.ReadString()),
                 ReadTriggers(input),
                 ReadInitialisers(input)
             );

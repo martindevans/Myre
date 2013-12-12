@@ -59,9 +59,12 @@
     <Compile Include="Particles\Initialisers\Size\RandomSize.cs" />
     <Compile Include="Particles\Initialisers\Velocity\EntityVelocity.cs" />
     <Compile Include="Particles\Initialisers\Velocity\RandomVelocity.cs" />
-    <Compile Include="Particles\MyreParticleContent.cs" />
+    <Compile Include="Particles\MyreParticleEmitterContent.cs" />
+    <Compile Include="Particles\MyreParticleSystemDescriptionContent.cs" />
+    <Compile Include="Particles\ParticleEmitter.cs" />
+    <Compile Include="Particles\MyreParticleEmitterProcessor.cs" />
     <Compile Include="Particles\MyreParticleSystemProcessor.cs" />
-    <Compile Include="Particles\ParticleSystemDescription.cs" />
+    <Compile Include="Particles\ParticleSystem.cs" />
     <Compile Include="Particles\Triggers\Burst.cs" />
     <Compile Include="Particles\Triggers\Continuous.cs" />
     <Compile Include="Particles\Triggers\ITrigger.cs" />

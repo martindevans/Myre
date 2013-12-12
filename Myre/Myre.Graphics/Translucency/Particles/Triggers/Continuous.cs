@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Myre.Graphics.Translucency.Particles.Initialisers;
 
 namespace Myre.Graphics.Translucency.Particles.Triggers
@@ -24,7 +23,7 @@ namespace Myre.Graphics.Translucency.Particles.Triggers
 
         public void Update(float dt)
         {
-            var emitsPerSecond = Math.Min(_emitter.Capacity / _emitter.Lifetime, EmitsPerSecond);
+            var emitsPerSecond = EmitsPerSecond;
             var timePerParticle = 1f / emitsPerSecond;
 
             // If we had any time left over that we didn't use during the

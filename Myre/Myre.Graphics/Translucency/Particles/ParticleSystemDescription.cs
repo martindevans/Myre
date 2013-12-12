@@ -1,24 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Graphics.Translucency.Particles
 {
-    ///// <summary>
-    ///// Describes blend modes for particles.
-    ///// </summary>
-    //public enum ParticleBlendMode
-    //{
-    //    /// <summary>
-    //    /// FinalColour = DestinationColour * (1 - SourceAlpha) + SourceColour
-    //    /// </summary>
-    //    Additive,
-
-    //    /// <summary>
-    //    /// FinalColour = DestinationColour * (1 - SourceAlpha) - SourceColour
-    //    /// </summary>
-    //    Subtractive
-    //}
-
     public enum ParticleType
     {
         Hard,
@@ -69,5 +54,24 @@ namespace Myre.Graphics.Translucency.Particles
         /// Gets or sets the maximum number of particles this system can hold
         /// </summary>
         public int Capacity { get; set; }
+    }
+
+    public class ParticleSystemDescriptionReader
+        : ContentTypeReader<ParticleSystemDescription>
+    {
+        protected override ParticleSystemDescription Read(ContentReader input, ParticleSystemDescription existingInstance)
+        {
+            return new ParticleSystemDescription
+            {
+                BlendState = input.ReadObject<BlendState>(),
+                EndLinearVelocity = input.ReadSingle(),
+                EndScale = input.ReadSingle(),
+                Gravity = input.ReadVector3(),
+                Lifetime = input.ReadSingle(),
+                Texture = input.ContentManager.Load<Texture2D>(input.ReadString()),
+                Capacity = input.ReadInt32(),
+                Type = ParticleType.Hard
+            };
+        }
     }
 }

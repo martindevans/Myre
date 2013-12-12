@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Graphics.Pipeline.Particles.Initialisers;
-using Myre.Graphics.Pipeline.Particles.Triggers;
 
 namespace Myre.Graphics.Pipeline.Particles
 {
@@ -18,10 +16,8 @@ namespace Myre.Graphics.Pipeline.Particles
         public readonly float Lifetime;
         public readonly string Texture;
         public readonly int Capacity;
-        public readonly ITrigger[] Triggers;
-        public readonly IInitialiser[] Initialisers;
 
-        public MyreParticleSystemDescriptionContent(BlendState blendState, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, string texture, int capacity, ITrigger[] triggers, IInitialiser[] initialisers)
+        public MyreParticleSystemDescriptionContent(BlendState blendState, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, string texture, int capacity)
         {
             BlendState = blendState;
             EndLinearVelocity = endLinearVelocity;
@@ -30,8 +26,6 @@ namespace Myre.Graphics.Pipeline.Particles
             Lifetime = lifetime;
             Texture = texture;
             Capacity = capacity;
-            Triggers = triggers;
-            Initialisers = initialisers;
         }
     }
 
@@ -47,24 +41,16 @@ namespace Myre.Graphics.Pipeline.Particles
             output.Write(value.Lifetime);
             output.Write(value.Texture);
             output.Write(value.Capacity);
-
-            output.Write(value.Triggers.Length);
-            for (int i = 0; i < value.Triggers.Length; i++)
-                output.WriteObject(value.Triggers[i]);
-
-            output.Write(value.Initialisers.Length);
-            for (int i = 0; i < value.Initialisers.Length; i++)
-                output.WriteObject(value.Initialisers[i]);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            return "Myre.Graphics.Translucency.Particles.ParticleSystemGeneratorReader, Myre.Graphics";
+            return "Myre.Graphics.Translucency.Particles.ParticleSystemDescriptionReader, Myre.Graphics";
         }
 
         public override string GetRuntimeType(TargetPlatform targetPlatform)
         {
-            return "Myre.Graphics.Translucency.Particles.ParticleSystemGenerator, Myre.Graphics";
+            return "Myre.Graphics.Translucency.Particles.ParticleSystemDescription, Myre.Graphics";
         }
     }
 }
