@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline">
+  <Asset Type="Pipeline:Particles.ParticleEmitter">
+    <System>Particles/TestSystem1</System>
+
+    <Triggers xmlns:Trigger="Myre.Graphics.Pipeline.Particles.Triggers">
+      <Item Type="Trigger:Continuous">
+        <EmitsPerSecond>500</EmitsPerSecond>
+      </Item>
+    </Triggers>
+
+    <Initialisers xmlns:Init="Myre.Graphics.Pipeline.Particles.Initialisers">
+      <Item Type="Init:Position.Ellipsoid">
+        <Shape>10 100 100</Shape>
+        <MinDistance>75</MinDistance>
+      </Item>
+      <Item Type="Init:Velocity.RandomVelocity">
+        <Max>20 10 20</Max>
+      </Item>
+      <Item Type="Init:AngularVelocity.RandomAngularVelocity">
+        <Min>-0.7854</Min>
+        <Max>0.7854</Max>
+      </Item>
+      <Item Type="Init:Size.RandomSize">
+        <Min>30</Min>
+        <Max>40</Max>
+      </Item>
+      <Item Type="Init:Colour.RandomStartColour">
+        <Min>FFFF0000</Min>
+        <Max>FFFFFFFF</Max>
+      </Item>
+      <Item Type="Init:Colour.RandomEndColour">
+        <Min>FFFFFFFF</Min>
+        <Max>FF0000FF</Max>
+      </Item>
+      <Item Type="Init:Lifetime.RandomLifetime">
+        <Min>0.7</Min>
+        <Max>1</Max>
+      </Item>
+    </Initialisers>
+  </Asset>
+</XnaContent>

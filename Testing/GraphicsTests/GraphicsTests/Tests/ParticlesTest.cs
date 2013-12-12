@@ -3,16 +3,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Myre.Collections;
 using Myre.Entities;
 using Myre.Graphics;
 using Myre.Graphics.Translucency;
 using Myre.Graphics.Translucency.Particles;
-using Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity;
-using Myre.Graphics.Translucency.Particles.Initialisers.Colour;
-using Myre.Graphics.Translucency.Particles.Initialisers.Lifetime;
-using Myre.Graphics.Translucency.Particles.Initialisers.Position;
-using Myre.Graphics.Translucency.Particles.Initialisers.Size;
-using Myre.Graphics.Translucency.Particles.Initialisers.Velocity;
 using Ninject;
 
 namespace GraphicsTests.Tests
@@ -24,7 +19,7 @@ namespace GraphicsTests.Tests
         private Scene _scene;
         private readonly ContentManager _content;
         private readonly GraphicsDevice _device;
-        private EntityParticleEmitter _emitter;
+        private ParticleEmitter _emitter;
         private Camera _camera;
 
         private KeyboardState _keyboardState;
@@ -73,20 +68,12 @@ namespace GraphicsTests.Tests
 
             var particleEntityDesc = _kernel.Get<EntityDescription>();
             particleEntityDesc.AddProperty<Vector3>("position");
-            particleEntityDesc.AddBehaviour<EntityParticleEmitter>();
+            particleEntityDesc.AddBehaviour<ParticleEmitter>();
             var entity = particleEntityDesc.Create();
             entity.GetProperty<Vector3>("position").Value = Vector3.Zero;
-            _scene.Add(entity);
-
-            var white = new Texture2D(_device, 1, 1);
-            white.SetData(new Color[] { Color.White });
-
-            _emitter = entity.GetBehaviour<EntityParticleEmitter>();
-            _content.Load<ParticleSystemGenerator>("Particles/TestSystem1").Setup(_emitter);
-
-            _emitter.Enabled = true;
-            _emitter.EmitPerSecond = 1000;
-            _emitter.VelocityBleedThrough = 0;
+            NamedBoxCollection initData = new NamedBoxCollection();
+            initData.Set<ParticleEmitterDescription>("particlesystem", _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
+            _scene.Add(entity, initData);
             
             base.OnShown();
         }

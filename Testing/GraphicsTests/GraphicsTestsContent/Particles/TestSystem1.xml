@@ -1,42 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline">
-  <Asset Type="Pipeline:Particles.ParticleSystemDescription">
+  <Asset Type="Pipeline:Particles.ParticleSystem">
     <BlendState>Additive</BlendState>
     <EndLinearVelocity>0.25</EndLinearVelocity>
     <EndScale>1.75</EndScale>
-    <Gravity>0 0 0</Gravity>
+    <Gravity>0 9 0</Gravity>
     <Lifetime>5</Lifetime>
     <Texture>fire</Texture>
     <Capacity>5001</Capacity>
-
-    <Initialisers xmlns:Init="Myre.Graphics.Pipeline.Particles.Initialisers">
-      <Item Type="Init:Position.Ellipsoid">
-        <Shape>10 100 100</Shape>
-        <MinDistance>75</MinDistance>
-      </Item>
-      <Item Type="Init:Velocity.RandomVelocity">
-        <Max>20 20 20</Max>
-      </Item>
-      <Item Type="Init:AngularVelocity.RandomAngularVelocity">
-        <Min>-0.7854</Min>
-        <Max>0.7854</Max>
-      </Item>
-      <Item Type="Init:Size.RandomSize">
-        <Min>30</Min>
-        <Max>40</Max>
-      </Item>
-      <Item Type="Init:Colour.RandomStartColour">
-        <Min>FFFF0000</Min>
-        <Max>FFFFFFFF</Max>
-      </Item>
-      <Item Type="Init:Colour.RandomEndColour">
-        <Min>FFFFFFFF</Min>
-        <Max>FF0000FF</Max>
-      </Item>
-      <Item Type="Init:Lifetime.RandomLifetime">
-        <Min>0.7</Min>
-        <Max>1</Max>
-      </Item>
-    </Initialisers>
   </Asset>
 </XnaContent>

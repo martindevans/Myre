@@ -674,12 +674,19 @@
       <Processor>MyreAnimationClipProcessor</Processor>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="Particles\TestEmitter1.xml">
+      <Name>TestEmitter1</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>MyreParticleEmitterProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="Particles\TestSystem1.xml">
       <Name>TestSystem1</Name>
       <Importer>XmlImporter</Importer>
       <Processor>MyreParticleSystemProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
