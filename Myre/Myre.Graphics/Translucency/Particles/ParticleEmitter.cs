@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Entities.Services;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Translucency.Particles.Initialisers;
 using Myre.Graphics.Translucency.Particles.Triggers;

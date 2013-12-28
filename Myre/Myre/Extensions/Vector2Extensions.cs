@@ -60,5 +60,24 @@ namespace Myre.Extensions
         {
             return Math.Max(v.X, v.Y);
         }
+
+        /// <summary>
+        /// Calculates the area of an irregular polygon. If the polygon is anticlockwise wound the area will be negative
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static float Area(this Vector2[] v)
+        {
+            var area = 0f;
+
+            int previous = v.Length - 1;
+            for (int i = 0; i < v.Length; i++)
+            {
+                area += (v[i].X + v[previous].X) * (v[i].Y - v[previous].Y);
+                previous = i;
+            }
+
+            return area / 2;
+        }
     }
 }

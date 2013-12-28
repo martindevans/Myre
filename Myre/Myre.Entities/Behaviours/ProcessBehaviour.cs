@@ -17,10 +17,16 @@ namespace Myre.Entities.Behaviours
         private static int _nextCounter;
         private uint _counter;
 
-        protected ProcessBehaviour()
+        protected ProcessBehaviour(string name)
+            : base(name)
         {
             Period = 0;
             _counter = new IntUIntUnion { IntValue = Interlocked.Increment(ref _nextCounter) }.UIntValue;   //Spread updates out across time to prevent clumping
+        }
+
+        protected ProcessBehaviour()
+            :this(null)
+        {
         }
 
 // ReSharper disable MemberCanBeProtected.Global

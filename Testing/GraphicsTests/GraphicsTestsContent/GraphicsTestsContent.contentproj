@@ -679,6 +679,7 @@
       <Name>TestEmitter1</Name>
       <Importer>XmlImporter</Importer>
       <Processor>MyreParticleEmitterProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
