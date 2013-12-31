@@ -6,11 +6,16 @@ using Microsoft.Xna.Framework;
 namespace Myre
 {
     /// <summary>
-    /// An integer location in 3space
+    /// An integer location in 4space
     /// </summary>
-    public struct Int3
-        : IEquatable<Int3>
+    public struct Int4
+        : IEquatable<Int4>
     {
+        /// <summary>
+        /// W Position
+        /// </summary>
+        public readonly int W;
+
         /// <summary>
         /// X Position
         /// </summary>
@@ -32,11 +37,13 @@ namespace Myre
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public Int3(int x, int y, int z)
+        /// <param name="w"></param>
+        public Int4(int x, int y, int z, int w)
         {
             X = x;
             Y = y;
             Z = z;
+            W = w;
         }
 
         /// <summary>
@@ -44,24 +51,24 @@ namespace Myre
         /// </summary>
         /// <returns></returns>
         [Pure]
-        public Vector3 ToVector3()
+        public Vector4 ToVector4()
         {
-            return new Vector3(X, Y, Z);
+            return new Vector4(X, Y, Z, W);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return X * 37 + Y * 13 + Z * 43;
+                return X * 37 + Y * 13 + Z * 43 + W * 71;
             }
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Int3)
+            if (obj is Int4)
             {
-                return Equals((Int3)obj);
+                return Equals((Int4)obj);
             }
 
             return false;
@@ -72,16 +79,17 @@ namespace Myre
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(Int3 other)
+        public bool Equals(Int4 other)
         {
             return X == other.X
                 && Y == other.Y
-                && Z == other.Z;
+                && Z == other.Z
+                && W == other.W;
         }
 
         public override string ToString()
         {
-            return string.Format("{0},{1},{2}", X, Y, Z);
+            return string.Format("{0},{1},{2},{3}", X, Y, Z, W);
         }
 
         /// <summary>
@@ -90,9 +98,9 @@ namespace Myre
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int3 operator +(Int3 a, Int3 b)
+        public static Int4 operator +(Int4 a, Int4 b)
         {
-            return new Int3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+            return new Int4(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
         }
 
         /// <summary>
@@ -101,9 +109,9 @@ namespace Myre
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Int3 operator -(Int3 a, Int3 b)
+        public static Int4 operator -(Int4 a, Int4 b)
         {
-            return new Int3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+            return new Int4(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
         }
     }
 }
