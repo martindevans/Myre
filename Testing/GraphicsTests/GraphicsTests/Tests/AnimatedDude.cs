@@ -50,6 +50,8 @@ namespace GraphicsTests.Tests
             _scene.Add(dudeEntity);
             _animation = dudeEntity.GetBehaviour<Animated>();
             _animation.EnableRootBoneTranslationY = true;
+            _animation.EnableRootBoneTranslationX = false;
+            _animation.EnableRootBoneTranslationZ = false;
 
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
 

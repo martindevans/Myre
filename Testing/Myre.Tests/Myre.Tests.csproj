@@ -48,19 +48,14 @@
   <ItemGroup>
     <Compile Include="Myre\Collections\Octree.cs" />
     <Compile Include="Myre\Collections\RingBufferTest.cs" />
+    <Compile Include="Myre\Extensions\Vector2ExtensionsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Graphics\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\Myre\Myre.Entities\%28x86%29 Myre.Entities.csproj">
       <Project>{5CDABE8C-7C9C-4163-8C85-FEA731088239}</Project>
       <Name>%28x86%29 Myre.Entities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Myre\Myre.Graphics\%28x86%29 Myre.Graphics.csproj">
-      <Project>{FC3D8E34-3333-42FB-9B47-3A273B1B50D8}</Project>
-      <Name>%28x86%29 Myre.Graphics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Myre\Myre\%28x86%29 Myre.csproj">
       <Project>{FDB5A9D8-9266-4F7B-BDE7-D4E720F5B45F}</Project>

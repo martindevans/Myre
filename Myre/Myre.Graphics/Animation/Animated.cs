@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Extensions;
 using Myre.Graphics.Animation.Clips;
 using Myre.Graphics.Geometry;
 
@@ -83,6 +84,26 @@ namespace Myre.Graphics.Animation
             set { _enableRootBoneTranslationZ.Value = value; }
         }
 
+        private Property<bool> _enableRootBoneRotation;
+        /// <summary>
+        /// Whether or not to include the rotation part of the root bone in the transform
+        /// </summary>
+        public bool EnableRootBoneRotation
+        {
+            get { return _enableRootBoneRotation.Value; }
+            set { _enableRootBoneRotation.Value = value; }
+        }
+
+        private Property<bool> _enableRootBoneScale;
+        /// <summary>
+        /// Whether or not to include the rotation part of the root bone in the transform
+        /// </summary>
+        public bool EnableRootBoneScale
+        {
+            get { return _enableRootBoneScale.Value; }
+            set { _enableRootBoneScale.Value = value; }
+        }
+
         /// <summary>
         /// The clip to play while there are no other active animations
         /// </summary>
@@ -105,6 +126,8 @@ namespace Myre.Graphics.Animation
             _enableRootBoneTranslationX = context.CreateProperty<bool>("animation_enable_root_translation_x", false);
             _enableRootBoneTranslationY = context.CreateProperty<bool>("animation_enable_root_translation_y", false);
             _enableRootBoneTranslationZ = context.CreateProperty<bool>("animation_enable_root_translation_z", false);
+            _enableRootBoneRotation = context.CreateProperty<bool>("animation_enable_root_rotation", true);
+            _enableRootBoneScale = context.CreateProperty<bool>("animation_enable_root_scale", true);
 
             base.CreateProperties(context);
         }
@@ -263,10 +286,14 @@ namespace Myre.Graphics.Animation
                 Quaternion rotation;
                 _boneTransforms[0].Decompose(out scale, out rotation, out translation);
 
-                _boneTransforms[0] = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(new Vector3(
-                    EnableRootBoneTranslationX ? translation.X : 0,
-                    EnableRootBoneTranslationY ? translation.Y : 0,
-                    EnableRootBoneTranslationZ ? translation.Z : 0)
+                _boneTransforms[0] =
+                    (EnableRootBoneScale ? Matrix.CreateScale(scale) : Matrix.Identity) *
+                    (EnableRootBoneRotation ? Matrix.CreateFromQuaternion(rotation) : Matrix.Identity) *
+                    Matrix.CreateTranslation(new Vector3(
+                        EnableRootBoneTranslationX ? translation.X : 0,
+                        EnableRootBoneTranslationY ? translation.Y : 0,
+                        EnableRootBoneTranslationZ ? translation.Z : 0
+                    )
                 );
             }
         }
@@ -319,7 +346,7 @@ namespace Myre.Graphics.Animation
             Vector3 endTranslation;
             end.Decompose(out endScale, out endRotation, out endTranslation);
 
-            Quaternion interpolatedRotation = Quaternion.Slerp(startRotation, endRotation, slerpAmount);
+            Quaternion interpolatedRotation = startRotation.Nlerp(endRotation, slerpAmount);
             Vector3 interpolatedScale = Vector3.SmoothStep(startScale, endScale, slerpAmount);
             Vector3 interpolatedTranslation = Vector3.SmoothStep(startTranslation, endTranslation, slerpAmount);
 

@@ -46,8 +46,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "(360) Myre.UI", "..\Myre\My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "(360) GraphicsTests", "GraphicsTests\GraphicsTests\(360) GraphicsTests.csproj", "{B0714813-F310-4A0F-AE2B-952C9527F01D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Serialisation.Tests", "Myre.Serialisation.Tests\Myre.Serialisation.Tests.csproj", "{84B618FF-81C7-40AA-A77A-56B384142162}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Tests", "Myre.Tests\Myre.Tests.csproj", "{523C09C2-B475-4CCC-9CCE-C19B54E4C829}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{99FA1591-AF06-4EFB-809B-2CA546D5802D}"
@@ -423,24 +421,6 @@ Global
 		{B0714813-F310-4A0F-AE2B-952C9527F01D}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
 		{B0714813-F310-4A0F-AE2B-952C9527F01D}.Release|Xbox 360.Build.0 = Release|Xbox 360
 		{B0714813-F310-4A0F-AE2B-952C9527F01D}.Release|Xbox 360.Deploy.0 = Release|Xbox 360
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Debug|Xbox 360.ActiveCfg = Debug|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Profile|Any CPU.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Profile|Any CPU.Build.0 = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Profile|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Profile|Mixed Platforms.Build.0 = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Profile|x86.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Profile|Xbox 360.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Release|x86.ActiveCfg = Release|Any CPU
-		{84B618FF-81C7-40AA-A77A-56B384142162}.Release|Xbox 360.ActiveCfg = Release|Any CPU
 		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{523C09C2-B475-4CCC-9CCE-C19B54E4C829}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

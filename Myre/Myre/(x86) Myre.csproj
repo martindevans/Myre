@@ -98,6 +98,7 @@
     <Compile Include="Collections\RingBuffer.cs" />
     <Compile Include="Collections\TokenOctree.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
+    <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Int4.cs" />
     <Compile Include="Delayed.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
