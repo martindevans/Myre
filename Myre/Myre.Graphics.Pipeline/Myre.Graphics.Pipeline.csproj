@@ -38,17 +38,17 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoneIndexer.cs" />
-    <Compile Include="MyreAnimationClipProcessor.cs" />
-    <Compile Include="AnimationDefinition.cs" />
-    <Compile Include="MyreAnimationContent.cs" />
-    <Compile Include="MyreMaterialContent.cs" />
-    <Compile Include="MyreMaterialData.cs" />
-    <Compile Include="MyreMaterialProcessor.cs" />
-    <Compile Include="MyreMeshContent.cs" />
-    <Compile Include="MyreMeshPartContent.cs" />
-    <Compile Include="MyreModelContent.cs" />
-    <Compile Include="MyreModelProcessor.cs" />
+    <Compile Include="Animations\ClipContent.cs" />
+    <Compile Include="Animations\KeyframeContent.cs" />
+    <Compile Include="Animations\EmbeddedAnimationProcessor.cs" />
+    <Compile Include="Animations\MyreEmbeddedAnimationDefinition.cs" />
+    <Compile Include="Animations\SkinningDataContent.cs" />
+    <Compile Include="Materials\MyreMaterialContent.cs" />
+    <Compile Include="Materials\MyreMaterialDefinition.cs" />
+    <Compile Include="Materials\MyreMaterialProcessor.cs" />
+    <Compile Include="Models\MyreMeshContent.cs" />
+    <Compile Include="Models\MyreModelContent.cs" />
+    <Compile Include="Models\MyreModelProcessor.cs" />
     <Compile Include="Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
     <Compile Include="Particles\Initialisers\Colour\RandomStartColour.cs" />
     <Compile Include="Particles\Initialisers\Colour\RandomEndColour.cs" />
@@ -70,8 +70,9 @@
     <Compile Include="Particles\Triggers\ITrigger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializers\BlendStateSerializer.cs" />
-    <Compile Include="XmlMaterialImporter.cs" />
+    <Compile Include="Materials\XmlMaterialImporter.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.ContentPipelineExtensions.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

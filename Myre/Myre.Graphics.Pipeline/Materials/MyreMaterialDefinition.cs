@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Materials
 {
-    public class MyreMaterialData
+    public class MyreMaterialDefinition
     {
         public string EffectName;
 

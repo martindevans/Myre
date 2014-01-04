@@ -23,6 +23,7 @@ namespace GraphicsTests.Tests
 
         private readonly string[] _sequence = new string[]
         {
+            //"walk01"
             "walk01","walk01","walk01","walk03","walk03",
             "death02", "get-up",
             "run01","run02","run03","run01",
@@ -39,11 +40,11 @@ namespace GraphicsTests.Tests
         {
             _scene = kernel.Get<Scene>();
 
-            var model = content.Load<ModelData>(@"models/zoe_fbx");
+            var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty<ModelData>("model", model);
             dude.AddProperty<Matrix>("transform", Matrix.Identity);
-            dude.AddProperty<bool>("is_static", true);
+            dude.AddProperty<bool>("is_static", false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
             var dudeEntity = dude.Create();
@@ -52,6 +53,7 @@ namespace GraphicsTests.Tests
             _animation.EnableRootBoneTranslationY = true;
             _animation.EnableRootBoneTranslationX = false;
             _animation.EnableRootBoneTranslationZ = false;
+            _animation.EnableRootBoneScale = true;
 
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
 
@@ -121,6 +123,7 @@ namespace GraphicsTests.Tests
                   .Then<LightingComponent>()
                 //.Then<ToneMapComponent>()
                   .Then<TranslucentComponent>()
+                  .Show("gbuffer_normals")
                   .Apply();
         }
 
@@ -135,7 +138,7 @@ namespace GraphicsTests.Tests
             Quaternion rotation;
             anim.RootBoneTransfomation.Decompose(out scale, out rotation, out position);
 
-            _dude.Transform = Matrix.CreateTranslation(new Vector3(position.X, 0, 0 * position.Z));
+            //_dude.Transform = Matrix.CreateTranslation(new Vector3(position.X, 0, position.Z));
         }
 
         public override void Draw(GameTime gameTime)

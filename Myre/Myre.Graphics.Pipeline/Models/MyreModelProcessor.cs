@@ -8,8 +8,10 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Graphics.Pipeline.Animations;
+using Myre.Graphics.Pipeline.Materials;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Models
 {
     /// <summary>
     /// This class will be instantiated by the XNA Framework Content Pipeline
@@ -152,7 +154,7 @@ namespace Myre.Graphics.Pipeline
                 skeletonHierarchy.Add(_bones.IndexOf(bone.Parent as BoneContent));
             }
 
-            _outputModel.SkinningData = new MyreSkinningDataContent(
+            _outputModel.SkinningData = new SkinningDataContent(
                 bindPose,
                 inverseBindPose,
                 skeletonHierarchy
@@ -326,14 +328,14 @@ namespace Myre.Graphics.Pipeline
 
         private void CreateShadowMaterial(MaterialContent material, bool animated)
         {
-            var materialData = new MyreMaterialData { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewLength" : "ViewLength" };
+            var materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewLength" : "ViewLength" };
 
-            var shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            var shadowMaterial = _context.Convert<MyreMaterialDefinition, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewlength", shadowMaterial);
 
-            materialData = new MyreMaterialData { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewZ" : "ViewZ" };
+            materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewZ" : "ViewZ" };
 
-            shadowMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            shadowMaterial = _context.Convert<MyreMaterialDefinition, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("shadows_viewz", shadowMaterial);
         }
 
@@ -346,13 +348,13 @@ namespace Myre.Graphics.Pipeline
             if (diffuseTexture == null)
                 return;
 
-            var materialData = new MyreMaterialData { EffectName = Path.GetFileNameWithoutExtension(GBufferEffectName), Technique = GBufferTechnique ?? (animated ? "Animated" : "Default") };
+            var materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(GBufferEffectName), Technique = GBufferTechnique ?? (animated ? "Animated" : "Default") };
 
             materialData.Textures.Add("DiffuseMap", diffuseTexture);
             materialData.Textures.Add("NormalMap", normalTexture);
             materialData.Textures.Add("SpecularMap", specularTexture);
 
-            var gbufferMaterial = _context.Convert<MyreMaterialData, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            var gbufferMaterial = _context.Convert<MyreMaterialDefinition, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
             _processedMaterials[material].Add("gbuffer", gbufferMaterial);
         }
         #endregion

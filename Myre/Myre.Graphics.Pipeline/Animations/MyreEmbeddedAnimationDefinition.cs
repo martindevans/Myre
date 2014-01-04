@@ -1,7 +1,7 @@
 ﻿
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Animations
 {
-    public class EmbeddedAnimationDefinition
+    public class MyreEmbeddedAnimationDefinition
     {
         public string AnimationSourceFile;
         public string SourceTakeName;

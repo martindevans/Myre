@@ -4,17 +4,18 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Myre.Graphics.Pipeline.Models;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Animations
 {
     [ContentProcessor(DisplayName = "Myre Embedded Animation Processor")]
-    public class MyreAnimationClipProcessor : ContentProcessor<EmbeddedAnimationDefinition, MyreClipContent>
+    public class EmbeddedAnimationProcessor : ContentProcessor<MyreEmbeddedAnimationDefinition, ClipContent>
     {
         public const long TICKS_PER_60_FPS = TimeSpan.TicksPerSecond / 60;
 
         private IList<BoneContent> _bones;
 
-        public override MyreClipContent Process(EmbeddedAnimationDefinition input, ContentProcessorContext context)
+        public override ClipContent Process(MyreEmbeddedAnimationDefinition input, ContentProcessorContext context)
         {
             NodeContent node = context.BuildAndLoadAsset<NodeContent, NodeContent>(new ExternalReference<NodeContent>(input.AnimationSourceFile), null);
 
@@ -25,15 +26,15 @@ namespace Myre.Graphics.Pipeline
 
             _bones = MeshHelper.FlattenSkeleton(MeshHelper.FindSkeleton(node));
 
-            return ProcessAnimation(animations.First().Value, context, input.StartFrame, input.EndFrame);
+            return ProcessAnimation(input.Name, animations[input.SourceTakeName], context, input.StartFrame, input.EndFrame);
         }
 
-        private MyreClipContent ProcessAnimation(AnimationContent anim, ContentProcessorContext context, int startFrame = 0, int endFrame = -1)
+        private ClipContent ProcessAnimation(string name, AnimationContent anim, ContentProcessorContext context, int startFrame = 0, int endFrame = -1)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
 
-            MyreClipContent animationClip = new MyreClipContent(anim.Name);
+            ClipContent animationClip = new ClipContent(name);
 
             var startFrameTime = ConvertFrameNumberToTimeSpan(startFrame);
             var endFrameTime = ConvertFrameNumberToTimeSpan(endFrame);
@@ -49,19 +50,19 @@ namespace Myre.Graphics.Pipeline
 
                 // Convert the keyframe data.
                 foreach (AnimationKeyframe keyframe in keyframes)
-                    animationClip.Keyframes.Add(new MyreKeyframeContent(boneIndex, keyframe.Time, keyframe.Transform));
+                    animationClip.Keyframes.Add(new KeyframeContent(boneIndex, keyframe.Time, keyframe.Transform));
             }
 
             // Sort the merged keyframes by time.
             animationClip.Keyframes.Sort((a, b) => a.Time.CompareTo(b.Time));
 
+            if (animationClip.Keyframes.Count == 0)
+                throw new InvalidContentException("Animation has no keyframes.");
+
             //Move the animation back so it starts at time zero
             var startTime = animationClip.Keyframes[0].Time;
             foreach (var keyframe in animationClip.Keyframes)
                 keyframe.Time -= startTime;
-
-            if (animationClip.Keyframes.Count == 0)
-                throw new InvalidContentException("Animation has no keyframes.");
 
             if (animationClip.Keyframes.Last().Time.Ticks <= TICKS_PER_60_FPS)
                 throw new InvalidContentException("Animation has < 1/60th second duration");
@@ -80,15 +81,16 @@ namespace Myre.Graphics.Pipeline
             foreach (KeyValuePair<string, AnimationContent> k in node.Animations)
             {
                 if (animations.ContainsKey(k.Key))
-                {
-                    foreach (KeyValuePair<string, AnimationChannel> c in k.Value.Channels)
-                    {
-                        animations[k.Key].Channels.Add(c.Key, c.Value);
-                    }
-                }
+                    throw new InvalidOperationException(string.Format("Two animations with same name on model! {0}", k.Key));
                 else
                 {
                     animations.Add(k.Key, k.Value);
+
+                    // Why not interpolate here?
+                    // The way animations are done is with a single take, with all the animations back to back, and EmbeddedAnimationDefinition which selects a range of frames
+                    // If we interpolate the animation to 60 fps we might end up with frame *across* two of the embedded animations
+                    // That would be bad (tm)
+                    //animations.Add(k.Key, Interpolate(k.Value));
                 }
             }
 
@@ -101,7 +103,7 @@ namespace Myre.Graphics.Pipeline
         /// </summary>
         /// <param name="input">The AnimationContent to interpolate.</param>
         /// <returns>The interpolated AnimationContent.</returns>
-        public virtual AnimationContent Interpolate(AnimationContent input)
+        private static AnimationContent Interpolate(AnimationContent input)
         {
             AnimationContent output = new AnimationContent();
 

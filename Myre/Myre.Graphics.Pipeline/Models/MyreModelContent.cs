@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using Myre.Graphics.Pipeline.Animations;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Models
 {
     [ContentSerializerRuntimeType("Myre.Graphics.Geometry.ModelData, Myre.Graphics")]
     public class MyreModelContent
@@ -14,7 +12,7 @@ namespace Myre.Graphics.Pipeline
         private readonly List<MyreMeshContent> _meshes = new List<MyreMeshContent>();
         public MyreMeshContent[] Meshes { get { return _meshes.ToArray(); } }
 
-        public MyreSkinningDataContent SkinningData { get; set; }
+        public SkinningDataContent SkinningData { get; set; }
 
         internal void AddMesh(MyreMeshContent mesh)
         {

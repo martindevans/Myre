@@ -5,8 +5,9 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using Myre.Graphics.Pipeline.Materials;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Models
 {
     [ContentSerializerRuntimeType("Myre.Graphics.Geometry.Mesh, Myre.Graphics")]
     public class MyreMeshContent

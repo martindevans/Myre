@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Materials
 {
     /// <summary>
     /// This class will be instantiated by the XNA Framework Content Pipeline
@@ -10,9 +9,9 @@ namespace Myre.Graphics.Pipeline
     /// the processor wishes to alter data without changing its type.
     /// </summary>
     [ContentProcessor(DisplayName = "Myre Material Processor")]
-    public class MyreMaterialProcessor : ContentProcessor<MyreMaterialData, MyreMaterialContent>
+    public class MyreMaterialProcessor : ContentProcessor<MyreMaterialDefinition, MyreMaterialContent>
     {
-        public override MyreMaterialContent Process(MyreMaterialData input, ContentProcessorContext context)
+        public override MyreMaterialContent Process(MyreMaterialDefinition input, ContentProcessorContext context)
         {
             MyreMaterialContent output = new MyreMaterialContent
             {

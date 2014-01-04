@@ -99,7 +99,7 @@ namespace DebugContentPipeline
         ///       Example:
         ///               private const string SingleItem = @"dude.fbx";
         /// </summary>
-        private const string SingleItem = @"Particles/TestParticleSystem.xml";
+        private const string SingleItem = @"Models/ZoeAnimations/attack01.xml";
 
         /// <summary>
         /// TODO: Set the XnaProfile to HiDef or Reach, depending on your target graphics profile.
@@ -143,7 +143,7 @@ namespace DebugContentPipeline
             globalProperties.Add("Configuration", Configuration);
             globalProperties.Add("XnaProfile", XnaProfile.ToString());
             globalProperties.Add("XNAContentPipelineTargetPlatform", XnaContentPipelineTargetPlatform);
-            globalProperties.Add("SingleItem", SingleItem);
+            //globalProperties.Add("SingleItem", SingleItem);
             globalProperties.Add("CustomAfterMicrosoftCommonTargets", DebuggingTargets);
 
             var project = ProjectCollection.GlobalProjectCollection.LoadProject(ProjectName, globalProperties, MSBuildVersion);

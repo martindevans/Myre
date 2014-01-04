@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
-namespace Myre.Graphics.Pipeline
+namespace Myre.Graphics.Pipeline.Materials
 {
     //[ContentSerializerRuntimeType("Myre.Graphics.Materials.Material, Myre.Graphics")]
     public class MyreMaterialContent

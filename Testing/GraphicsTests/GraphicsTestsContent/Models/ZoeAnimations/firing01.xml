@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline">
-  <Asset Type="Pipeline:EmbeddedAnimationDefinition">
+<XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline.Animations">
+  <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
     
-    <AnimationSourceFile>Models/zoe_fbx.fbx</AnimationSourceFile>
+    <AnimationSourceFile>Models/zoe.fbx</AnimationSourceFile>
     <SourceTakeName>Take 001</SourceTakeName>
     <StartFrame>1115</StartFrame>
     <EndFrame>1125</EndFrame>
