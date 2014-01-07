@@ -12,18 +12,18 @@ namespace Myre.Graphics.Pipeline.Animations
         public int Bone { get; set; }
         public TimeSpan Time { get; set; }
 
-        public Vector3 Position { get; set; }
+        public Vector3 Translation { get; set; }
         public Vector3 Scale { get; set; }
-        public Quaternion Orientation { get; set; }
+        public Quaternion Rotation { get; set; }
 
         public KeyframeContent(int boneIndex, TimeSpan timeSpan, Vector3 position, Vector3 scale, Quaternion orientaton)
         {
             Bone = boneIndex;
             Time = timeSpan;
 
-            Position = position;
+            Translation = position;
             Scale = scale;
-            Orientation = orientaton;
+            Rotation = orientaton;
         }
     }
 
@@ -35,9 +35,9 @@ namespace Myre.Graphics.Pipeline.Animations
             output.Write(value.Bone);
             output.Write(value.Time.Ticks);
 
-            output.Write(value.Position);
+            output.Write(value.Translation);
             output.Write(value.Scale);
-            output.Write(value.Orientation);
+            output.Write(value.Rotation);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

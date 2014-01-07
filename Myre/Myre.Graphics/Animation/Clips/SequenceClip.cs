@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Graphics.Animation.Clips
 {
@@ -34,9 +32,9 @@ namespace Myre.Graphics.Animation.Clips
             get { return "RandomSelection(" + SelectedClip.Name + ")"; }
         }
 
-        public Keyframe[] Keyframes
+        public Keyframe[][] Channels
         {
-            get { return SelectedClip.Keyframes; }
+            get { return SelectedClip.Channels; }
         }
 
         public TimeSpan Duration

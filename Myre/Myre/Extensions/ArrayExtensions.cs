@@ -40,5 +40,20 @@ namespace Myre.Extensions
                 }
             }
         }
+
+        /// <summary>
+        /// Copies a segment of one array to an equal length segment of another array
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        public static void CopyTo<T>(this ArraySegment<T> source, ArraySegment<T> destination)
+        {
+            if (source.Count != destination.Count)
+                throw new InvalidOperationException("Copy requires that source and destination are the same size");
+
+            for (int i = 0; i < source.Count; i++)
+                destination.Array[i + destination.Offset] = source.Array[source.Offset + i];
+        }
     }
 }

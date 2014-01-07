@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Animation.Clips
@@ -9,12 +8,9 @@ namespace Myre.Graphics.Animation.Clips
         :IClip
     {
         public string Name { get; internal set; }
-        public Keyframe[] Keyframes { get; internal set; }
+        public Keyframe[][] Channels { get; internal set; }
 
-        public TimeSpan Duration
-        {
-            get { return Keyframes.Last().Time; }
-        }
+        public TimeSpan Duration { get; internal set; }
 
         public void Start()
         {
@@ -22,11 +18,6 @@ namespace Myre.Graphics.Animation.Clips
 
         internal Clip()
         {
-        }
-
-        public Clip(Keyframe[] keyframes)
-        {
-            Keyframes = keyframes;
         }
     }
 
@@ -38,10 +29,16 @@ namespace Myre.Graphics.Animation.Clips
 
             existingInstance.Name = input.ReadString();
 
+            existingInstance.Duration = new TimeSpan(input.ReadInt64());
+
             int count = input.ReadInt32();
-            existingInstance.Keyframes = new Keyframe[count];
+            existingInstance.Channels = new Keyframe[count][];
             for (int i = 0; i < count; i++)
-                existingInstance.Keyframes[i] = input.ReadObject<Keyframe>();
+            {
+                existingInstance.Channels[i] = new Keyframe[input.ReadInt32()];
+                for (int j = 0; j < existingInstance.Channels[i].Length; j++)
+                    existingInstance.Channels[i][j] = input.ReadObject<Keyframe>();
+            }
 
             return existingInstance;
         }

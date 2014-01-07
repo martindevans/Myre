@@ -29,7 +29,15 @@ namespace Myre.Graphics.Pipeline.Animations
             //Write bind pose
             output.Write(value.BindPose.Count);
             foreach (var matrix in value.BindPose)
-                output.Write(matrix);
+            {
+                Vector3 trans, scale;
+                Quaternion rot;
+                matrix.Decompose(out scale, out rot, out trans);
+
+                output.Write(trans);
+                output.Write(scale);
+                output.Write(rot);
+            }
 
             //Write inverse bind pose
             output.Write(value.InverseBindPose.Count);

@@ -6,7 +6,7 @@ namespace Myre.Graphics.Animation.Clips
     public class RandomClip
         : IClip
     {
-        private Random _random = new Random();
+        private readonly Random _random = new Random();
         private readonly List<IClip> _clips = new List<IClip>();
 
         private int _selectedIndex = 0;
@@ -31,9 +31,9 @@ namespace Myre.Graphics.Animation.Clips
             get { return "RandomSelection(" + SelectedClip.Name + ")"; }
         }
 
-        public Keyframe[] Keyframes
+        public Keyframe[][] Channels
         {
-            get { return SelectedClip.Keyframes; }
+            get { return SelectedClip.Channels; }
         }
 
         public TimeSpan Duration

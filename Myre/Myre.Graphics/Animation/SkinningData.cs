@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Animation
@@ -10,14 +9,12 @@ namespace Myre.Graphics.Animation
         /// Bindpose matrices for each bone in the skeleton,
         /// relative to the parent bone.
         /// </summary>
-        public Matrix[] BindPose { get; internal set; }
-
+        public Transform[] BindPose { get; internal set; }
 
         /// <summary>
         /// Vertex to bonespace transforms for each bone in the skeleton.
         /// </summary>
         public Matrix[] InverseBindPose { get; internal set; }
-
 
         /// <summary>
         /// For each bone in the skeleton, stores the index of the parent bone.
@@ -32,9 +29,9 @@ namespace Myre.Graphics.Animation
             existingInstance = existingInstance ?? new SkinningData();
 
             //Read bind pose
-            existingInstance.BindPose = new Matrix[input.ReadInt32()];
+            existingInstance.BindPose = new Transform[input.ReadInt32()];
             for (int i = 0; i < existingInstance.BindPose.Length; i++)
-                existingInstance.BindPose[i] = input.ReadMatrix();
+                existingInstance.BindPose[i] = new Transform { Translation = input.ReadVector3(), Scale = input.ReadVector3(), Rotation = input.ReadQuaternion() };
 
             //Read inverse bind pose
             existingInstance.InverseBindPose = new Matrix[input.ReadInt32()];

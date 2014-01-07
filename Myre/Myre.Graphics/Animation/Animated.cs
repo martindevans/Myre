@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Extensions;
 using Myre.Graphics.Animation.Clips;
 using Myre.Graphics.Geometry;
 
@@ -27,10 +26,14 @@ namespace Myre.Graphics.Animation
         private PlayingClip _fadingIn;
 
         // Current animation transform matrices.
-        Matrix[] _boneTransformTargets;
         Matrix[] _boneTransforms;
         Matrix[] _worldTransforms;
         Matrix[] _skinTransforms;
+
+        public Matrix[] TEMP_SkinTransforms
+        {
+            get { return _skinTransforms; }
+        }
 
         private SkinningData skinningData
         {
@@ -47,10 +50,10 @@ namespace Myre.Graphics.Animation
             get
             {
                 Vector3 a = Vector3.Zero;
-                if (_fadingIn != null)
-                    a += _fadingIn.RootPositionDelta;
-                if (_fadingOut != null)
-                    a += _fadingOut.RootPositionDelta;
+                //if (_fadingIn != null)
+                //    a += _fadingIn.RootPositionDelta;
+                //if (_fadingOut != null)
+                //    a += _fadingOut.RootPositionDelta;
                 return a;
             }
         }
@@ -170,10 +173,9 @@ namespace Myre.Graphics.Animation
         {
             if (model != null && model.Model != null && model.Model.SkinningData != null)
             {
-                _boneTransformTargets = new Matrix[_model.Model.SkinningData.BindPose.Length];
-                Array.Copy(_model.Model.SkinningData.BindPose, _boneTransformTargets, _boneTransformTargets.Length);
                 _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
-                Array.Copy(_model.Model.SkinningData.BindPose, _boneTransforms, _boneTransforms.Length);
+                for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
+                    BuildMatrix(_model.Model.SkinningData.BindPose[i], out _boneTransforms[i]);
 
                 _worldTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 _skinTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
@@ -225,7 +227,6 @@ namespace Myre.Graphics.Animation
         protected override void Update(float elapsedTime)
         {
             UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime));
-            UpdateBoneTransformTargets();
             UpdateBoneTransforms();
             UpdateWorldTransforms();
         }
@@ -275,31 +276,17 @@ namespace Myre.Graphics.Animation
                 return DefaultClip;
         }
 
-        private void UpdateBoneTransformTargets()
-        {
-            for (int boneIndex = 0; boneIndex < _boneTransformTargets.Length; boneIndex++)
-            {
-                Keyframe fadeOut = _fadingOut[boneIndex];
-                Keyframe fadeIn = null;
-                if (_fadingIn != null)
-                    fadeIn = _fadingIn[boneIndex];
-
-                if (fadeOut != null && fadeIn == null)
-                    _boneTransformTargets[boneIndex] = BuildMatrix(fadeOut.Position, fadeOut.Scale, fadeOut.Orientation);
-                if (fadeOut == null && fadeIn != null)
-                {
-                    throw new NotImplementedException();
-                    //_boneTransformTargets[boneIndex] = BuildInterpolatedMatrix(_boneTransforms[boneIndex].Position, _boneTransforms[boneIndex].Scale, _boneTransforms[boneIndex].Orientation, fadeIn.Position, fadeIn.Scale, fadeIn.Orientation, _crossfadeProgress);
-                }
-                if (fadeOut != null && fadeIn != null)
-                    _boneTransformTargets[boneIndex] = BuildInterpolatedMatrix(fadeOut.Position, fadeOut.Scale, fadeOut.Orientation, fadeIn.Position, fadeIn.Scale, fadeIn.Orientation, _crossfadeProgress);
-            }
-        }
-
         private void UpdateBoneTransforms()
         {
-            for (int i = 0; i < _boneTransforms.Length; i++)
-                _boneTransforms[i] = _boneTransformTargets[i];
+            for (int boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
+            {
+                if (_fadingOut != null && _fadingIn == null)
+                    BuildMatrix(_fadingOut.Transform(boneIndex), out _boneTransforms[boneIndex]);
+                if (_fadingOut == null && _fadingIn != null)
+                    BuildMatrix(_fadingIn.Transform(boneIndex), out _boneTransforms[boneIndex]);
+                if (_fadingOut != null && _fadingIn != null)
+                    BuildMatrix(_fadingOut.Transform(boneIndex).Interpolate(_fadingIn.Transform(boneIndex), _crossfadeProgress), out _boneTransforms[boneIndex]);
+            }
 
             _rootBoneTransform.Value = _boneTransforms[0];
             if (!EnableRootBoneTranslationX || !EnableRootBoneTranslationY || !EnableRootBoneTranslationZ || !EnableRootBoneScale || !EnableRootBoneRotation)
@@ -330,7 +317,10 @@ namespace Myre.Graphics.Animation
             {
                 int parentBone = skinningData.SkeletonHierarchy[bone];
 
+                //Multiply by parent bone transform
                 Matrix.Multiply(ref _boneTransforms[bone], ref _worldTransforms[parentBone], out _worldTransforms[bone]);
+
+                //Multiply by bind pose
                 Matrix.Multiply(ref skinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
             }
         }
@@ -348,45 +338,9 @@ namespace Myre.Graphics.Animation
             public bool Loop;
         }
 
-        private static Matrix BuildMatrix(Vector3 position, Vector3 scale, Quaternion orientation)
+        private static void BuildMatrix(Transform transform, out Matrix result)
         {
-            return Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(orientation) * Matrix.CreateScale(scale);
-        }
-
-        private Matrix BuildInterpolatedMatrix(Vector3 pos1, Vector3 scale1, Quaternion orientation1, Vector3 pos2, Vector3 scale2, Quaternion orientation2, float amount)
-        {
-            Quaternion interpolatedRotation = orientation1.Nlerp(orientation2, amount);
-            Vector3 interpolatedScale = Vector3.SmoothStep(scale1, scale2, amount);
-            Vector3 interpolatedTranslation = Vector3.SmoothStep(pos1, pos2, amount);
-
-            return BuildMatrix(interpolatedTranslation, interpolatedScale, interpolatedRotation);
-        }
-
-        private static Matrix SlerpMatrix(Matrix start, Matrix end, float slerpAmount)
-        {
-            slerpAmount = MathHelper.Clamp(slerpAmount, 0, 1);
-// ReSharper disable CompareOfFloatsByEqualityOperator
-            if (slerpAmount == 1)
-                return end;
-            if (slerpAmount == 0)
-                return start;
-// ReSharper restore CompareOfFloatsByEqualityOperator
-
-            Vector3 startScale;
-            Quaternion startRotation;
-            Vector3 startTranslation;
-            start.Decompose(out startScale, out startRotation, out startTranslation);
-
-            Vector3 endScale;
-            Quaternion endRotation;
-            Vector3 endTranslation;
-            end.Decompose(out endScale, out endRotation, out endTranslation);
-
-            Quaternion interpolatedRotation = startRotation.Nlerp(endRotation, slerpAmount);
-            Vector3 interpolatedScale = Vector3.SmoothStep(startScale, endScale, slerpAmount);
-            Vector3 interpolatedTranslation = Vector3.SmoothStep(startTranslation, endTranslation, slerpAmount);
-
-            return Matrix.CreateScale(interpolatedScale) * Matrix.CreateFromQuaternion(interpolatedRotation) * Matrix.CreateTranslation(interpolatedTranslation);
+            result = Matrix.CreateScale(transform.Scale) * Matrix.CreateFromQuaternion(transform.Rotation) * Matrix.CreateTranslation(transform.Translation);
         }
     }
 }

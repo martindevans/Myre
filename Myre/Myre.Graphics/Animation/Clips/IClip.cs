@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Myre.Graphics.Animation.Clips
 {
@@ -19,9 +16,9 @@ namespace Myre.Graphics.Animation.Clips
         void Start();
 
         /// <summary>
-        /// The keyframes of this animation in time order
+        /// The keyframes of this animation in time order, split by channel
         /// </summary>
-        Keyframe[] Keyframes { get; }
+        Keyframe[][] Channels { get; }
 
         /// <summary>
         /// The duration of this animation

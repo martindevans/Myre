@@ -10,9 +10,9 @@ namespace Myre.Graphics.Animation
         public int Bone { get; set; }
         public TimeSpan Time { get; set; }
 
-        public Vector3 Position { get; set; }
+        public Vector3 Translation { get; set; }
         public Vector3 Scale { get; set; }
-        public Quaternion Orientation { get; set; }
+        public Quaternion Rotation { get; set; }
 
         internal Keyframe()
         {
@@ -23,9 +23,9 @@ namespace Myre.Graphics.Animation
             Bone = bone;
             Time = time;
 
-            Position = position;
+            Translation = position;
             Scale = scale;
-            Orientation = orientaton;
+            Rotation = orientaton;
         }
 
         public override string ToString()
@@ -43,9 +43,9 @@ namespace Myre.Graphics.Animation
             existingInstance.Bone = input.ReadInt32();
             existingInstance.Time = new TimeSpan(input.ReadInt64());
 
-            existingInstance.Position = input.ReadVector3();
+            existingInstance.Translation = input.ReadVector3();
             existingInstance.Scale = input.ReadVector3();
-            existingInstance.Orientation = input.ReadQuaternion();
+            existingInstance.Rotation = input.ReadQuaternion();
 
             return existingInstance;
         }

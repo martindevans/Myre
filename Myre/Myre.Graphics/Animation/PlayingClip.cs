@@ -1,44 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Myre.Collections;
+using Myre.Extensions;
 using Myre.Graphics.Animation.Clips;
 
 namespace Myre.Graphics.Animation
 {
     internal class PlayingClip
     {
-        private readonly List<Keyframe> _keyframes = new List<Keyframe>();
-
+        private int[] _channelFrames;
         public IClip Animation { get; private set; }
 
         public TimeSpan ElapsedTime { get; private set; }
-        int _currentKeyframe;
-
-        public Keyframe this[int boneIndex]
-        {
-            get { return _keyframes[boneIndex]; }
-        }
 
         public float TimeFactor { get; set; }
         public bool Loop { get; set; }
         public TimeSpan FadeOutTime { get; set; }
 
-        private bool _firstRootFrame = true;
-        private Vector3 _rootPosition;
-        private Vector3 _rootScale;
-        private Quaternion _rootOrientation;
-
-        public Vector3 RootPositionDelta { get; private set; }
-        public Vector3 RootScaleDelta { get; private set; }
-        public Quaternion RootOrientationDelta { get; private set; }
-
-        private void ClearKeyframes(int size)
+        private void Restart()
         {
-            _keyframes.Capacity = size;
-            _keyframes.Clear();
-            for (int i = 0; i < size; i++)
-                _keyframes.Add(null);
+            ElapsedTime = TimeSpan.Zero;
+
+            for (int i = 0; i < _channelFrames.Length; i++)
+                _channelFrames[i] = 0;
         }
 
         private void Play(IClip animation, int bones)
@@ -46,10 +30,10 @@ namespace Myre.Graphics.Animation
             if (animation == null)
                 throw new ArgumentNullException("animation");
 
-            ClearKeyframes(bones);
             Animation = animation;
-            ElapsedTime = TimeSpan.Zero;
-            _currentKeyframe = 0;
+            _channelFrames = new int[animation.Channels.Length];
+
+            Restart();
         }
 
         public void Update(TimeSpan elapsedTime)
@@ -63,53 +47,41 @@ namespace Myre.Graphics.Animation
                     return;
 
                 Animation.Start();
-                _currentKeyframe = 0;
-                ElapsedTime = TimeSpan.Zero;
+                Restart();
             }
 
-            bool recalculateRootDelta = false;
-
-            // Read keyframe matrices.
-            Keyframe[] keyframes = Animation.Keyframes;
-            while (_currentKeyframe < keyframes.Length)
+            for (int i = 0; i < Animation.Channels.Length; i++)
             {
-                Keyframe keyframe = keyframes[_currentKeyframe];
+                var channel = Animation.Channels[i];
 
-                // Stop when we've read up to the current time position.
-                if (keyframe.Time > ElapsedTime)
-                    break;
-
-                // Use this keyframe.
-                _keyframes[keyframe.Bone] = keyframe;
-                recalculateRootDelta |= keyframe.Bone == 0;
-
-                _currentKeyframe++;
+                //Iterate up frames until we find the frame which is greater than the current time index for this channel
+                while (channel[_channelFrames[i]].Time < ElapsedTime)
+                    _channelFrames[i]++;
             }
+        }
 
-            if (recalculateRootDelta)
+        public Transform Transform(int channel)
+        {
+            int index = _channelFrames[channel];
+
+            //frame which is greater than or equal to the current time
+            var b = Animation.Channels[channel][index];
+            if (b.Time == ElapsedTime || index == 0)
+                return new Transform { Translation = b.Translation, Rotation = b.Rotation, Scale = b.Scale };
+
+            //Previous frame
+            var a = Animation.Channels[channel][index - 1];
+
+            //Interpolation factor between frames
+            var t = (float)((ElapsedTime - a.Time).TotalSeconds / (b.Time - a.Time).TotalSeconds);
+
+            //Linearly interpolate frames
+            return new Transform
             {
-                Vector3 pos = _keyframes[0].Position;
-                Vector3 scale = _keyframes[0].Scale;
-                Quaternion orientation = _keyframes[0].Orientation;
-
-                if (!_firstRootFrame)
-                {
-                    _firstRootFrame = false;
-                    RootPositionDelta = pos - _rootPosition;
-                    RootScaleDelta = scale - _rootScale;
-                    RootOrientationDelta = Quaternion.Inverse(_rootOrientation) * orientation;
-                }
-
-                _rootPosition = pos;
-                _rootScale = scale;
-                _rootOrientation = orientation;
-            }
-            else
-            {
-                RootOrientationDelta = Quaternion.Identity;
-                RootPositionDelta = Vector3.Zero;
-                RootScaleDelta = Vector3.Zero;
-            }
+                Translation = Vector3.Lerp(a.Translation, b.Translation, t),
+                Rotation = a.Rotation.Nlerp(b.Rotation, t),
+                Scale = Vector3.Lerp(a.Scale, b.Scale, t)
+            };
         }
 
         private static readonly Pool<PlayingClip> _pool = new Pool<PlayingClip>();
@@ -125,7 +97,6 @@ namespace Myre.Graphics.Animation
 
         internal static void Return(PlayingClip playing)
         {
-            playing._keyframes.Clear();
             playing.Animation = null;
             _pool.Return(playing);
         }

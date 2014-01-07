@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Myre.Graphics.Pipeline.Animations;
 using Myre.Graphics.Pipeline.Materials;
 
@@ -78,6 +79,8 @@ namespace Myre.Graphics.Pipeline.Models
         }
 
         private IList<BoneContent> _bones;
+        private Dictionary<string, int> _boneIndices;
+
         /// <summary>
         /// Converts incoming graphics data into our custom model format.
         /// </summary>
@@ -108,29 +111,29 @@ namespace Myre.Graphics.Pipeline.Models
             return _outputModel;
         }
 
-        /// <summary>
-        /// Bakes unwanted transforms into the model geometry,
-        /// so everything ends up in the same coordinate system.
-        /// </summary>
-        static void FlattenTransforms(NodeContent node, BoneContent skeleton)
-        {
-            foreach (NodeContent child in node.Children)
-            {
-                // Don't process the skeleton, because that is special.
-                if (child == skeleton)
-                    continue;
+        ///// <summary>
+        ///// Bakes unwanted transforms into the model geometry,
+        ///// so everything ends up in the same coordinate system.
+        ///// </summary>
+        //static void FlattenTransforms(NodeContent node, BoneContent skeleton)
+        //{
+        //    foreach (NodeContent child in node.Children)
+        //    {
+        //        // Don't process the skeleton, because that is special.
+        //        if (child == skeleton)
+        //            continue;
 
-                // Bake the local transform into the actual geometry.
-                MeshHelper.TransformScene(child, child.Transform);
+        //        // Bake the local transform into the actual geometry.
+        //        MeshHelper.TransformScene(child, child.Transform);
 
-                // Having baked it, we can now set the local
-                // coordinate system back to identity.
-                child.Transform = Matrix.Identity;
+        //        // Having baked it, we can now set the local
+        //        // coordinate system back to identity.
+        //        child.Transform = Matrix.Identity;
 
-                // Recurse.
-                FlattenTransforms(child, skeleton);
-            }
-        }
+        //        // Recurse.
+        //        FlattenTransforms(child, skeleton);
+        //    }
+        //}
 
         #region animation processing
         private void ProcessSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context)
@@ -142,6 +145,7 @@ namespace Myre.Graphics.Pipeline.Models
             }
 
             _bones = MeshHelper.FlattenSkeleton(skeleton);
+            _boneIndices = _bones.Select((a, i) => new {a, i}).ToDictionary(a => a.a.Name, a => a.i);
 
             List<Matrix> bindPose = new List<Matrix>();
             List<Matrix> inverseBindPose = new List<Matrix>();
@@ -165,6 +169,7 @@ namespace Myre.Graphics.Pipeline.Models
         #region geometry processing
         private void ProcessMesh(MeshContent mesh, ContentProcessorContext context)
         {
+            MeshHelper.MergeDuplicateVertices(mesh);
             MeshHelper.OptimizeForCache(mesh);
 
             // create texture coordinates of 0 if none are present
@@ -222,7 +227,6 @@ namespace Myre.Graphics.Pipeline.Models
             // Add the new piece of geometry to our output model.
             model.AddMesh(new MyreMeshContent
             {
-                //Parent = geometry.Parent,
                 Name = geometry.Parent.Name,
                 BoundingSphere = boundingSphere,
                 Materials = materials,
@@ -267,16 +271,16 @@ namespace Myre.Graphics.Pipeline.Models
                     continue;
                 }
 
-                bwc.NormalizeWeights(4);
                 int count = bwc.Count;
+                bwc.NormalizeWeights(4);
 
                 // Add the appropriate bone indices based on the bone names in the
                 // BoneWeightCollection
                 Vector4 bi = new Vector4(
-                    count > 0 ? FindBoneIndex(bwc[0].BoneName, _bones) : 0,
-                    count > 1 ? FindBoneIndex(bwc[1].BoneName, _bones) : 0,
-                    count > 2 ? FindBoneIndex(bwc[2].BoneName, _bones) : 0,
-                    count > 3 ? FindBoneIndex(bwc[3].BoneName, _bones) : 0
+                    count > 0 ? _boneIndices[bwc[0].BoneName] : 0,
+                    count > 1 ? _boneIndices[bwc[1].BoneName] : 0,
+                    count > 2 ? _boneIndices[bwc[2].BoneName] : 0,
+                    count > 3 ? _boneIndices[bwc[3].BoneName] : 0
                 );
                 indicesToAdd[i] = bi;
 
@@ -360,7 +364,6 @@ namespace Myre.Graphics.Pipeline.Models
         #endregion
 
         #region find texture resources
-
         private string CanonicalizeTexturePath(string texturePath, bool dxt)
         {
             if (texturePath == null)
@@ -493,16 +496,68 @@ namespace Myre.Graphics.Pipeline.Models
             return geometry.Any(item => item.Vertices.Channels.Contains(channel));
         }
 
-        public static int FindBoneIndex(string name, IList<BoneContent> bones)
+        /// <summary>
+        /// Determine if a node is a skinned node, meaning it has bone weights associated with it.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private static bool IsSkinned(NodeContent node)
         {
-            for (int i = 0; i < bones.Count; i++)
+            // It has to be a MeshContent node
+            MeshContent mesh = node as MeshContent;
+            if (mesh == null)
+                return false;
+
+            // In the geometry we have to find a vertex channel that
+            // has a bone weight collection
+            foreach (GeometryContent geometry in mesh.Geometry)
             {
-                var bone = bones[i];
-                if (bone.Name == name)
-                    return i;
+                foreach (VertexChannel vchannel in geometry.Vertices.Channels)
+                {
+                    if (vchannel is VertexChannel<BoneWeightCollection>)
+                        return true;
+                }
             }
-            
-            throw new InvalidContentException(string.Format("Found animation for bone '{0}', which is not part of the skeleton.", name));
+
+            return false;
+        }
+
+        /// <summary>
+        /// Bakes unwanted transforms into the model geometry,
+        /// so everything ends up in the same coordinate system.
+        /// </summary>
+        private static void FlattenTransforms(NodeContent node, BoneContent skeleton)
+        {
+            foreach (NodeContent child in node.Children)
+            {
+                // Don't process the skeleton, because that is special.
+                if (child == skeleton)
+                    continue;
+
+                // This is important: Don't bake in the transforms except
+                // for geometry that is part of a skinned mesh
+                if (!IsSkinned(child))
+                    continue;
+
+                FlattenAllTransforms(child);
+            }
+        }
+
+        /// <summary>
+        /// Recursively flatten all transforms from this node down
+        /// </summary>
+        /// <param name="node"></param>
+        private static void FlattenAllTransforms(NodeContent node)
+        {
+            // Bake the local transform into the actual geometry.
+            MeshHelper.TransformScene(node, node.Transform);
+
+            // Having baked it, we can now set the local
+            // coordinate system back to identity.
+            node.Transform = Matrix.Identity;
+
+            foreach (NodeContent child in node.Children)
+                FlattenAllTransforms(child);
         }
         #endregion
     }
