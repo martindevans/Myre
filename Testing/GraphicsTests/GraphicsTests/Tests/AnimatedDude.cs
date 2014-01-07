@@ -123,7 +123,7 @@ namespace GraphicsTests.Tests
                   .Then<LightingComponent>()
                 //.Then<ToneMapComponent>()
                   .Then<TranslucentComponent>()
-                  .Show("gbuffer_normals")
+                  //.Show("gbuffer_normals")
                   .Apply();
         }
 

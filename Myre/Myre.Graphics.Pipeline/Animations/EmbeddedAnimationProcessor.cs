@@ -19,12 +19,12 @@ namespace Myre.Graphics.Pipeline.Animations
         {
             NodeContent node = context.BuildAndLoadAsset<NodeContent, NodeContent>(new ExternalReference<NodeContent>(input.AnimationSourceFile), null);
 
-            Dictionary<string, AnimationContent> animations = new Dictionary<string, AnimationContent>();
-            FindAnimations(node, animations);
-            if (animations.Count() > 1)
-                throw new InvalidContentException("Animation file cannot contain more than 1 animation");
+            Dictionary<string, AnimationContent> animations = FindAnimations(node).ToDictionary(a => a.Key, a => a.Value);
 
             _bones = MeshHelper.FlattenSkeleton(MeshHelper.FindSkeleton(node));
+
+            if (!animations.ContainsKey(input.SourceTakeName))
+                throw new KeyNotFoundException(string.Format(@"Animation '{0}' not found, only options are {1}", input.SourceTakeName, animations.Keys.Aggregate((a, b) => a + "," + b)));
 
             return ProcessAnimation(input.Name, animations[input.SourceTakeName], context, input.StartFrame, input.EndFrame);
         }
@@ -44,16 +44,30 @@ namespace Myre.Graphics.Pipeline.Animations
                 // Look up what bone this channel is controlling.
                 int boneIndex = MyreModelProcessor.FindBoneIndex(channel.Key, _bones);
 
-                var keyframes = channel.Value
-                                       .Where(k => k.Time >= startFrameTime)
-                                       .Where(k => endFrame == -1 || k.Time <= endFrameTime);
+                var keyframes = channel
+                    .Value
+                    .Where(k => k.Time >= startFrameTime)
+                    .Where(k => endFrame == -1 || k.Time <= endFrameTime);
 
                 // Convert the keyframe data.
                 foreach (AnimationKeyframe keyframe in keyframes)
-                    animationClip.Keyframes.Add(new KeyframeContent(boneIndex, keyframe.Time, keyframe.Transform));
+                {
+                    //Clean up transform
+                    var transform = keyframe.Transform;
+                    transform.Right = Vector3.Normalize(transform.Right);
+                    transform.Up = Vector3.Normalize(transform.Up);
+                    transform.Backward = Vector3.Normalize(transform.Backward);
+
+                    //Decompose into parts
+                    Vector3 pos, scale;
+                    Quaternion orientation;
+                    keyframe.Transform.Decompose(out scale, out orientation, out pos);
+
+                    animationClip.Keyframes.Add(new KeyframeContent(boneIndex, keyframe.Time, pos, scale, orientation));
+                }
             }
 
-            // Sort the merged keyframes by time.
+            // Sort the merged by time.
             animationClip.Keyframes.Sort((a, b) => a.Time.CompareTo(b.Time));
 
             if (animationClip.Keyframes.Count == 0)
@@ -64,38 +78,47 @@ namespace Myre.Graphics.Pipeline.Animations
             foreach (var keyframe in animationClip.Keyframes)
                 keyframe.Time -= startTime;
 
+            //Ensure every bone has a keyframe at the start of the animation
+            for (int i = 0; i < _bones.Count; i++)
+            {
+                var firstKeyframe = animationClip.Keyframes.FirstOrDefault(a => a.Bone == i);
+                if (firstKeyframe == null || firstKeyframe.Time.Ticks == 0)
+                    continue;
+
+                animationClip.Keyframes.Add(new KeyframeContent(i, new TimeSpan(0), firstKeyframe.Position, firstKeyframe.Scale, firstKeyframe.Orientation));
+            }
+
+            // Sort the keyframes by time.
+            animationClip.Keyframes.Sort((a, b) => a.Time.CompareTo(b.Time));
+
             if (animationClip.Keyframes.Last().Time.Ticks <= TICKS_PER_60_FPS)
                 throw new InvalidContentException("Animation has < 1/60th second duration");
 
             return animationClip;
         }
 
-        TimeSpan ConvertFrameNumberToTimeSpan(int frameNumber)
+        private static TimeSpan ConvertFrameNumberToTimeSpan(int frameNumber)
         {
             const float frameTime = 1000f / 30f;
             return new TimeSpan(0, 0, 0, 0, (int)(frameNumber * frameTime));
         }
 
-        private static void FindAnimations(NodeContent node, Dictionary<string, AnimationContent> animations)
+        private static IEnumerable<KeyValuePair<string, AnimationContent>> FindAnimations(NodeContent node)
         {
             foreach (KeyValuePair<string, AnimationContent> k in node.Animations)
             {
-                if (animations.ContainsKey(k.Key))
-                    throw new InvalidOperationException(string.Format("Two animations with same name on model! {0}", k.Key));
-                else
-                {
-                    animations.Add(k.Key, k.Value);
+                yield return k;
 
-                    // Why not interpolate here?
-                    // The way animations are done is with a single take, with all the animations back to back, and EmbeddedAnimationDefinition which selects a range of frames
-                    // If we interpolate the animation to 60 fps we might end up with frame *across* two of the embedded animations
-                    // That would be bad (tm)
-                    //animations.Add(k.Key, Interpolate(k.Value));
-                }
+                // Why not interpolate here?
+                // The way animations are done is with a single take, with all the animations back to back, and EmbeddedAnimationDefinition which selects a range of frames
+                // If we interpolate the animation to 60 fps we might end up with frame *across* two of the embedded animations
+                // That would be bad (tm)
+                //yield return new KeyValuePair<string, AnimationContent>(k.Key, Interpolate(k.Value));
             }
 
             foreach (NodeContent child in node.Children)
-                FindAnimations(child, animations);
+                foreach (var childAnimation in FindAnimations(child))
+                    yield return childAnimation;
         }
 
         /// <summary>

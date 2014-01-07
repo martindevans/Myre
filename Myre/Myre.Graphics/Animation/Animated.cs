@@ -42,6 +42,20 @@ namespace Myre.Graphics.Animation
             get { return skinningData.SkeletonHierarchy.Length; }
         }
 
+        public Vector3 RootPositionDelta
+        {
+            get
+            {
+                Vector3 a = Vector3.Zero;
+                if (_fadingIn != null)
+                    a += _fadingIn.RootPositionDelta;
+                if (_fadingOut != null)
+                    a += _fadingOut.RootPositionDelta;
+                return a;
+            }
+        }
+
+
         public Action<string> OnAnimationCompleted;
 
         private Property<Matrix> _rootBoneTransform;
@@ -114,13 +128,11 @@ namespace Myre.Graphics.Animation
         }
 
         private Property<ClipPlaybackParameters> _defaultClip;
-        private Property<float> _animationSmoothing;
         #endregion
 
         #region initialise
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _animationSmoothing = context.CreateProperty<float>("animation_smoothing", 0.5f);
             _defaultClip = context.CreateProperty<ClipPlaybackParameters>("animation_default_clip");
             _rootBoneTransform = context.CreateProperty<Matrix>("animation_root_transform", Matrix.Identity);
             _enableRootBoneTranslationX = context.CreateProperty<bool>("animation_enable_root_translation_x", false);
@@ -145,6 +157,13 @@ namespace Myre.Graphics.Animation
 
             _model.ModelDataChanged += ModelChanged;
             ModelChanged(_model);
+        }
+
+        public override void Shutdown(INamedDataProvider shutdownData)
+        {
+            _model.ModelDataChanged -= ModelChanged;
+
+            base.Shutdown(shutdownData);
         }
 
         private void ModelChanged(ModelInstance model)
@@ -266,21 +285,24 @@ namespace Myre.Graphics.Animation
                     fadeIn = _fadingIn[boneIndex];
 
                 if (fadeOut != null && fadeIn == null)
-                    _boneTransformTargets[boneIndex] = fadeOut.Transform;
+                    _boneTransformTargets[boneIndex] = BuildMatrix(fadeOut.Position, fadeOut.Scale, fadeOut.Orientation);
                 if (fadeOut == null && fadeIn != null)
-                    _boneTransformTargets[boneIndex] = SlerpMatrix(_boneTransforms[boneIndex], fadeIn.Transform, _crossfadeProgress);
+                {
+                    throw new NotImplementedException();
+                    //_boneTransformTargets[boneIndex] = BuildInterpolatedMatrix(_boneTransforms[boneIndex].Position, _boneTransforms[boneIndex].Scale, _boneTransforms[boneIndex].Orientation, fadeIn.Position, fadeIn.Scale, fadeIn.Orientation, _crossfadeProgress);
+                }
                 if (fadeOut != null && fadeIn != null)
-                    _boneTransformTargets[boneIndex] = SlerpMatrix(fadeOut.Transform, fadeIn.Transform, _crossfadeProgress);
+                    _boneTransformTargets[boneIndex] = BuildInterpolatedMatrix(fadeOut.Position, fadeOut.Scale, fadeOut.Orientation, fadeIn.Position, fadeIn.Scale, fadeIn.Orientation, _crossfadeProgress);
             }
         }
 
         private void UpdateBoneTransforms()
         {
             for (int i = 0; i < _boneTransforms.Length; i++)
-                _boneTransforms[i] = SlerpMatrix(_boneTransforms[i], _boneTransformTargets[i], (1 - _animationSmoothing.Value));
+                _boneTransforms[i] = _boneTransformTargets[i];
 
             _rootBoneTransform.Value = _boneTransforms[0];
-            if (!EnableRootBoneTranslationX || !EnableRootBoneTranslationY || !EnableRootBoneTranslationZ)
+            if (!EnableRootBoneTranslationX || !EnableRootBoneTranslationY || !EnableRootBoneTranslationZ || !EnableRootBoneScale || !EnableRootBoneRotation)
             {
                 Vector3 translation, scale;
                 Quaternion rotation;
@@ -324,6 +346,20 @@ namespace Myre.Graphics.Animation
             public TimeSpan FadeInTime;
             public TimeSpan FadeOutTime;
             public bool Loop;
+        }
+
+        private static Matrix BuildMatrix(Vector3 position, Vector3 scale, Quaternion orientation)
+        {
+            return Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(orientation) * Matrix.CreateScale(scale);
+        }
+
+        private Matrix BuildInterpolatedMatrix(Vector3 pos1, Vector3 scale1, Quaternion orientation1, Vector3 pos2, Vector3 scale2, Quaternion orientation2, float amount)
+        {
+            Quaternion interpolatedRotation = orientation1.Nlerp(orientation2, amount);
+            Vector3 interpolatedScale = Vector3.SmoothStep(scale1, scale2, amount);
+            Vector3 interpolatedTranslation = Vector3.SmoothStep(pos1, pos2, amount);
+
+            return BuildMatrix(interpolatedTranslation, interpolatedScale, interpolatedRotation);
         }
 
         private static Matrix SlerpMatrix(Matrix start, Matrix end, float slerpAmount)
