@@ -41,5 +41,10 @@ namespace Myre.Graphics.Animation.Clips
         {
             get { return SelectedClip.Duration; }
         }
+
+        public int RootBoneIndex
+        {
+            get { return SelectedClip.RootBoneIndex; }
+        }
     }
 }

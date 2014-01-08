@@ -18,64 +18,41 @@ namespace Myre.Graphics.Pipeline.Animations
 
         public override ClipContent Process(MyreEmbeddedAnimationDefinition input, ContentProcessorContext context)
         {
+            //Build the content source
             NodeContent node = context.BuildAndLoadAsset<NodeContent, NodeContent>(new ExternalReference<NodeContent>(input.AnimationSourceFile), null);
 
-            Dictionary<string, AnimationContent> animations = FindAnimations(node).ToDictionary(a => a.Key, a => a.Value);
+            //Find the named animation from the content source
+            var animation = FindAnimations(node).Where(a => a.Key == input.SourceTakeName).Select(a => a.Value).FirstOrDefault();
+            if (animation == null)
+                throw new KeyNotFoundException(string.Format(@"Animation '{0}' not found, only options are {1}", input.SourceTakeName, FindAnimations(node).Select(a => a.Key).Aggregate((a, b) => a + "," + b)));
 
+            //Find the skeleton
             _bones = MeshHelper.FlattenSkeleton(MeshHelper.FindSkeleton(node));
             _boneNames = _bones.Select((a, i) => new  { a, i }).ToDictionary(a => a.a.Name, a => a.i);
 
-            if (!animations.ContainsKey(input.SourceTakeName))
-                throw new KeyNotFoundException(string.Format(@"Animation '{0}' not found, only options are {1}", input.SourceTakeName, animations.Keys.Aggregate((a, b) => a + "," + b)));
+            //The "Root" bone is not necessarily the actual root of the tree
+            //Find which bones are before and after the notional "Root" bone
+            var root = _bones[_boneNames[input.RootBone]];
+            HashSet<string> descendents = new HashSet<string>(Descendents(root).Select(b => b.Name)); //Descendents of root obviously come after root (tautology)
+            HashSet<string> ancestors = new HashSet<string>(_bones.Select(b => b.Name));              //Set of all bones, minus descendents and minus the root itself must be all ancestors of root
+            ancestors.ExceptWith(descendents);
+            ancestors.Remove(root.Name);
 
-            return ProcessAnimation(input.Name, animations[input.SourceTakeName], context, input.StartFrame, input.EndFrame);
+            return ProcessAnimation(input.Name, animation, input.StartTime, input.EndTime, ancestors, root.Name, input.FixLooping);
         }
 
-        private ClipContent ProcessAnimation(string name, AnimationContent anim, ContentProcessorContext context, int startFrame = 0, int endFrame = -1)
+        private ClipContent ProcessAnimation(string name, AnimationContent anim, float startTime, float endTime, ISet<string> preRootBones, string rootBone, bool fixLooping)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
 
-            ClipContent animationClip = new ClipContent(name, _boneNames.Count);
+            ClipContent animationClip = new ClipContent(name, _boneNames.Count, _boneNames[rootBone]);
 
-            var startFrameTime = ConvertFrameNumberToTimeSpan(startFrame);
-            var endFrameTime = ConvertFrameNumberToTimeSpan(endFrame);
+            var startFrameTime = TimeSpan.FromSeconds(startTime);
+            var endFrameTime = TimeSpan.FromSeconds(endTime);
 
             foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
-            {
-                // Look up what bone this channel is controlling.
-                int boneIndex = _boneNames[channel.Key];
-
-                //Find keyframes for this channel
-                var keyframes = channel
-                    .Value
-                    .Where(k => k.Time >= startFrameTime)
-                    .Where(k => endFrame == -1 || k.Time <= endFrameTime);
-
-                LinkedList<KeyframeContent> animationKeyframes = new LinkedList<KeyframeContent>();
-
-                // Convert the keyframe data and accumulate in a linked list
-                foreach (AnimationKeyframe keyframe in keyframes.OrderBy(a => a.Time))
-                {
-                    //Clean up transform
-                    var transform = keyframe.Transform;
-                    transform.Right = Vector3.Normalize(transform.Right);
-                    transform.Up = Vector3.Normalize(transform.Up);
-                    transform.Backward = Vector3.Normalize(transform.Backward);
-
-                    //Decompose into parts
-                    Vector3 pos, scale;
-                    Quaternion orientation;
-                    keyframe.Transform.Decompose(out scale, out orientation, out pos);
-
-                    animationKeyframes.AddLast(new KeyframeContent(boneIndex, keyframe.Time, pos, scale, orientation));
-                }
-
-                LinearKeyframeReduction(animationKeyframes);
-
-                //Add these keyframes to the animation
-                animationClip.Channels[boneIndex].AddRange(animationKeyframes);
-            }
+                ProcessChannel(animationClip, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping);
 
             if (animationClip.Channels.Any(a => a.Count == 0))
                 throw new InvalidContentException("Animation has no keyframes.");
@@ -92,24 +69,25 @@ namespace Myre.Graphics.Pipeline.Animations
             return animationClip;
         }
 
-        private static TimeSpan ConvertFrameNumberToTimeSpan(int frameNumber)
+        private IEnumerable<BoneContent> Descendents(BoneContent bone)
         {
-            const float frameTime = 1000f / 30f;
-            return new TimeSpan(0, 0, 0, 0, (int)(frameNumber * frameTime));
+            foreach (var boneContent in bone.Children.OfType<BoneContent>())
+            {
+                yield return boneContent;
+                foreach (var descendent in Descendents(boneContent))
+                    yield return descendent;
+            }
         }
 
+        /// <summary>
+        /// Find all AnimationContent which are a child of the given node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private static IEnumerable<KeyValuePair<string, AnimationContent>> FindAnimations(NodeContent node)
         {
             foreach (KeyValuePair<string, AnimationContent> k in node.Animations)
-            {
                 yield return k;
-
-                // Why not interpolate here?
-                // The way animations are done is with a single take, with all the animations back to back, and EmbeddedAnimationDefinition which selects a range of frames
-                // If we interpolate the animation to 60 fps we might end up with frame *across* two of the embedded animations
-                // That would be bad (tm)
-                //yield return new KeyValuePair<string, AnimationContent>(k.Key, Interpolate(k.Value));
-            }
 
             foreach (NodeContent child in node.Children)
                 foreach (var childAnimation in FindAnimations(child))
@@ -152,6 +130,65 @@ namespace Myre.Graphics.Pipeline.Animations
                     node = n;
                 }
             }
+        }
+
+        private void ProcessChannel(ClipContent output, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping)
+        {
+            // Look up what bone this channel is controlling.
+            int boneIndex = _boneNames[channel.Key];
+
+            //Find keyframes for this channel
+            var keyframes = channel
+                .Value
+                .Where(k => k.Time >= startFrameTime)
+                .Where(k => k.Time <= endFrameTime);
+
+            LinkedList<KeyframeContent> animationKeyframes = new LinkedList<KeyframeContent>();
+
+            //Discard any data about channels which come before the root
+            bool discard = preRoot.Contains(channel.Key);
+
+            // Convert the keyframe data and accumulate in a linked list
+            foreach (AnimationKeyframe keyframe in keyframes.OrderBy(a => a.Time))
+            {
+                //Decompose into parts
+                Vector3 pos, scale;
+                Quaternion orientation;
+                if (!discard)
+                {
+                    //Clean up transform
+                    var transform = keyframe.Transform;
+                    transform.Right = Vector3.Normalize(transform.Right);
+                    transform.Up = Vector3.Normalize(transform.Up);
+                    transform.Backward = Vector3.Normalize(transform.Backward);
+
+                    keyframe.Transform.Decompose(out scale, out orientation, out pos);
+                }
+                else
+                {
+                    pos = Vector3.Zero;
+                    scale = Vector3.One;
+                    orientation = Quaternion.Identity;
+                }
+
+                animationKeyframes.AddLast(new KeyframeContent(boneIndex, keyframe.Time, pos, scale, orientation));
+            }
+
+            if (fixLooping && !discard && !channel.Key.Equals(root, StringComparison.InvariantCulture))
+                FixLooping(animationKeyframes);
+
+            //Remove keyframes that can be estimated by linear interpolation
+            LinearKeyframeReduction(animationKeyframes);
+
+            //Add these keyframes to the animation
+            output.Channels[boneIndex].AddRange(animationKeyframes);
+        }
+
+        private void FixLooping(LinkedList<KeyframeContent> animationKeyframes)
+        {
+            animationKeyframes.Last.Value.Translation = animationKeyframes.First.Value.Translation;
+            animationKeyframes.Last.Value.Scale = animationKeyframes.First.Value.Scale;
+            animationKeyframes.Last.Value.Rotation = animationKeyframes.First.Value.Rotation;
         }
     }
 }

@@ -20,6 +20,11 @@ namespace Myre.Graphics.Animation
         /// For each bone in the skeleton, stores the index of the parent bone.
         /// </summary>
         public int[] SkeletonHierarchy { get; internal set; }
+
+        /// <summary>
+        /// Names of the bones
+        /// </summary>
+        public string[] Names { get; internal set; }
     }
 
     public class SkinningDataReader : ContentTypeReader<SkinningData>
@@ -42,6 +47,10 @@ namespace Myre.Graphics.Animation
             existingInstance.SkeletonHierarchy = new int[input.ReadInt32()];
             for (int i = 0; i < existingInstance.SkeletonHierarchy.Length; i++)
                 existingInstance.SkeletonHierarchy[i] = input.ReadInt32();
+
+            existingInstance.Names = new string[input.ReadInt32()];
+            for (int i = 0; i < existingInstance.Names.Length; i++)
+                existingInstance.Names[i] = input.ReadString();
 
             return existingInstance;
         }

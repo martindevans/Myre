@@ -12,6 +12,8 @@ namespace Myre.Graphics.Animation.Clips
 
         public TimeSpan Duration { get; internal set; }
 
+        public int RootBoneIndex { get; internal set; }
+
         public void Start()
         {
         }
@@ -39,6 +41,8 @@ namespace Myre.Graphics.Animation.Clips
                 for (int j = 0; j < existingInstance.Channels[i].Length; j++)
                     existingInstance.Channels[i][j] = input.ReadObject<Keyframe>();
             }
+
+            existingInstance.RootBoneIndex = input.ReadInt32();
 
             return existingInstance;
         }

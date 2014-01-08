@@ -24,5 +24,10 @@ namespace Myre.Graphics.Animation.Clips
         /// The duration of this animation
         /// </summary>
         TimeSpan Duration { get; }
+
+        /// <summary>
+        /// Get the index of the root bone of this animation
+        /// </summary>
+        int RootBoneIndex { get; }
     }
 }

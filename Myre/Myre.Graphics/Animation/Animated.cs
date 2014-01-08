@@ -30,11 +30,6 @@ namespace Myre.Graphics.Animation
         Matrix[] _worldTransforms;
         Matrix[] _skinTransforms;
 
-        public Matrix[] TEMP_SkinTransforms
-        {
-            get { return _skinTransforms; }
-        }
-
         private SkinningData skinningData
         {
             get { return _model.Model.SkinningData; }
@@ -45,27 +40,13 @@ namespace Myre.Graphics.Animation
             get { return skinningData.SkeletonHierarchy.Length; }
         }
 
-        public Vector3 RootPositionDelta
-        {
-            get
-            {
-                Vector3 a = Vector3.Zero;
-                //if (_fadingIn != null)
-                //    a += _fadingIn.RootPositionDelta;
-                //if (_fadingOut != null)
-                //    a += _fadingOut.RootPositionDelta;
-                return a;
-            }
-        }
-
-
         public Action<string> OnAnimationCompleted;
 
-        private Property<Matrix> _rootBoneTransform;
+        private Property<Transform> _rootBoneTransform;
         /// <summary>
         /// The transformation of the root bone
         /// </summary>
-        public Matrix RootBoneTransfomation
+        public Transform RootBoneTransfomationDelta
         {
             get { return _rootBoneTransform.Value; }
             set { _rootBoneTransform.Value = value; }
@@ -137,7 +118,7 @@ namespace Myre.Graphics.Animation
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             _defaultClip = context.CreateProperty<ClipPlaybackParameters>("animation_default_clip");
-            _rootBoneTransform = context.CreateProperty<Matrix>("animation_root_transform", Matrix.Identity);
+            _rootBoneTransform = context.CreateProperty<Transform>("animation_root_transform", Transform.Identity);
             _enableRootBoneTranslationX = context.CreateProperty<bool>("animation_enable_root_translation_x", false);
             _enableRootBoneTranslationY = context.CreateProperty<bool>("animation_enable_root_translation_y", false);
             _enableRootBoneTranslationZ = context.CreateProperty<bool>("animation_enable_root_translation_z", false);
@@ -175,7 +156,7 @@ namespace Myre.Graphics.Animation
             {
                 _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
-                    BuildMatrix(_model.Model.SkinningData.BindPose[i], out _boneTransforms[i]);
+                    BuildMatrix(ref _model.Model.SkinningData.BindPose[i], out _boneTransforms[i]);
 
                 _worldTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 _skinTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
@@ -227,7 +208,7 @@ namespace Myre.Graphics.Animation
         protected override void Update(float elapsedTime)
         {
             UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime));
-            UpdateBoneTransforms();
+            UpdateBoneTransforms(elapsedTime);
             UpdateWorldTransforms();
         }
 
@@ -276,34 +257,56 @@ namespace Myre.Graphics.Animation
                 return DefaultClip;
         }
 
-        private void UpdateBoneTransforms()
+        private void UpdateBoneTransforms(float deltaTime)
         {
             for (int boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
             {
+                Transform transform;
                 if (_fadingOut != null && _fadingIn == null)
-                    BuildMatrix(_fadingOut.Transform(boneIndex), out _boneTransforms[boneIndex]);
-                if (_fadingOut == null && _fadingIn != null)
-                    BuildMatrix(_fadingIn.Transform(boneIndex), out _boneTransforms[boneIndex]);
-                if (_fadingOut != null && _fadingIn != null)
-                    BuildMatrix(_fadingOut.Transform(boneIndex).Interpolate(_fadingIn.Transform(boneIndex), _crossfadeProgress), out _boneTransforms[boneIndex]);
+                    transform = _fadingOut.Transform(boneIndex);
+                else if (_fadingOut == null && _fadingIn != null)
+                    transform = _fadingIn.Transform(boneIndex);
+                else if (_fadingOut != null && _fadingIn != null)
+                    transform = _fadingOut.Transform(boneIndex).Interpolate(_fadingIn.Transform(boneIndex), _crossfadeProgress);
+                else
+                    throw new InvalidOperationException("No active animations");
+
+                if (_fadingIn != null && boneIndex == _fadingIn.Animation.RootBoneIndex)
+                    BuildRootBoneMatrix(ref transform, out _boneTransforms[boneIndex]);
+                else if (_fadingOut != null && boneIndex == _fadingOut.Animation.RootBoneIndex)
+                    BuildRootBoneMatrix(ref transform, out _boneTransforms[boneIndex]);
+                else
+                    BuildMatrix(ref transform, out _boneTransforms[boneIndex]);
             }
 
-            _rootBoneTransform.Value = _boneTransforms[0];
+            if (_fadingOut != null && _fadingIn != null)
+            {
+                RootBoneTransfomationDelta = _fadingOut.Delta(_fadingOut.Animation.RootBoneIndex).Interpolate(_fadingIn.Delta(_fadingIn.Animation.RootBoneIndex), _crossfadeProgress);
+            }
+            else if (_fadingOut != null)
+                RootBoneTransfomationDelta = _fadingOut.Delta(_fadingOut.Animation.RootBoneIndex);
+            else if (_fadingIn != null)
+                RootBoneTransfomationDelta = _fadingIn.Delta(_fadingIn.Animation.RootBoneIndex);
+            else
+                throw new InvalidOperationException("No root bone motion found");
+        }
+
+        private void BuildRootBoneMatrix(ref Transform transform, out Matrix m)
+        {
             if (!EnableRootBoneTranslationX || !EnableRootBoneTranslationY || !EnableRootBoneTranslationZ || !EnableRootBoneScale || !EnableRootBoneRotation)
             {
-                Vector3 translation, scale;
-                Quaternion rotation;
-                _boneTransforms[0].Decompose(out scale, out rotation, out translation);
-
-                _boneTransforms[0] =
-                    (EnableRootBoneScale ? Matrix.CreateScale(scale) : Matrix.Identity) *
-                    (EnableRootBoneRotation ? Matrix.CreateFromQuaternion(rotation) : Matrix.Identity) *
+                m = (EnableRootBoneScale ? Matrix.CreateScale(transform.Scale) : Matrix.Identity) *
+                    (EnableRootBoneRotation ? Matrix.CreateFromQuaternion(transform.Rotation) : Matrix.Identity) *
                     Matrix.CreateTranslation(new Vector3(
-                        EnableRootBoneTranslationX ? translation.X : 0,
-                        EnableRootBoneTranslationY ? translation.Y : 0,
-                        EnableRootBoneTranslationZ ? translation.Z : 0
+                        EnableRootBoneTranslationX ? transform.Translation.X : 0,
+                        EnableRootBoneTranslationY ? transform.Translation.Y : 0,
+                        EnableRootBoneTranslationZ ? transform.Translation.Z : 0
                     )
                 );
+            }
+            else
+            {
+                BuildMatrix(ref transform, out m);
             }
         }
 
@@ -338,7 +341,7 @@ namespace Myre.Graphics.Animation
             public bool Loop;
         }
 
-        private static void BuildMatrix(Transform transform, out Matrix result)
+        private static void BuildMatrix(ref Transform transform, out Matrix result)
         {
             result = Matrix.CreateScale(transform.Scale) * Matrix.CreateFromQuaternion(transform.Rotation) * Matrix.CreateTranslation(transform.Translation);
         }

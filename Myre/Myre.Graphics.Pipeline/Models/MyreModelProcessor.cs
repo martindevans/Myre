@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Myre.Graphics.Pipeline.Animations;
 using Myre.Graphics.Pipeline.Materials;
 
@@ -111,30 +110,6 @@ namespace Myre.Graphics.Pipeline.Models
             return _outputModel;
         }
 
-        ///// <summary>
-        ///// Bakes unwanted transforms into the model geometry,
-        ///// so everything ends up in the same coordinate system.
-        ///// </summary>
-        //static void FlattenTransforms(NodeContent node, BoneContent skeleton)
-        //{
-        //    foreach (NodeContent child in node.Children)
-        //    {
-        //        // Don't process the skeleton, because that is special.
-        //        if (child == skeleton)
-        //            continue;
-
-        //        // Bake the local transform into the actual geometry.
-        //        MeshHelper.TransformScene(child, child.Transform);
-
-        //        // Having baked it, we can now set the local
-        //        // coordinate system back to identity.
-        //        child.Transform = Matrix.Identity;
-
-        //        // Recurse.
-        //        FlattenTransforms(child, skeleton);
-        //    }
-        //}
-
         #region animation processing
         private void ProcessSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context)
         {
@@ -161,7 +136,8 @@ namespace Myre.Graphics.Pipeline.Models
             _outputModel.SkinningData = new SkinningDataContent(
                 bindPose,
                 inverseBindPose,
-                skeletonHierarchy
+                skeletonHierarchy,
+                _bones.Select(b => b.Name).ToList()
             );
         }
         #endregion
@@ -352,7 +328,7 @@ namespace Myre.Graphics.Pipeline.Models
             if (diffuseTexture == null)
                 return;
 
-            var materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(GBufferEffectName), Technique = GBufferTechnique ?? (animated ? "Animated" : "Default") };
+            var materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(_gbufferEffectName), Technique = _gbufferTechnique ?? (animated ? "Animated" : "Default") };
 
             materialData.Textures.Add("DiffuseMap", diffuseTexture);
             materialData.Textures.Add("NormalMap", normalTexture);

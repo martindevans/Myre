@@ -12,12 +12,14 @@ namespace Myre.Graphics.Pipeline.Animations
         public List<Matrix> BindPose { get; private set; }
         public List<Matrix> InverseBindPose { get; private set; }
         public List<int> Hierarchy { get; private set; }
+        public List<string> BoneNames { get; private set; }
 
-        public SkinningDataContent(List<Matrix> bindPose, List<Matrix> inverseBindPose, List<int> hierarchy)
+        public SkinningDataContent(List<Matrix> bindPose, List<Matrix> inverseBindPose, List<int> hierarchy, List<string> names)
         {
             BindPose = bindPose;
             InverseBindPose = inverseBindPose;
             Hierarchy = hierarchy;
+            BoneNames = names;
         }
     }
 
@@ -48,6 +50,11 @@ namespace Myre.Graphics.Pipeline.Animations
             output.Write(value.Hierarchy.Count);
             foreach (var i in value.Hierarchy)
                 output.Write(i);
+
+            //Write names
+            output.Write(value.BoneNames.Count);
+            foreach (var boneName in value.BoneNames)
+                output.Write(boneName);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
