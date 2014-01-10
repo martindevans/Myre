@@ -49,5 +49,23 @@ namespace Myre.Extensions
         {
             return new Int3((int) v.X, (int) v.Y, (int) v.Z);
         }
+
+        /// <summary>
+        /// Performs CatmullRom spline interpolation between vectors
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="c"></param>
+        /// <param name="d"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static Vector3 CatmullRom(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t)
+        {
+            var x = MathHelper.CatmullRom(a.X, b.X, c.X, d.X, t);
+            var y = MathHelper.CatmullRom(a.Y, b.Y, c.Y, d.Y, t);
+            var z = MathHelper.CatmullRom(a.Z, b.Z, c.Z, d.Z, t);
+
+            return new Vector3(x, y, z);
+        }
     }
 }

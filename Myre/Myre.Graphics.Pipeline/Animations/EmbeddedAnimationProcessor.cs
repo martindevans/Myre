@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -51,11 +52,16 @@ namespace Myre.Graphics.Pipeline.Animations
             var startFrameTime = TimeSpan.FromSeconds(startTime);
             var endFrameTime = TimeSpan.FromSeconds(endTime);
 
-            foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
-                ProcessChannel(animationClip, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping);
+            Parallel.ForEach(anim.Channels, channel =>
+            //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
+                {
+                    int boneIndex = _boneNames[channel.Key];
+                    animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping).ToArray();
+                }
+            );
 
-            if (animationClip.Channels.Any(a => a.Count == 0))
-                throw new InvalidContentException("Animation has no keyframes.");
+            if (animationClip.Channels.Any(a => a.Length == 0))
+                throw new InvalidContentException("Animation has no keyframes for a channel.");
 
             // Sort the keyframes by time.
             animationClip.SortKeyframes();
@@ -67,6 +73,56 @@ namespace Myre.Graphics.Pipeline.Animations
             animationClip.InsertStartFrames();
 
             return animationClip;
+        }
+
+        private static IEnumerable<KeyframeContent> ProcessChannel(int boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping)
+        {
+            //Find keyframes for this channel
+            var keyframes = channel
+                .Value
+                .Where(k => k.Time >= startFrameTime)
+                .Where(k => k.Time <= endFrameTime);
+
+            LinkedList<KeyframeContent> animationKeyframes = new LinkedList<KeyframeContent>();
+
+            //Discard any data about channels which come before the root
+            bool discard = preRoot.Contains(channel.Key);
+
+            // Convert the keyframe data and accumulate in a linked list
+            foreach (AnimationKeyframe keyframe in keyframes.OrderBy(a => a.Time))
+            {
+                //Decompose into parts
+                Vector3 pos, scale;
+                Quaternion orientation;
+                if (!discard)
+                {
+                    //Clean up transform
+                    var transform = keyframe.Transform;
+                    transform.Right = Vector3.Normalize(transform.Right);
+                    transform.Up = Vector3.Normalize(transform.Up);
+                    transform.Backward = Vector3.Normalize(transform.Backward);
+
+                    keyframe.Transform.Decompose(out scale, out orientation, out pos);
+                }
+                else
+                {
+                    pos = Vector3.Zero;
+                    scale = Vector3.One;
+                    orientation = Quaternion.Identity;
+                }
+
+                animationKeyframes.AddLast(new KeyframeContent(boneIndex, keyframe.Time, pos, scale, orientation));
+            }
+
+            //If necessary copy the first keyframe into the data of the last keyframe
+            if (fixLooping && !discard && !channel.Key.Equals(root, StringComparison.InvariantCulture))
+                FixLooping(animationKeyframes, endFrameTime);
+
+            //Remove keyframes that can be estimated by linear interpolation
+            LinearKeyframeReduction(animationKeyframes);
+
+            //Add these keyframes to the animation
+            return animationKeyframes;
         }
 
         private IEnumerable<BoneContent> Descendents(BoneContent bone)
@@ -132,63 +188,23 @@ namespace Myre.Graphics.Pipeline.Animations
             }
         }
 
-        private void ProcessChannel(ClipContent output, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping)
+        /// <summary>
+        /// Make sure that the frame at the end of this channel has the same data as the frame at the start of this channel
+        /// </summary>
+        /// <param name="animationKeyframes"></param>
+        /// <param name="endFrameTime"></param>
+        private static void FixLooping(LinkedList<KeyframeContent> animationKeyframes, TimeSpan endFrameTime)
         {
-            // Look up what bone this channel is controlling.
-            int boneIndex = _boneNames[channel.Key];
-
-            //Find keyframes for this channel
-            var keyframes = channel
-                .Value
-                .Where(k => k.Time >= startFrameTime)
-                .Where(k => k.Time <= endFrameTime);
-
-            LinkedList<KeyframeContent> animationKeyframes = new LinkedList<KeyframeContent>();
-
-            //Discard any data about channels which come before the root
-            bool discard = preRoot.Contains(channel.Key);
-
-            // Convert the keyframe data and accumulate in a linked list
-            foreach (AnimationKeyframe keyframe in keyframes.OrderBy(a => a.Time))
+            if (animationKeyframes.Last.Value.Time == endFrameTime)
             {
-                //Decompose into parts
-                Vector3 pos, scale;
-                Quaternion orientation;
-                if (!discard)
-                {
-                    //Clean up transform
-                    var transform = keyframe.Transform;
-                    transform.Right = Vector3.Normalize(transform.Right);
-                    transform.Up = Vector3.Normalize(transform.Up);
-                    transform.Backward = Vector3.Normalize(transform.Backward);
-
-                    keyframe.Transform.Decompose(out scale, out orientation, out pos);
-                }
-                else
-                {
-                    pos = Vector3.Zero;
-                    scale = Vector3.One;
-                    orientation = Quaternion.Identity;
-                }
-
-                animationKeyframes.AddLast(new KeyframeContent(boneIndex, keyframe.Time, pos, scale, orientation));
+                animationKeyframes.Last.Value.Translation = animationKeyframes.First.Value.Translation;
+                animationKeyframes.Last.Value.Scale = animationKeyframes.First.Value.Scale;
+                animationKeyframes.Last.Value.Rotation = animationKeyframes.First.Value.Rotation;
             }
-
-            if (fixLooping && !discard && !channel.Key.Equals(root, StringComparison.InvariantCulture))
-                FixLooping(animationKeyframes);
-
-            //Remove keyframes that can be estimated by linear interpolation
-            LinearKeyframeReduction(animationKeyframes);
-
-            //Add these keyframes to the animation
-            output.Channels[boneIndex].AddRange(animationKeyframes);
-        }
-
-        private void FixLooping(LinkedList<KeyframeContent> animationKeyframes)
-        {
-            animationKeyframes.Last.Value.Translation = animationKeyframes.First.Value.Translation;
-            animationKeyframes.Last.Value.Scale = animationKeyframes.First.Value.Scale;
-            animationKeyframes.Last.Value.Rotation = animationKeyframes.First.Value.Rotation;
+            else if (animationKeyframes.Last.Value.Time > endFrameTime)
+                throw new ArgumentException("Last frame comes after the end of the animation", "endFrameTime");
+            else
+                animationKeyframes.AddLast(new KeyframeContent(animationKeyframes.Last.Value.Bone, endFrameTime, animationKeyframes.First.Value.Translation, animationKeyframes.First.Value.Scale, animationKeyframes.First.Value.Rotation));
         }
     }
 }
