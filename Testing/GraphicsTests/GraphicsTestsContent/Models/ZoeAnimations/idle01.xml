@@ -3,9 +3,10 @@
   <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
     
     <AnimationSourceFile>Models/zoe.fbx</AnimationSourceFile>
-    <SourceTakeName>Take 001</SourceTakeName>
-    <StartFrame>495</StartFrame>
-    <EndFrame>590</EndFrame>
-    <Name>idle01</Name>
+    <SourceTakeName>DefaultAction</SourceTakeName>
+    <StartTime>19.8</StartTime>
+    <EndTime>23.6</EndTime>
+    <RootBone>MotionRoot</RootBone>
+		<FixLooping>false</FixLooping>
   </Asset>
 </XnaContent>

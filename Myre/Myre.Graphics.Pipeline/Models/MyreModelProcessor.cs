@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Pipeline.Animations;
 using Myre.Graphics.Pipeline.Materials;
@@ -503,7 +504,7 @@ namespace Myre.Graphics.Pipeline.Models
             var vertexBufferContent = geometry.Vertices.CreateVertexBuffer();
 
             // Convert the input material.
-            var materials = ProcessMaterial(geometry.Material, geometry.Parent);
+            var materials = ProcessMaterial(geometry.Material, geometry.Parent, context);
             
             // Add the new piece of geometry to our output model.
             model.AddMesh(new MyreMeshContent
@@ -591,7 +592,7 @@ namespace Myre.Graphics.Pipeline.Models
         /// Creates default materials suitable for rendering in the myre deferred renderer.
         /// The current material is searched for diffuse, normal and specular textures.
         /// </summary>
-        Dictionary<string, MyreMaterialContent> ProcessMaterial(MaterialContent material, MeshContent mesh)
+        Dictionary<string, MyreMaterialContent> ProcessMaterial(MaterialContent material, MeshContent mesh, ContentProcessorContext context)
         {
             //material = context.Convert<MaterialContent, MaterialContent>(material, "MaterialProcessor");
             if (material == null)
@@ -604,7 +605,7 @@ namespace Myre.Graphics.Pipeline.Models
                 _processedMaterials[material] = new Dictionary<string, MyreMaterialContent>();
 
                 bool animatedMaterials = MeshHelper.FindSkeleton(mesh) != null;
-                CreateGBufferMaterial(material, mesh, animatedMaterials);
+                CreateGBufferMaterial(material, mesh, animatedMaterials, context);
                 CreateShadowMaterial(material, animatedMaterials);
             }
 
@@ -624,11 +625,11 @@ namespace Myre.Graphics.Pipeline.Models
             _processedMaterials[material].Add("shadows_viewz", shadowMaterial);
         }
 
-        private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated)
+        private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated, ContentProcessorContext context)
         {
-            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material));
-            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material));
-            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material));
+            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material, context));
+            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material, context));
+            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material, context));
 
             if (diffuseTexture == null)
                 return;
@@ -665,11 +666,25 @@ namespace Myre.Graphics.Pipeline.Models
             return Path.Combine(dirname, filename);
         }
 
-        private string FindDiffuseTexture(MeshContent mesh, MaterialContent material)
+        private string MakeRelative(string fromPath, string toPath)
+        {
+            Uri from = new Uri(fromPath);
+            Uri to = new Uri(toPath);
+
+            Uri relative = from.MakeRelativeUri(to);
+            string path = Uri.UnescapeDataString(relative.ToString()).Replace('/', Path.DirectorySeparatorChar);
+
+            var filename = Path.GetFileNameWithoutExtension(path);
+            var dirname = Path.GetDirectoryName(path);
+
+            return Path.Combine(dirname, filename);
+        }
+
+        private string FindDiffuseTexture(MeshContent mesh, MaterialContent material, ContentProcessorContext context)
         {
             if (string.IsNullOrEmpty(DiffuseTexture))
             {
-                var texture = FindTexture(mesh, material, "texture", "diffuse", "diff", "d", "c");
+                var texture = FindTexture(mesh, material, context, true, "texture", "diffuse", "diff", "d", "c");
 
                 if (texture != null)
                     return texture;
@@ -682,30 +697,41 @@ namespace Myre.Graphics.Pipeline.Models
             return DiffuseTexture;
         }
 
-        private string FindNormalTexture(MeshContent mesh, MaterialContent material)
+        private string FindNormalTexture(MeshContent mesh, MaterialContent material, ContentProcessorContext context)
         {
             if (string.IsNullOrEmpty(NormalTexture))
-                return FindTexture(mesh, material, "normalmap", "normal", "norm", "n", "bumpmap", "bump", "b") ?? "null_normal";
+                return FindTexture(mesh, material, context, false, "normalmap", "normal", "norm", "n", "bumpmap", "bump", "b") ?? "null_normal";
 // ReSharper disable AssignNullToNotNullAttribute
             return Path.Combine(_directory, Path.GetFileNameWithoutExtension(NormalTexture));
 // ReSharper restore AssignNullToNotNullAttribute
         }
 
-        private string FindSpecularTexture(MeshContent mesh, MaterialContent material)
+        private string FindSpecularTexture(MeshContent mesh, MaterialContent material, ContentProcessorContext context)
         {
             if (string.IsNullOrEmpty(SpecularTexture))
-                return FindTexture(mesh, material, "specularmap", "specular", "spec", "s") ?? "null_specular";
+                return FindTexture(mesh, material, context, true, "specularmap", "specular", "spec", "s") ?? "null_specular";
 // ReSharper disable AssignNullToNotNullAttribute
             return Path.Combine(_directory, Path.GetFileNameWithoutExtension(SpecularTexture));
 // ReSharper restore AssignNullToNotNullAttribute
         }
 
-        private string FindTexture(MeshContent mesh, MaterialContent material, params string[] possibleKeys)
+        private string FindTexture(MeshContent mesh, MaterialContent material, ContentProcessorContext context, bool allowDxt, params string[] possibleKeys)
         {
+            //Find a path to the unbuilt content
             var path = FindTexturePath(mesh, material, possibleKeys);
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 return null;
-            return path;
+
+            //Build the content
+            var contentItem = _context.BuildAsset<TextureContent, TextureContent>(new ExternalReference<TextureContent>(path), "TextureProcessor", new OpaqueDataDictionary
+            {
+                { "GenerateMipmaps", true },
+                { "TextureFormat", allowDxt ? TextureProcessorOutputFormat.DxtCompressed : TextureProcessorOutputFormat.Color },
+
+            }, null, null);
+
+            //Return the path (relative to the output root) to this item
+            return MakeRelative(context.OutputDirectory, contentItem.Filename);
         }
 
         private string FindTexturePath(MeshContent mesh, MaterialContent material, string[] possibleKeys)
@@ -747,14 +773,9 @@ namespace Myre.Graphics.Pipeline.Models
             }
 
             // try and find the file in the meshs' directory
-            foreach (var key in possibleKeys)
-            {
-                foreach (var file in Directory.EnumerateFiles(_directory, mesh.Name + "_" + key + ".*", SearchOption.AllDirectories))
-                    return file;
-            }
-
-            // cant find anything
-            return null;
+            return possibleKeys
+                .SelectMany(key => Directory.EnumerateFiles(_directory, mesh.Name + "_" + key + ".*", SearchOption.AllDirectories))
+                .FirstOrDefault();
         }
         #endregion
 

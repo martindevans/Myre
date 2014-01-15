@@ -39,6 +39,8 @@ namespace GraphicsTests
         Vector3 cameraRotation;
         CameraScript cameraScript;
 
+        private ModelInstance _sponza;
+
         public Scene Scene
         {
             get { return scene; }
@@ -194,19 +196,6 @@ namespace GraphicsTests
             //floorEntity.AddBehaviour<ModelInstance>();
             //scene.Add(floorEntity.Create());
 
-            var lizardModel = content.Load<ModelData>(@"Models\lizard");
-            var lizard = kernel.Get<EntityDescription>();
-            lizard.AddProperty<ModelData>("model");
-            lizard.AddProperty<Matrix>("transform");
-            lizard.AddProperty<bool>("is_static");
-            var lizardEntity = lizard.Create();
-            lizardEntity.GetProperty<ModelData>("model").Value = lizardModel;
-            lizardEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(50 / 700f) * Matrix.CreateTranslation(150, 0, 0);
-            lizardEntity.GetProperty<bool>("is_static").Value = true;
-            lizard.AddBehaviour<ModelInstance>();
-
-            scene.Add(lizardEntity);
-
             //var ship1 = content.Load<ModelData>(@"Models\Ship1");
             //var ship1Entity = kernel.Get<EntityDescription>();
             //ship1Entity.AddProperty<ModelData>("model", ship1);
@@ -221,13 +210,13 @@ namespace GraphicsTests
             hebe.AddProperty<Matrix>("transform");
             hebe.AddProperty<bool>("is_static");
             hebe.AddBehaviour<ModelInstance>();
-            //var hebeEntity = hebe.Create();
-            //hebeEntity.GetProperty<ModelData>("model").Value = hebeModel;
-            //hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
-            //                                                        * Matrix.CreateRotationY(MathHelper.PiOver2)
-            //                                                        * Matrix.CreateTranslation(-150, 20, 0);
-            //hebeEntity.GetProperty<bool>("is_static").Value = true;
-            //scene.Add(hebeEntity);
+            var hebeEntity = hebe.Create();
+            hebeEntity.GetProperty<ModelData>("model").Value = hebeModel;
+            hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
+                                                                    * Matrix.CreateRotationY(MathHelper.PiOver2)
+                                                                    * Matrix.CreateTranslation(-150, 20, 0);
+            hebeEntity.GetProperty<bool>("is_static").Value = true;
+            scene.Add(hebeEntity);
 
             //var dudeModel = content.Load<ModelData>(@"dude");
             //var dude = kernel.Get<EntityDescription>();
@@ -245,7 +234,7 @@ namespace GraphicsTests
             lightBlocker.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
-            lightBlocker.GetProperty<bool>("is_static").Value = true;
+            lightBlocker.GetProperty<bool>("is_static").Value = false;
             scene.Add(lightBlocker);
 
             var sponzaModel = content.Load<ModelData>(@"Sponza");
@@ -259,6 +248,7 @@ namespace GraphicsTests
             sponzaEntity.GetProperty<Matrix>("transform").Value = Matrix.Identity * Matrix.CreateScale(1);
             sponzaEntity.GetProperty<bool>("is_static").Value = true;
             scene.Add(sponzaEntity);
+            _sponza = sponzaEntity.GetBehaviour<ModelInstance>();
 
             var renderer = scene.GetService<Renderer>();
             resolution = renderer.Data.Get<Vector2>("resolution");

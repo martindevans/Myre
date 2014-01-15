@@ -23,16 +23,9 @@ namespace GraphicsTests.Tests
 
         private readonly string[] _sequence = new string[]
         {
-            //"walk01"
-            "walk01","walk01","walk01","walk03","walk03",
-            "death02", "get-up",
-            "run01","run02","run03","run01",
-            "run-jump","roll-forward","run01",
-            "run_ready-shoot","run_ready-shoot",
-            "run_shooting","run_shooting", "run_shooting",
-            "firing01","firing02","firing03","firing03","walk_shooting",
-            "walk01", "walk02", "walk01", "walk03",
-            "emo03", "walk03", "chat01"
+            "idle01"
+            //"idle01", "idle02", "jump", "roll-backward-0", "roll-forward-0", "roll-left-0", "roll-right-0", "run-forward-0", "run-forward-1", "run-forward-2",
+            //"run-forward_jump-0", "sitting", "strafe-left-0", "strafe-right-0", "swim-forward-0", "walk-backward-0", "walk-forward-0", "walk-forward-1", "walk-forward-2"
         };
 
         public AnimatedDude(IKernel kernel, ContentManager content, GraphicsDevice device)
@@ -123,7 +116,7 @@ namespace GraphicsTests.Tests
                   .Then<LightingComponent>()
                 //.Then<ToneMapComponent>()
                   .Then<TranslucentComponent>()
-                  //.Show("gbuffer_normals")
+                  .Show("gbuffer_normals")
                   .Apply();
         }
 
@@ -134,11 +127,7 @@ namespace GraphicsTests.Tests
 
             var anim = _dude.Owner.GetBehaviour<Animated>();
 
-            Vector3 position, scale;
-            Quaternion rotation;
-            anim.RootBoneTransfomation.Decompose(out scale, out rotation, out position);
-
-            //_dude.Transform = Matrix.CreateTranslation(new Vector3(position.X, 0, position.Z));
+            //_dude.Transform = Matrix.CreateTranslation(new Vector3(anim.RootBoneTransfomationDelta.Translation.X, 0, anim.RootBoneTransfomationDelta.Translation.Z));
         }
 
         public override void Draw(GameTime gameTime)

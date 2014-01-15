@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline.Animations">
   <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
-    
     <AnimationSourceFile>Models/zoe.fbx</AnimationSourceFile>
-    <SourceTakeName>Take 001</SourceTakeName>
-    <StartFrame>595</StartFrame>
-    <EndFrame>770</EndFrame>
-    <Name>idle02</Name>
+    <SourceTakeName>DefaultAction</SourceTakeName>
+    <StartTime>23.8</StartTime>
+    <EndTime>30.8</EndTime>
+    <RootBone>MotionRoot</RootBone>
+		<FixLooping>true</FixLooping>
   </Asset>
 </XnaContent>
