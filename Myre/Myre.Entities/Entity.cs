@@ -31,21 +31,26 @@ namespace Myre.Entities
         public sealed class ConstructionContext
         {
             private readonly Entity _entity;
-            internal bool Frozen;
+            private readonly Behaviour _behaviour;
 
-            internal ConstructionContext(Entity entity)
+            internal bool Frozen = false;
+
+            internal ConstructionContext(Entity entity, Behaviour behaviour)
             {
                 _entity = entity;
+                _behaviour = behaviour;
             }
 
             public Property<T> CreateProperty<T>(TypedName<T> name, T value = default(T))
             {
                 CheckFrozen();
 
-                var property = _entity.GetProperty<T>(name);
+                string fullName = _behaviour.GetFullPropertyName(name.Name);
+
+                var property = _entity.GetProperty(new TypedName<T>(fullName));
                 if (property == null)
                 {
-                    property = new Property<T>(name.Name) {Value = value};
+                    property = new Property<T>(fullName) { Value = value };
                     _entity.AddProperty(property);
                 }
 
@@ -64,8 +69,6 @@ namespace Myre.Entities
 
         private readonly List<IProperty> _propertiesList;
         private readonly List<Behaviour> _behavioursList;
-
-        private readonly ConstructionContext _constructionContext;
 
         public EntityVersion Version { get; private set; }
 
@@ -135,9 +138,6 @@ namespace Myre.Entities
 
             BehavioursIndex = new ReadOnlyDictionary<Type, Behaviour[]>(_behaviours);
 
-            // create initialisation context
-            _constructionContext = new ConstructionContext(this);
-
             // allow behaviours to add their own properties
             CreateProperties();
         }
@@ -179,14 +179,15 @@ namespace Myre.Entities
 
         private void CreateProperties()
         {
-            _constructionContext.Frozen = false;
-
             foreach (var item in Behaviours)
             {
-                item.CreateProperties(_constructionContext);
+                var context = new ConstructionContext(this, item) { Frozen = false };
+
+                item.CreateProperties(context);
+
+                context.Frozen = true;
             }
 
-            _constructionContext.Frozen = true;
         }
 
         /// <summary>

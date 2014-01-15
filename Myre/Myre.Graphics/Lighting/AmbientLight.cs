@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _skyColour = context.CreateProperty(new TypedName<Vector3>(SKY_COLOUR_NAME + AppendName()), Color.LightSkyBlue.ToVector3());
-            _groundColour = context.CreateProperty(new TypedName<Vector3>(GROUND_COLOUR_NAME + AppendName()), Color.LightGray.ToVector3());
-            _up = context.CreateProperty(new TypedName<Vector3>(UP_NAME + AppendName()), Vector3.Up);
+            _skyColour = context.CreateProperty(new TypedName<Vector3>(SKY_COLOUR_NAME), Color.LightSkyBlue.ToVector3());
+            _groundColour = context.CreateProperty(new TypedName<Vector3>(GROUND_COLOUR_NAME), Color.LightGray.ToVector3());
+            _up = context.CreateProperty(new TypedName<Vector3>(UP_NAME), Vector3.Up);
 
             base.CreateProperties(context);
         }
@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(SKY_COLOUR_NAME + AppendName(), _skyColour);
-            initialisationData.TryCopyValue(GROUND_COLOUR_NAME + AppendName(), _groundColour);
-            initialisationData.TryCopyValue(UP_NAME + AppendName(), _up);
+            initialisationData.TryCopyValue(SKY_COLOUR_NAME, _skyColour);
+            initialisationData.TryCopyValue(GROUND_COLOUR_NAME, _groundColour);
+            initialisationData.TryCopyValue(UP_NAME, _up);
         }
     }
 }

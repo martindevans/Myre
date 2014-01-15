@@ -9,14 +9,14 @@ namespace Myre.Graphics.Lighting
     public class SpotLight
         : Behaviour
     {
-        private const string COLOUR_NAME = "colour";
-        private const string POSITION_NAME = "position";
-        private const string DIRECTION_NAME = "direction";
-        private const string ANGLE_NAME = "angle";
-        private const string RANGE_NAME = "range";
-        private const string MASK_NAME = "mask";
-        private const string SHADOW_RESOLUTION_NAME = "shadow_resolution";
-        private const string ACTIVE_NAME = "spotlight_active";
+        private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
+        private static readonly TypedName<Vector3> _positionName = new TypedName<Vector3>("position");
+        private static readonly TypedName<Vector3> _directionName = new TypedName<Vector3>("direction");
+        private static readonly TypedName<float> _angleName = new TypedName<float>("angle");
+        private static readonly TypedName<float> _rangeName = new TypedName<float>("range");
+        private static readonly TypedName<Texture2D> _maskName = new TypedName<Texture2D>("mask");
+        private static readonly TypedName<int> _shadowResolutionName = new TypedName<int>("shadow_resolution");
+        private static readonly TypedName<bool> _activeName = new TypedName<bool>("spotlight_active");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
@@ -77,14 +77,14 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(new TypedName<Vector3>(COLOUR_NAME + AppendName()));
-            _position = context.CreateProperty(new TypedName<Vector3>(POSITION_NAME + AppendName()));
-            _direction = context.CreateProperty(new TypedName<Vector3>(DIRECTION_NAME + AppendName()));
-            _angle = context.CreateProperty(new TypedName<float>(ANGLE_NAME + AppendName()));
-            _range = context.CreateProperty(new TypedName<float>(RANGE_NAME + AppendName()));
-            _mask = context.CreateProperty(new TypedName<Texture2D>(MASK_NAME + AppendName()));
-            _shadowResolution = context.CreateProperty(new TypedName<int>(SHADOW_RESOLUTION_NAME + AppendName()));
-            _active = context.CreateProperty(new TypedName<bool>(ACTIVE_NAME + AppendName()), true);
+            _colour = context.CreateProperty(_colourName);
+            _position = context.CreateProperty(_positionName);
+            _direction = context.CreateProperty(_directionName);
+            _angle = context.CreateProperty(_angleName);
+            _range = context.CreateProperty(_rangeName);
+            _mask = context.CreateProperty(_maskName);
+            _shadowResolution = context.CreateProperty(_shadowResolutionName);
+            _active = context.CreateProperty(_activeName, true);
 
             base.CreateProperties(context);
         }
@@ -93,14 +93,14 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(COLOUR_NAME + AppendName(), _colour);
-            initialisationData.TryCopyValue(POSITION_NAME + AppendName(), _position);
-            initialisationData.TryCopyValue(DIRECTION_NAME + AppendName(), _direction);
-            initialisationData.TryCopyValue(ANGLE_NAME + AppendName(), _angle);
-            initialisationData.TryCopyValue(RANGE_NAME + AppendName(), _range);
-            initialisationData.TryCopyValue(MASK_NAME + AppendName(), _mask);
-            initialisationData.TryCopyValue(SHADOW_RESOLUTION_NAME + AppendName(), _shadowResolution);
-            initialisationData.TryCopyValue(ACTIVE_NAME + AppendName(), _active);
+            initialisationData.TryCopyValue(_colourName, _colour);
+            initialisationData.TryCopyValue(_positionName, _position);
+            initialisationData.TryCopyValue(_directionName, _direction);
+            initialisationData.TryCopyValue(_angleName, _angle);
+            initialisationData.TryCopyValue(_rangeName, _range);
+            initialisationData.TryCopyValue(_maskName, _mask);
+            initialisationData.TryCopyValue(_shadowResolutionName, _shadowResolution);
+            initialisationData.TryCopyValue(_activeName, _active);
         }
     }
 }

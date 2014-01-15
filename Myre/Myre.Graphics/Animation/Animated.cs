@@ -15,6 +15,14 @@ namespace Myre.Graphics.Animation
         :ProcessBehaviour, ModelInstance.IRenderDataSupplier
     {
         #region fields
+        private static readonly TypedName<ClipPlaybackParameters> _defaultClipName = new TypedName<ClipPlaybackParameters>("animation_default_clip");
+        private static readonly TypedName<Transform> _rootTransformName = new TypedName<Transform>("animation_root_transform");
+        private static readonly TypedName<bool> _rootTranslationXName = new TypedName<bool>("animation_enable_root_translation_x");
+        private static readonly TypedName<bool> _rootTranslationYName = new TypedName<bool>("animation_enable_root_translation_y");
+        private static readonly TypedName<bool> _rootTranslationZName = new TypedName<bool>("animation_enable_root_translation_z");
+        private static readonly TypedName<bool> _enableRootRotationName = new TypedName<bool>("animation_enable_root_rotation");
+        private static readonly TypedName<bool> _enableRootScaleName = new TypedName<bool>("animation_enable_root_scale");
+
         private ModelInstance _model;
 
         private readonly Queue<ClipPlaybackParameters> _animationQueue = new Queue<ClipPlaybackParameters>();
@@ -136,13 +144,13 @@ namespace Myre.Graphics.Animation
         #region initialise
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _defaultClip = context.CreateProperty(new TypedName<ClipPlaybackParameters>("animation_default_clip"));
-            _rootBoneTransform = context.CreateProperty(new TypedName<Transform>("animation_root_transform"), Transform.Identity);
-            _enableRootBoneTranslationX = context.CreateProperty(new TypedName<bool>("animation_enable_root_translation_x"), false);
-            _enableRootBoneTranslationY = context.CreateProperty(new TypedName<bool>("animation_enable_root_translation_y"), false);
-            _enableRootBoneTranslationZ = context.CreateProperty(new TypedName<bool>("animation_enable_root_translation_z"), false);
-            _enableRootBoneRotation = context.CreateProperty(new TypedName<bool>("animation_enable_root_rotation"), true);
-            _enableRootBoneScale = context.CreateProperty(new TypedName<bool>("animation_enable_root_scale"), true);
+            _defaultClip = context.CreateProperty(_defaultClipName);
+            _rootBoneTransform = context.CreateProperty(_rootTransformName, Transform.Identity);
+            _enableRootBoneTranslationX = context.CreateProperty(_rootTranslationXName, false);
+            _enableRootBoneTranslationY = context.CreateProperty(_rootTranslationYName, false);
+            _enableRootBoneTranslationZ = context.CreateProperty(_rootTranslationZName, false);
+            _enableRootBoneRotation = context.CreateProperty(_enableRootRotationName, true);
+            _enableRootBoneScale = context.CreateProperty(_enableRootScaleName, true);
 
             base.CreateProperties(context);
         }

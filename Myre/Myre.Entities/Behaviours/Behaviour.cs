@@ -109,9 +109,9 @@ namespace Myre.Entities.Behaviours
             IsReady = false;
         }
 
-        protected string AppendName()
+        public string GetFullPropertyName(string propertyName)
         {
-            return Name == null ? "" : "_" + Name;
+            return Name == null ? propertyName : string.Format("{0}_{1}", propertyName, Name);
         }
     }
 }

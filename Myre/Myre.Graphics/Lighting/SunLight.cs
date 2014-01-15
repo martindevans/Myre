@@ -8,9 +8,9 @@ namespace Myre.Graphics.Lighting
     public class SunLight
         : Behaviour
     {
-        private const string COLOUR_NAME = "colour";
-        private const string DIRECTION_NAME = "direction";
-        private const string SHADOW_RESOLUTION_NAME = "shadow_resolution";
+        private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
+        private static readonly TypedName<Vector3> _directionName = new TypedName<Vector3>("direction");
+        private static readonly TypedName<int> _shadowResolutionName = new TypedName<int>("shadow_resolution");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _direction;
@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(new TypedName<Vector3>(COLOUR_NAME + AppendName()), Color.LightBlue.ToVector3());
-            _direction = context.CreateProperty(new TypedName<Vector3>(DIRECTION_NAME + AppendName()), Vector3.Down);
-            _shadowResolution = context.CreateProperty(new TypedName<int>(SHADOW_RESOLUTION_NAME + AppendName()));
+            _colour = context.CreateProperty(_colourName, Color.LightBlue.ToVector3());
+            _direction = context.CreateProperty(_directionName, Vector3.Down);
+            _shadowResolution = context.CreateProperty(_shadowResolutionName);
 
             base.CreateProperties(context);
         }
@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(COLOUR_NAME + AppendName(), _colour);
-            initialisationData.TryCopyValue(DIRECTION_NAME + AppendName(), _direction);
-            initialisationData.TryCopyValue(SHADOW_RESOLUTION_NAME + AppendName(), _shadowResolution);
+            initialisationData.TryCopyValue(_colourName, _colour);
+            initialisationData.TryCopyValue(_directionName, _direction);
+            initialisationData.TryCopyValue(_shadowResolutionName, _shadowResolution);
         }
     }
 }

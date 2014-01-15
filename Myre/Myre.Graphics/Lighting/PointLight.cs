@@ -8,9 +8,9 @@ namespace Myre.Graphics.Lighting
     public class PointLight
         : Behaviour
     {
-        private const string COLOUR_NAME = "colour";
-        private const string POSITION_NAME = "position";
-        private const string RANGE_NAME = "range";
+        private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
+        private static readonly TypedName<Vector3> _positionName = new TypedName<Vector3>("position");
+        private static readonly TypedName<float> _rangeName = new TypedName<float>("range");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(new TypedName<Vector3>(COLOUR_NAME + AppendName()));
-            _position = context.CreateProperty(new TypedName<Vector3>(POSITION_NAME + AppendName()));
-            _range = context.CreateProperty(new TypedName<float>(RANGE_NAME + AppendName()));
+            _colour = context.CreateProperty(_colourName);
+            _position = context.CreateProperty(_positionName);
+            _range = context.CreateProperty(_rangeName);
             
             base.CreateProperties(context);
         }
@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(COLOUR_NAME + AppendName(), _colour);
-            initialisationData.TryCopyValue(POSITION_NAME + AppendName(), _position);
-            initialisationData.TryCopyValue(RANGE_NAME + AppendName(), _range);
+            initialisationData.TryCopyValue(_colourName, _colour);
+            initialisationData.TryCopyValue(_positionName, _position);
+            initialisationData.TryCopyValue(_rangeName, _range);
         }
     }
 }

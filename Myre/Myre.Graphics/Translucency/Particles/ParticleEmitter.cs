@@ -33,7 +33,7 @@ namespace Myre.Graphics.Translucency.Particles
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
-            var generator = initialisationData.GetValue(new TypedName<ParticleEmitterDescription>("particlesystem" + AppendName()), false);
+            var generator = initialisationData.GetValue(new TypedName<ParticleEmitterDescription>("particlesystem"), false);
             generator.Setup(this);
             System = Owner.Scene.GetService<ParticleSystemService>().Get(generator.Description);
 

@@ -15,6 +15,13 @@ namespace Myre.Graphics.Geometry
     public class ModelInstance
         : Behaviour
     {
+        private static readonly TypedName<ModelData> _modelName = new TypedName<ModelData>("model");
+        private static readonly TypedName<Matrix> _transformName = new TypedName<Matrix>("transform");
+        private static readonly TypedName<bool> _isStaticName = new TypedName<bool>("is_static");
+        private static readonly TypedName<bool> _isInvisibleName = new TypedName<bool>("is_invisible");
+        private static readonly TypedName<bool> _ignoreViewMatrixName = new TypedName<bool>("ignore_view_matrix");
+        private static readonly TypedName<bool> _ignoreProjectionMatrixName = new TypedName<bool>("ignore_projection_matrix");
+
         private Property<ModelData> _model;
         private Property<Matrix> _transform;
         private Property<bool> _isStatic;
@@ -80,14 +87,12 @@ namespace Myre.Graphics.Geometry
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            var append = (Name == null ? "" : "_" + Name);
-
-            _model = context.CreateProperty(new TypedName<ModelData>("model" + append));
-            _transform = context.CreateProperty(new TypedName<Matrix>("transform" + append));
-            _isStatic = context.CreateProperty(new TypedName<bool>("is_static" + append));
-            _isInvisible = context.CreateProperty(new TypedName<bool>("is_invisible" + append));
-            _ignoreViewMatrix = context.CreateProperty(new TypedName<bool>("ignore_view_matrix" + append), false);
-            _ignoreProjectionMatrix = context.CreateProperty(new TypedName<bool>("ignore_projection_matrix" + append), false);
+            _model = context.CreateProperty(_modelName);
+            _transform = context.CreateProperty(_transformName);
+            _isStatic = context.CreateProperty(_isStaticName);
+            _isInvisible = context.CreateProperty(_isInvisibleName);
+            _ignoreViewMatrix = context.CreateProperty(_ignoreViewMatrixName, false);
+            _ignoreProjectionMatrix = context.CreateProperty(_ignoreProjectionMatrixName, false);
 
             base.CreateProperties(context);
         }

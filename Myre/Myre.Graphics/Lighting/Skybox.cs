@@ -8,6 +8,10 @@ namespace Myre.Graphics.Lighting
     public class Skybox
         : Behaviour
     {
+        private static readonly TypedName<TextureCube> _textureName = new TypedName<TextureCube>("texture");
+        private static readonly TypedName<float> _brightnessName = new TypedName<float>("brightness");
+        private static readonly TypedName<bool> _gammaCorrectName = new TypedName<bool>("gamma_correct");
+
         private Property<TextureCube> _texture;
         private Property<float> _brightness;
         private Property<bool> _gammaCorrect;
@@ -32,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _texture = context.CreateProperty(new TypedName<TextureCube>("texture"));
-            _brightness = context.CreateProperty(new TypedName<float>("brightness"));
-            _gammaCorrect = context.CreateProperty(new TypedName<bool>("gamma_correct"));
+            _texture = context.CreateProperty(_textureName);
+            _brightness = context.CreateProperty(_brightnessName);
+            _gammaCorrect = context.CreateProperty(_gammaCorrectName);
 
             base.CreateProperties(context);
         }
@@ -43,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue("texture" + AppendName(), _texture);
-            initialisationData.TryCopyValue("brightness" + AppendName(), _brightness);
-            initialisationData.TryCopyValue("gamma_correct" + AppendName(), _gammaCorrect);
+            initialisationData.TryCopyValue(_textureName, _texture);
+            initialisationData.TryCopyValue(_brightnessName, _brightness);
+            initialisationData.TryCopyValue(_gammaCorrectName, _gammaCorrect);
         }
     }
 }
