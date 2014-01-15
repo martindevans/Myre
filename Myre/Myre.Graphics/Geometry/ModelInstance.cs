@@ -250,7 +250,7 @@ namespace Myre.Graphics.Geometry
                 if (!_phases.TryGetValue(phase, out meshes))
                     return;
 
-                var viewFrustum = metadata.GetValue<BoundingFrustum>("viewfrustum");
+                var viewFrustum = metadata.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
                 _bounds.Clear();
                 _bounds.Add(viewFrustum);
                 QueryVisible(_bounds, _buffer);
@@ -258,7 +258,7 @@ namespace Myre.Graphics.Geometry
                 foreach (var item in _buffer)
                     item.IsVisible = !item.Instance.IsInvisible;
 
-                var view = metadata.GetValue<Matrix>("view");
+                var view = metadata.GetValue(new TypedName<Matrix>("view"));
                 CalculateWorldViews(meshes, view);              //Calculate WorldView for all mesh instances
 
                 DepthSortMeshes(meshes);                        //Sort batches by first item in batch

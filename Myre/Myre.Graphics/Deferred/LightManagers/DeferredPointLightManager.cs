@@ -57,7 +57,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _touchesBothPlanes.Clear();
             _doesntTouchNear.Clear();
 
-            var frustum = renderer.Data.GetValue<BoundingFrustum>("viewfrustum");
+            var frustum = renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
             
             foreach (var light in Behaviours)
             {
@@ -137,22 +137,22 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             if (material != null)
             {
-                Vector3 position = Vector3.Transform(light.Position, metadata.GetValue<Matrix>("view"));
+                Vector3 position = Vector3.Transform(light.Position, metadata.GetValue(new TypedName<Matrix>("view")));
                 material.Parameters["LightPosition"].SetValue(position);
                 material.Parameters["Colour"].SetValue(light.Colour);
                 material.Parameters["Range"].SetValue(light.Range);
             }
 
-            var view = metadata.GetValue<Matrix>("view");
-            var worldview = metadata.Get<Matrix>("worldview", default(Matrix), true);
-            var projection = metadata.GetValue<Matrix>("projection");
-            var worldviewprojection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
+            var view = metadata.GetValue(new TypedName<Matrix>("view"));
+            var projection = metadata.GetValue<Matrix>(new TypedName<Matrix>("projection"));
 
             var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius) * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
 
-            worldview.Value = world * view;
-            worldviewprojection.Value = worldview.Value * projection;
+            var worldview = world * view;
+            metadata.Set(new TypedName<Matrix>("worldview"), worldview);
+
+            metadata.Set(new TypedName<Matrix>("worldviewprojection"), worldview * projection);
         }
     }
 }

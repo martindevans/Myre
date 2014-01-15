@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Collections;
+﻿using Myre.Collections;
 
 namespace Myre.Extensions
 {
@@ -18,7 +14,7 @@ namespace Myre.Extensions
         /// <param name="name"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T? GetMaybeValue<T>(this INamedDataCollection data, string name) where T : struct
+        public static T? GetMaybeValue<T>(this INamedDataCollection data, TypedName<T> name) where T : struct
         {
             T v;
             if (data.TryGetValue<T>(name, out v))

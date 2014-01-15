@@ -130,6 +130,7 @@
     <Compile Include="Pulser.cs" />
     <Compile Include="RotatedBoundingBox.cs" />
     <Compile Include="StaticRandom.cs" />
+    <Compile Include="TypedName.cs" />
     <Compile Include="TypeUnions.cs" />
   </ItemGroup>
   <ItemGroup>

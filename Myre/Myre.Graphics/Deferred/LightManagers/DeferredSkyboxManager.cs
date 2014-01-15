@@ -45,10 +45,10 @@ namespace Myre.Graphics.Deferred.LightManagers
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
 
-            var view = renderer.Data.GetValue<Matrix>("view");
+            var view = renderer.Data.GetValue(new TypedName<Matrix>("view"));
             view.Translation = Vector3.Zero;
             _skyboxEffect.Parameters["View"].SetValue(view);
-            _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.GetValue<Matrix>("projection"));
+            _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.GetValue(new TypedName<Matrix>("projection")));
 
             for (int i = 0; i < Behaviours.Count; i++)
             {

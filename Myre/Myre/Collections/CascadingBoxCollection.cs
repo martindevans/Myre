@@ -9,25 +9,25 @@ namespace Myre.Collections
     public class CascadingBoxCollection
         :MarshalByRefObject, INamedDataCollection
     {
-        private readonly INamedDataProvider _parent;
+        private readonly INamedDataCollection _parent;
         private readonly NamedBoxCollection _values;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parent"></param>
-        public CascadingBoxCollection(INamedDataProvider parent)
+        public CascadingBoxCollection(INamedDataCollection parent)
         {
             _parent = parent;
             _values = new NamedBoxCollection();
         }
 
-        public void Set<T>(string key, T value)
+        public void Set<T>(TypedName<T> key, T value)
         {
             _values.Set<T>(key, value);
         }
 
-        public T GetValue<T>(string name, bool useDefaultValue = true)
+        public T GetValue<T>(TypedName<T> name, bool useDefaultValue = true)
         {
             T value;
             if (TryGetValue<T>(name, out value))
@@ -36,12 +36,17 @@ namespace Myre.Collections
                 return _parent.GetValue<T>(name, useDefaultValue);
         }
 
-        public bool TryGetValue<T>(string name, out T value)
+        public bool TryGetValue<T>(TypedName<T> name, out T value)
         {
             if (_values.TryGetValue<T>(name, out value))
                 return true;
 
             return _parent.TryGetValue<T>(name, out value);
+        }
+
+        public Box<T> Get<T>(TypedName<T> key, T defaultValue = default(T), bool create = true)
+        {
+            return _values.Get<T>(key.Name, defaultValue, create);
         }
     }
 }

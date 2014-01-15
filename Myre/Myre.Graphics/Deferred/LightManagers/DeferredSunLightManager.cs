@@ -92,7 +92,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             if (_material != null)
             {
-                Matrix view = metadata.GetValue<Matrix>("view");
+                Matrix view = metadata.GetValue(new TypedName<Matrix>("view"));
                 Vector3 direction = light.Direction;
                 Vector3.TransformNormal(ref direction, ref view, out direction);
 
@@ -104,7 +104,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
                 if (shadowsEnabled)
                 {
-                    _material.Parameters["ShadowProjection"].SetValue(metadata.GetValue<Matrix>("inverseview") * data.View * data.Projection);
+                    _material.Parameters["ShadowProjection"].SetValue(metadata.GetValue(new TypedName<Matrix>("inverseview")) * data.View * data.Projection);
                     _material.Parameters["ShadowMapSize"].SetValue(new Vector2(light.ShadowResolution, light.ShadowResolution));
                     _material.Parameters["ShadowMap"].SetValue(data.ShadowMap);
                     _material.Parameters["LightFarClip"].SetValue(data.FarClip);
@@ -115,7 +115,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
         public void Prepare(Renderer renderer)
         {
-            renderer.Data.GetValue<BoundingFrustum>("viewfrustum").GetCorners(_frustumCornersWs);
+            renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum")).GetCorners(_frustumCornersWs);
 
             for (int i = 0; i < _lights.Count; i++)
             {
@@ -173,7 +173,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             var nearPlane = new Plane(light.Direction, depthOffset);
             nearPlane.Normalize();
             Plane transformedNearPlane;
-            var view = renderer.Data.GetValue<Matrix>("view");
+            var view = renderer.Data.GetValue(new TypedName<Matrix>("view"));
             Plane.Transform(ref nearPlane, ref view, out transformedNearPlane);
             data.NearClip = new Vector4(transformedNearPlane.Normal, transformedNearPlane.D);
         }

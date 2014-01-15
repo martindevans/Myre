@@ -127,7 +127,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _touchesBothPlanes.Clear();
             _touchesNeitherPlane.Clear();
 
-            var frustum = renderer.Data.GetValue<BoundingFrustum>("viewfrustum");
+            var frustum = renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
 
             float falloffFactor = renderer.Data.Get("lighting_attenuationscale", 100).Value;
             _geometryLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
@@ -285,7 +285,7 @@ namespace Myre.Graphics.Deferred.LightManagers
         private void SetupLight(RendererMetadata metadata, Material material, LightData data)
         {
             var light = data.Light;
-            Matrix view = metadata.GetValue<Matrix>("view");
+            Matrix view = metadata.GetValue(new TypedName<Matrix>("view"));
 
             if (material != null)
             {
@@ -297,7 +297,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
                 if (light.Mask != null || light.ShadowResolution > 0)
                 {
-                    var inverseView = metadata.GetValue<Matrix>("inverseview");
+                    var inverseView = metadata.GetValue(new TypedName<Matrix>("inverseview"));
                     var cameraToLightProjection = inverseView * data.View * data.Projection;
                     material.Parameters["CameraViewToLightProjection"].SetValue(cameraToLightProjection);
                 }
@@ -324,12 +324,11 @@ namespace Myre.Graphics.Deferred.LightManagers
                         * Matrix.CreateTranslation(light.Position);
             metadata.Set<Matrix>("world", world);
 
-            var worldview = metadata.Get<Matrix>("worldview", default(Matrix), true);
-            var projection = metadata.GetValue<Matrix>("projection");
-            var worldviewprojection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
+            var projection = metadata.GetValue(new TypedName<Matrix>("projection"));
 
-            worldview.Value = world * view;
-            worldviewprojection.Value = worldview.Value * projection;
+            var worldview = world * view;
+            metadata.Set(new TypedName<Matrix>("worldview"), worldview);
+            metadata.Set(new TypedName<Matrix>("worldviewprojection"), worldview * projection);
         }
     }
 }

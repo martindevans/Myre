@@ -40,7 +40,7 @@ namespace Myre.Graphics.Deferred
             var metadata = renderer.Data;
             var device = renderer.Device;
 
-            var resolution = metadata.GetValue<Vector2>("resolution");
+            var resolution = metadata.GetValue(new TypedName<Vector2>("resolution"));
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 

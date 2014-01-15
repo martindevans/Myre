@@ -15,6 +15,11 @@ namespace Myre.Entities.Extensions
         /// <returns>true, if the copy happened, otherwise false</returns>
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string name, Property<T> property)
         {
+            return TryCopyValue<T>(dataProvider, new TypedName<T>(name), v => property.Value = v);
+        }
+
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, TypedName<T> name, Property<T> property)
+        {
             return TryCopyValue<T>(dataProvider, name, v => property.Value = v);
         }
 
@@ -23,7 +28,7 @@ namespace Myre.Entities.Extensions
             return dataProvider.TryCopyValue<T>(property.Name, property);
         }
 
-        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string name, Action<T> action)
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, TypedName<T> name, Action<T> action)
         {
             if (dataProvider == null)
                 return false;

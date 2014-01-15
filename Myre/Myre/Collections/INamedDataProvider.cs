@@ -13,7 +13,7 @@ namespace Myre.Collections
         /// <param name="useDefaultValue"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        T GetValue<T>(string name, bool useDefaultValue = true);
+        T GetValue<T>(TypedName<T> name, bool useDefaultValue = true);
 
         /// <summary>
         /// 
@@ -22,6 +22,6 @@ namespace Myre.Collections
         /// <param name="value"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        bool TryGetValue<T>(string name, out T value);
+        bool TryGetValue<T>(TypedName<T> name, out T value);
     }
 }

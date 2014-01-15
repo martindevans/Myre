@@ -13,6 +13,6 @@ namespace Myre.Collections
         /// <param name="value"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        void Set<T>(string key, T value);
+        void Set<T>(TypedName<T> key, T value);
     }
 }

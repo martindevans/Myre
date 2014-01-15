@@ -185,7 +185,7 @@ namespace Myre.Graphics.Translucency.Particles
 
                 // Set an effect parameter describing the viewport size. This is
                 // needed to convert particle sizes into screen space point sizes.
-                _viewportScaleParameter.SetValue(new Vector2(0.5f / data.GetValue<Viewport>("viewport").AspectRatio, -0.5f));
+                _viewportScaleParameter.SetValue(new Vector2(0.5f / data.GetValue(new TypedName<Viewport>("viewport")).AspectRatio, -0.5f));
 
                 // Set an effect parameter describing the current time. All the vertex
                 // shader particle animation is keyed off this value.

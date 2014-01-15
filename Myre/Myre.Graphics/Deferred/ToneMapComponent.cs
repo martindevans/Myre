@@ -70,8 +70,8 @@ namespace Myre.Graphics.Deferred
             var metadata = renderer.Data;
             var device = renderer.Device;
 
-            var lightBuffer = metadata.GetValue<Texture2D>("lightbuffer");
-            var resolution = metadata.GetValue<Vector2>("resolution");
+            var lightBuffer = metadata.GetValue(new TypedName<Texture2D>("lightbuffer"));
+            var resolution = metadata.GetValue(new TypedName<Vector2>("resolution"));
 
             CalculateLuminance(renderer, resolution, device, lightBuffer);
             Bloom(renderer, resolution, device, lightBuffer);
@@ -126,9 +126,9 @@ namespace Myre.Graphics.Deferred
             var thresholded = RenderTargetManager.GetTarget(device, (int)halfResolution.X, (int)halfResolution.Y, SurfaceFormat.Rgba64, name:"bloom thresholded");
             device.SetRenderTarget(thresholded);
             _bloom.Parameters["Resolution"].SetValue(halfResolution);
-            _bloom.Parameters["Threshold"].SetValue(renderer.Data.GetValue<float>("hdr_bloomthreshold"));
-            _bloom.Parameters["MinExposure"].SetValue(renderer.Data.GetValue<float>("hdr_minexposure"));
-            _bloom.Parameters["MaxExposure"].SetValue(renderer.Data.GetValue<float>("hdr_maxexposure"));
+            _bloom.Parameters["Threshold"].SetValue(renderer.Data.GetValue(new TypedName<float>("hdr_bloomthreshold")));
+            _bloom.Parameters["MinExposure"].SetValue(renderer.Data.GetValue(new TypedName<float>("hdr_minexposure")));
+            _bloom.Parameters["MaxExposure"].SetValue(renderer.Data.GetValue(new TypedName<float>("hdr_maxexposure")));
             _bloom.Parameters["Texture"].SetValue(lightBuffer);
             _bloom.Parameters["Luminance"].SetValue(_adaptedLuminance[_current]);
             _bloom.CurrentTechnique = _bloom.Techniques["ThresholdDownsample2X"];
@@ -144,7 +144,7 @@ namespace Myre.Graphics.Deferred
 
             // blur the target
             var blurred = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom blurred");
-            _gaussian.Blur(downsample, blurred, renderer.Data.GetValue<float>("hdr_bloomblurammount"));
+            _gaussian.Blur(downsample, blurred, renderer.Data.GetValue(new TypedName<float>("hdr_bloomblurammount")));
 
             // upscale back to half resolution
             device.SetRenderTarget(thresholded);
@@ -170,8 +170,8 @@ namespace Myre.Graphics.Deferred
 
             _toneMap.Parameters["Texture"].SetValue(lightBuffer);
             _toneMap.Parameters["Luminance"].SetValue(_adaptedLuminance[_current]);
-            _toneMap.Parameters["MinExposure"].SetValue(renderer.Data.GetValue<float>("hdr_minexposure"));
-            _toneMap.Parameters["MaxExposure"].SetValue(renderer.Data.GetValue<float>("hdr_maxexposure"));
+            _toneMap.Parameters["MinExposure"].SetValue(renderer.Data.GetValue(new TypedName<float>("hdr_minexposure")));
+            _toneMap.Parameters["MaxExposure"].SetValue(renderer.Data.GetValue(new TypedName<float>("hdr_maxexposure")));
             _quad.Draw(_toneMap, renderer.Data);
             Output("tonemapped", toneMapped);
         }
