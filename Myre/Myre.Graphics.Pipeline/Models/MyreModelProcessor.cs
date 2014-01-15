@@ -690,7 +690,7 @@ namespace Myre.Graphics.Pipeline.Models
                     return texture;
 
                 if (AllowNullDiffuseTexture)
-                    return "null_specular";
+                    return "null_diffuse";
 
                 return null;
             }
@@ -836,10 +836,17 @@ namespace Myre.Graphics.Pipeline.Models
                 if (child == skeleton)
                     continue;
 
-                // This is important: Don't bake in the transforms except
-                // for geometry that is part of a skinned mesh
-                if (!IsSkinned(child))
-                    continue;
+                //------------------------------------------------
+                // TODO: Support static meshes parented to a bone
+                // -----------------------------------------------
+                // What's this all about?
+                // If Myre supported meshes which were not skinned, but still had a bone parent this would be important
+                // But it doesn't, so we skip this.
+
+                //// This is important: Don't bake in the transforms except
+                //// for geometry that is part of a skinned mesh
+                //if (!IsSkinned(child))
+                //    continue;
 
                 FlattenAllTransforms(child);
             }

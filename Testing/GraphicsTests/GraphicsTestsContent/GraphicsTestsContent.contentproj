@@ -195,7 +195,6 @@
       <Name>Hebe2</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
-      <ProcessorParameters_AllowNullDiffuseTexture>False</ProcessorParameters_AllowNullDiffuseTexture>
     </Compile>
     <Compile Include="Myre.Graphics\SpotLight.fx">
       <Name>SpotLight</Name>
@@ -413,6 +412,16 @@
       <Name>t-pose</Name>
       <Importer>XmlImporter</Importer>
       <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="null_diffuse.png">
+      <Name>null_diffuse</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ColorKeyEnabled>False</ProcessorParameters_ColorKeyEnabled>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_TextureFormat>DxtCompressed</ProcessorParameters_TextureFormat>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
