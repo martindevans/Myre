@@ -10,6 +10,8 @@
     <AssemblyName>Myre.Graphics.Pipeline</AssemblyName>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\..\..\Heist2\DebugPipeline1\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,6 +31,7 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml">
       <Private>False</Private>
     </Reference>
@@ -83,6 +86,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.ContentPipelineExtensions.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

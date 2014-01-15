@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Content;
@@ -10,21 +11,19 @@ namespace Myre.Graphics.Pipeline.Animations
     [ContentSerializerRuntimeType("Myre.Graphics.Animation.Clip, Myre.Graphics")]
     public class ClipContent
     {
-        public string Name { get; private set; }
         public int RootBoneIndex { get; private set; }
-        public KeyframeContent[][] Channels { get; private set; }
+        public List<KeyframeContent>[] Channels { get; private set; }
 
-        public ClipContent(string name, int boneCount, int rootBoneIndex)
+        public ClipContent(int boneCount, int rootBoneIndex)
         {
-            Name = name;
             RootBoneIndex = rootBoneIndex;
 
-            Channels = new KeyframeContent[boneCount][];
+            Channels = new List<KeyframeContent>[boneCount];
         }
 
         public void SortKeyframes()
         {
-            Parallel.ForEach(Channels, k => Array.Sort(k, (a, b) => a.Time.CompareTo(b.Time)));
+            Parallel.ForEach(Channels, k => k.Sort((a, b) => a.Time.CompareTo(b.Time)));
         }
 
         public void SubtractKeyframeTime()
@@ -37,21 +36,28 @@ namespace Myre.Graphics.Pipeline.Animations
             });
         }
 
-        public void InsertStartFrames()
+        public void InsertStartAndEndFrames()
         {
-            Parallel.ForEach(Channels, c =>
+            var endTime = Channels.Select(c => c.Max(k => k.Time)).Max().Ticks;
+
+            Parallel.ForEach(Channels, (c, i) =>
             {
-                var first = c[0];
-                if (first.Time.Ticks != 0)
+                var first = c.First();
+                var last = c.Last();
+                bool insertFirst = first.Time.Ticks != 0;
+                bool insertLast = last.Time.Ticks != endTime;
+
+                int expansionCount = (insertFirst ? 1 : 0) + (insertLast ? 1 : 0);
+                
+                if (expansionCount != 0)
                 {
-                    //Create a new array 1 longer
-                    var n = new KeyframeContent[c.Length + 1];
-
                     //Insert a keyframe at the start
-                    n[0] = new KeyframeContent(first.Bone, new TimeSpan(0), first.Translation, first.Scale, first.Rotation);
+                    if (insertFirst)
+                        c.Insert(0, new KeyframeContent(first.Bone, new TimeSpan(0), first.Translation, first.Scale, first.Rotation));
 
-                    //Copy over the rest
-                    Array.Copy(c, 0, n, 1, c.Length);
+                    //Insert a keyframe at the end
+                    if (insertLast)
+                        c.Add(new KeyframeContent(last.Bone, new TimeSpan(endTime), last.Translation, last.Scale, last.Rotation));
                 }
             });
         }
@@ -62,19 +68,16 @@ namespace Myre.Graphics.Pipeline.Animations
     {
         protected override void Write(ContentWriter output, ClipContent value)
         {
-            //Name of this animation
-            output.Write(value.Name);
-
             //Time index of the last keyframe of this animation
             output.Write(value.Channels.Select(c => c.Max(k => k.Time)).Max().Ticks);
 
             //Keyframes
             output.Write(value.Channels.Length);
-            for (int i = 0; i < value.Channels.Length; i++)
+            foreach (var channel in value.Channels)
             {
-                output.Write(value.Channels[i].Length);
-                for (int j = 0; j < value.Channels[i].Length; j++)
-                    output.WriteObject(value.Channels[i][j]);
+                output.Write(channel.Count);
+                for (int j = 0; j < channel.Count; j++)
+                    output.WriteObject(channel[j]);
             }
 
             //The root bone index

@@ -20,12 +20,34 @@ namespace Myre.Graphics.Animation
 
         private void Restart()
         {
-            ElapsedTime = TimeSpan.Zero;
+            //Move back by animation duration
+            ElapsedTime -= Animation.Duration;
 
+            //Set back to start frame
             for (int i = 0; i < _channelFrames.Length; i++)
                 _channelFrames[i] = 1;
-            for (int i = 0; i < _previousTransforms.Length; i++)
-                _previousTransforms[i] = Animation.Channels[i][0].Transform;
+
+            //Calculate the previous transform back into initial pose space, this is to fix deltas
+            for (int i = 0; i < _transforms.Length; i++)
+            {
+                var a = Animation.Channels[i][0].Transform;
+                var b = Animation.Channels[i][Animation.Channels[i].Length - 1].Transform;
+                var delta = Graphics.Animation.Transform.Subtract(b, a);
+
+                _transforms[i] = Graphics.Animation.Transform.Subtract(_transforms[i], delta);
+            }
+        }
+
+        private void Start()
+        {
+            //Set time to zero
+            ElapsedTime = TimeSpan.Zero;
+
+            //Set frames to start
+            for (int i = 0; i < _channelFrames.Length; i++)
+                _channelFrames[i] = 1;
+
+            //Set transforms to start positions too
             for (int i = 0; i < _transforms.Length; i++)
                 _transforms[i] = Animation.Channels[i][0].Transform;
         }
@@ -40,7 +62,7 @@ namespace Myre.Graphics.Animation
             _previousTransforms = new Transform[animation.Channels.Length];
             _transforms = new Transform[animation.Channels.Length];
 
-            Restart();
+            Start();
         }
 
         public void Update(TimeSpan elapsedTime)
@@ -53,14 +75,8 @@ namespace Myre.Graphics.Animation
                 if (!Loop)
                     return;
 
-                //We've overrun, save how much we've overrun by
-                var excessTime = ElapsedTime -= Animation.Duration;
-
                 Animation.Start();
                 Restart();
-
-                //Skip ahead to how much we overran by
-                ElapsedTime = excessTime;
             }
 
             for (int i = 0; i < Animation.Channels.Length; i++)
@@ -103,7 +119,7 @@ namespace Myre.Graphics.Animation
 
         public Transform Delta(int channel)
         {
-            return Graphics.Animation.Transform.Difference(_previousTransforms[channel], _transforms[channel]);
+            return Graphics.Animation.Transform.Subtract(_transforms[channel], _previousTransforms[channel]);
         }
 
         private static readonly Pool<PlayingClip> _pool = new Pool<PlayingClip>();

@@ -8,7 +8,6 @@ namespace Myre.Graphics.Pipeline.Animations
         public string SourceTakeName;
         public float StartTime;
         public float EndTime;
-        public string Name;
         public string RootBone;
         public bool FixLooping;
 // ReSharper restore UnassignedField.Global

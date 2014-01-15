@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Myre.Extensions;
 
 namespace Myre.Graphics.Animation
 {
+    [Serializable]
     public struct Transform
     {
         public static readonly Transform Identity = new Transform { Rotation = Quaternion.Identity, Scale = Vector3.One, Translation = Vector3.Zero };
@@ -24,10 +26,10 @@ namespace Myre.Graphics.Animation
         /// <summary>
         /// Calculates the transform that moves from A to B
         /// </summary>
-        /// <param name="a"></param>
         /// <param name="b"></param>
+        /// <param name="a"></param>
         /// <returns></returns>
-        public static Transform Difference(Transform a, Transform b)
+        public static Transform Subtract(Transform b, Transform a)
         {
             return new Transform
             {

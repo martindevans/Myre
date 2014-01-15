@@ -25,6 +25,11 @@ namespace Myre.Graphics.Animation
         /// Names of the bones
         /// </summary>
         public string[] Names { get; internal set; }
+
+        /// <summary>
+        /// Bounding matrices for each bone. Aligned with the bone
+        /// </summary>
+        public BoundingBox[] Bounds { get; internal set; }
     }
 
     public class SkinningDataReader : ContentTypeReader<SkinningData>
@@ -48,9 +53,15 @@ namespace Myre.Graphics.Animation
             for (int i = 0; i < existingInstance.SkeletonHierarchy.Length; i++)
                 existingInstance.SkeletonHierarchy[i] = input.ReadInt32();
 
+            //Read names
             existingInstance.Names = new string[input.ReadInt32()];
             for (int i = 0; i < existingInstance.Names.Length; i++)
                 existingInstance.Names[i] = input.ReadString();
+
+            //Read per bone bounding boxes
+            existingInstance.Bounds = new BoundingBox[input.ReadInt32()];
+            for (int i = 0; i < existingInstance.Bounds.Length; i++)
+                existingInstance.Bounds[i] = input.ReadObject<BoundingBox>();
 
             return existingInstance;
         }

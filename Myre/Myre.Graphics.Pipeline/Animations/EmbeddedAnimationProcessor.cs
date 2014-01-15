@@ -39,15 +39,15 @@ namespace Myre.Graphics.Pipeline.Animations
             ancestors.ExceptWith(descendents);
             ancestors.Remove(root.Name);
 
-            return ProcessAnimation(input.Name, animation, input.StartTime, input.EndTime, ancestors, root.Name, input.FixLooping);
+            return ProcessAnimation(animation, input.StartTime, input.EndTime, ancestors, root.Name, input.FixLooping);
         }
 
-        private ClipContent ProcessAnimation(string name, AnimationContent anim, float startTime, float endTime, ISet<string> preRootBones, string rootBone, bool fixLooping)
+        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, ISet<string> preRootBones, string rootBone, bool fixLooping)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
 
-            ClipContent animationClip = new ClipContent(name, _boneNames.Count, _boneNames[rootBone]);
+            ClipContent animationClip = new ClipContent(_boneNames.Count, _boneNames[rootBone]);
 
             var startFrameTime = TimeSpan.FromSeconds(startTime);
             var endFrameTime = TimeSpan.FromSeconds(endTime);
@@ -56,11 +56,11 @@ namespace Myre.Graphics.Pipeline.Animations
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
                 {
                     int boneIndex = _boneNames[channel.Key];
-                    animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping).ToArray();
+                    animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping).ToList();
                 }
             );
 
-            if (animationClip.Channels.Any(a => a.Length == 0))
+            if (animationClip.Channels.Any(a => a.Count == 0))
                 throw new InvalidContentException("Animation has no keyframes for a channel.");
 
             // Sort the keyframes by time.
@@ -69,8 +69,8 @@ namespace Myre.Graphics.Pipeline.Animations
             // Move the animation so the first keyframe sits at time zero
             animationClip.SubtractKeyframeTime();
 
-            // Ensure every bone has a keyframe at the start of the animation
-            animationClip.InsertStartFrames();
+            // Ensure every bone has a keyframe at the start and end of the animation
+            animationClip.InsertStartAndEndFrames();
 
             return animationClip;
         }

@@ -128,6 +128,7 @@
     <Compile Include="IRecycleable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pulser.cs" />
+    <Compile Include="RotatedBoundingBox.cs" />
     <Compile Include="StaticRandom.cs" />
     <Compile Include="TypeUnions.cs" />
   </ItemGroup>

@@ -29,7 +29,7 @@ namespace Myre.Graphics.Animation.Clips
         {
             existingInstance = existingInstance ?? new Clip();
 
-            existingInstance.Name = input.ReadString();
+            existingInstance.Name = input.AssetName;
 
             existingInstance.Duration = new TimeSpan(input.ReadInt64());
 

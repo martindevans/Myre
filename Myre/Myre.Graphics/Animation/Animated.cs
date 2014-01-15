@@ -6,6 +6,7 @@ using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Animation.Clips;
 using Myre.Graphics.Geometry;
+using System.Linq;
 
 namespace Myre.Graphics.Animation
 {
@@ -29,6 +30,24 @@ namespace Myre.Graphics.Animation
         Matrix[] _boneTransforms;
         Matrix[] _worldTransforms;
         Matrix[] _skinTransforms;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Matrix[] BoneTransforms
+        {
+            get { return _boneTransforms; }
+        }
+
+        public Matrix[] WorldTransforms
+        {
+            get { return _worldTransforms; }
+        }
+
+        public Matrix[] SkinTransforms
+        {
+            get { return _skinTransforms; }
+        }
 
         private SkinningData skinningData
         {
@@ -333,17 +352,68 @@ namespace Myre.Graphics.Animation
             metadata.Set<Matrix[]>("bones", _skinTransforms);
         }
 
+        private static void BuildMatrix(ref Transform transform, out Matrix result)
+        {
+            result = Matrix.CreateScale(transform.Scale) * Matrix.CreateFromQuaternion(transform.Rotation) * Matrix.CreateTranslation(transform.Translation);
+        }
+
+        public IEnumerable<KeyValuePair<string, float>> Intersections(Ray ray)
+        {
+            return _model
+                .Model
+                .SkinningData
+                .Bounds
+                .Select((b, i) =>
+                {
+                    Matrix transform;
+                    Matrix.Invert(ref _worldTransforms[i], out transform);
+
+                    var start = Vector3.Transform(ray.Position, transform);             //Transform ray into bone space
+                    var direction = Vector3.TransformNormal(ray.Direction, transform);
+
+                    float? depth = b.Intersects(new Ray(start, direction));             //Intersect new ray in bone space
+                    var name = _model.Model.SkinningData.Names[i];
+
+                    return new KeyValuePair<string, float?>(name, depth);
+
+                })
+                .Where(a => a.Value.HasValue)                                           //Only pass values which intersect
+// ReSharper disable PossibleInvalidOperationException
+                .Select(a => new KeyValuePair<string, float>(a.Key, a.Value.Value))     //Select float (now we know it's not null)
+// ReSharper restore PossibleInvalidOperationException
+                .OrderBy(a => a.Value)                                                  //Order by distance along ray
+                .ToArray();
+        }
+
+        public IEnumerable<string> Intersections(BoundingSphere sphere)
+        {
+            return _model
+                .Model
+                .SkinningData
+                .Bounds
+                .Select((b, i) =>
+                {
+                    Matrix transform;
+                    Matrix.Invert(ref _worldTransforms[i], out transform);
+
+                    var center = Vector3.Transform(sphere.Center, transform);                   //Transform sphere center into bone space
+
+                    var intersects = b.Intersects(new BoundingSphere(center, sphere.Radius));   //Intersect new sphere in bone space
+                    var name = _model.Model.SkinningData.Names[i];
+
+                    return new KeyValuePair<bool, string>(intersects, name);
+
+                })
+                .Where(a => a.Key)
+                .Select(a => a.Value);
+        }
+
         public struct ClipPlaybackParameters
         {
             public IClip Clip;
             public TimeSpan FadeInTime;
             public TimeSpan FadeOutTime;
             public bool Loop;
-        }
-
-        private static void BuildMatrix(ref Transform transform, out Matrix result)
-        {
-            result = Matrix.CreateScale(transform.Scale) * Matrix.CreateFromQuaternion(transform.Rotation) * Matrix.CreateTranslation(transform.Translation);
         }
     }
 }

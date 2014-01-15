@@ -6,10 +6,10 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Pipeline.Animations;
 using Myre.Graphics.Pipeline.Materials;
+using Matrix = Microsoft.Xna.Framework.Matrix;
 
 namespace Myre.Graphics.Pipeline.Models
 {
@@ -89,8 +89,20 @@ namespace Myre.Graphics.Pipeline.Models
 
             _directory = Path.GetDirectoryName(input.Identity.SourceFilename);
 
+            List<Vector3>[] verticesPerBone = null;
+
             // Find the skeleton.
             BoneContent skeleton = MeshHelper.FindSkeleton(input);
+            if (skeleton != null)
+            {
+                _bones = MeshHelper.FlattenSkeleton(skeleton);
+                _boneIndices = _bones.Select((a, i) => new {a, i}).ToDictionary(a => a.a.Name, a => a.i);
+
+                //Create a list of positions for each bone
+                verticesPerBone = new List<Vector3>[MeshHelper.FlattenSkeleton(skeleton).Count];
+                for (int i = 0; i < verticesPerBone.Length; i++)
+                    verticesPerBone[i] = new List<Vector3>();
+            }
 
             // We don't want to have to worry about different parts of the model being
             // in different local coordinate systems, so let's just bake everything.
@@ -98,29 +110,26 @@ namespace Myre.Graphics.Pipeline.Models
 
             _outputModel = new MyreModelContent();
 
-            //Extract skeleton data from the input
-            ProcessSkinningData(input, skeleton, context);
-
             //Process meshes
             List<MeshContent> meshes = new List<MeshContent>();
             FindMeshes(input, meshes);
             foreach (var mesh in meshes)
-                ProcessMesh(mesh, context);
+                ProcessMesh(mesh, context, verticesPerBone);
+
+            //Extract skeleton data from the input
+            ProcessSkinningData(input, skeleton, context, verticesPerBone);
 
             return _outputModel;
         }
 
         #region animation processing
-        private void ProcessSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context)
+        private void ProcessSkinningData(NodeContent node, BoneContent skeleton, ContentProcessorContext context, IEnumerable<List<Vector3>> verticesPerBone)
         {
             if (skeleton == null)
             {
                 _outputModel.SkinningData = null;
                 return;
             }
-
-            _bones = MeshHelper.FlattenSkeleton(skeleton);
-            _boneIndices = _bones.Select((a, i) => new {a, i}).ToDictionary(a => a.a.Name, a => a.i);
 
             List<Matrix> bindPose = new List<Matrix>();
             List<Matrix> inverseBindPose = new List<Matrix>();
@@ -137,13 +146,308 @@ namespace Myre.Graphics.Pipeline.Models
                 bindPose,
                 inverseBindPose,
                 skeletonHierarchy,
-                _bones.Select(b => b.Name).ToList()
+                _bones.Select(b => b.Name).ToList(),
+                verticesPerBone.Select((a, i) => CalculateBoundingBox(a, _bones[i])).ToList()
             );
+        }
+
+        #region ABB fitting
+        private static BoundingBox CalculateBoundingBox(List<Vector3> points, BoneContent bone)
+        {
+            if (points.Count == 0)
+                return new BoundingBox();
+
+            Matrix m = Matrix.Invert(bone.AbsoluteTransform);
+
+            //We could sample a load of rotations *around* the bone axis here, and establish a rotated bounding box to find a slightly smaller volume
+
+            return BoundingBox.CreateFromPoints(points.Select(p => Vector3.Transform(p, m)));
         }
         #endregion
 
+        #region OBB fitting
+        //        //OBB fitting Code adapted from here:
+//        //http://jamesgregson.blogspot.co.uk/2011/03/latex-test.html
+
+//        private static RotatedBoundingBox CalculateBoundingBox(List<Vector3> points)
+//        {
+//            var bounds = BuildBoundsFromConvexHull(points);
+
+//            //int failures = 0;
+
+//            //foreach (var vector3 in points)
+//            //{
+//            //    var trans = Vector3.Transform(vector3, bounds.Rotation);
+
+//            //    var dmax = bounds.Bounds.Max - trans;
+//            //    if (dmax.X < -0.0001f || dmax.Y < -0.0001f || dmax.Z < -0.0001f)
+//            //    {
+//            //        failures++;
+//            //    }
+//            //    var dmin = bounds.Bounds.Min - trans;
+//            //    if (dmin.X > 0.0001f || dmin.Y > 0.0001f || dmin.Z > 0.0001f)
+//            //    {
+//            //        failures++;
+//            //    }
+//            //}
+
+//            //if (failures > 0)
+//            //    throw new NotImplementedException();
+
+//            return bounds;
+//        }
+
+//        private static RotatedBoundingBox BuildBoundsFromConvexHull(IEnumerable<Vector3> vertices)
+//        {
+//            if (vertices.Any())
+//            {
+//                var hull = QHull(vertices).ToArray();
+//                if (hull.Any())
+//                    return BuildBoundsFromTriangles(hull, vertices);
+//            }
+
+//            return new RotatedBoundingBox
+//            {
+//                Bounds = new BoundingBox(Vector3.Zero, Vector3.Zero),
+//                Rotation = Quaternion.Identity
+//            };
+//        }
+
+//        private static RotatedBoundingBox BuildBoundsFromTriangles(IList<Triangle> triangles, IEnumerable<Vector3> vertices)
+//        {
+//            Vector3 avg = Vector3.Zero;
+//            float cxx = 0, cxy = 0, cxz = 0, cyy = 0, cyz = 0, czz = 0;
+//            float totalArea = 0;
+
+//            // loop over the triangles this time to find the
+//            // mean location
+//            for (int i = 0; i < triangles.Count; i += 3)
+//            {
+//                var p = triangles[i].A;
+//                var q = triangles[i].B;
+//                var r = triangles[i].C;
+//                var mui = (p + q + r) / 3f;
+
+//                float triArea = Vector3.Cross((q - p), (r - p)).Length() / 2;
+//                avg += mui * triArea;
+//                totalArea += triArea;
+
+//                // these bits set the c terms to Am*E[xx], Am*E[xy], Am*E[xz]....
+//                cxx += (9.0f * mui.X * mui.X + p.X * p.X + q.X * q.X + r.X * r.X) * (triArea / 12);
+//                cxy += (9.0f * mui.X * mui.Y + p.X * p.Y + q.X * q.Y + r.X * r.Y) * (triArea / 12);
+//                cxz += (9.0f * mui.X * mui.Z + p.X * p.Z + q.X * q.Z + r.X * r.Z) * (triArea / 12);
+//                cyy += (9.0f * mui.Y * mui.Y + p.Y * p.Y + q.Y * q.Y + r.Y * r.Y) * (triArea / 12);
+//                cyz += (9.0f * mui.Y * mui.Z + p.Y * p.Z + q.Y * q.Z + r.Y * r.Z) * (triArea / 12);
+//                czz += (9.0f * mui.Z * mui.Z + p.Z * p.Z + q.Z * q.Z + r.Z * r.Z) * (triArea / 12.0f);
+//            }
+
+//            // divide out the Am fraction from the average position and 
+//            // covariance terms
+//            avg /= totalArea;
+//            cxx /= totalArea;
+//            cxy /= totalArea;
+//            cxz /= totalArea;
+//            cyy /= totalArea;
+//            cyz /= totalArea;
+//            czz /= totalArea;
+
+//            // now subtract off the E[x]*E[x], E[x]*E[y], ... terms
+//            cxx -= avg.X * avg.X;
+//            cxy -= avg.X * avg.Y;
+//            cxz -= avg.X * avg.Z;
+//            cyy -= avg.Y * avg.Y;
+//            cyz -= avg.Y * avg.Z;
+//            czz -= avg.Z * avg.Z;
+
+//            var covariance = DenseMatrix.OfArray(new float[,]
+//            {
+//                {cxx, cxy, cxz},
+//                {cxy, cyy, cyz},
+//                {cxz, cyz, czz}
+//            });
+
+//            return BuildBoundsFromCovarianceMatrix(covariance, vertices);
+//        }
+
+//        private static RotatedBoundingBox BuildBoundsFromCovarianceMatrix(DenseMatrix covarianceMatrix, IEnumerable<Vector3> vertices)
+//        {
+//            var evd = covarianceMatrix.Evd();
+//            var eigen = evd.EigenVectors();
+
+//            Func<Vector<float>, Vector3> toVector3 = v =>
+//            {
+//                if (v.Count != 3)
+//                    throw new ArgumentException("v");
+
+//                return new Vector3(v[0], v[1], v[2]);
+//            };
+
+//            var r = Vector3.Normalize(toVector3(eigen.Column(0)));
+//            var u = Vector3.Normalize(toVector3(eigen.Column(1)));
+//            var f = Vector3.Normalize(toVector3(eigen.Column(2)));
+
+//            Vector3 min = new Vector3(float.MaxValue);
+//            Vector3 max = new Vector3(float.MinValue);
+//            foreach (var vertex in vertices)
+//            {
+//                var pPrime = new Vector3(Vector3.Dot(r, vertex), Vector3.Dot(u, vertex), Vector3.Dot(f, vertex));
+//                min.X = Math.Min(min.X, pPrime.X);
+//                min.Y = Math.Min(min.Y, pPrime.Y);
+//                min.Z = Math.Min(min.Z, pPrime.Z);
+//                max.X = Math.Max(max.X, pPrime.X);
+//                max.Y = Math.Max(max.Y, pPrime.Y);
+//                max.Z = Math.Max(max.Z, pPrime.Z);
+//            }
+
+//            Matrix rotation = Matrix.Identity;
+//            rotation.Right = r;
+//            rotation.Forward = f;
+//            rotation.Up = u;
+
+//            var result = new RotatedBoundingBox
+//            {
+//                Bounds = new BoundingBox(min, max),
+//                Rotation = Quaternion.CreateFromRotationMatrix(rotation)
+//            };
+
+//            return result;
+//        }
+
+//        private static RotatedBoundingBox BuildFromVertices(IEnumerable<Vector3> vertices)
+//        {
+//            var count = vertices.Count();
+//            if (count == 0)
+//            {
+//                return new RotatedBoundingBox
+//                {
+//                    Bounds = new BoundingBox(Vector3.Zero, Vector3.Zero),
+//                    Rotation = Quaternion.Identity
+//                };
+//            }
+
+//            var avg = vertices.Select(a => a / count).Aggregate((a, b) => a + b);
+
+//            float cxx = 0, cxy = 0, cxz = 0, cyy = 0, cyz = 0, czz = 0;
+//            foreach (var point in vertices)
+//            {
+//                cxx += point.X * point.X - avg.X * avg.X;
+//                cxy += point.X * point.Y - avg.X * avg.Y;
+//                cxz += point.X * point.Z - avg.X * avg.Z;
+//                cyy += point.Y * point.Y - avg.Y * avg.Y;
+//                cyz += point.Y * point.Z - avg.Y * avg.Z;
+//                czz += point.Z * point.Z - avg.Z * avg.Z;
+//            }
+
+//            var covariance = DenseMatrix.OfArray(new float[,]
+//            {
+//                {cxx, cxy, cxz},
+//                {cxy, cyy, cyz},
+//                {cxz, cyz, czz}
+//            });
+
+//            return BuildBoundsFromCovarianceMatrix(covariance, vertices);
+//        }
+
+//        private struct Triangle
+//        {
+//            public Vector3 A;
+//            public Vector3 B;
+//            public Vector3 C;
+
+//            public Triangle(Vector3 a, Vector3 b, Vector3 c)
+//            {
+//                A = a;
+//                B = b;
+//                C = c;
+//            }
+//        }
+
+//        private static IEnumerable<Triangle> QHull(IEnumerable<Vector3> vertices)
+//        {
+//            StringBuilder shapeBuilder = new StringBuilder();
+//            shapeBuilder.AppendLine("3");                                                         //Dimensions
+//            shapeBuilder.AppendLine(vertices.Count().ToString(CultureInfo.InvariantCulture));     //vertex count
+//            foreach (var vector3 in vertices)
+//                shapeBuilder.AppendLine(string.Format("{0} {1} {2}", vector3.X, vector3.Y, vector3.Z));   //Vertices
+//            var shape = shapeBuilder.ToString();
+
+//            var tmp = Path.GetTempFileName();
+//            using (var qhull = File.OpenWrite(tmp))
+//            {
+//                using (var qhullRes = Assembly.GetExecutingAssembly().GetManifestResourceStream("Myre.Graphics.Pipeline.qhull.exe"))
+//                    qhullRes.CopyTo(qhull);
+//            }
+
+//            string result;
+//            try
+//            {
+//                Process p = new Process();
+//                p.StartInfo = new ProcessStartInfo
+//                {
+//                    FileName = tmp,
+//                    UseShellExecute = false,
+//                    Arguments = "Ft",
+//                    CreateNoWindow = true,
+//                    RedirectStandardInput = true,
+//                    RedirectStandardOutput = true,
+//                };
+
+//                p.Start();
+//                p.StandardInput.Write(shape);
+//                p.StandardInput.Close();
+
+//                result = p.StandardOutput.ReadToEnd();
+
+//                p.WaitForExit();
+//            }
+//            finally
+//            {
+//                try
+//                {
+//                    File.Delete(tmp);
+//                }
+//// ReSharper disable EmptyGeneralCatchClause
+//                catch
+//// ReSharper restore EmptyGeneralCatchClause
+//                {
+//                    //Well, we tried
+//                }
+//            }
+
+//            if (string.IsNullOrWhiteSpace(result))
+//                return new Triangle[0];
+
+//            var lines = result.Split('\n').ToArray();
+
+//            if (int.Parse(lines[0]) != 3)
+//                throw new InvalidOperationException("Incorrect number of dimensions");
+
+//            if (lines[1].Split(' ').Length != 3)
+//                throw new InvalidOperationException("Incorrect number of counts");
+
+//            var vertexCount = int.Parse(lines[1].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0]);
+//            var outputVertices = lines.Skip(2).Take(vertexCount).Select(line =>
+//            {
+//                var floats = line.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(float.Parse).ToArray();
+//                return new Vector3(floats[0], floats[1], floats[2]);
+//            }).ToArray();
+
+//            int trianglesCount = int.Parse(lines[1].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+//            var outputTriangles = lines.Skip(2).Skip(vertexCount).Take(trianglesCount).Select(line =>
+//            {
+//                var ints = line.Trim().Split(' ').Select(int.Parse).ToArray();
+//                if (ints[0] != 3)
+//                    throw new InvalidOperationException("Incorrect number of indices");
+//                return new Triangle(outputVertices[ints[1]], outputVertices[ints[2]], outputVertices[ints[3]]);
+//            }).ToArray();
+
+//            return outputTriangles;
+//        }
+        #endregion
+        #endregion
+
         #region geometry processing
-        private void ProcessMesh(MeshContent mesh, ContentProcessorContext context)
+        private void ProcessMesh(MeshContent mesh, ContentProcessorContext context, List<Vector3>[] verticesPerBone)
         {
             MeshHelper.MergeDuplicateVertices(mesh);
             MeshHelper.OptimizeForCache(mesh);
@@ -166,24 +470,27 @@ namespace Myre.Graphics.Pipeline.Models
                 MeshHelper.CalculateTangentFrames(mesh, VertexChannelNames.TextureCoordinate(0), tangentName, binormalName);
             }
 
-            //var outputMesh = new MyreMeshContent();
-            //outputMesh.Parent = mesh.Parent;
-            //outputMesh.BoundingSphere = BoundingSphere.CreateFromPoints(mesh.Positions);
-
             // Process all the geometry in the mesh.
             foreach (GeometryContent geometry in mesh.Geometry)
-            {
-                ProcessGeometry(geometry, _outputModel, context);
-            }
-
-            //outputModel.AddMesh(outputMesh);
+                ProcessGeometry(geometry, _outputModel, context, verticesPerBone);
         }
 
         /// <summary>
         /// Converts a single piece of input geometry into our custom format.
         /// </summary>
-        void ProcessGeometry(GeometryContent geometry, MyreModelContent model, ContentProcessorContext context)
+        void ProcessGeometry(GeometryContent geometry, MyreModelContent model, ContentProcessorContext context, List<Vector3>[] verticesPerBone)
         {
+            //save which vertices are assigned to which bone
+            if (geometry.Vertices.Channels.Contains(VertexChannelNames.Weights(0)) && verticesPerBone != null)
+            {
+                var weights = geometry.Vertices.Channels.Get<BoneWeightCollection>(VertexChannelNames.Weights(0));
+                for (int i = 0; i < weights.Count; i++)
+                {
+                    var maxBone = weights[i].Aggregate((a, b) => a.Weight > b.Weight ? a : b).BoneName;
+                    verticesPerBone[_boneIndices[maxBone]].Add(geometry.Vertices.Positions[i]);
+                }
+            }
+
             var channels = geometry.Vertices.Channels.ToArray();
             foreach (var channel in channels)
                 ProcessChannel(geometry, channel, context);
@@ -197,14 +504,12 @@ namespace Myre.Graphics.Pipeline.Models
 
             // Convert the input material.
             var materials = ProcessMaterial(geometry.Material, geometry.Parent);
-
-            var boundingSphere = BoundingSphere.CreateFromPoints(geometry.Vertices.Positions);
             
             // Add the new piece of geometry to our output model.
             model.AddMesh(new MyreMeshContent
             {
                 Name = geometry.Parent.Name,
-                BoundingSphere = boundingSphere,
+                BoundingSphere = BoundingSphere.CreateFromPoints(geometry.Vertices.Positions),
                 Materials = materials,
                 IndexBuffer = geometry.Indices,
                 VertexBuffer = vertexBufferContent,
@@ -321,9 +626,9 @@ namespace Myre.Graphics.Pipeline.Models
 
         private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated)
         {
-            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material), true);
-            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material), false);
-            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material), true);
+            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material));
+            var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material));
+            var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material));
 
             if (diffuseTexture == null)
                 return;
@@ -340,20 +645,16 @@ namespace Myre.Graphics.Pipeline.Models
         #endregion
 
         #region find texture resources
-        private string CanonicalizeTexturePath(string texturePath, bool dxt)
+        private string CanonicalizeTexturePath(string texturePath)
         {
             if (texturePath == null)
                 return null;
 
-            var contentItem = _context.BuildAsset<TextureContent, TextureContent>(new ExternalReference<TextureContent>(texturePath), "TextureProcessor", new OpaqueDataDictionary
-            {
-                { "GenerateMipmaps", true },
-                { "TextureFormat", dxt ? TextureProcessorOutputFormat.DxtCompressed : TextureProcessorOutputFormat.Color },
+            if (!Path.IsPathRooted(texturePath))
+                return texturePath;
 
-            }, null, null);
-
-            Uri from = new Uri(_context.OutputDirectory);
-            Uri to = new Uri(contentItem.Filename);
+            Uri from = new Uri(_directory);
+            Uri to = new Uri(new ExternalReference<Texture2DContent>(texturePath).Filename);
 
             Uri relative = from.MakeRelativeUri(to);
             string path = Uri.UnescapeDataString(relative.ToString()).Replace('/', Path.DirectorySeparatorChar);
@@ -374,25 +675,29 @@ namespace Myre.Graphics.Pipeline.Models
                     return texture;
 
                 if (AllowNullDiffuseTexture)
-                    return "null_specular.tga";
+                    return "null_specular";
 
                 return null;
             }
-            return Path.Combine(_directory, DiffuseTexture);
+            return DiffuseTexture;
         }
 
         private string FindNormalTexture(MeshContent mesh, MaterialContent material)
         {
             if (string.IsNullOrEmpty(NormalTexture))
-                return FindTexture(mesh, material, "normalmap", "normal", "norm", "n", "bumpmap", "bump", "b") ?? "null_normal.tga";
-            return Path.Combine(_directory, NormalTexture);
+                return FindTexture(mesh, material, "normalmap", "normal", "norm", "n", "bumpmap", "bump", "b") ?? "null_normal";
+// ReSharper disable AssignNullToNotNullAttribute
+            return Path.Combine(_directory, Path.GetFileNameWithoutExtension(NormalTexture));
+// ReSharper restore AssignNullToNotNullAttribute
         }
 
         private string FindSpecularTexture(MeshContent mesh, MaterialContent material)
         {
             if (string.IsNullOrEmpty(SpecularTexture))
-                return FindTexture(mesh, material, "specularmap", "specular", "spec", "s") ?? "null_specular.tga";
-            return Path.Combine(_directory, SpecularTexture);
+                return FindTexture(mesh, material, "specularmap", "specular", "spec", "s") ?? "null_specular";
+// ReSharper disable AssignNullToNotNullAttribute
+            return Path.Combine(_directory, Path.GetFileNameWithoutExtension(SpecularTexture));
+// ReSharper restore AssignNullToNotNullAttribute
         }
 
         private string FindTexture(MeshContent mesh, MaterialContent material, params string[] possibleKeys)
