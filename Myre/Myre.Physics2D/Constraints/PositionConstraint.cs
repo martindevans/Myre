@@ -22,10 +22,10 @@ namespace Myre.Physics2D.Constraints
             if (_body == null)
                 throw new Exception("VelocityConstraint requires that the entity contain a DynamicPhysics behaviour.");
 
-            _targetPosition = context.CreateProperty<Vector2>("target_position");
-            _strength = context.CreateProperty<float>("position_constraint_strength");
-            _damping = context.CreateProperty<float>("position_constraint_damping");
-            _axis = context.CreateProperty<Vector2>("position_constraint_axis");
+            _targetPosition = context.CreateProperty(new TypedName<Vector2>("target_position"));
+            _strength = context.CreateProperty(new TypedName<float>("position_constraint_strength"));
+            _damping = context.CreateProperty(new TypedName<float>("position_constraint_damping"));
+            _axis = context.CreateProperty(new TypedName<Vector2>("position_constraint_axis"));
 
             base.CreateProperties(context);
         }

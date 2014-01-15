@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Myre;
+using Myre.Collections;
 using Myre.Debugging.UI;
 using Myre.Entities;
-using Myre.Graphics.Animation;
-using Ninject;
-using Microsoft.Xna.Framework;
 using Myre.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
-using Myre.UI;
-using Myre.Debugging;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
-using Myre.Collections;
+using Ninject;
 
 namespace GraphicsTests
 {
@@ -89,8 +86,8 @@ namespace GraphicsTests
             cameraDesc.AddProperty<Viewport>("viewport");
             cameraDesc.AddBehaviour<View>();
             var cameraEntity = cameraDesc.Create();
-            cameraEntity.GetProperty<Camera>("camera").Value = camera;
-            cameraEntity.GetProperty<Viewport>("viewport").Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
+            cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
+            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
             scene.Add(cameraEntity);
 
             if (config.Skybox)
@@ -98,9 +95,9 @@ namespace GraphicsTests
                 var skyboxDesc = kernel.Get<EntityDescription>();
                 skyboxDesc.AddBehaviour<Skybox>();
                 var skybox = skyboxDesc.Create();
-                skybox.GetProperty<TextureCube>("texture").Value = content.Load<TextureCube>("StormCubeMap");
-                skybox.GetProperty<float>("brightness").Value = 0.5f;
-                skybox.GetProperty<bool>("gamma_correct").Value = false;
+                skybox.GetProperty(new TypedName<TextureCube>("texture")).Value = content.Load<TextureCube>("StormCubeMap");
+                skybox.GetProperty(new TypedName<float>("brightness")).Value = 0.5f;
+                skybox.GetProperty(new TypedName<bool>("gamma_correct")).Value = false;
                 scene.Add(skybox);
             }
 
@@ -131,9 +128,9 @@ namespace GraphicsTests
                 var entity = pointLight.Create();
                 scene.Add(entity);
 
-                entity.GetProperty<Vector3>("position").Value = new Vector3(0, 10, 0);
-                entity.GetProperty<Vector3>("colour").Value = new Vector3(0, 5, 0);
-                entity.GetProperty<float>("range").Value = 200;
+                entity.GetProperty(new TypedName<Vector3>("position")).Value = new Vector3(0, 10, 0);
+                entity.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(0, 5, 0);
+                entity.GetProperty(new TypedName<float>("range")).Value = 200;
 
                 var light = entity.GetBehaviour<PointLight>();
                 light.Colour = Vector3.Normalize(new Vector3(0.1f + (float)rng.NextDouble(), 0.1f + (float)rng.NextDouble(), 0.1f + (float)rng.NextDouble())) * 10;
@@ -152,13 +149,13 @@ namespace GraphicsTests
                 spotLight.AddProperty<int>("shadow_resolution");
                 spotLight.AddBehaviour<SpotLight>();
                 var spotLightEntity = spotLight.Create();
-                spotLightEntity.GetProperty<Vector3>("position").Value = new Vector3(-180, 250, 0);
-                spotLightEntity.GetProperty<Vector3>("colour").Value = new Vector3(10);
-                spotLightEntity.GetProperty<Vector3>("direction").Value = new Vector3(0, -1, 0);
-                spotLightEntity.GetProperty<float>("angle").Value = MathHelper.PiOver2;
-                spotLightEntity.GetProperty<float>("range").Value = 500;
-                spotLightEntity.GetProperty<Texture2D>("mask").Value = content.Load<Texture2D>("Chrysanthemum");
-                spotLightEntity.GetProperty<int>("shadow_resolution").Value = 1024;
+                spotLightEntity.GetProperty(new TypedName<Vector3>("position")).Value = new Vector3(-180, 250, 0);
+                spotLightEntity.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(10);
+                spotLightEntity.GetProperty(new TypedName<Vector3>("direction")).Value = new Vector3(0, -1, 0);
+                spotLightEntity.GetProperty(new TypedName<float>("angle")).Value = MathHelper.PiOver2;
+                spotLightEntity.GetProperty(new TypedName<float>("range")).Value = 500;
+                spotLightEntity.GetProperty(new TypedName<Texture2D>("mask")).Value = content.Load<Texture2D>("Chrysanthemum");
+                spotLightEntity.GetProperty(new TypedName<int>("shadow_resolution")).Value = 1024;
                 this.spotLight = spotLightEntity.GetBehaviour<SpotLight>();
                 scene.Add(spotLightEntity);
             }
@@ -171,9 +168,9 @@ namespace GraphicsTests
                 ambientLight.AddProperty<Vector3>("up");
                 ambientLight.AddBehaviour<AmbientLight>();
                 var ambientLightEntity = ambientLight.Create();
-                ambientLightEntity.GetProperty<Vector3>("sky_colour").Value = new Vector3(0.04f);
-                ambientLightEntity.GetProperty<Vector3>("ground_colour").Value = new Vector3(0.04f, 0.05f, 0.04f);
-                ambientLightEntity.GetProperty<Vector3>("up").Value = Vector3.Up;
+                ambientLightEntity.GetProperty(new TypedName<Vector3>("sky_colour")).Value = new Vector3(0.04f);
+                ambientLightEntity.GetProperty(new TypedName<Vector3>("ground_colour")).Value = new Vector3(0.04f, 0.05f, 0.04f);
+                ambientLightEntity.GetProperty(new TypedName<Vector3>("up")).Value = Vector3.Up;
                 scene.Add(ambientLightEntity);
             }
 
@@ -182,9 +179,9 @@ namespace GraphicsTests
                 var sunlight = kernel.Get<EntityDescription>();
                 sunlight.AddBehaviour<SunLight>();
                 var sunlightEntity = sunlight.Create();
-                sunlightEntity.GetProperty<Vector3>("colour").Value = new Vector3(1, 0.75f, 0.6f);
-                sunlightEntity.GetProperty<Vector3>("direction").Value = Vector3.Down;
-                sunlightEntity.GetProperty<int>("shadow_resolution").Value = 1024;
+                sunlightEntity.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(1, 0.75f, 0.6f);
+                sunlightEntity.GetProperty(new TypedName<Vector3>("direction")).Value = Vector3.Down;
+                sunlightEntity.GetProperty(new TypedName<int>("shadow_resolution")).Value = 1024;
                 scene.Add(sunlightEntity);
             }
 
@@ -211,11 +208,11 @@ namespace GraphicsTests
             hebe.AddProperty<bool>("is_static");
             hebe.AddBehaviour<ModelInstance>();
             var hebeEntity = hebe.Create();
-            hebeEntity.GetProperty<ModelData>("model").Value = hebeModel;
-            hebeEntity.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
+            hebeEntity.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
+            hebeEntity.GetProperty(new TypedName<Matrix>("transform")).Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
-            hebeEntity.GetProperty<bool>("is_static").Value = true;
+            hebeEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
             scene.Add(hebeEntity);
 
             //var dudeModel = content.Load<ModelData>(@"dude");
@@ -229,12 +226,12 @@ namespace GraphicsTests
             //scene.Add(dudeEntity);
 
             var lightBlocker = hebe.Create();
-            hebeTransform = lightBlocker.GetProperty<Matrix>("transform");
-            lightBlocker.GetProperty<ModelData>("model").Value = hebeModel;
-            lightBlocker.GetProperty<Matrix>("transform").Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
+            hebeTransform = lightBlocker.GetProperty(new TypedName<Matrix>("transform"));
+            lightBlocker.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
+            lightBlocker.GetProperty(new TypedName<Matrix>("transform")).Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
-            lightBlocker.GetProperty<bool>("is_static").Value = false;
+            lightBlocker.GetProperty(new TypedName<bool>("is_static")).Value = false;
             scene.Add(lightBlocker);
 
             var sponzaModel = content.Load<ModelData>(@"Sponza");
@@ -244,9 +241,9 @@ namespace GraphicsTests
             sponza.AddProperty<bool>("is_static");
             sponza.AddBehaviour<ModelInstance>();
             var sponzaEntity = sponza.Create();
-            sponzaEntity.GetProperty<ModelData>("model").Value = sponzaModel;
-            sponzaEntity.GetProperty<Matrix>("transform").Value = Matrix.Identity * Matrix.CreateScale(1);
-            sponzaEntity.GetProperty<bool>("is_static").Value = true;
+            sponzaEntity.GetProperty(new TypedName<ModelData>("model")).Value = sponzaModel;
+            sponzaEntity.GetProperty(new TypedName<Matrix>("transform")).Value = Matrix.Identity * Matrix.CreateScale(1);
+            sponzaEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
             scene.Add(sponzaEntity);
             _sponza = sponzaEntity.GetBehaviour<ModelInstance>();
 
@@ -350,7 +347,7 @@ namespace GraphicsTests
             for (int i = 0; i < lights.Count / 10; i++)
             {
                 var light = lights[i];
-                var offset = i * (MathHelper.TwoPi / (lights.Count / 10));
+                var offset = i * (MathHelper.TwoPi / (lights.Count / 10f));
                 light.Position = new Vector3(
                     (float)Math.Cos(totalTime + offset) * 40,
                     10,
@@ -360,7 +357,7 @@ namespace GraphicsTests
             for (int i = lights.Count / 10; i < lights.Count; i++)
             {
                 var light = lights[i];
-                var offset = i * (MathHelper.TwoPi / (lights.Count  - (lights.Count / 10)));
+                var offset = i * (MathHelper.TwoPi / (lights.Count  - (lights.Count / 10f)));
                 light.Position = new Vector3(
                     (float)Math.Cos(-totalTime + offset) * 100,
                     10,

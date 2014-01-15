@@ -26,7 +26,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
 
         public override void Attach(ParticleEmitter emitter)
         {
-            _position = emitter.Owner.GetProperty<Vector3>("position");
+            _position = emitter.Owner.GetProperty(new TypedName<Vector3>("position"));
             _previousPosition = _position.Value;
         }
 

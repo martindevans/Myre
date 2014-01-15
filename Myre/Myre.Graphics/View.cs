@@ -27,8 +27,8 @@ namespace Myre.Graphics
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _camera = context.CreateProperty<Camera>("camera");
-            _viewport = context.CreateProperty<Viewport>("viewport");
+            _camera = context.CreateProperty(new TypedName<Camera>("camera"));
+            _viewport = context.CreateProperty(new TypedName<Viewport>("viewport"));
 
             base.CreateProperties(context);
         }

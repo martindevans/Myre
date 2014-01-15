@@ -82,12 +82,12 @@ namespace Myre.Graphics.Geometry
         {
             var append = (Name == null ? "" : "_" + Name);
 
-            _model = context.CreateProperty<ModelData>("model" + append);
-            _transform = context.CreateProperty<Matrix>("transform" + append);
-            _isStatic = context.CreateProperty<bool>("is_static" + append);
-            _isInvisible = context.CreateProperty<bool>("is_invisible" + append);
-            _ignoreViewMatrix = context.CreateProperty<bool>("ignore_view_matrix" + append, false);
-            _ignoreProjectionMatrix = context.CreateProperty<bool>("ignore_projection_matrix" + append, false);
+            _model = context.CreateProperty(new TypedName<ModelData>("model" + append));
+            _transform = context.CreateProperty(new TypedName<Matrix>("transform" + append));
+            _isStatic = context.CreateProperty(new TypedName<bool>("is_static" + append));
+            _isInvisible = context.CreateProperty(new TypedName<bool>("is_invisible" + append));
+            _ignoreViewMatrix = context.CreateProperty(new TypedName<bool>("ignore_view_matrix" + append), false);
+            _ignoreProjectionMatrix = context.CreateProperty(new TypedName<bool>("ignore_projection_matrix" + append), false);
 
             base.CreateProperties(context);
         }

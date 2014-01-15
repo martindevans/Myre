@@ -38,14 +38,14 @@ namespace Myre.Entities
                 _entity = entity;
             }
 
-            public Property<T> CreateProperty<T>(String name, T value = default(T))
+            public Property<T> CreateProperty<T>(TypedName<T> name, T value = default(T))
             {
                 CheckFrozen();
 
                 var property = _entity.GetProperty<T>(name);
                 if (property == null)
                 {
-                    property = new Property<T>(name) {Value = value};
+                    property = new Property<T>(name.Name) {Value = value};
                     _entity.AddProperty(property);
                 }
 
@@ -316,9 +316,9 @@ namespace Myre.Entities
         /// <typeparam name="T">The data type this property contains.</typeparam>
         /// <param name="name">The name of the propery.</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public Property<T> GetProperty<T>(String name)
+        public Property<T> GetProperty<T>(TypedName<T> name)
         {
-            return GetProperty(name) as Property<T>;
+            return GetProperty(name.Name) as Property<T>;
         }
 
         /// <summary>

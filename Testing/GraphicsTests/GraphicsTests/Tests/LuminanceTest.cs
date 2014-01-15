@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Myre;
 using Myre.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Translucency;
@@ -119,10 +120,10 @@ namespace GraphicsTests.Tests
             this.content = content;
             this.device = device;
 
-            UI.Root.Gestures.Bind((g, t, d) => light.GetProperty<Vector3>("colour").Value = new Vector3(5),
+            UI.Root.Gestures.Bind((g, t, d) => light.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(5),
                 new KeyPressed(Keys.L));
 
-            UI.Root.Gestures.Bind((g, t, d) => light.GetProperty<Vector3>("colour").Value = Vector3.Zero,
+            UI.Root.Gestures.Bind((g, t, d) => light.GetProperty(new TypedName<Vector3>("colour")).Value = Vector3.Zero,
                 new KeyReleased(Keys.L));
         }
 

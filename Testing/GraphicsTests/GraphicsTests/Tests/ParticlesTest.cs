@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Myre;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Graphics;
@@ -62,15 +63,15 @@ namespace GraphicsTests.Tests
             cameraDescription.AddProperty<Viewport>("viewport");
             cameraDescription.AddBehaviour<View>();
             var cameraEntity = cameraDescription.Create();
-            cameraEntity.GetProperty<Camera>("camera").Value = _camera;
-            cameraEntity.GetProperty<Viewport>("viewport").Value = new Viewport() { Width = _device.PresentationParameters.BackBufferWidth, Height = _device.PresentationParameters.BackBufferHeight };
+            cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = _camera;
+            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = _device.PresentationParameters.BackBufferWidth, Height = _device.PresentationParameters.BackBufferHeight };
             _scene.Add(cameraEntity);
 
             var particleEntityDesc = _kernel.Get<EntityDescription>();
             particleEntityDesc.AddProperty<Vector3>("position");
             particleEntityDesc.AddBehaviour<ParticleEmitter>();
             var entity = particleEntityDesc.Create();
-            entity.GetProperty<Vector3>("position").Value = Vector3.Zero;
+            entity.GetProperty(new TypedName<Vector3>("position")).Value = Vector3.Zero;
             NamedBoxCollection initData = new NamedBoxCollection();
             initData.Set<ParticleEmitterDescription>("particlesystem", _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
             _scene.Add(entity, initData);

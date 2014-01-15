@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Myre;
 using Myre.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -207,8 +208,8 @@ namespace GraphicsTests.Tests
             camera.AddProperty<Viewport>("viewport");
             camera.AddBehaviour<View>();
             var cameraEntity = camera.Create();
-            cameraEntity.GetProperty<Camera>("camera").Value = new Camera();
-            cameraEntity.GetProperty<Viewport>("viewport").Value = new Viewport() { Height = 1920, Width = 1080 };
+            cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = new Camera();
+            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Height = 1920, Width = 1080 };
             scene.Add(camera.Create());
 
             var renderer = scene.GetService<Renderer>();

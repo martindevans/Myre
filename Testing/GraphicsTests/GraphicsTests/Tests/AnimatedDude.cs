@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Myre;
 using Myre.Entities;
 using Myre.Graphics;
 using Myre.Graphics.Animation;
@@ -79,8 +80,8 @@ namespace GraphicsTests.Tests
             cameraDesc.AddProperty<Viewport>("viewport");
             cameraDesc.AddBehaviour<View>();
             var cameraEntity = cameraDesc.Create();
-            cameraEntity.GetProperty<Camera>("camera").Value = camera;
-            cameraEntity.GetProperty<Viewport>("viewport").Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
+            cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
+            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
             _scene.Add(cameraEntity);
 
             var ambientLight = kernel.Get<EntityDescription>();

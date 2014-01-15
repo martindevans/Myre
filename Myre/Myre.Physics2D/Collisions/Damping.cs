@@ -24,9 +24,9 @@ namespace Myre.Physics2D.Collisions
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _velocity = context.CreateProperty<Vector3>("velocity", default(Vector3));
-            _acceleration = context.CreateProperty<Vector3>("acceleration", default(Vector3));
-            _inverseMass = context.CreateProperty<float>(InverseMassCalculator.INVERSE_MASS, default(float));
+            _velocity = context.CreateProperty(new TypedName<Vector3>("velocity"), default(Vector3));
+            _acceleration = context.CreateProperty(new TypedName<Vector3>("acceleration"), default(Vector3));
+            _inverseMass = context.CreateProperty(new TypedName<float>(InverseMassCalculator.INVERSE_MASS), default(float));
 
             base.CreateProperties(context);
         }
@@ -35,7 +35,7 @@ namespace Myre.Physics2D.Collisions
         {
             if (Owner.GetBehaviour<InverseMassCalculator>(null) == null)
                 throw new InvalidOperationException("Inverse mass calculator must be attached");
-            _damping = Owner.GetProperty<float>("damping");
+            _damping = Owner.GetProperty(new TypedName<float>("damping"));
 
             base.Initialise(initialisationData);
         }

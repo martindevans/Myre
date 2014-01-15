@@ -52,6 +52,11 @@ namespace Myre.Entities
         /// </summary>
         public String Name { get; private set; }
 
+        public TypedName<T> TypedName
+        {
+            get { return new TypedName<T>(Name); }
+        }
+
         private T _value;
         /// <summary>
         /// The value of this property

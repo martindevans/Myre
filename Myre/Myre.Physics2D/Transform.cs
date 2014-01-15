@@ -40,10 +40,10 @@ namespace Myre.Physics2D
         
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _position = context.CreateProperty<Vector2>(PhysicsProperties.POSITION);
-            _rotation = context.CreateProperty<float>(PhysicsProperties.ROTATION);
-            _transform = context.CreateProperty<Matrix>("transform");
-            _inverseTransform = context.CreateProperty<Matrix>("inverse_transform");
+            _position = context.CreateProperty(new TypedName<Vector2>(PhysicsProperties.POSITION));
+            _rotation = context.CreateProperty(new TypedName<float>(PhysicsProperties.ROTATION));
+            _transform = context.CreateProperty(new TypedName<Matrix>("transform"));
+            _inverseTransform = context.CreateProperty(new TypedName<Matrix>("inverse_transform"));
 
             _position.PropertySet += (p, o, n) => _isDirty = true;
             _rotation.PropertySet += (p, o, n) => _isDirty = true;

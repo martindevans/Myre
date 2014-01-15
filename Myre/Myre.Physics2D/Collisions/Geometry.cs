@@ -72,10 +72,10 @@ namespace Myre.Physics2D.Collisions
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _frictionCoefficient = context.CreateProperty<float>("friction_coefficient", default(float));
-            _restitutionCoefficient = context.CreateProperty<float>("restitution_coefficient", default(float));
-            _sleeping = context.CreateProperty<bool>("sleeping", default(bool));
-            _group = context.CreateProperty<CollisionGroup>("collision_group", default(CollisionGroup));
+            _frictionCoefficient = context.CreateProperty(new TypedName<float>("friction_coefficient"), default(float));
+            _restitutionCoefficient = context.CreateProperty(new TypedName<float>("restitution_coefficient"), default(float));
+            _sleeping = context.CreateProperty(new TypedName<bool>("sleeping"), default(bool));
+            _group = context.CreateProperty(new TypedName<CollisionGroup>("collision_group"), default(CollisionGroup));
 
             _restitutionCoefficient.PropertySet += ValidateRestitution;
             _sleeping.PropertySet += WakeUp;

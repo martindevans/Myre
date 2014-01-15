@@ -136,13 +136,13 @@ namespace Myre.Graphics.Animation
         #region initialise
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _defaultClip = context.CreateProperty<ClipPlaybackParameters>("animation_default_clip");
-            _rootBoneTransform = context.CreateProperty<Transform>("animation_root_transform", Transform.Identity);
-            _enableRootBoneTranslationX = context.CreateProperty<bool>("animation_enable_root_translation_x", false);
-            _enableRootBoneTranslationY = context.CreateProperty<bool>("animation_enable_root_translation_y", false);
-            _enableRootBoneTranslationZ = context.CreateProperty<bool>("animation_enable_root_translation_z", false);
-            _enableRootBoneRotation = context.CreateProperty<bool>("animation_enable_root_rotation", true);
-            _enableRootBoneScale = context.CreateProperty<bool>("animation_enable_root_scale", true);
+            _defaultClip = context.CreateProperty(new TypedName<ClipPlaybackParameters>("animation_default_clip"));
+            _rootBoneTransform = context.CreateProperty(new TypedName<Transform>("animation_root_transform"), Transform.Identity);
+            _enableRootBoneTranslationX = context.CreateProperty(new TypedName<bool>("animation_enable_root_translation_x"), false);
+            _enableRootBoneTranslationY = context.CreateProperty(new TypedName<bool>("animation_enable_root_translation_y"), false);
+            _enableRootBoneTranslationZ = context.CreateProperty(new TypedName<bool>("animation_enable_root_translation_z"), false);
+            _enableRootBoneRotation = context.CreateProperty(new TypedName<bool>("animation_enable_root_rotation"), true);
+            _enableRootBoneScale = context.CreateProperty(new TypedName<bool>("animation_enable_root_scale"), true);
 
             base.CreateProperties(context);
         }

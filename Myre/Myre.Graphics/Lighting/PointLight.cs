@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName());
-            _position = context.CreateProperty<Vector3>(POSITION_NAME + AppendName());
-            _range = context.CreateProperty<float>(RANGE_NAME + AppendName());
+            _colour = context.CreateProperty(new TypedName<Vector3>(COLOUR_NAME + AppendName()));
+            _position = context.CreateProperty(new TypedName<Vector3>(POSITION_NAME + AppendName()));
+            _range = context.CreateProperty(new TypedName<float>(RANGE_NAME + AppendName()));
             
             base.CreateProperties(context);
         }

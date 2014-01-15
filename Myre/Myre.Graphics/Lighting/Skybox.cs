@@ -32,9 +32,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _texture = context.CreateProperty<TextureCube>("texture");
-            _brightness = context.CreateProperty<float>("brightness");
-            _gammaCorrect = context.CreateProperty<bool>("gamma_correct");
+            _texture = context.CreateProperty(new TypedName<TextureCube>("texture"));
+            _brightness = context.CreateProperty(new TypedName<float>("brightness"));
+            _gammaCorrect = context.CreateProperty(new TypedName<bool>("gamma_correct"));
 
             base.CreateProperties(context);
         }

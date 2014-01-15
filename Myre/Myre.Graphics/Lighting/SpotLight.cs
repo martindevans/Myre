@@ -77,14 +77,14 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty<Vector3>(COLOUR_NAME + AppendName());
-            _position = context.CreateProperty<Vector3>(POSITION_NAME + AppendName());
-            _direction = context.CreateProperty<Vector3>(DIRECTION_NAME + AppendName());
-            _angle = context.CreateProperty<float>(ANGLE_NAME + AppendName());
-            _range = context.CreateProperty<float>(RANGE_NAME + AppendName());
-            _mask = context.CreateProperty<Texture2D>(MASK_NAME + AppendName());
-            _shadowResolution = context.CreateProperty<int>(SHADOW_RESOLUTION_NAME + AppendName());
-            _active = context.CreateProperty<bool>(ACTIVE_NAME + AppendName(), true);
+            _colour = context.CreateProperty(new TypedName<Vector3>(COLOUR_NAME + AppendName()));
+            _position = context.CreateProperty(new TypedName<Vector3>(POSITION_NAME + AppendName()));
+            _direction = context.CreateProperty(new TypedName<Vector3>(DIRECTION_NAME + AppendName()));
+            _angle = context.CreateProperty(new TypedName<float>(ANGLE_NAME + AppendName()));
+            _range = context.CreateProperty(new TypedName<float>(RANGE_NAME + AppendName()));
+            _mask = context.CreateProperty(new TypedName<Texture2D>(MASK_NAME + AppendName()));
+            _shadowResolution = context.CreateProperty(new TypedName<int>(SHADOW_RESOLUTION_NAME + AppendName()));
+            _active = context.CreateProperty(new TypedName<bool>(ACTIVE_NAME + AppendName()), true);
 
             base.CreateProperties(context);
         }
