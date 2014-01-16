@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Myre
 {
     /// <summary>
@@ -8,6 +10,7 @@ namespace Myre
     /// This may seem a little odd as the type parameter is not used. This type exists so that you can store a TypedName&lt;T&gt; somewhere and unambiguously refer to a box or property. The type parameter really exists for compiler inferencing
     /// </remarks>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     public struct TypedName<T>
     {
         /// <summary>
@@ -25,13 +28,14 @@ namespace Myre
         }
 
         /// <summary>
-        /// Implicitly cast a string into a TypedName
+        /// Append a string to the name of a TypedName
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
         /// <returns></returns>
-        //public static implicit operator TypedName<T>(string name)
-        //{
-        //    return new TypedName<T>(name);
-        //}
+        public static TypedName<T> operator +(TypedName<T> a, string b)
+        {
+            return new TypedName<T>(string.Format("{0}_{1}", a.Name, b));
+        }
     }
 }
