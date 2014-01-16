@@ -23,5 +23,15 @@ namespace Myre
         {
             Name = name;
         }
+
+        /// <summary>
+        /// Implicitly cast a string into a TypedName
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        //public static implicit operator TypedName<T>(string name)
+        //{
+        //    return new TypedName<T>(name);
+        //}
     }
 }

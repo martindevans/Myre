@@ -60,7 +60,7 @@ namespace GraphicsTests.Tests
             _camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
 
             var cameraDescription = _kernel.Get<EntityDescription>();
-            cameraDescription.AddProperty<Viewport>("viewport");
+            cameraDescription.AddProperty(new TypedName<Viewport>("viewport"));
             cameraDescription.AddBehaviour<View>();
             var cameraEntity = cameraDescription.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = _camera;
@@ -68,7 +68,7 @@ namespace GraphicsTests.Tests
             _scene.Add(cameraEntity);
 
             var particleEntityDesc = _kernel.Get<EntityDescription>();
-            particleEntityDesc.AddProperty<Vector3>("position");
+            particleEntityDesc.AddProperty(new TypedName<Vector3>("position"));
             particleEntityDesc.AddBehaviour<ParticleEmitter>();
             var entity = particleEntityDesc.Create();
             entity.GetProperty(new TypedName<Vector3>("position")).Value = Vector3.Zero;

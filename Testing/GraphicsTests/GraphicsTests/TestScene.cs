@@ -82,8 +82,8 @@ namespace GraphicsTests
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
 
             var cameraDesc = kernel.Get<EntityDescription>();
-            cameraDesc.AddProperty<Camera>("camera");
-            cameraDesc.AddProperty<Viewport>("viewport");
+            cameraDesc.AddProperty(new TypedName<Camera>("camera"));
+            cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
             cameraDesc.AddBehaviour<View>();
             var cameraEntity = cameraDesc.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
@@ -115,9 +115,9 @@ namespace GraphicsTests
             //scene.Add(sun2);
 
             var pointLight = kernel.Get<EntityDescription>();
-            pointLight.AddProperty<Vector3>("position");
-            pointLight.AddProperty<Vector3>("colour");
-            pointLight.AddProperty<float>("range");
+            pointLight.AddProperty(new TypedName<Vector3>("position"));
+            pointLight.AddProperty(new TypedName<Vector3>("colour"));
+            pointLight.AddProperty(new TypedName<float>("range"));
             pointLight.AddBehaviour<PointLight>();
             //scene.Add(pointLight.Create());
 
@@ -140,13 +140,13 @@ namespace GraphicsTests
             if (config.Spotlight)
             {
                 var spotLight = kernel.Get<EntityDescription>();
-                spotLight.AddProperty<Vector3>("position");
-                spotLight.AddProperty<Vector3>("colour");
-                spotLight.AddProperty<Vector3>("direction");
-                spotLight.AddProperty<float>("angle");
-                spotLight.AddProperty<float>("range");
-                spotLight.AddProperty<Texture2D>("mask");
-                spotLight.AddProperty<int>("shadow_resolution");
+                spotLight.AddProperty(new TypedName<Vector3>("position"));
+                spotLight.AddProperty(new TypedName<Vector3>("colour"));
+                spotLight.AddProperty(new TypedName<Vector3>("direction"));
+                spotLight.AddProperty(new TypedName<float>("angle"));
+                spotLight.AddProperty(new TypedName<float>("range"));
+                spotLight.AddProperty(new TypedName<Texture2D>("mask"));
+                spotLight.AddProperty(new TypedName<int>("shadow_resolution"));
                 spotLight.AddBehaviour<SpotLight>();
                 var spotLightEntity = spotLight.Create();
                 spotLightEntity.GetProperty(new TypedName<Vector3>("position")).Value = new Vector3(-180, 250, 0);
@@ -163,9 +163,9 @@ namespace GraphicsTests
             if (config.AmbientLight)
             {
                 var ambientLight = kernel.Get<EntityDescription>();
-                ambientLight.AddProperty<Vector3>("sky_colour");
-                ambientLight.AddProperty<Vector3>("ground_colour");
-                ambientLight.AddProperty<Vector3>("up");
+                ambientLight.AddProperty(new TypedName<Vector3>("sky_colour"));
+                ambientLight.AddProperty(new TypedName<Vector3>("ground_colour"));
+                ambientLight.AddProperty(new TypedName<Vector3>("up"));
                 ambientLight.AddBehaviour<AmbientLight>();
                 var ambientLightEntity = ambientLight.Create();
                 ambientLightEntity.GetProperty(new TypedName<Vector3>("sky_colour")).Value = new Vector3(0.04f);
@@ -203,9 +203,9 @@ namespace GraphicsTests
 
             var hebeModel = content.Load<ModelData>(@"Models\Hebe2");
             var hebe = kernel.Get<EntityDescription>();
-            hebe.AddProperty<ModelData>("model");
-            hebe.AddProperty<Matrix>("transform");
-            hebe.AddProperty<bool>("is_static");
+            hebe.AddProperty(new TypedName<ModelData>("model"));
+            hebe.AddProperty(new TypedName<Matrix>("transform"));
+            hebe.AddProperty(new TypedName<bool>("is_static"));
             hebe.AddBehaviour<ModelInstance>();
             var hebeEntity = hebe.Create();
             hebeEntity.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
@@ -236,9 +236,9 @@ namespace GraphicsTests
 
             var sponzaModel = content.Load<ModelData>(@"Sponza");
             var sponza = kernel.Get<EntityDescription>();
-            sponza.AddProperty<ModelData>("model");
-            sponza.AddProperty<Matrix>("transform");
-            sponza.AddProperty<bool>("is_static");
+            sponza.AddProperty(new TypedName<ModelData>("model"));
+            sponza.AddProperty(new TypedName<Matrix>("transform"));
+            sponza.AddProperty(new TypedName<bool>("is_static"));
             sponza.AddBehaviour<ModelInstance>();
             var sponzaEntity = sponza.Create();
             sponzaEntity.GetProperty(new TypedName<ModelData>("model")).Value = sponzaModel;

@@ -204,8 +204,8 @@ namespace GraphicsTests.Tests
             scene = new Scene(kernel);
             
             var camera = new EntityDescription(kernel);
-            camera.AddProperty<Camera>("camera");
-            camera.AddProperty<Viewport>("viewport");
+            camera.AddProperty(new TypedName<Camera>("camera"));
+            camera.AddProperty(new TypedName<Viewport>("viewport"));
             camera.AddBehaviour<View>();
             var cameraEntity = camera.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = new Camera();

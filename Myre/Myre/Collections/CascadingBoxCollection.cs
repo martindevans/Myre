@@ -9,14 +9,14 @@ namespace Myre.Collections
     public class CascadingBoxCollection
         :MarshalByRefObject, INamedDataCollection
     {
-        private readonly INamedDataCollection _parent;
+        private readonly INamedDataProvider _parent;
         private readonly NamedBoxCollection _values;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parent"></param>
-        public CascadingBoxCollection(INamedDataCollection parent)
+        public CascadingBoxCollection(INamedDataProvider parent)
         {
             _parent = parent;
             _values = new NamedBoxCollection();

@@ -36,9 +36,9 @@ namespace GraphicsTests.Tests
 
             var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
-            dude.AddProperty<ModelData>("model", model);
-            dude.AddProperty<Matrix>("transform", Matrix.Identity);
-            dude.AddProperty<bool>("is_static", false);
+            dude.AddProperty(new TypedName<ModelData>("model"), model);
+            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.Identity);
+            dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
             var dudeEntity = dude.Create();
@@ -76,8 +76,8 @@ namespace GraphicsTests.Tests
             var camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateTranslation(-20, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up) };
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
             var cameraDesc = kernel.Get<EntityDescription>();
-            cameraDesc.AddProperty<Camera>("camera");
-            cameraDesc.AddProperty<Viewport>("viewport");
+            cameraDesc.AddProperty(new TypedName<Camera>("camera"));
+            cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
             cameraDesc.AddBehaviour<View>();
             var cameraEntity = cameraDesc.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
@@ -85,27 +85,27 @@ namespace GraphicsTests.Tests
             _scene.Add(cameraEntity);
 
             var ambientLight = kernel.Get<EntityDescription>();
-            ambientLight.AddProperty<Vector3>("sky_colour", new Vector3(0.44f));
-            ambientLight.AddProperty<Vector3>("ground_colour", new Vector3(0.24f, 0.35f, 0.24f));
-            ambientLight.AddProperty<Vector3>("up", Vector3.Up);
+            ambientLight.AddProperty(new TypedName<Vector3>("sky_colour"), new Vector3(0.44f));
+            ambientLight.AddProperty(new TypedName<Vector3>("ground_colour"), new Vector3(0.24f, 0.35f, 0.24f));
+            ambientLight.AddProperty(new TypedName<Vector3>("up"), Vector3.Up);
             ambientLight.AddBehaviour<AmbientLight>();
             _scene.Add(ambientLight.Create());
 
             var sponza = kernel.Get<EntityDescription>();
-            sponza.AddProperty<ModelData>("model", content.Load<ModelData>(@"Sponza"));
-            sponza.AddProperty<Matrix>("transform", Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-350, 0, 0));
-            sponza.AddProperty<bool>("is_static", true);
+            sponza.AddProperty(new TypedName<ModelData>("model"), content.Load<ModelData>(@"Sponza"));
+            sponza.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-350, 0, 0));
+            sponza.AddProperty(new TypedName<bool>("is_static"), true);
             sponza.AddBehaviour<ModelInstance>();
             _scene.Add(sponza.Create());
 
             var spotLight = kernel.Get<EntityDescription>();
-            spotLight.AddProperty<Vector3>("position", new Vector3(150, 50, 0));
-            spotLight.AddProperty<Vector3>("colour", new Vector3(5));
-            spotLight.AddProperty<Vector3>("direction", new Vector3(-1, 0, 0));
-            spotLight.AddProperty<float>("angle", MathHelper.PiOver2);
-            spotLight.AddProperty<float>("range", 1000);
-            spotLight.AddProperty<Texture2D>("mask", content.Load<Texture2D>("Chrysanthemum"));
-            spotLight.AddProperty<int>("shadow_resolution", 1024);
+            spotLight.AddProperty(new TypedName<Vector3>("position"), new Vector3(150, 50, 0));
+            spotLight.AddProperty(new TypedName<Vector3>("colour"), new Vector3(5));
+            spotLight.AddProperty(new TypedName<Vector3>("direction"), new Vector3(-1, 0, 0));
+            spotLight.AddProperty(new TypedName<float>("angle"), MathHelper.PiOver2);
+            spotLight.AddProperty(new TypedName<float>("range"), 1000);
+            spotLight.AddProperty(new TypedName<Texture2D>("mask"), content.Load<Texture2D>("Chrysanthemum"));
+            spotLight.AddProperty(new TypedName<int>("shadow_resolution"), 1024);
             spotLight.AddBehaviour<SpotLight>();
             var spotLightEntity = spotLight.Create();
             _scene.Add(spotLightEntity);

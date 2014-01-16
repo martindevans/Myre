@@ -183,10 +183,10 @@ namespace Myre.Entities
         /// <typeparam name="T"></typeparam>
         /// <param name="name">The name.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour<T>(string name = null)
+        public bool AddBehaviour<T>(TypedName<T> name = default(TypedName<T>))
             where T : Behaviour
         {
-            return AddBehaviour(typeof(T), name);
+            return AddBehaviour(typeof(T), name.Name);
         }
 
 #if WINDOWS
@@ -282,9 +282,9 @@ namespace Myre.Entities
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty<T>(string name, T initialValue = default(T))
+        public bool AddProperty<T>(TypedName<T> name, T initialValue = default(T))
         {
-            return AddProperty(typeof(T), name, initialValue);
+            return AddProperty(typeof(T), name.Name, initialValue);
         }
 
         /// <summary>

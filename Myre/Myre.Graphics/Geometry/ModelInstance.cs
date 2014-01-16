@@ -15,12 +15,12 @@ namespace Myre.Graphics.Geometry
     public class ModelInstance
         : Behaviour
     {
-        private static readonly TypedName<ModelData> _modelName = new TypedName<ModelData>("model");
-        private static readonly TypedName<Matrix> _transformName = new TypedName<Matrix>("transform");
-        private static readonly TypedName<bool> _isStaticName = new TypedName<bool>("is_static");
-        private static readonly TypedName<bool> _isInvisibleName = new TypedName<bool>("is_invisible");
-        private static readonly TypedName<bool> _ignoreViewMatrixName = new TypedName<bool>("ignore_view_matrix");
-        private static readonly TypedName<bool> _ignoreProjectionMatrixName = new TypedName<bool>("ignore_projection_matrix");
+        public static readonly TypedName<ModelData> ModelName = new TypedName<ModelData>("model");
+        public static readonly TypedName<Matrix> TransformName = new TypedName<Matrix>("transform");
+        public static readonly TypedName<bool> IsStaticName = new TypedName<bool>("is_static");
+        public static readonly TypedName<bool> IsInvisibleName = new TypedName<bool>("is_invisible");
+        public static readonly TypedName<bool> IgnoreViewMatrixName = new TypedName<bool>("ignore_view_matrix");
+        public static readonly TypedName<bool> IgnoreProjectionMatrixName = new TypedName<bool>("ignore_projection_matrix");
 
         private Property<ModelData> _model;
         private Property<Matrix> _transform;
@@ -87,12 +87,12 @@ namespace Myre.Graphics.Geometry
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _model = context.CreateProperty(_modelName);
-            _transform = context.CreateProperty(_transformName);
-            _isStatic = context.CreateProperty(_isStaticName);
-            _isInvisible = context.CreateProperty(_isInvisibleName);
-            _ignoreViewMatrix = context.CreateProperty(_ignoreViewMatrixName, false);
-            _ignoreProjectionMatrix = context.CreateProperty(_ignoreProjectionMatrixName, false);
+            _model = context.CreateProperty(ModelName);
+            _transform = context.CreateProperty(TransformName);
+            _isStatic = context.CreateProperty(IsStaticName);
+            _isInvisible = context.CreateProperty(IsInvisibleName);
+            _ignoreViewMatrix = context.CreateProperty(IgnoreViewMatrixName, false);
+            _ignoreProjectionMatrix = context.CreateProperty(IgnoreProjectionMatrixName, false);
 
             base.CreateProperties(context);
         }

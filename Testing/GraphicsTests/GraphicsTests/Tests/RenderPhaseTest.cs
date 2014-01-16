@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre;
-using Ninject;
-using Myre.Graphics.Materials;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Myre.Graphics;
-using Myre.Collections;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using System.Diagnostics;
-using System.Xml;
+using Myre;
 using Myre.Entities;
+using Myre.Graphics;
+using Ninject;
 
 namespace GraphicsTests
 {
@@ -126,8 +118,8 @@ namespace GraphicsTests
             scene = new Scene(kernel);
             
             var camera = new EntityDescription(kernel);
-            camera.AddProperty<Camera>("camera");
-            camera.AddProperty<Viewport>("viewport");
+            camera.AddProperty(new TypedName<Camera>("camera"));
+            camera.AddProperty(new TypedName<Viewport>("viewport"));
             camera.AddBehaviour<View>();
             var cameraEntity = camera.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = new Camera();
