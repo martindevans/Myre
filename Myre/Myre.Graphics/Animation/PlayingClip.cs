@@ -9,6 +9,8 @@ namespace Myre.Graphics.Animation
         private int[] _channelFrames;
         public IClip Animation { get; private set; }
 
+        public Animated.ClipPlaybackParameters PlaybackParameters { get; set; }
+
         public TimeSpan ElapsedTime { get; private set; }
 
         public float TimeFactor { get; set; }
@@ -52,15 +54,16 @@ namespace Myre.Graphics.Animation
                 _transforms[i] = Animation.Channels[i][0].Transform;
         }
 
-        private void Play(IClip animation, int bones)
+        private void Play(Animated.ClipPlaybackParameters clipParameters, int bones)
         {
-            if (animation == null)
-                throw new ArgumentNullException("animation");
+            PlaybackParameters = clipParameters;
+            if (clipParameters.Clip == null)
+                throw new ArgumentNullException("clipParameters");
 
-            Animation = animation;
-            _channelFrames = new int[animation.Channels.Length];
-            _previousTransforms = new Transform[animation.Channels.Length];
-            _transforms = new Transform[animation.Channels.Length];
+            Animation = clipParameters.Clip;
+            _channelFrames = new int[Animation.Channels.Length];
+            _previousTransforms = new Transform[Animation.Channels.Length];
+            _transforms = new Transform[Animation.Channels.Length];
 
             Start();
         }
@@ -123,7 +126,7 @@ namespace Myre.Graphics.Animation
         }
 
         private static readonly Pool<PlayingClip> _pool = new Pool<PlayingClip>();
-        internal static PlayingClip Create(IClip clip, int bones)
+        internal static PlayingClip Create(Animated.ClipPlaybackParameters clip, int bones)
         {
             PlayingClip instance;
             lock (_pool)

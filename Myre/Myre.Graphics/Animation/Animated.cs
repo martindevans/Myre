@@ -15,13 +15,13 @@ namespace Myre.Graphics.Animation
         :ProcessBehaviour, ModelInstance.IRenderDataSupplier
     {
         #region fields
-        private static readonly TypedName<ClipPlaybackParameters> _defaultClipName = new TypedName<ClipPlaybackParameters>("animation_default_clip");
-        private static readonly TypedName<Transform> _rootTransformName = new TypedName<Transform>("animation_root_transform");
-        private static readonly TypedName<bool> _rootTranslationXName = new TypedName<bool>("animation_enable_root_translation_x");
-        private static readonly TypedName<bool> _rootTranslationYName = new TypedName<bool>("animation_enable_root_translation_y");
-        private static readonly TypedName<bool> _rootTranslationZName = new TypedName<bool>("animation_enable_root_translation_z");
-        private static readonly TypedName<bool> _enableRootRotationName = new TypedName<bool>("animation_enable_root_rotation");
-        private static readonly TypedName<bool> _enableRootScaleName = new TypedName<bool>("animation_enable_root_scale");
+        public static readonly TypedName<ClipPlaybackParameters> DefaultClipName = new TypedName<ClipPlaybackParameters>("animation_default_clip");
+        public static readonly TypedName<Transform> RootTransformName = new TypedName<Transform>("animation_root_transform");
+        public static readonly TypedName<bool> RootTranslationXName = new TypedName<bool>("animation_enable_root_translation_x");
+        public static readonly TypedName<bool> RootTranslationYName = new TypedName<bool>("animation_enable_root_translation_y");
+        public static readonly TypedName<bool> RootTranslationZName = new TypedName<bool>("animation_enable_root_translation_z");
+        public static readonly TypedName<bool> EnableRootRotationName = new TypedName<bool>("animation_enable_root_rotation");
+        public static readonly TypedName<bool> EnableRootScaleName = new TypedName<bool>("animation_enable_root_scale");
 
         private ModelInstance _model;
 
@@ -65,6 +65,11 @@ namespace Myre.Graphics.Animation
         private int BonesCount
         {
             get { return skinningData.SkeletonHierarchy.Length; }
+        }
+
+        public IClip CurrentlyPlaying
+        {
+            get { return _fadingOut.Animation; }
         }
 
         public Action<string> OnAnimationCompleted;
@@ -144,13 +149,13 @@ namespace Myre.Graphics.Animation
         #region initialise
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _defaultClip = context.CreateProperty(_defaultClipName);
-            _rootBoneTransform = context.CreateProperty(_rootTransformName, Transform.Identity);
-            _enableRootBoneTranslationX = context.CreateProperty(_rootTranslationXName, false);
-            _enableRootBoneTranslationY = context.CreateProperty(_rootTranslationYName, false);
-            _enableRootBoneTranslationZ = context.CreateProperty(_rootTranslationZName, false);
-            _enableRootBoneRotation = context.CreateProperty(_enableRootRotationName, true);
-            _enableRootBoneScale = context.CreateProperty(_enableRootScaleName, true);
+            _defaultClip = context.CreateProperty(DefaultClipName);
+            _rootBoneTransform = context.CreateProperty(RootTransformName, Transform.Identity);
+            _enableRootBoneTranslationX = context.CreateProperty(RootTranslationXName, false);
+            _enableRootBoneTranslationY = context.CreateProperty(RootTranslationYName, false);
+            _enableRootBoneTranslationZ = context.CreateProperty(RootTranslationZName, false);
+            _enableRootBoneRotation = context.CreateProperty(EnableRootRotationName, true);
+            _enableRootBoneScale = context.CreateProperty(EnableRootScaleName, true);
 
             base.CreateProperties(context);
         }
@@ -158,6 +163,13 @@ namespace Myre.Graphics.Animation
         public override void Initialise(INamedDataProvider initialisationData)
         {
             base.Initialise(initialisationData);
+
+            if (initialisationData != null)
+            {
+                ClipPlaybackParameters defaultClip;
+                if (initialisationData.TryGetValue<ClipPlaybackParameters>(DefaultClipName, out defaultClip))
+                    _defaultClip.Value = defaultClip;
+            }
 
             _model = Owner.GetBehaviour<ModelInstance>();
         }
@@ -201,8 +213,12 @@ namespace Myre.Graphics.Animation
         /// Enqueues the givem clip, to be played once the previous clip reaches it's fade out time
         /// </summary>
         /// <param name="parameters"></param>
-        public void EnqueueClip(ClipPlaybackParameters parameters)
+        /// <param name="clearQueue">Whether to cancel the animation queue and add this to it</param>
+        public void EnqueueClip(ClipPlaybackParameters parameters, bool clearQueue = false)
         {
+            if (clearQueue)
+                _animationQueue.Clear();
+
             _animationQueue.Enqueue(parameters);
         }
 
@@ -217,11 +233,11 @@ namespace Myre.Graphics.Animation
                 _animationQueue.Clear();
 
             if (parameters.Clip == null)
-                return;
+                parameters = DefaultClip;
 
             parameters.Clip.Start();
 
-            _fadingIn = PlayingClip.Create(parameters.Clip, BonesCount);
+            _fadingIn = PlayingClip.Create(parameters, BonesCount);
             _fadingIn.TimeFactor = 1;
             _fadingIn.Loop = parameters.Loop;
             _fadingIn.FadeOutTime = parameters.FadeOutTime;
@@ -276,12 +292,21 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        private ClipPlaybackParameters NextClip()
+        private ClipPlaybackParameters NextClip(bool allowLoop = true)
         {
             if (_animationQueue.Count > 0)
-                return _animationQueue.Dequeue();
+            {
+                var followup = _animationQueue.Dequeue();   //Play followup from queue?
+
+                if (followup.Clip == null)
+                    return NextClip(false);     //If followup clip was empty, find next clip but explicitly disallow looping of currently playing animation
+                else
+                    return followup;            //Otherwise, play followup clip
+            }
+            else if (_fadingOut.Loop && allowLoop)
+                return _fadingOut.PlaybackParameters; //If the queue is empty, replay this clip (if it's looping)
             else
-                return DefaultClip;
+                return DefaultClip; //Otherwise idle
         }
 
         private void UpdateBoneTransforms(float deltaTime)
