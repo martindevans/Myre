@@ -41,11 +41,21 @@ namespace Myre.Entities
                 _behaviour = behaviour;
             }
 
-            public Property<T> CreateProperty<T>(TypedName<T> name, T value = default(T))
+            /// <summary>
+            /// Create a new property attached to this entity
+            /// </summary>
+            /// <typeparam name="T">The Type of this property (usually inferred from the name parameter)</typeparam>
+            /// <param name="name">The Type and name of this property</param>
+            /// <param name="value">The initial value of this property</param>
+            /// <param name="appendBehaviourName">If true, the name will be appended with "_BEHAVIOURNAME"</param>
+            /// <returns>The property created</returns>
+            public Property<T> CreateProperty<T>(TypedName<T> name, T value = default(T), bool appendBehaviourName = true)
             {
                 CheckFrozen();
 
-                string fullName = _behaviour.GetFullPropertyName(name.Name);
+                string fullName = name.Name;
+                if (appendBehaviourName)
+                    fullName = _behaviour.GetFullPropertyName(name.Name);
 
                 var property = _entity.GetProperty(new TypedName<T>(fullName));
                 if (property == null)

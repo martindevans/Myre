@@ -303,7 +303,7 @@ namespace Myre.Graphics.Animation
                 else
                     return followup;            //Otherwise, play followup clip
             }
-            else if (_fadingOut.Loop && allowLoop)
+            else if (_fadingOut != null && _fadingOut.Loop && allowLoop)
                 return _fadingOut.PlaybackParameters; //If the queue is empty, replay this clip (if it's looping)
             else
                 return DefaultClip; //Otherwise idle
