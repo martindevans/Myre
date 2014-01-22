@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -89,6 +90,26 @@ namespace Myre.Extensions
             var parseMethod = t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null);
 
             return parseMethod.Invoke(null, new object[] {s});
+        }
+
+        /// <summary>
+        /// Get all types this type derives from
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetImplementedTypes(this Type t)
+        {
+            //A type obviously is itself
+            yield return t;
+
+            //All the interfaces this type implements
+            foreach (var typeInterface in t.GetInterfaces())
+                yield return typeInterface;
+
+            //Recurse for base type
+            if (t.BaseType != null)
+                foreach (var implementedType in GetImplementedTypes(t.BaseType))
+                    yield return implementedType;
         }
     }
 }

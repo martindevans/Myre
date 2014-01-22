@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
+using Myre.Extensions;
 
 namespace Myre.Entities
 {
@@ -156,23 +157,8 @@ namespace Myre.Entities
         {
             Type type = behaviour.GetType();
 
-            foreach (var t in GetImplementedTypes(type).Distinct())
+            foreach (var t in type.GetImplementedTypes().Distinct())
                 LazyGetCategoryList(t, catagorised).Add(behaviour);
-        }
-
-        private IEnumerable<Type> GetImplementedTypes(Type t)
-        {
-            //A type obviously is itself
-            yield return t;
-
-            //All the interfaces this type implements
-            foreach (var typeInterface in t.GetInterfaces())
-                yield return typeInterface;
-
-            //Recurse for base type
-            if (t.BaseType != null)
-                foreach (var implementedType in GetImplementedTypes(t.BaseType))
-                    yield return implementedType;
         }
 
         private List<Behaviour> LazyGetCategoryList(Type type, Dictionary<Type, List<Behaviour>> catagorised)
