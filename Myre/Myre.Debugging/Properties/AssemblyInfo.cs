@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("Myre.Debugging")]
 [assembly: AssemblyProduct("Myre.Debugging")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Debugging Framework for XNA games")]
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
 [assembly: AssemblyTrademark("")]
@@ -30,4 +30,4 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0.4")]
+[assembly: AssemblyVersion("1.1.0")]

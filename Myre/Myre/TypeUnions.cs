@@ -24,6 +24,26 @@ namespace Myre
     }
 
     /// <summary>
+    /// Provides a safe way of bitwise converting a Single to a Uint32
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    public struct SingleIntUnion
+    {
+        /// <summary>
+        /// The value of this union, interpreted as a single
+        /// </summary>
+        [FieldOffset(0)]
+        public float SingleValue;
+
+        /// <summary>
+        /// The value of this union, interpreted as a uint
+        /// </summary>
+        [FieldOffset(0)]
+        [CLSCompliant(false)]
+        public int IntValue;
+    }
+
+    /// <summary>
     /// Provides a safe way of bitwise converting a Double to a ULong
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]
