@@ -100,12 +100,6 @@
     <Compile Include="SpinLock.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Myre\%28x86%29 Myre.csproj">
-      <Project>{FDB5A9D8-9266-4F7B-BDE7-D4E720F5B45F}</Project>
-      <Name>%28x86%29 Myre</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
