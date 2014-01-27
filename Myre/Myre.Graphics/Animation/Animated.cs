@@ -69,7 +69,7 @@ namespace Myre.Graphics.Animation
 
         public IClip CurrentlyPlaying
         {
-            get { return _fadingOut.Animation; }
+            get { return (_fadingIn ?? _fadingOut).Animation; }
         }
 
         public Action<string> OnAnimationCompleted;

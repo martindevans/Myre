@@ -80,6 +80,20 @@
     <Compile Include="StatisticGraph.cs" />
     <Compile Include="StatisticTextLog.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Myre.Debugging\%28x86%29 Myre.Debugging.csproj">
+      <Project>{F987DEC5-E12F-4566-A200-DE18D6044E21}</Project>
+      <Name>%28x86%29 Myre.Debugging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Myre.UI\%28x86%29 Myre.UI.csproj">
+      <Project>{ADFDCC4A-8805-4BCA-9FBA-FB04920AFA33}</Project>
+      <Name>%28x86%29 Myre.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Myre\%28x86%29 Myre.csproj">
+      <Project>{FDB5A9D8-9266-4F7B-BDE7-D4E720F5B45F}</Project>
+      <Name>%28x86%29 Myre</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--
