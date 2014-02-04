@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 
 namespace Myre.Collections
 {
@@ -11,7 +10,7 @@ namespace Myre.Collections
     /// and may implement <see cref="IRecycleable"/>.</typeparam>
     public class Pool<T> where T : class, new()
     {
-        static Pool<T> _instance;
+        private static readonly Pool<T> _instance = new Pool<T>();
         /// <summary>
         /// Gets the static instance.
         /// </summary>
@@ -20,12 +19,6 @@ namespace Myre.Collections
         {
             get
             {
-                if (_instance == null)
-                {
-                    var p = new Pool<T>();
-                    Interlocked.CompareExchange(ref _instance, p, null);
-                }
-
                 return _instance;
             }
         }

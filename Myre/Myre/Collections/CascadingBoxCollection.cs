@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Myre.Extensions;
 
 namespace Myre.Collections
 {
@@ -11,6 +14,7 @@ namespace Myre.Collections
     {
         private readonly INamedDataProvider _parent;
         private readonly NamedBoxCollection _values;
+        private readonly IEnumerable<KeyValuePair<string, IBox>> _enumerable;
 
         /// <summary>
         /// 
@@ -20,6 +24,8 @@ namespace Myre.Collections
         {
             _parent = parent;
             _values = new NamedBoxCollection();
+
+            _enumerable = _parent.Where(a => _values.Contains(a.Key)).Append(_values);
         }
 
         public void Set<T>(TypedName<T> key, T value)
@@ -44,9 +50,27 @@ namespace Myre.Collections
             return _parent.TryGetValue<T>(name, out value);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="create"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public Box<T> Get<T>(TypedName<T> key, T defaultValue = default(T), bool create = true)
         {
             return _values.Get<T>(key.Name, defaultValue, create);
+        }
+
+        public IEnumerator<KeyValuePair<string, IBox>> GetEnumerator()
+        {
+            return _enumerable.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

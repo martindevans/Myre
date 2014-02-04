@@ -1,10 +1,14 @@
 ﻿
+using System;
+using System.Collections.Generic;
+
 namespace Myre.Collections
 {
     /// <summary>
     /// 
     /// </summary>
     public interface INamedDataProvider
+        :IEnumerable<KeyValuePair<string, IBox>>
     {
         /// <summary>
         /// 
