@@ -38,8 +38,9 @@ namespace Myre.Collections
             T value;
             if (TryGetValue<T>(name, out value))
                 return value;
-            else
-                return _parent.GetValue<T>(name, useDefaultValue);
+
+            //DIdn't manage to get it from parent or self, get it from self using default value flag
+            return _values.GetValue<T>(name, useDefaultValue);
         }
 
         public bool TryGetValue<T>(TypedName<T> name, out T value)
