@@ -24,7 +24,7 @@ namespace GraphicsTests.Tests
 
         private readonly string[] _sequence = new string[]
         {
-            "idle01"
+            "walk-forward-0"
             //"idle01", "idle02", "jump", "roll-backward-0", "roll-forward-0", "roll-left-0", "roll-right-0", "run-forward-0", "run-forward-1", "run-forward-2",
             //"run-forward_jump-0", "sitting", "strafe-left-0", "strafe-right-0", "swim-forward-0", "walk-backward-0", "walk-forward-0", "walk-forward-1", "walk-forward-2"
         };
@@ -37,7 +37,7 @@ namespace GraphicsTests.Tests
             var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty(new TypedName<ModelData>("model"), model);
-            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.Identity);
+            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(100));
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
@@ -53,10 +53,7 @@ namespace GraphicsTests.Tests
 
             _animation.DefaultClip = new Animated.ClipPlaybackParameters
             {
-                Clip = new RandomClip(
-                    content.Load<Clip>("Models/ZoeAnimations/idle02"),
-                    content.Load<Clip>("Models/ZoeAnimations/idle01")
-                    ),
+                Clip = new RandomClip(content.Load<Clip>("Models/ZoeAnimations/idle01")),
                 FadeInTime = TimeSpan.FromSeconds(1f),
                 FadeOutTime = TimeSpan.FromSeconds(0.5f),
                 Loop = false,
@@ -69,7 +66,7 @@ namespace GraphicsTests.Tests
                     Clip = content.Load<Clip>("Models/ZoeAnimations/" + name),
                     FadeInTime = TimeSpan.FromSeconds(0.1f),
                     FadeOutTime = TimeSpan.FromSeconds(0.0f),
-                    Loop = false,
+                    Loop = true,
                 });
             }
 
@@ -127,6 +124,12 @@ namespace GraphicsTests.Tests
             base.Update(gameTime);
 
             var anim = _dude.Owner.GetBehaviour<Animated>();
+
+            if (anim.CurrentlyPlaying.Name.Contains("walk"))
+            {
+                Console.WriteLine(anim.RootBoneTransfomationDelta.Translation.Z);
+                Console.WriteLine(anim.root
+            }
 
             //_dude.Transform = Matrix.CreateTranslation(new Vector3(anim.RootBoneTransfomationDelta.Translation.X, 0, anim.RootBoneTransfomationDelta.Translation.Z));
         }

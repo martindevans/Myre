@@ -3,9 +3,9 @@
   <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
     <AnimationSourceFile>Models/zoe.fbx</AnimationSourceFile>
     <SourceTakeName>DefaultAction</SourceTakeName>
-    <StartTime>23.8</StartTime>
-    <EndTime>30.8</EndTime>
+    <StartTime>0.4</StartTime>
+    <EndTime>1.56</EndTime>
     <RootBone>MotionRoot</RootBone>
-		<FixLooping>true</FixLooping>
+    <FixLooping>true</FixLooping>
   </Asset>
 </XnaContent>

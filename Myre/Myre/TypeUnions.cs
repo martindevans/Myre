@@ -19,7 +19,6 @@ namespace Myre
         /// The value of this union, interpreted as a uint
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public uint UIntValue;
     }
 
@@ -39,7 +38,6 @@ namespace Myre
         /// The value of this union, interpreted as a uint
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public int IntValue;
     }
 
@@ -59,7 +57,6 @@ namespace Myre
         /// The value of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public ulong ULongValue;
     }
 
@@ -79,7 +76,6 @@ namespace Myre
         /// The value of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public ulong ULongValue;
     }
 
@@ -99,7 +95,6 @@ namespace Myre
         /// The value of this union, interpreted as a uint
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public uint UIntValue;
     }
 
@@ -119,7 +114,6 @@ namespace Myre
         /// The value of this union, interpreted as a byte
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public byte ByteValue;
     }
 
@@ -139,14 +133,12 @@ namespace Myre
         /// The value of the first 64 bits of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public ulong UlongValue1;
 
         /// <summary>
         /// The value of the last 64 bits of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(sizeof(ulong))]
-        [CLSCompliant(false)]
         public ulong UlongValue2;
     }
 
@@ -166,14 +158,12 @@ namespace Myre
         /// The value of the first 16 bits of this union, interpreted as a short
         /// </summary>
         [FieldOffset(0)]
-        [CLSCompliant(false)]
         public short ShortValue1;
 
         /// <summary>
         /// The value of the last 16 bits of this union, interpreted as a short
         /// </summary>
         [FieldOffset(sizeof(ushort))]
-        [CLSCompliant(false)]
         public short ShortValue2;
     }
 

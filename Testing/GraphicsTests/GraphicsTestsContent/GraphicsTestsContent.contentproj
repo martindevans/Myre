@@ -393,11 +393,6 @@
       <Importer>XmlImporter</Importer>
       <Processor>EmbeddedAnimationProcessor</Processor>
     </Compile>
-    <Compile Include="Models\ZoeAnimations\idle02.xml">
-      <Name>idle02</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-    </Compile>
     <Compile Include="Models\ZoeAnimations\jump.xml">
       <Name>jump</Name>
       <Importer>XmlImporter</Importer>
@@ -422,6 +417,13 @@
       <ProcessorParameters_ColorKeyEnabled>False</ProcessorParameters_ColorKeyEnabled>
       <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
       <ProcessorParameters_TextureFormat>DxtCompressed</ProcessorParameters_TextureFormat>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\ZoeAnimations\walk-forward-0.xml">
+      <Name>walk-forward-0</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>EmbeddedAnimationProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
