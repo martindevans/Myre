@@ -125,11 +125,10 @@ namespace GraphicsTests.Tests
 
             var anim = _dude.Owner.GetBehaviour<Animated>();
 
-            if (anim.CurrentlyPlaying.Name.Contains("walk"))
-            {
-                Console.WriteLine(anim.RootBoneTransfomationDelta.Translation.Z);
-                Console.WriteLine(anim.root
-            }
+            //if (anim.CurrentlyPlaying.Name.Contains("walk"))
+            //{
+            //    Console.WriteLine(anim.RootBoneTransfomationDelta.Translation.Z);
+            //}
 
             //_dude.Transform = Matrix.CreateTranslation(new Vector3(anim.RootBoneTransfomationDelta.Translation.X, 0, anim.RootBoneTransfomationDelta.Translation.Z));
         }

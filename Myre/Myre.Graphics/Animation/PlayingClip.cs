@@ -25,19 +25,7 @@ namespace Myre.Graphics.Animation
             //Move back by animation duration
             ElapsedTime -= Animation.Duration;
 
-            //Set back to start frame
-            for (int i = 0; i < _channelFrames.Length; i++)
-                _channelFrames[i] = 1;
-
-            //Calculate the previous transform back into initial pose space, this is to fix deltas
-            for (int i = 0; i < _transforms.Length; i++)
-            {
-                var a = Animation.Channels[i][0].Transform;
-                var b = Animation.Channels[i][Animation.Channels[i].Length - 1].Transform;
-                var delta = Graphics.Animation.Transform.Subtract(b, a);
-
-                _transforms[i] = Graphics.Animation.Transform.Subtract(_transforms[i], delta);
-            }
+            SeekToStart();
         }
 
         private void Start()
@@ -45,13 +33,16 @@ namespace Myre.Graphics.Animation
             //Set time to zero
             ElapsedTime = TimeSpan.Zero;
 
-            //Set frames to start
-            for (int i = 0; i < _channelFrames.Length; i++)
-                _channelFrames[i] = 1;
+            SeekToStart();
+        }
 
-            //Set transforms to start positions too
-            for (int i = 0; i < _transforms.Length; i++)
+        private void SeekToStart()
+        {
+            for (int i = 0; i < _channelFrames.Length; i++)
+            {
+                _channelFrames[i] = 0;
                 _transforms[i] = Animation.Channels[i][0].Transform;
+            }
         }
 
         private void Play(Animated.ClipPlaybackParameters clipParameters, int bones)
