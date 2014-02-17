@@ -390,6 +390,11 @@ namespace Myre.Graphics.Animation
             result = Matrix.CreateScale(transform.Scale) * Matrix.CreateFromQuaternion(transform.Rotation) * Matrix.CreateTranslation(transform.Translation);
         }
 
+        /// <summary>
+        /// Test a ray (in model space) for intersection with individual bones.
+        /// </summary>
+        /// <param name="ray"></param>
+        /// <returns></returns>
         public IEnumerable<KeyValuePair<string, float>> Intersections(Ray ray)
         {
             return _model
