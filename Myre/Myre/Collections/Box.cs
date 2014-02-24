@@ -12,6 +12,11 @@ namespace Myre.Collections
         /// The value of this box
         /// </summary>
         object Value { get; set; }
+
+        /// <summary>
+        /// The type of the value of this box
+        /// </summary>
+        Type Type { get; }
     }
 
     /// <summary>
@@ -40,6 +45,11 @@ namespace Myre.Collections
                 if (BoxChanged != null)
                     BoxChanged(this, old, Value);
             }
+        }
+
+        public Type Type
+        {
+            get { return typeof(T); }
         }
 
         /// <summary>

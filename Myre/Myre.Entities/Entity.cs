@@ -219,7 +219,7 @@ namespace Myre.Entities
         }
 
         /// <summary>
-        /// Initialises this instance.
+        /// Initialises this instance. Automatically assigns initialisation values to properties with the same name and an assignable type
         /// </summary>
         /// <param name="initialisationData">Initialisation data to pass to behaviours</param>
         internal void Initialise(INamedDataProvider initialisationData)
@@ -228,16 +228,24 @@ namespace Myre.Entities
             IsDisposed = false;
             _shutdownData = null;
 
+            //Automatically assign properties
+            foreach (var item in initialisationData)
+            {
+                var prop = GetProperty(item.Key);
+                if (prop.Type.IsAssignableFrom(item.Value.Type))
+                    prop.Value = item.Value.Value;
+            }
+
+            //Initialise behaviours (potentially overwriting the auto assign)
             foreach (var item in Behaviours)
             {
                 if (!item.IsReady)
                     item.Initialise(initialisationData);
             }
 
+            //Ok everything has been initialised
             foreach (var item in Behaviours)
-            {
                 item.Initialised();
-            }
         }
 
         /// <summary>
