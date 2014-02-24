@@ -229,11 +229,14 @@ namespace Myre.Entities
             _shutdownData = null;
 
             //Automatically assign properties
-            foreach (var item in initialisationData)
+            if (initialisationData != null)
             {
-                var prop = GetProperty(item.Key);
-                if (prop.Type.IsAssignableFrom(item.Value.Type))
-                    prop.Value = item.Value.Value;
+                foreach (var item in initialisationData)
+                {
+                    var prop = GetProperty(item.Key);
+                    if (prop.Type.IsAssignableFrom(item.Value.Type))
+                        prop.Value = item.Value.Value;
+                }
             }
 
             //Initialise behaviours (potentially overwriting the auto assign)
