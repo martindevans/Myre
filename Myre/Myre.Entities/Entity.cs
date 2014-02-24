@@ -234,7 +234,7 @@ namespace Myre.Entities
                 foreach (var item in initialisationData)
                 {
                     var prop = GetProperty(item.Key);
-                    if (prop.Type.IsAssignableFrom(item.Value.Type))
+                    if (prop != null && prop.Type.IsAssignableFrom(item.Value.Type))
                         prop.Value = item.Value.Value;
                 }
             }
