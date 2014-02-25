@@ -228,16 +228,16 @@ namespace Myre.Entities
             IsDisposed = false;
             _shutdownData = null;
 
-            //Automatically assign properties
-            if (initialisationData != null)
-            {
-                foreach (var item in initialisationData)
-                {
-                    var prop = GetProperty(item.Key);
-                    if (prop != null && prop.Type.IsAssignableFrom(item.Value.Type))
-                        prop.Value = item.Value.Value;
-                }
-            }
+            ////Automatically assign properties
+            //if (initialisationData != null)
+            //{
+            //    foreach (var item in initialisationData)
+            //    {
+            //        var prop = GetProperty(item.Key);
+            //        if (prop != null && prop.Type.IsAssignableFrom(item.Value.Type))
+            //            prop.Value = item.Value.Value;
+            //    }
+            //}
 
             //Initialise behaviours (potentially overwriting the auto assign)
             foreach (var item in Behaviours)
