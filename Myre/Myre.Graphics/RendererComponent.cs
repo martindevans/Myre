@@ -181,6 +181,11 @@ namespace Myre.Graphics
         public bool Initialised { get; private set; }
 
         /// <summary>
+        /// Gets the context of this resource
+        /// </summary>
+        public ResourceContext Context { get; private set; }
+
+        /// <summary>
         /// Initialised this renderer component.
         /// </summary>
         /// <remarks>
@@ -192,6 +197,7 @@ namespace Myre.Graphics
         public virtual void Initialise(Renderer renderer, ResourceContext context)
         {
             Initialised = true;
+            Context = context;
         }
 
         /// <summary>
