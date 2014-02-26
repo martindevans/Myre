@@ -180,10 +180,23 @@ namespace Myre.Graphics
         /// </summary>
         public bool Initialised { get; private set; }
 
+        private ResourceContext _context;
+
         /// <summary>
-        /// Gets the context of this resource
+        /// Gets the inputs of this resource
         /// </summary>
-        public ResourceContext Context { get; private set; }
+        public IEnumerable<string> Inputs
+        {
+            get { return _context.Inputs; }
+        }
+
+        /// <summary>
+        /// Gets the outputs of this resource
+        /// </summary>
+        public IEnumerable<string> Outputs
+        {
+            get { return _context.Outputs.Select(a => a.Name); }
+        }
 
         /// <summary>
         /// Initialised this renderer component.
@@ -197,7 +210,7 @@ namespace Myre.Graphics
         public virtual void Initialise(Renderer renderer, ResourceContext context)
         {
             Initialised = true;
-            Context = context;
+            _context = context;
         }
 
         /// <summary>
