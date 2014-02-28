@@ -10,12 +10,18 @@ namespace Myre.Entities.Events
     /// <param name="scope">The scope of the transmitted event.</param>
     public delegate void MyreEventHandler<in T>(T data, object scope);
 
+    interface IEvent
+    {
+
+    }
+
     /// <summary>
     /// A class which represents an event for a specified data type.
     /// Instances of this type can be used to send events to listeners which have registered with this event.
     /// </summary>
     /// <typeparam name="Data">The type of payload data this event sends.</typeparam>
     public class Event<Data>
+        : IEvent
     {
         class Invocation
             : IEventInvocation
@@ -37,7 +43,7 @@ namespace Myre.Entities.Events
                 //Loop over event listeners backwards so most recent handlers are executed first
                 //This makes events compatible with using them as a chained system where more recent handlers can temporarily block lower handlers (by modifying the event data)
                 for (int i = Event._listeners.Count - 1; i >= 0; i--)
-                    Data = Event._listeners[i].HandleEvent(Data, Event.Scope);
+                    Data = Event._listeners[i].HandleEvent(Data, Event._scope);
 
                 Event.TriggerEvent(Data);
             }
@@ -88,11 +94,6 @@ namespace Myre.Entities.Events
         /// </summary>
         /// <value>The service.</value>
         public EventService Service { get { return _service; } }
-
-        /// <summary>
-        /// Gets the scope object for this event.
-        /// </summary>
-        public object Scope { get { return _scope; } }
 
         internal Event(EventService service, object scope = null, Event<Data> globalScoped = null)
         {
@@ -148,7 +149,7 @@ namespace Myre.Entities.Events
         private void TriggerEvent(Data data)
         {
             if (Sent != null)
-                Sent(data, Scope);
+                Sent(data, _scope);
         }
     }
 }

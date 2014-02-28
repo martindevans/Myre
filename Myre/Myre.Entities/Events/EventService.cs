@@ -29,8 +29,8 @@ namespace Myre.Entities.Events
     {
         class Events
         {
-            public object GlobalScope;
-            public readonly Dictionary<object, object> LocalScopes = new Dictionary<object, object>();
+            public IEvent GlobalScope;
+            public readonly Dictionary<object, IEvent> LocalScopes = new Dictionary<object, IEvent>();
         }
 
         private readonly Dictionary<Type, Events> _events;
@@ -53,6 +53,7 @@ namespace Myre.Entities.Events
         /// Gets an event of the specified type.
         /// </summary>
         /// <typeparam name="T">The type of data this event sends.</typeparam>
+        /// <param name="scope">The scope of this event. Messages sent to an unscoped event are only received by the unscoped event, messages sent to a scoped event are only sent to listeners with the same scope *and* to the unscoped event</param>
         /// <returns></returns>
         public Event<T> GetEvent<T>(object scope = null)
         {
@@ -61,11 +62,11 @@ namespace Myre.Entities.Events
             Events e;
             if (!_events.TryGetValue(type, out e))
             {
-                e = new Events {GlobalScope = new Event<T>(this)};
+                e = new Events { GlobalScope = new Event<T>(this) };
                 _events[type] = e;
             }
 
-            object instance;
+            IEvent instance;
             if (scope == null)
                 instance = e.GlobalScope;
             else
