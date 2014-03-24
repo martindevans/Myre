@@ -67,5 +67,21 @@ namespace Myre.Extensions
 
             return new Vector3(x, y, z);
         }
+
+        /// <summary>
+        /// Clamps each element within the ranges of equivalwnt elements from min and max
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static Vector3 Clamp(this Vector3 point, Vector3 min, Vector3 max)
+        {
+            return new Vector3(
+                MathHelper.Clamp(point.X, min.X, max.X),
+                MathHelper.Clamp(point.Y, min.Y, max.Y),
+                MathHelper.Clamp(point.Z, min.Z, max.Z)
+            );
+        }
     }
 }

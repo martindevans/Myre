@@ -50,5 +50,16 @@ namespace Myre.Extensions
             // create and return rectangle
             return new BoundingBox(min, max);
         }
+
+        /// <summary>
+        /// Finds the closest point on a bounding box from another point
+        /// </summary>
+        /// <param name="box"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector3 ClosestPoint(this BoundingBox box, Vector3 point)
+        {
+            return point.Clamp(box.Min, box.Max);
+        }
     }
 }
