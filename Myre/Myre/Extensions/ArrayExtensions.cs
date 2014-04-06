@@ -12,33 +12,25 @@ namespace Myre.Extensions
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
-        /// <param name="amount"></param>
+        /// <param name="offset"></param>
         /// <returns></returns>
-        public static void Rotate<T>(this T[] array, int amount)
+        public static void Rotate<T>(this T[] array, int offset)
         {
-            if (amount == 0)
+            if (offset == 0 || array.Length <= 1)
                 return;
 
-            bool right = amount > 0;
-            amount = Math.Abs(amount);
+            offset = offset % array.Length;
 
-            int offset = array.Length % amount;
-            if (offset > 0)
-            {
-                T[] temp = new T[offset];
-                if (!right)
-                {
-                    Array.Copy(array, temp, offset);
-                    Array.Copy(array, offset, array, 0, array.Length - offset);
-                    Array.Copy(temp, 0, array, array.Length - offset, temp.Length);
-                }
-                else
-                {
-                    Array.Copy(array, array.Length - offset, temp, 0, offset);
-                    Array.Copy(array, 0, array, offset, array.Length - offset);
-                    Array.Copy(temp, 0, array, 0, temp.Length);
-                }
-            }
+            if (offset == 0)
+                return;
+
+            if (offset < 0)
+                offset = array.Length + offset;
+
+            T[] temp = new T[offset];
+            Array.Copy(array, array.Length - offset, temp, 0, offset);
+            Array.Copy(array, 0, array, offset, array.Length - offset);
+            Array.Copy(temp, 0, array, 0, temp.Length);
         }
 
         /// <summary>
