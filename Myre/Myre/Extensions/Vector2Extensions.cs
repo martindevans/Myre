@@ -79,5 +79,33 @@ namespace Myre.Extensions
 
             return area / 2;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static bool IsConvex(this Vector2[] v)
+        {
+            int sign = 0;
+            for (int i = 0; i < v.Length; i++)
+            {
+                var p = v[i];
+                var p1 = v[(i + 1) % v.Length];
+                var p2 = v[(i + 2) % v.Length];
+
+                var d1 = p1 - p;
+                var d2 = p2 - p1;
+
+                var zcrossproduct = d1.X * d2.Y - d1.Y * d2.X;
+
+                if (i == 0)
+                    sign = Math.Sign(zcrossproduct);
+                else if (Math.Sign(zcrossproduct) != sign)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }
