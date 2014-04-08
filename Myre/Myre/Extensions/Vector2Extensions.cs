@@ -88,6 +88,7 @@ namespace Myre.Extensions
         public static bool IsConvex(this Vector2[] v)
         {
             int sign = 0;
+            bool first = true;
             for (int i = 0; i < v.Length; i++)
             {
                 var p = v[i];
@@ -97,12 +98,18 @@ namespace Myre.Extensions
                 var d1 = p1 - p;
                 var d2 = p2 - p1;
 
-                var zcrossproduct = d1.X * d2.Y - d1.Y * d2.X;
+                var crossProductSign = Math.Sign(d1.X * d2.Y - d1.Y * d2.X);
 
-                if (i == 0)
-                    sign = Math.Sign(zcrossproduct);
-                else if (Math.Sign(zcrossproduct) != sign)
-                    return false;
+                if (crossProductSign != 0)
+                {
+                    if (first)
+                    {
+                        sign = crossProductSign;
+                        first = false;
+                    }
+                    else if (crossProductSign != sign)
+                        return false;
+                }
             }
 
             return true;
