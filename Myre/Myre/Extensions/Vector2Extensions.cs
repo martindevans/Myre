@@ -84,8 +84,9 @@ namespace Myre.Extensions
         /// 
         /// </summary>
         /// <param name="v"></param>
+        /// <param name="epsilon"></param>
         /// <returns></returns>
-        public static bool IsConvex(this Vector2[] v)
+        public static bool IsConvex(this Vector2[] v, float epsilon = float.Epsilon)
         {
             int sign = 0;
             bool first = true;
@@ -98,18 +99,19 @@ namespace Myre.Extensions
                 var d1 = p1 - p;
                 var d2 = p2 - p1;
 
-                var crossProductSign = Math.Sign(d1.X * d2.Y - d1.Y * d2.X);
+                var crossProduct = d1.X * d2.Y - d1.Y * d2.X;
+                int crossProductSign = crossProduct > epsilon ? 1 : crossProduct < -epsilon ? -1 : 0;
 
-                if (crossProductSign != 0)
+                if (crossProductSign == 0)
+                    continue;
+
+                if (first)
                 {
-                    if (first)
-                    {
-                        sign = crossProductSign;
-                        first = false;
-                    }
-                    else if (crossProductSign != sign)
-                        return false;
+                    sign = crossProductSign;
+                    first = false;
                 }
+                else if (crossProductSign != sign)
+                    return false;
             }
 
             return true;
