@@ -81,6 +81,9 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             foreach (var light in _lights)
             {
+                if (!light.Light.Active)
+                    continue;
+
                 SetupLight(renderer.Data, light);
                 _quad.Draw(_material, renderer.Data);
             }
@@ -121,6 +124,9 @@ namespace Myre.Graphics.Deferred.LightManagers
             {
                 var data = _lights[i];
                 var light = data.Light;
+
+                if (!light.Active)
+                    continue;
 
                 light.Direction = Vector3.Normalize(light.Direction);
 

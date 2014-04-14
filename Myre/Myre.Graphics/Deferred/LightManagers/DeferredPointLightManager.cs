@@ -100,6 +100,9 @@ namespace Myre.Graphics.Deferred.LightManagers
             device.RasterizerState = RasterizerState.CullCounterClockwise;
             foreach (var light in _touchesBothPlanes)
             {
+                if (!light.Active)
+                    continue;
+
                 SetupLight(metadata, _quadLightingMaterial, light);
                 _quad.Draw(_quadLightingMaterial, metadata);
             }
@@ -116,6 +119,9 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             foreach (var light in lights)
             {
+                if (!light.Active)
+                    continue;
+
                 SetupLight(metadata, _geometryLightingMaterial, light);
                 DrawGeomery(_geometryLightingMaterial, metadata, device);
             }

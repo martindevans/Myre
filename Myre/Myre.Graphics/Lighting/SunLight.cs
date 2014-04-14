@@ -11,10 +11,18 @@ namespace Myre.Graphics.Lighting
         private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
         private static readonly TypedName<Vector3> _directionName = new TypedName<Vector3>("direction");
         private static readonly TypedName<int> _shadowResolutionName = new TypedName<int>("shadow_resolution");
+        private static readonly TypedName<bool> _activeName = new TypedName<bool>("sunlight_active");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _direction;
         private Property<int> _shadowResolution;
+        private Property<bool> _active;
+
+        public bool Active
+        {
+            get { return _active.Value; }
+            set { _active.Value = value; }
+        }
 
         public Vector3 Colour
         {
@@ -39,6 +47,7 @@ namespace Myre.Graphics.Lighting
             _colour = context.CreateProperty(_colourName, Color.LightBlue.ToVector3());
             _direction = context.CreateProperty(_directionName, Vector3.Down);
             _shadowResolution = context.CreateProperty(_shadowResolutionName);
+            _active = context.CreateProperty(_activeName, true);
 
             base.CreateProperties(context);
         }
@@ -50,6 +59,7 @@ namespace Myre.Graphics.Lighting
             initialisationData.TryCopyValue(_colourName, _colour);
             initialisationData.TryCopyValue(_directionName, _direction);
             initialisationData.TryCopyValue(_shadowResolutionName, _shadowResolution);
+            initialisationData.TryCopyValue(_activeName, _active);
         }
     }
 }

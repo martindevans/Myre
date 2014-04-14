@@ -11,10 +11,18 @@ namespace Myre.Graphics.Lighting
         private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
         private static readonly TypedName<Vector3> _positionName = new TypedName<Vector3>("position");
         private static readonly TypedName<float> _rangeName = new TypedName<float>("range");
+        private static readonly TypedName<bool> _activeName = new TypedName<bool>("pointlight_active");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
         private Property<float> _range;
+        private Property<bool> _active;
+
+        public bool Active
+        {
+            get { return _active.Value; }
+            set { _active.Value = value; }
+        }
 
         public Vector3 Colour
         {
@@ -39,6 +47,7 @@ namespace Myre.Graphics.Lighting
             _colour = context.CreateProperty(_colourName);
             _position = context.CreateProperty(_positionName);
             _range = context.CreateProperty(_rangeName);
+            _active = context.CreateProperty(_activeName, true);
             
             base.CreateProperties(context);
         }
@@ -50,6 +59,7 @@ namespace Myre.Graphics.Lighting
             initialisationData.TryCopyValue(_colourName, _colour);
             initialisationData.TryCopyValue(_positionName, _position);
             initialisationData.TryCopyValue(_rangeName, _range);
+            initialisationData.TryCopyValue(_activeName, _active);
         }
     }
 }
