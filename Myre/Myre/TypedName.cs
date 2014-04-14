@@ -37,5 +37,25 @@ namespace Myre
         {
             return new TypedName<T>(string.Format("{0}_{1}", a.Name, b));
         }
+
+        /// <summary>
+        /// Explicitly cast this name into a string
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static explicit operator string(TypedName<T> name)
+        {
+            return name.Name;
+        }
+
+        /// <summary>
+        /// Explicitly cast a string into a typed name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static explicit operator TypedName<T>(string name)
+        {
+            return new TypedName<T>(name);
+        }
     }
 }
