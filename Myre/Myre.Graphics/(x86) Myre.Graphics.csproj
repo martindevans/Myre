@@ -168,6 +168,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\AmbientLight.xnb" />
+    <None Include="Resources\ParticleSystem.xnb" />
     <None Include="Resources\SpotLight.xnb" />
   </ItemGroup>
   <ItemGroup>

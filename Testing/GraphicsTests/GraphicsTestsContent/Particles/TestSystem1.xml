@@ -8,5 +8,6 @@
     <Lifetime>5</Lifetime>
     <Texture>fire</Texture>
     <Capacity>5001</Capacity>
+    <Type>Soft</Type>
   </Asset>
 </XnaContent>

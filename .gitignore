@@ -4,6 +4,10 @@
 *.user
 *.nupkg
 /Documentation
+/Myre/ContentBuilderGame/ContentBuilderGame/bin
+/Myre/ContentBuilderGame/ContentBuilderGame/obj
+/Myre/ContentBuilderGame/ContentBuilderGameContent/bin
+/Myre/ContentBuilderGame/ContentBuilderGameContent/obj
 /Myre/Myre/obj
 /Myre/Myre/bin
 /Myre/Myre.Debugging/obj

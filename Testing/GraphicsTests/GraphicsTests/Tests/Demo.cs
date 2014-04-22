@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using Myre.Graphics.Translucency;
-using Ninject;
-using Myre.Entities;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework;
-using Myre.Graphics.Geometry;
-using System.IO;
-using Myre.Graphics.Lighting;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Myre.UI.Gestures;
+using Myre;
 using Myre.Collections;
+using Myre.Entities;
+using Myre.Graphics;
 using Myre.Graphics.Deferred;
+using Myre.Graphics.Translucency;
+using Myre.Graphics.Translucency.Particles;
+using Ninject;
 
 namespace GraphicsTests.Tests
 {
@@ -58,6 +52,15 @@ namespace GraphicsTests.Tests
         protected override void BeginTransitionOn()
         {
             scene = kernel.Get<TestScene>();
+
+            var particleEntityDesc = scene.Scene.Kernel.Get<EntityDescription>();
+            particleEntityDesc.AddProperty(new TypedName<Vector3>("position"));
+            particleEntityDesc.AddBehaviour<ParticleEmitter>();
+            var entity = particleEntityDesc.Create();
+            entity.GetProperty(new TypedName<Vector3>("position")).Value = Vector3.Zero;
+            NamedBoxCollection initData = new NamedBoxCollection();
+            initData.Set<ParticleEmitterDescription>("particlesystem", content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
+            scene.Scene.Add(entity, initData);
 
             var renderer = scene.Scene.GetService<Renderer>();
 

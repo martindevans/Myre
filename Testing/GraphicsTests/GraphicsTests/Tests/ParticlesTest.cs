@@ -20,7 +20,6 @@ namespace GraphicsTests.Tests
         private Scene _scene;
         private readonly ContentManager _content;
         private readonly GraphicsDevice _device;
-        private ParticleEmitter _emitter;
         private Camera _camera;
 
         private KeyboardState _keyboardState;

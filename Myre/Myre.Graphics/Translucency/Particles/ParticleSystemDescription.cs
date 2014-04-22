@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -70,7 +71,7 @@ namespace Myre.Graphics.Translucency.Particles
                 Lifetime = input.ReadSingle(),
                 Texture = input.ContentManager.Load<Texture2D>(input.ReadString()),
                 Capacity = input.ReadInt32(),
-                Type = ParticleType.Hard
+                Type = (ParticleType)Enum.Parse(typeof(ParticleType), input.ReadString())
             };
         }
     }

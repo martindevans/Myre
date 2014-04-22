@@ -16,8 +16,9 @@ namespace Myre.Graphics.Pipeline.Particles
         public readonly float Lifetime;
         public readonly string Texture;
         public readonly int Capacity;
+        public readonly string Type;
 
-        public MyreParticleSystemDescriptionContent(BlendState blendState, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, string texture, int capacity)
+        public MyreParticleSystemDescriptionContent(BlendState blendState, float endLinearVelocity, float endScale, Vector3 gravity, float lifetime, string texture, int capacity, string type)
         {
             BlendState = blendState;
             EndLinearVelocity = endLinearVelocity;
@@ -26,6 +27,7 @@ namespace Myre.Graphics.Pipeline.Particles
             Lifetime = lifetime;
             Texture = texture;
             Capacity = capacity;
+            Type = type;
         }
     }
 
@@ -41,6 +43,7 @@ namespace Myre.Graphics.Pipeline.Particles
             output.Write(value.Lifetime);
             output.Write(value.Texture);
             output.Write(value.Capacity);
+            output.Write(value.Type);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

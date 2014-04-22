@@ -11,7 +11,7 @@ namespace Myre.Graphics.Pipeline.Particles
             var r = new ExternalReference<TextureContent>(input.Texture);
             context.AddDependency(r.Filename);
 
-            return new MyreParticleSystemDescriptionContent(input.BlendState, input.EndLinearVelocity, input.EndScale, input.Gravity, input.Lifetime, input.Texture, input.Capacity);
+            return new MyreParticleSystemDescriptionContent(input.BlendState, input.EndLinearVelocity, input.EndScale, input.Gravity, input.Lifetime, input.Texture, input.Capacity, input.Type);
         }
     }
 }

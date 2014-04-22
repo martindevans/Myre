@@ -12,5 +12,6 @@ namespace Myre.Graphics.Pipeline.Particles
         public float Lifetime;
         public string Texture;
         public int Capacity;
+        public string Type;
     }
 }

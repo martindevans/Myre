@@ -157,9 +157,6 @@
   <data name="Nothing" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bin\x86\Debug\Myre.Graphics.Content\Nothing.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="ParticleSystem" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\ParticleSystem.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="PointLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>bin\x86\Debug\Myre.Graphics.Content\PointLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -189,5 +186,8 @@
   </data>
   <data name="AmbientLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AmbientLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ParticleSystem" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\ParticleSystem.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

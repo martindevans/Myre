@@ -196,11 +196,6 @@
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
     </Compile>
-    <Compile Include="Myre.Graphics\SpotLight.fx">
-      <Name>SpotLight</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="ParticleSystem.fx">
       <Name>ParticleSystem</Name>
       <Importer>EffectImporter</Importer>
