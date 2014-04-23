@@ -162,15 +162,13 @@ float4 PixelShaderFunction(in float4 colour   : COLOR0,
 						   in float2 depth : TEXCOORD2,
 						   uniform bool soft) : COLOR0
 {
-	positionCS /= positionCS.w;
-	float2 depthTexCoord = float2(positionCS.x / 2 + 0.5, -positionCS.y / 2 + 0.5);
-	float sceneDepth = tex2D(depthSampler, depthTexCoord).r;
-
-	float depthDelta = sceneDepth - depth.x;
-	clip(depthDelta);
-
 	if (soft)
 	{
+		positionCS /= positionCS.w;
+		float2 depthTexCoord = float2(positionCS.x / 2 + 0.5, -positionCS.y / 2 + 0.5);
+		float sceneDepth = tex2D(depthSampler, depthTexCoord).r;
+		float depthDelta = sceneDepth - depth.x;
+
 		colour *= saturate(depthDelta / depth.y);
 	}
 

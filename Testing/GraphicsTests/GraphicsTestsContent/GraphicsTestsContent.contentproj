@@ -195,11 +195,9 @@
       <Name>Hebe2</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
-    </Compile>
-    <Compile Include="ParticleSystem.fx">
-      <Name>ParticleSystem</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
+      <ProcessorParameters_TranslucentEffectName>DefaultGBuffer.fx</ProcessorParameters_TranslucentEffectName>
+      <ProcessorParameters_TranslucentEffectTechnique>Translucent</ProcessorParameters_TranslucentEffectTechnique>
+      <ProcessorParameters_DiffuseTexture>White Dot</ProcessorParameters_DiffuseTexture>
     </Compile>
     <Compile Include="Models\zoe.fbx">
       <Name>zoe</Name>
@@ -216,6 +214,8 @@
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
       <ProcessorParameters_AllowNullDiffuseTexture>False</ProcessorParameters_AllowNullDiffuseTexture>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer.fx</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows.fx</ProcessorParameters_ShadowEffectName>
     </Compile>
     <Compile Include="StormCubeMap.dds">
       <Name>StormCubeMap</Name>
@@ -419,6 +419,20 @@
       <Name>walk-forward-0</Name>
       <Importer>XmlImporter</Importer>
       <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BlackTexture.png">
+      <Name>BlackTexture</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="White Dot.bmp">
+      <Name>White Dot</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

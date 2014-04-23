@@ -45,18 +45,36 @@ namespace Myre.Graphics.Pipeline.Models
         [DisplayName("Allow null diffuse textures"), DefaultValue(false)]
         public bool AllowNullDiffuseTexture { get; set; }
 
-        private string _gbufferEffectName = "DefaultGBuffer.fx";
+        private string _gbufferEffectName = null;
         [DisplayName("GBuffer Effect")]
-        [DefaultValue("DefaultGBuffer.fx")]
+        [DefaultValue(null)]
         public string GBufferEffectName
         {
             get { return _gbufferEffectName; }
             set { _gbufferEffectName = value; }
         }
 
-        private string _shadowEffectName = "DefaultShadows.fx";
+        private string _translucentEffectName = null;
+        [DisplayName("Translucent Effect")]
+        [DefaultValue(null)]
+        public string TranslucentEffectName
+        {
+            get { return _translucentEffectName; }
+            set { _translucentEffectName = value; }
+        }
+
+        private string _translucentEffectTechnique = "translucent";
+        [DisplayName("Translucent Effect Technique")]
+        [DefaultValue("translucent")]
+        public string TranslucentEffectTechnique
+        {
+            get { return _translucentEffectTechnique; }
+            set { _translucentEffectTechnique = value; }
+        }
+
+        private string _shadowEffectName = null;
         [DisplayName("GBuffer Shadow Effect")]
-        [DefaultValue("DefaultShadows.fx")]
+        [DefaultValue(null)]
         public string ShadowEffectName
         {
             get { return _shadowEffectName; }
@@ -326,13 +344,31 @@ namespace Myre.Graphics.Pipeline.Models
                 bool animatedMaterials = MeshHelper.FindSkeleton(mesh) != null;
                 CreateGBufferMaterial(material, mesh, animatedMaterials, context);
                 CreateShadowMaterial(material, animatedMaterials);
+                CreateTransparentMaterial(material, mesh, animatedMaterials, context);
             }
 
             return _processedMaterials[material];
         }
 
+        private void CreateTransparentMaterial(MaterialContent material, MeshContent mesh, bool animated, ContentProcessorContext context)
+        {
+            if (TranslucentEffectName == null)
+                return;
+
+            var materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(TranslucentEffectName), Technique = _translucentEffectTechnique ?? (animated ? "AnimatedTranslucent" : "Translucent") };
+            var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material, context));
+            if (diffuseTexture != null)
+                materialData.Textures.Add("DiffuseMap", diffuseTexture);
+
+            var translucentMaterial = _context.Convert<MyreMaterialDefinition, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
+            _processedMaterials[material].Add("translucent", translucentMaterial);
+        }
+
         private void CreateShadowMaterial(MaterialContent material, bool animated)
         {
+            if (ShadowEffectName == null)
+                return;
+
             var materialData = new MyreMaterialDefinition { EffectName = Path.GetFileNameWithoutExtension(ShadowEffectName), Technique = animated ? "AnimatedViewLength" : "ViewLength" };
 
             var shadowMaterial = _context.Convert<MyreMaterialDefinition, MyreMaterialContent>(materialData, "MyreMaterialProcessor");
@@ -346,6 +382,9 @@ namespace Myre.Graphics.Pipeline.Models
 
         private void CreateGBufferMaterial(MaterialContent material, MeshContent mesh, bool animated, ContentProcessorContext context)
         {
+            if (GBufferEffectName == null)
+                return;
+
             var diffuseTexture = CanonicalizeTexturePath(FindDiffuseTexture(mesh, material, context));
             var normalTexture = CanonicalizeTexturePath(FindNormalTexture(mesh, material, context));
             var specularTexture = CanonicalizeTexturePath(FindSpecularTexture(mesh, material, context));

@@ -148,7 +148,7 @@ namespace GraphicsTests.Tests
                 .Then<LightingComponent>()
                 .Then(toneMap)
                 .Then(new Phase(this, device, toneMap))
-                //.Then<RestoreDepthPhase>()
+                .Then<RestoreDepthPhase>()
                 .Then<TranslucentComponent>()
                 //.Then<AntiAliasComponent>()
                 .Apply();

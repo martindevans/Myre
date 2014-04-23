@@ -71,9 +71,10 @@ namespace GraphicsTests.Tests
                 .Then<EdgeDetectComponent>()
                 .Then<Ssao>()
                 .Then<LightingComponent>()
+                .Then<RestoreDepthPhase>()
+                .Then<TranslucentComponent>()
                 .Then<ToneMapComponent>()
-                .Then<AntiAliasComponent>()
-                .Then<TranslucentComponent>();
+                .Then<AntiAliasComponent>();
 
             ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
@@ -84,6 +85,7 @@ namespace GraphicsTests.Tests
                 .Then<GeometryBufferComponent>()
                 .Then<Ssao>()
                 .Then<LightingComponent>()
+                .Then<RestoreDepthPhase>()
                 .Then<TranslucentComponent>();
                 //.Show("lightbuffer");
 

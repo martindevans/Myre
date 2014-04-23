@@ -9,6 +9,8 @@ uniform texture DiffuseMap;
 uniform texture NormalMap;
 uniform texture SpecularMap;
 
+uniform float Opacity : OPACITY;
+
 sampler diffuseSampler = sampler_state
 {
 	Texture = (DiffuseMap);
@@ -98,6 +100,14 @@ void DefaultPixelShaderFunction(uniform bool ClipAlpha,
 	out_diffuse = float4(diffuseSample.rgb, specularSample.a);
 }
 
+float4 DefaultTranslucentPixelShaderFunction(in DefaultVertexShaderOutput input) : COLOR0
+{
+    float4 diffuseSample = tex2D(diffuseSampler, input.TexCoord);
+
+	diffuseSample.a *= Opacity;
+	return float4(diffuseSample.rgb, diffuseSample.a);
+}
+
 struct AnimatedVertexShaderInput
 {
     float4 Position : POSITION0;
@@ -140,5 +150,23 @@ technique Animated
 	{
 		VertexShader = compile vs_3_0 AnimatedVertexShaderFunction();
 		PixelShader = compile ps_3_0 DefaultPixelShaderFunction(true);
+	}
+}
+
+technique Translucent
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 DefaultVertexShaderFunction();
+		PixelShader = compile ps_3_0 DefaultTranslucentPixelShaderFunction();
+	}
+}
+
+technique AnimatedTranslucent
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 AnimatedVertexShaderFunction();
+		PixelShader = compile ps_3_0 DefaultTranslucentPixelShaderFunction();
 	}
 }

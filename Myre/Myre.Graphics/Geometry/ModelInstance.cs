@@ -19,6 +19,7 @@ namespace Myre.Graphics.Geometry
         public static readonly TypedName<Matrix> TransformName = new TypedName<Matrix>("transform");
         public static readonly TypedName<bool> IsStaticName = new TypedName<bool>("is_static");
         public static readonly TypedName<bool> IsInvisibleName = new TypedName<bool>("is_invisible");
+        public static readonly TypedName<float> OpacityName = new TypedName<float>("opacity");
         public static readonly TypedName<bool> IgnoreViewMatrixName = new TypedName<bool>("ignore_view_matrix");
         public static readonly TypedName<bool> IgnoreProjectionMatrixName = new TypedName<bool>("ignore_projection_matrix");
 
@@ -26,6 +27,7 @@ namespace Myre.Graphics.Geometry
         private Property<Matrix> _transform;
         private Property<bool> _isStatic;
         private Property<bool> _isInvisible;
+        private Property<float> _opacity;
         private Property<bool> _ignoreViewMatrix;
         private Property<bool> _ignoreProjectionMatrix;
 
@@ -54,6 +56,13 @@ namespace Myre.Graphics.Geometry
             get { return _isInvisible.Value; }
             set { _isInvisible.Value = value; }
         }
+
+        public float Opacity
+        {
+            get { return _opacity.Value; }
+            set { _opacity.Value = value; }
+        }
+
 
         internal event Action<ModelInstance> ModelDataChanged;
         internal event Action<ModelInstance, Mesh> ModelMeshAdded;
@@ -91,6 +100,7 @@ namespace Myre.Graphics.Geometry
             _transform = context.CreateProperty(TransformName);
             _isStatic = context.CreateProperty(IsStaticName);
             _isInvisible = context.CreateProperty(IsInvisibleName);
+            _opacity = context.CreateProperty(OpacityName, 1);
             _ignoreViewMatrix = context.CreateProperty(IgnoreViewMatrixName, false);
             _ignoreProjectionMatrix = context.CreateProperty(IgnoreProjectionMatrixName, false);
 
@@ -276,6 +286,18 @@ namespace Myre.Graphics.Geometry
                             _visibleInstances.Add(instance);
                     }
 
+                    if (phase == "translucent")
+                    {
+                        //TODO: Use something other than additive blending for transparent meshes (multiplicative?)
+                        _device.BlendState = BlendState.Additive;
+                        _device.DepthStencilState = DepthStencilState.DepthRead;
+                    }
+                    else
+                    {
+                        _device.BlendState = BlendState.Opaque;
+                        _device.DepthStencilState = DepthStencilState.Default;
+                    }
+
                     if (_visibleInstances.Count > 0)
                     {
                         DrawMesh(mesh, metadata);
@@ -355,6 +377,8 @@ namespace Myre.Graphics.Geometry
                         worldViewProjection.Value = worldView.Value;
                     else
                         worldViewProjection.Value = worldView.Value * projection.Value;
+
+                    metadata.Set("opacity", instance.Instance.Opacity);
 
                     foreach (var pass in data.Material.Begin(metadata))
                     {

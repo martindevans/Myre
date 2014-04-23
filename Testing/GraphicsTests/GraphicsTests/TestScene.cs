@@ -213,6 +213,7 @@ namespace GraphicsTests
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
             hebeEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
+            hebeEntity.GetProperty(ModelInstance.OpacityName).Value = 0.05f;
             scene.Add(hebeEntity);
 
             //var dudeModel = content.Load<ModelData>(@"dude");
@@ -232,6 +233,7 @@ namespace GraphicsTests
                                                                     * Matrix.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix.CreateTranslation(-150, 20, 0);
             lightBlocker.GetProperty(new TypedName<bool>("is_static")).Value = false;
+            lightBlocker.GetProperty(ModelInstance.OpacityName).Value = 0.05f;
             scene.Add(lightBlocker);
 
             var sponzaModel = content.Load<ModelData>(@"Sponza");
