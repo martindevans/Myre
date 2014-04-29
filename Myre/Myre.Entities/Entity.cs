@@ -364,7 +364,7 @@ namespace Myre.Entities
             Behaviour[] array;
             _behaviours.TryGetValue(type, out array);
 
-            return array;
+            return array ?? new Behaviour[0];
         }
 
         /// <summary>
@@ -385,12 +385,7 @@ namespace Myre.Entities
         /// <returns></returns>
         public T[] GetBehaviours<T>()
         {
-            //return GetBehaviours(typeof(T)) as T[];
-            var v = GetBehaviours(typeof(T));
-            if (v != null)
-                return v.Cast<T>().ToArray();
-            else
-                return new T[0];
+            return GetBehaviours(typeof(T)) as T[];
         }
     }
 }
