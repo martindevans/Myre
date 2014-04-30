@@ -385,7 +385,9 @@ namespace Myre.Entities
         /// <returns></returns>
         public T[] GetBehaviours<T>()
         {
-            return GetBehaviours(typeof(T)) as T[];
+            return GetBehaviours(typeof(T))
+                .Cast<T>()
+                .ToArray();
         }
     }
 }
