@@ -37,17 +37,17 @@ namespace GraphicsTests.Tests
             var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty(new TypedName<ModelData>("model"), model);
-            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(100));
+            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(10));
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
             _animation = dudeEntity.GetBehaviour<Animated>();
-            _animation.EnableRootBoneTranslationY = true;
+            _animation.EnableRootBoneTranslationY = false;
             _animation.EnableRootBoneTranslationX = false;
             _animation.EnableRootBoneTranslationZ = false;
-            _animation.EnableRootBoneScale = true;
+            _animation.EnableRootBoneScale = false;
 
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
 

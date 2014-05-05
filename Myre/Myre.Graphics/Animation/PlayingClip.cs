@@ -9,7 +9,11 @@ namespace Myre.Graphics.Animation
         private int[] _channelFrames;
         public IClip Animation { get; private set; }
 
-        public Animated.ClipPlaybackParameters PlaybackParameters { get; set; }
+        private Animated.ClipPlaybackParameters _parameters;
+        public Animated.ClipPlaybackParameters PlaybackParameters
+        {
+            get { return _parameters; }
+        }
 
         public TimeSpan ElapsedTime { get; private set; }
 
@@ -47,9 +51,12 @@ namespace Myre.Graphics.Animation
 
         private void Play(Animated.ClipPlaybackParameters clipParameters, int bones)
         {
-            PlaybackParameters = clipParameters;
-            if (clipParameters.Clip == null)
+            _parameters = clipParameters;
+            if (_parameters.Clip == null)
                 throw new ArgumentNullException("clipParameters");
+
+            if (_parameters.Interpolator == null)
+                _parameters.Interpolator = Interpolation.BackEaseInOut();
 
             Animation = clipParameters.Clip;
             _channelFrames = new int[Animation.Channels.Length];
@@ -102,8 +109,11 @@ namespace Myre.Graphics.Animation
             //Interpolation factor between frames
             var t = (float)((ElapsedTime.TotalSeconds - a.Time.TotalSeconds) / (b.Time.TotalSeconds - a.Time.TotalSeconds));
 
+            //Convert linear interpolation into some other easing function
+            var t2 = PlaybackParameters.Interpolator(t);
+
             //Linearly interpolate frames
-            return a.Transform.Interpolate(b.Transform, t);
+            return a.Transform.Interpolate(b.Transform, t2);
         }
 
         public Transform Transform(int channel)

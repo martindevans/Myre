@@ -452,6 +452,7 @@ namespace Myre.Graphics.Animation
             public TimeSpan FadeInTime;
             public TimeSpan FadeOutTime;
             public bool Loop;
+            public Func<float, float> Interpolator;
         }
     }
 }

@@ -89,6 +89,7 @@
     <Compile Include="ICopyable.cs" />
     <Compile Include="IDisposableObject.cs" />
     <Compile Include="Int3.cs" />
+    <Compile Include="Interpolation.cs" />
     <Compile Include="IRecycleable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pulser.cs" />
