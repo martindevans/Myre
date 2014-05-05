@@ -56,7 +56,7 @@ namespace Myre.Graphics.Animation
                 throw new ArgumentNullException("clipParameters");
 
             if (_parameters.Interpolator == null)
-                _parameters.Interpolator = Interpolation.BackEaseInOut();
+                _parameters.Interpolator = Interpolation.Linear();
 
             Animation = clipParameters.Clip;
             _channelFrames = new int[Animation.Channels.Length];
