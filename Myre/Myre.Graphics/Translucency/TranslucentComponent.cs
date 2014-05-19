@@ -7,7 +7,14 @@ namespace Myre.Graphics.Translucency
     public class TranslucentComponent
         : RendererComponent
     {
+        private readonly string _phaseName;
+
         private ReadOnlyCollection<IGeometryProvider> _geometryProviders;
+
+        public TranslucentComponent(string phaseName = "translucent")
+        {
+            _phaseName = phaseName;
+        }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
@@ -27,7 +34,7 @@ namespace Myre.Graphics.Translucency
         public override void Draw(Renderer renderer)
         {
             foreach (var geometryProvider in _geometryProviders)
-                geometryProvider.Draw("translucent", renderer.Data);
+                geometryProvider.Draw(_phaseName, renderer.Data);
         }
     }
 }
