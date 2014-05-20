@@ -305,6 +305,7 @@ namespace Myre.Graphics.Deferred.LightManagers
                 material.Parameters["LightPosition"].SetValue(position);
                 material.Parameters["LightDirection"].SetValue(-direction);
                 material.Parameters["Angle"].SetValue(angle);
+                material.Parameters["Falloff"].SetValue(light.Falloff);
                 material.Parameters["Range"].SetValue(light.Range);
                 material.Parameters["Colour"].SetValue(light.Colour);
                 material.Parameters["EnableProjectiveTexturing"].SetValue(light.Mask != null);

@@ -294,6 +294,8 @@ namespace GraphicsTests
             MouseState mouse = Mouse.GetState();
             KeyboardState keyboard = Keyboard.GetState();
 
+            spotLight.Direction = Vector3.Normalize(Vector3.Lerp(Vector3.Normalize(new Vector3(-0.5f, -1, 0)), Vector3.Normalize(new Vector3(0.5f, -1, 0)), (float)Math.Sin(totalTime) * 0.5f + 0.5f));
+
             game.IsMouseVisible = false;
             if (mouse.IsButtonDown(MouseButtons.Right))
             {

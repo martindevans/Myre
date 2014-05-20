@@ -17,6 +17,7 @@ namespace Myre.Graphics.Lighting
         private static readonly TypedName<Texture2D> _maskName = new TypedName<Texture2D>("mask");
         private static readonly TypedName<int> _shadowResolutionName = new TypedName<int>("shadow_resolution");
         private static readonly TypedName<bool> _activeName = new TypedName<bool>("spotlight_active");
+        private static readonly TypedName<float> _falloffName = new TypedName<float>("falloff");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
@@ -26,6 +27,7 @@ namespace Myre.Graphics.Lighting
         private Property<Texture2D> _mask;
         private Property<int> _shadowResolution;
         private Property<bool> _active;
+        private Property<float> _falloff;
 
         public bool Active
         {
@@ -75,6 +77,12 @@ namespace Myre.Graphics.Lighting
             set { _shadowResolution.Value = value; }
         }
 
+        public float Falloff
+        {
+            get { return _falloff.Value; }
+            set { _falloff.Value = value; }
+        }
+
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             _colour = context.CreateProperty(_colourName);
@@ -85,6 +93,7 @@ namespace Myre.Graphics.Lighting
             _mask = context.CreateProperty(_maskName);
             _shadowResolution = context.CreateProperty(_shadowResolutionName);
             _active = context.CreateProperty(_activeName, true);
+            _falloff = context.CreateProperty(_falloffName, 1);
 
             base.CreateProperties(context);
         }
@@ -101,6 +110,7 @@ namespace Myre.Graphics.Lighting
             initialisationData.TryCopyValue(_maskName, _mask);
             initialisationData.TryCopyValue(_shadowResolutionName, _shadowResolution);
             initialisationData.TryCopyValue(_activeName, _active);
+            initialisationData.TryCopyValue(_falloffName, _falloff);
         }
     }
 }

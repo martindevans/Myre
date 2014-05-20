@@ -8,6 +8,7 @@ float3 LightPosition;
 float3 LightDirection;
 float Angle;
 float Range;
+float Falloff;
 float LightFalloffFactor;
 float3 CameraPosition : CAMERAPOSITION;
 bool EnableProjectiveTexturing;
@@ -69,8 +70,9 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 	float3 surfaceToLight = LightPosition - viewPosition;
 	float distance = length(surfaceToLight);	
 	float3 L = surfaceToLight / distance;
+	float LdD = dot(L, LightDirection);
 
-	if (dot(L, LightDirection) > Angle)
+	if (LdD > Angle)
 	{
 		float4 sampledNormals = tex2D(normalSampler, texCoord);
 		float3 normal = DecodeNormal(sampledNormals.xy);
@@ -83,13 +85,18 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 		float attenuation = 1 - saturate(distance / Range); //saturate(LightFalloffFactor / (distance * distance));
 		attenuation *= attenuation;
 
+		// Falloff with anglular distance from center of light
+		// falloff is 1 at center of light and 0 at edge
+		float falloff = (Angle - LdD) / (Angle - 1);
+		attenuation *= pow(falloff, Falloff);
+
 		float3 V = normalize(CameraPosition - viewPosition);
 		float3 R = normalize(reflect(-L, normal));
 
 		float NdL = max(dot(normal, L), 0.00001);
 		float RdV = max(dot(R, V), 0.00001);
 
-		float3 light = Colour * attenuation;
+		float3 light = Colour * attenuation * 1;
 
 		float4 projectedTexCoord = 0;
 		if (EnableProjectiveTexturing || EnableShadows)
