@@ -120,6 +120,7 @@
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialParameter.cs" />
     <Compile Include="Materials\MaterialReader.cs" />
+    <Compile Include="PlanView.cs" />
     <Compile Include="Translucency\Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Colour\RandomEndColour.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Colour\RandomStartColour.cs" />

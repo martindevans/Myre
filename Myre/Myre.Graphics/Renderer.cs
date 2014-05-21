@@ -90,10 +90,14 @@ namespace Myre.Graphics
 
             foreach (var view in _views)
             {
-                view.SetMetadata(_data);
-                var output = Plan.Execute(this);
+                view.Begin(this);
+                {
+                    view.SetMetadata(_data);
+                    var output = Plan.Execute(this);
 
-                _viewResults.Enqueue(output);
+                    _viewResults.Enqueue(output);
+                }
+                view.End(this);
             }
 
 #if WINDOWS

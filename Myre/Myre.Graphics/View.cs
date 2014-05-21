@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
@@ -33,12 +34,36 @@ namespace Myre.Graphics
             base.CreateProperties(context);
         }
 
-        public void SetMetadata(RendererMetadata metadata)
+        public virtual void SetMetadata(RendererMetadata metadata)
         {
             metadata.Set("activeview", this);
             metadata.Set("resolution", new Vector2(_viewport.Value.Width, _viewport.Value.Height));
             metadata.Set("viewport", _viewport.Value);
             _camera.Value.SetMetadata(metadata);
+        }
+
+        private Renderer _currentRenderer;
+
+        /// <summary>
+        /// Indicates that the given renderer is about to render this view
+        /// </summary>
+        /// <param name="renderer"></param>
+        public virtual void Begin(Renderer renderer)
+        {
+            if (_currentRenderer != null)
+                throw new InvalidOperationException("Cannot 'Begin' rendering a view whilst it is already begun");
+            _currentRenderer = renderer;
+        }
+
+        /// <summary>
+        /// Indicates that the given renderer has finished rendering this view
+        /// </summary>
+        /// <param name="renderer"></param>
+        public virtual void End(Renderer renderer)
+        {
+            if (_currentRenderer != renderer)
+                throw new InvalidOperationException("Cannot 'End' rendering a view whilst begun with a different view");
+            _currentRenderer = null;
         }
 
         protected override void Update(float elapsedTime)

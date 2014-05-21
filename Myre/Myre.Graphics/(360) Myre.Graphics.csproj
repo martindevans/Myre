@@ -91,6 +91,7 @@
     <Compile Include="Particles\ParticleSystem.cs" />
     <Compile Include="Particles\ParticleSystemDescription.cs" />
     <Compile Include="Particles\ParticleVertex.cs" />
+    <Compile Include="PlanView.cs" />
     <Compile Include="PostProcessing\Gaussian.cs" />
     <Compile Include="PostProcessing\Scale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
