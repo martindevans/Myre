@@ -56,14 +56,10 @@ namespace GraphicsTests
             public bool AmbientLight = true;
             public bool Fire = true;
             public bool SunLight = false;
+            public bool View = true;
         }
 
-        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device)
-            : this(kernel, game, content, device, null)
-        {
-        }
-
-        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device, SceneConfiguration config)
+        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device, SceneConfiguration config = null)
         {
             config = config ?? new SceneConfiguration();
 
@@ -81,14 +77,17 @@ namespace GraphicsTests
             camera.View = Matrix.CreateLookAt(cameraPosition, new Vector3(0, 50, 0), Vector3.Up);
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
 
-            var cameraDesc = kernel.Get<EntityDescription>();
-            cameraDesc.AddProperty(new TypedName<Camera>("camera"));
-            cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
-            cameraDesc.AddBehaviour<View>();
-            var cameraEntity = cameraDesc.Create();
-            cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
-            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
-            scene.Add(cameraEntity);
+            if (config.View)
+            {
+                var cameraDesc = kernel.Get<EntityDescription>();
+                cameraDesc.AddProperty(new TypedName<Camera>("camera"));
+                cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
+                cameraDesc.AddBehaviour<View>();
+                var cameraEntity = cameraDesc.Create();
+                cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
+                cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() {Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight};
+                scene.Add(cameraEntity);
+            }
 
             if (config.Skybox)
             {

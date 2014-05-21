@@ -93,7 +93,7 @@ namespace Myre.Graphics
                 view.Begin(this);
                 {
                     view.SetMetadata(_data);
-                    var output = Plan.Execute(this);
+                    var output = Plan.Execute();
 
                     _viewResults.Enqueue(output);
                 }

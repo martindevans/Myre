@@ -76,6 +76,7 @@
     <Compile Include="Tests\Demo.cs" />
     <Compile Include="Tests\EdgeDetectTest.cs" />
     <Compile Include="Tests\GBufferTest.cs" />
+    <Compile Include="Tests\GBufferTest2.cs" />
     <Compile Include="Tests\LightingTest.cs" />
     <Compile Include="Tests\LuminanceTest.cs" />
     <Compile Include="Tests\MaterialContentTest.cs" />

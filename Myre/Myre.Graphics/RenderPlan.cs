@@ -8,6 +8,7 @@ using Ninject;
 namespace Myre.Graphics
 {
     public class RenderPlan
+        : ICloneable
     {
         public struct Output
         {
@@ -60,11 +61,8 @@ namespace Myre.Graphics
         }
 
         private RenderPlan(RenderPlan previous, RendererComponent next)
+            :this(previous)
         {
-            _kernel = previous._kernel;
-            _renderer = previous._renderer;
-            _resources = new Dictionary<string, Resource>(previous._resources);
-            _resourceLastUsed = new Dictionary<string, int>(previous._resourceLastUsed);
             _components = Append(previous._components, next);
 
             var context = CreateContext(previous._finalContext);
@@ -89,6 +87,17 @@ namespace Myre.Graphics
                 _output = previous._output;
                 _resourceLastUsed[_output.Name] = _components.Length - 1;
             }
+        }
+
+        private RenderPlan(RenderPlan previous)
+        {
+            _kernel = previous._kernel;
+            _renderer = previous._renderer;
+            _resources = new Dictionary<string, Resource>(previous._resources);
+            _resourceLastUsed = new Dictionary<string, int>(previous._resourceLastUsed);
+            _components = (RendererComponent[])previous._components.Clone();
+            _finalContext = previous._finalContext;
+            _output = previous._output;
         }
 
         private void Initialise()
@@ -138,7 +147,7 @@ namespace Myre.Graphics
             _renderer.Plan = this;
         }
 
-        public Output Execute(Renderer renderer)
+        public Output Execute()
         {
             if (_freePoints == null)
                 Initialise();
@@ -149,19 +158,19 @@ namespace Myre.Graphics
             {
                 var component = _components[i];
                 component.Plan = this;
-                component.Draw(renderer);
+                component.Draw(_renderer);
 
                 while (resourceIndex < _freePoints.Length && _freePoints[resourceIndex].Index <= i)
                 {
                     var point = _freePoints[resourceIndex];
                     if (point.Name != _output.Name)
-                        _resources[point.Name].Finalise(renderer);
+                        _resources[point.Name].Finalise(_renderer);
 
                     resourceIndex++;
                 }
             }
 
-            return new Output(renderer, _output);
+            return new Output(_renderer, _output);
         }
 
         internal RenderTarget2D GetResource(string name)
@@ -184,5 +193,15 @@ namespace Myre.Graphics
         {
             get { return _components; }
         }
-}
+
+        public RenderPlan Clone()
+        {
+            return new RenderPlan(this);
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+    }
 }

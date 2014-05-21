@@ -103,6 +103,7 @@
     <Compile Include="TestScreen.cs" />
     <Compile Include="Tests\AnimatedDude.cs" />
     <Compile Include="Tests\AntiAliasTest.cs" />
+    <Compile Include="Tests\GBufferTest2.cs" />
     <Compile Include="Tests\Demo.cs" />
     <Compile Include="Tests\EdgeDetectTest.cs" />
     <Compile Include="Tests\GBufferTest.cs" />

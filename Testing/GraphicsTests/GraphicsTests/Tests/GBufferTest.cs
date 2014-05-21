@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using Ninject;
-using Myre.Entities;
-using Microsoft.Xna.Framework.Content;
+﻿using System.IO;
 using Microsoft.Xna.Framework;
-using Myre.Graphics.Geometry;
-using System.IO;
-using Myre.Graphics.Lighting;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Myre.Graphics;
 using Myre.Graphics.Deferred;
+using Ninject;
 
 namespace GraphicsTests.Tests
 {
