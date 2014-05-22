@@ -41,7 +41,7 @@ namespace Myre.Graphics
         }
 
         private readonly IKernel _kernel;
-        private readonly Renderer _renderer;
+        public Renderer Renderer { get; private set; }
 
         private readonly RendererComponent[] _components;
         private readonly ResourceContext _finalContext;
@@ -53,7 +53,7 @@ namespace Myre.Graphics
         internal RenderPlan(IKernel kernel, Renderer renderer)
         {
             _kernel = kernel;
-            _renderer = renderer;
+            Renderer = renderer;
             _components = new RendererComponent[0];
             _resources = new Dictionary<string, Resource>();
             _resourceLastUsed = new Dictionary<string, int>();
@@ -66,7 +66,7 @@ namespace Myre.Graphics
             _components = Append(previous._components, next);
 
             var context = CreateContext(previous._finalContext);
-            next.Initialise(_renderer, context);
+            next.Initialise(Renderer, context);
 
             foreach (var resource in context.Inputs)
                 _resourceLastUsed[resource] = _components.Length - 1;
@@ -92,7 +92,7 @@ namespace Myre.Graphics
         private RenderPlan(RenderPlan previous)
         {
             _kernel = previous._kernel;
-            _renderer = previous._renderer;
+            Renderer = previous.Renderer;
             _resources = new Dictionary<string, Resource>(previous._resources);
             _resourceLastUsed = new Dictionary<string, int>(previous._resourceLastUsed);
             _components = (RendererComponent[])previous._components.Clone();
@@ -144,7 +144,7 @@ namespace Myre.Graphics
 
         public void Apply()
         {
-            _renderer.Plan = this;
+            Renderer.Plan = this;
         }
 
         public Output Execute()
@@ -158,19 +158,19 @@ namespace Myre.Graphics
             {
                 var component = _components[i];
                 component.Plan = this;
-                component.Draw(_renderer);
+                component.Draw(Renderer);
 
                 while (resourceIndex < _freePoints.Length && _freePoints[resourceIndex].Index <= i)
                 {
                     var point = _freePoints[resourceIndex];
                     if (point.Name != _output.Name)
-                        _resources[point.Name].Finalise(_renderer);
+                        _resources[point.Name].Finalise(Renderer);
 
                     resourceIndex++;
                 }
             }
 
-            return new Output(_renderer, _output);
+            return new Output(Renderer, _output);
         }
 
         internal RenderTarget2D GetResource(string name)
@@ -181,7 +181,7 @@ namespace Myre.Graphics
         internal void SetResource(string name, RenderTarget2D resource)
         {
             _resources[name].RenderTarget = resource;
-            _renderer.Data.Set<Texture2D>(name, resource);
+            Renderer.Data.Set<Texture2D>(name, resource);
         }
 
         public IEnumerable<string> Resources
