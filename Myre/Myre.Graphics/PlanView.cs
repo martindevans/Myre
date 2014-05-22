@@ -26,6 +26,10 @@ namespace Myre.Graphics
             //Cache plan which is already applied
             _previousPlan = renderer.Plan;
 
+            //If a null plan is returned use the default renderer plan
+            if (plan == null)
+                return;
+
             //Apply new plan
             plan.Apply();
         }
