@@ -9,8 +9,15 @@ namespace Myre.Graphics
 
         protected abstract RenderPlan CreatePlan(Renderer renderer);
 
-        private RenderPlan _previousPlan;
+        /// <summary>
+        /// Clear the plan cache (causes CreatePlan to be called again as if for the first time)
+        /// </summary>
+        protected void ClearCache()
+        {
+            _plans.Clear();
+        }
 
+        private RenderPlan _previousPlan;
         public override void Begin(Renderer renderer)
         {
             base.Begin(renderer);
