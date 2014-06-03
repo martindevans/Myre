@@ -12,25 +12,23 @@ namespace Myre.Graphics
     {
         public struct Output
         {
-            private readonly RenderTarget2D _target;
             private readonly Resource _resource;
             private readonly Renderer _renderer;
 
             public Texture2D Image
             {
-                get { return _target; }
+                get { return _resource.RenderTarget; }
             }
 
             internal Output(Renderer renderer, Resource resource)
             {
                 _renderer = renderer;
                 _resource = resource;
-                _target = resource.RenderTarget;
             }
 
             public void Finalise()
             {
-                _resource.Finalise(_renderer, _target);
+                _resource.Finalise(_renderer);
             }
         }
 

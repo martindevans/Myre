@@ -19,11 +19,6 @@ namespace Myre.Graphics
         {
             Finaliser(renderer, RenderTarget);
         }
-
-        public void Finalise(Renderer renderer, RenderTarget2D target)
-        {
-            Finaliser(renderer, target);
-        }
     }
 
     /// <summary>

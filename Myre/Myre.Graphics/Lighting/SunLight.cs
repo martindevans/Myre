@@ -8,10 +8,10 @@ namespace Myre.Graphics.Lighting
     public class SunLight
         : Behaviour
     {
-        private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
-        private static readonly TypedName<Vector3> _directionName = new TypedName<Vector3>("direction");
-        private static readonly TypedName<int> _shadowResolutionName = new TypedName<int>("shadow_resolution");
-        private static readonly TypedName<bool> _activeName = new TypedName<bool>("sunlight_active");
+        public static readonly TypedName<Vector3> ColourName = new TypedName<Vector3>("colour");
+        public static readonly TypedName<Vector3> DirectionName = new TypedName<Vector3>("direction");
+        public static readonly TypedName<int> ShadowResolutionName = new TypedName<int>("shadow_resolution");
+        public static readonly TypedName<bool> ActiveName = new TypedName<bool>("sunlight_active");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _direction;
@@ -44,10 +44,10 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(_colourName, Color.LightBlue.ToVector3());
-            _direction = context.CreateProperty(_directionName, Vector3.Down);
-            _shadowResolution = context.CreateProperty(_shadowResolutionName);
-            _active = context.CreateProperty(_activeName, true);
+            _colour = context.CreateProperty(ColourName, Color.LightBlue.ToVector3());
+            _direction = context.CreateProperty(DirectionName, Vector3.Down);
+            _shadowResolution = context.CreateProperty(ShadowResolutionName);
+            _active = context.CreateProperty(ActiveName, true);
 
             base.CreateProperties(context);
         }
@@ -56,10 +56,10 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(_colourName, _colour);
-            initialisationData.TryCopyValue(_directionName, _direction);
-            initialisationData.TryCopyValue(_shadowResolutionName, _shadowResolution);
-            initialisationData.TryCopyValue(_activeName, _active);
+            initialisationData.TryCopyValue(ColourName, _colour);
+            initialisationData.TryCopyValue(DirectionName, _direction);
+            initialisationData.TryCopyValue(ShadowResolutionName, _shadowResolution);
+            initialisationData.TryCopyValue(ActiveName, _active);
         }
     }
 }

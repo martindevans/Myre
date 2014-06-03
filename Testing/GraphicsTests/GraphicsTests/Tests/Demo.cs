@@ -65,19 +65,21 @@ namespace GraphicsTests.Tests
             var renderer = scene.Scene.GetService<Renderer>();
 
             ssaoIntensity = renderer.Data.Get<float>("ssao_intensity");
-            
+
             fullPlan = renderer.StartPlan()
-                .Then<GeometryBufferComponent>()
-                .Then<EdgeDetectComponent>()
-                .Then<Ssao>()
-                .Then<LightingComponent>()
-                .Then<RestoreDepthPhase>()
-                .Then<TranslucentComponent>()
-                .Then<ToneMapComponent>()
-                .Then<AntiAliasComponent>();
+                               .Then<GeometryBufferComponent>()
+                               .Then<EdgeDetectComponent>()
+                               .Then<Ssao>()
+                               .Then<LightingComponent>()
+                               .Then<RestoreDepthPhase>()
+                               .Then<TranslucentComponent>()
+                               .Then<ToneMapComponent>()
+                               .Then<AntiAliasComponent>()
+                               .Show("antialiased");
 
             ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
+                .Then<EdgeDetectComponent>()
                 .Then<Ssao>()
                 .Show("ssao");
 

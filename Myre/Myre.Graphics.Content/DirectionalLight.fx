@@ -52,59 +52,6 @@ sampler diffuseSampler = sampler_state
 	AddressV = Clamp;
 };
 
-/*
-texture ShadowMap;
-sampler shadowSampler = sampler_state
-{
-	Texture = (ShadowMap);
-	MinFilter = Point;
-	MipFilter = None;
-	MagFilter = Point;
-	AddressU = Clamp;
-	AddressV = Clamp;
-};
-
-// Calculates the shadow term using PCF with edge tap smoothing
-float CalcShadowTermSoftPCF(float fLightDepth, float2 vTexCoord, int iSqrtSamples)
-{
-    float fShadowTerm = 0.0f;  
-        
-    float fRadius = (iSqrtSamples - 1.0f) / 2;        
-    for (float y = -fRadius; y <= fRadius; y++)
-    {
-        for (float x = -fRadius; x <= fRadius; x++)
-        {
-            float2 vOffset = 0;
-            vOffset = float2(x, y);                
-            vOffset /= ShadowMapSize;
-            float2 vSamplePoint = vTexCoord + vOffset;            
-            float fDepth = tex2D(shadowSampler, vSamplePoint).x;
-            float fSample = (fLightDepth <= fDepth + BIAS);
-            
-            // Edge tap smoothing
-            float xWeight = 1;
-            float yWeight = 1;
-            
-            if (x == -fRadius)
-                xWeight = 1 - frac(vTexCoord.x * ShadowMapSize.x);
-            else if (x == fRadius)
-                xWeight = frac(vTexCoord.x * ShadowMapSize.x);
-                
-            if (y == -fRadius)
-                yWeight = 1 - frac(vTexCoord.y * ShadowMapSize.y);
-            else if (y == fRadius)
-                yWeight = frac(vTexCoord.y * ShadowMapSize.y);
-                
-            fShadowTerm += fSample * xWeight * yWeight;
-        }                                            
-    }        
-    
-    fShadowTerm /= (iSqrtSamples * iSqrtSamples );
-    
-    return fShadowTerm;
-}
-*/
-
 void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
 						 in float3 in_FrustumRay : TEXCOORD1,
 						 out float4 out_Colour : COLOR0)
@@ -137,7 +84,7 @@ void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
 		projectedTexCoord.y = (1 - projectedTexCoord.y) / 2;
 
 		float depth = (dot(viewPosition, LightNearPlane.xyz) + LightNearPlane.w) / LightFarClip;
-		light *= CalculateShadow(depth, projectedTexCoord.xy, 3, LightFarClip);
+		light *= CalculateShadow(depth, projectedTexCoord.xy, 9, LightFarClip);
 	}
 
 	out_Colour = float4(NdL * light * (diffuse + specularIntensity * pow(RdV, specularPower)), 1);

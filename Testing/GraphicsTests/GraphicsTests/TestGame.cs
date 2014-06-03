@@ -68,6 +68,7 @@ namespace GraphicsTests
 
             Kernel = NinjectKernel.Instance;
             NinjectKernel.BindGame(this);
+            Kernel.Settings.AllowNullInjection = true;
 
             previousKeyboard = Keyboard.GetState();
 

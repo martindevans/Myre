@@ -59,7 +59,7 @@ namespace GraphicsTests
             public bool View = true;
         }
 
-        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device, SceneConfiguration config = null)
+        public TestScene(IKernel kernel, Game game, ContentManager content, GraphicsDevice device, [Optional]SceneConfiguration config)
         {
             config = config ?? new SceneConfiguration();
 
@@ -100,13 +100,14 @@ namespace GraphicsTests
                 scene.Add(skybox);
             }
 
-            //var sunEntity = kernel.Get<EntityDescription>();
-            //sunEntity.AddProperty<Vector3>("direction", Vector3.Normalize(new Vector3(-.2f, -1f, .3f)));
-            //sunEntity.AddProperty<Vector3>("colour", new Vector3(5f));
-            //sunEntity.AddProperty<int>("shadow_resolution", 4096);
-            //sunEntity.AddBehaviour<SunLight>();
-            //sun = sunEntity.Create();
-            //scene.Add(sun);
+            var sunEntity = kernel.Get<EntityDescription>();
+            sunEntity.AddProperty(SunLight.DirectionName, Vector3.Normalize(new Vector3(-.2f, -1f, .3f)));
+            sunEntity.AddProperty(SunLight.ColourName, new Vector3(5f));
+            sunEntity.AddProperty(SunLight.ShadowResolutionName, 4096);
+            sunEntity.AddProperty(SunLight.ActiveName, true);
+            sunEntity.AddBehaviour<SunLight>();
+            sun = sunEntity.Create();
+            scene.Add(sun);
 
             //var sun2 = sunEntity.Create();
             //sun2.GetProperty<Vector3>("direction").Value = Vector3.Normalize(new Vector3(1, -1, 0));
