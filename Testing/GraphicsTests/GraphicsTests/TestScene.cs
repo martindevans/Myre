@@ -102,7 +102,7 @@ namespace GraphicsTests
 
             var sunEntity = kernel.Get<EntityDescription>();
             sunEntity.AddProperty(SunLight.DirectionName, Vector3.Normalize(new Vector3(-.2f, -1f, .3f)));
-            sunEntity.AddProperty(SunLight.ColourName, new Vector3(5f));
+            sunEntity.AddProperty(SunLight.ColourName, new Vector3(1, 0.3f, 0.01f) * 5);
             sunEntity.AddProperty(SunLight.ShadowResolutionName, 4096);
             sunEntity.AddProperty(SunLight.ActiveName, true);
             sunEntity.AddBehaviour<SunLight>();

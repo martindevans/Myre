@@ -43,11 +43,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectionalLight.fx">
-      <Name>DirectionalLight</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="ClearGBuffer.fx">
       <Name>ClearGBuffer</Name>
       <Importer>EffectImporter</Importer>
