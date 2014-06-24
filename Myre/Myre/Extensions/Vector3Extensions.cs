@@ -83,5 +83,95 @@ namespace Myre.Extensions
                 MathHelper.Clamp(point.Z, min.Z, max.Z)
             );
         }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 XX(this Vector3 point)
+        {
+            return new Vector2(point.X, point.X);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 XY(this Vector3 point)
+        {
+            return new Vector2(point.X, point.Y);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 XZ(this Vector3 point)
+        {
+            return new Vector2(point.X, point.Z);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 YX(this Vector3 point)
+        {
+            return new Vector2(point.Y, point.X);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 YY(this Vector3 point)
+        {
+            return new Vector2(point.Y, point.Y);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 YZ(this Vector3 point)
+        {
+            return new Vector2(point.Y, point.Z);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 ZX(this Vector3 point)
+        {
+            return new Vector2(point.Z, point.X);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 ZY(this Vector3 point)
+        {
+            return new Vector2(point.Z, point.Y);
+        }
+
+        /// <summary>
+        /// Get a vector 2 with the specified elements
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static Vector2 ZZ(this Vector3 point)
+        {
+            return new Vector2(point.Z, point.Z);
+        }
     }
 }
