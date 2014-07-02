@@ -113,5 +113,27 @@ namespace Myre
         {
             return new Int4(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator ==(Int4 a, Int4 b)
+        {
+            return a.Equals(b);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator !=(Int4 a, Int4 b)
+        {
+            return !(a == b);
+        }
     }
 }
