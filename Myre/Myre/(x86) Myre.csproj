@@ -99,6 +99,7 @@
     <Compile Include="Collections\TokenOctree.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
+    <Compile Include="Extensions\PlaneExtensions.cs" />
     <Compile Include="Int4.cs" />
     <Compile Include="Delayed.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />

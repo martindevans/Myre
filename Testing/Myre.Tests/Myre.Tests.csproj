@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Myre\Collections\Octree.cs" />
     <Compile Include="Myre\Collections\RingBufferTest.cs" />
+    <Compile Include="Myre\Extensions\PlaneExtensionsTest.cs" />
     <Compile Include="Myre\Extensions\Vector2ExtensionsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

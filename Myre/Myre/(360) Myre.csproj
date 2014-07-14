@@ -79,6 +79,7 @@
     <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\Int32Extensions.cs" />
     <Compile Include="Extensions\KeysExtensions.cs" />
+    <Compile Include="Extensions\PlaneExtensions.cs" />
     <Compile Include="Extensions\RandomExtensions.cs" />
     <Compile Include="Extensions\RectangleExtensions.cs" />
     <Compile Include="Extensions\StringBuilderExtensions.cs" />
