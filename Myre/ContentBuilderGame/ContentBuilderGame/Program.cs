@@ -2,7 +2,7 @@ using System;
 
 namespace ContentBuilderGame
 {
-#if WINDOWS || XBOX
+#if WINDOWS
     static class Program
     {
         /// <summary>

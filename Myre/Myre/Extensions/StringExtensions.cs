@@ -16,20 +16,7 @@ namespace Myre.Extensions
         /// <returns><c>true</c> if the parse succeeded; else <c>false</c>.</returns>
         public static bool TryToByte(this string value, out byte result)
         {
-#if XBOX
-            try
-            {
-                result = byte.Parse(value);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = 0;
-                return false;
-            }
-#else
             return byte.TryParse(value, out result);
-#endif
         }
 
         /// <summary>
@@ -40,20 +27,7 @@ namespace Myre.Extensions
         /// <returns><c>true</c> if the parse succeeded; else <c>false</c>.</returns>
         public static bool TryToInt(this string value, out int result)
         {
-#if XBOX
-            try
-            {
-                result = int.Parse(value);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = 0;
-                return false;
-            }
-#else
             return int.TryParse(value, out result);
-#endif
         }
 
         /// <summary>
@@ -64,20 +38,7 @@ namespace Myre.Extensions
         /// <returns><c>true</c> if the parse succeeded; else <c>false</c>.</returns>
         public static bool TryToBool(this string value, out bool result)
         {
-#if XBOX
-            try
-            {
-                result = bool.Parse(value);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = false;
-                return false;
-            }
-#else
             return bool.TryParse(value, out result);
-#endif
         }
 
         /// <summary>
@@ -88,20 +49,7 @@ namespace Myre.Extensions
         /// <returns><c>true</c> if the parse succeeded; else <c>false</c>.</returns>
         public static bool TryToFloat(this string value, out float result)
         {
-#if XBOX
-            try
-            {
-                result = float.Parse(value);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = 0;
-                return false;
-            }
-#else
             return float.TryParse(value, out result);
-#endif
         }
 
         /// <summary>

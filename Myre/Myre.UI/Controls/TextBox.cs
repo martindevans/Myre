@@ -139,21 +139,7 @@ namespace Myre.UI.Controls
         public void BeginTyping(PlayerIndex player)
         {
             _typing = true;
-#if !WINDOWS
-            Guide.BeginShowKeyboardInput(player, _title, _description, _text.ToString(), GuideCallback, null);
-#endif
         }
-
-#if !WINDOWS
-        private void GuideCallback(IAsyncResult result)
-        {
-            string input = Guide.EndShowKeyboardInput(result);
-            Text = input;
-
-            _selectionStartIndex = _selectionEndIndex = 0;
-            _typing = false;
-        }
-#endif
 
         public override void Update(GameTime gameTime)
         {
