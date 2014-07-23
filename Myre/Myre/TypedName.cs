@@ -31,10 +31,13 @@ namespace Myre
         /// Append a string to the name of a TypedName
         /// </summary>
         /// <param name="a"></param>
-        /// <param name="b"></param>
+        /// <param name="b">the string to append, if this is null or empty nothing will happen</param>
         /// <returns></returns>
         public static TypedName<T> operator +(TypedName<T> a, string b)
         {
+            if (string.IsNullOrEmpty(b))
+                return a;
+
             return new TypedName<T>(string.Format("{0}_{1}", a.Name, b));
         }
 
