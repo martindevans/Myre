@@ -77,7 +77,7 @@ namespace Myre.Extensions
                 previous = i;
             }
 
-            return area / 2;
+            return -area / 2;
         }
 
         /// <summary>
