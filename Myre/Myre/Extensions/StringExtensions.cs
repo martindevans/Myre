@@ -97,5 +97,16 @@ namespace Myre.Extensions
                 return false;
             return s[0] == c;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static string Format(string format, params object[] args)
+        {
+            return string.Format(format, args);
+        }
     }
 }
