@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics.Animation
 {
+    [Serializable]
     public class SkinningData
     {
         /// <summary>
