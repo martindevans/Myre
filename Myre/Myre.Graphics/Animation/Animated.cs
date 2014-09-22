@@ -57,7 +57,7 @@ namespace Myre.Graphics.Animation
             get { return _skinTransforms; }
         }
 
-        private SkinningData skinningData
+        public SkinningData skinningData
         {
             get { return _model.Model.SkinningData; }
         }
