@@ -57,14 +57,14 @@ namespace Myre.Graphics.Animation
             get { return _skinTransforms; }
         }
 
-        public SkinningData skinningData
+        public SkinningData SkinningData
         {
             get { return _model.Model.SkinningData; }
         }
 
         private int BonesCount
         {
-            get { return skinningData.SkeletonHierarchy.Length; }
+            get { return SkinningData.SkeletonHierarchy.Length; }
         }
 
         public IClip CurrentlyPlaying
@@ -370,13 +370,13 @@ namespace Myre.Graphics.Animation
             // Child bones.
             for (int bone = 1; bone < _worldTransforms.Length; bone++)
             {
-                int parentBone = skinningData.SkeletonHierarchy[bone];
+                int parentBone = SkinningData.SkeletonHierarchy[bone];
 
                 //Multiply by parent bone transform
                 Matrix.Multiply(ref _boneTransforms[bone], ref _worldTransforms[parentBone], out _worldTransforms[bone]);
 
                 //Multiply by bind pose
-                Matrix.Multiply(ref skinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
+                Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
             }
         }
 
