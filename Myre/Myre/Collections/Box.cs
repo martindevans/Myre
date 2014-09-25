@@ -160,7 +160,7 @@ namespace Myre.Collections
         /// <summary>
         /// Adds the specified value to this container.
         /// </summary>
-        /// <typeparam name="T">The type of value to add.</typeparam>
+        /// <typeparam name="T">c</typeparam>
         /// <param name="key">The key.</param>
         /// <param name="value">The value.</param>
         /// <returns>The box containing the value at the specified key.</returns>
@@ -169,6 +169,27 @@ namespace Myre.Collections
             var box = Get<T>(key);
             if (box == null)
                 throw new InvalidOperationException("The value at key " + key + " is of the wrong type");
+
+            box.Value = value;
+        }
+
+        /// <summary>
+        /// Adds the specified value to this container.
+        /// </summary>
+        /// <param name="key">The value.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="type">The type of value to add.</param>
+        public void Set(Key key, object value, Type type)
+        {
+            var box = Get(key);
+            if (box != null && !box.Type.IsAssignableFrom(type))
+                throw new InvalidOperationException("The value at key " + key + " is of the wrong type");
+
+            if (box == null)
+            {
+                box = (IBox)Activator.CreateInstance(typeof(Box<>).MakeGenericType(type));
+                _values.Add(key, box);
+            }
 
             box.Value = value;
         }

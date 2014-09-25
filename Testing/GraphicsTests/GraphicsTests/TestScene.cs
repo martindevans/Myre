@@ -9,6 +9,7 @@ using Myre;
 using Myre.Collections;
 using Myre.Debugging.UI;
 using Myre.Entities;
+using Myre.Extensions;
 using Myre.Graphics;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
@@ -247,6 +248,7 @@ namespace GraphicsTests
             sponzaEntity.GetProperty(new TypedName<Matrix>("transform")).Value = Matrix.Identity * Matrix.CreateScale(1);
             sponzaEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
             scene.Add(sponzaEntity);
+
             _sponza = sponzaEntity.GetBehaviour<ModelInstance>();
 
             var renderer = scene.GetService<Renderer>();
