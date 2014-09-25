@@ -1,7 +1,7 @@
 function Push-Nuget($path, $csproj) {
     $fullPathToCsprog = Join-Path -Path $path -ChildPath $csproj -resolve;
     
-    nuget pack $fullPathToCsprog -Prop Configuration=Release -IncludeReferencedProjects
+    nuget pack $fullPathToCsprog -Prop Configuration=Release -IncludeReferencedProjects -Symbols
     
     get-childitem -Filter *.nupkg -name | foreach ($_) {
         Write-Host "Pushing " $_ -backgroundcolor darkgreen -foregroundcolor white;
