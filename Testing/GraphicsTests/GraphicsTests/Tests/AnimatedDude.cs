@@ -20,7 +20,7 @@ namespace GraphicsTests.Tests
     {
         private readonly Scene _scene;
         private readonly ModelInstance _dude;
-        private readonly Animated _animation;
+        private readonly AnimationQueue _animationQueue;
 
         private readonly string[] _sequence = new string[]
         {
@@ -41,17 +41,18 @@ namespace GraphicsTests.Tests
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
+            dude.AddBehaviour<AnimationQueue>();
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
-            _animation = dudeEntity.GetBehaviour<Animated>();
-            _animation.EnableRootBoneTranslationY = false;
-            _animation.EnableRootBoneTranslationX = false;
-            _animation.EnableRootBoneTranslationZ = false;
-            _animation.EnableRootBoneScale = false;
+            _animationQueue = dudeEntity.GetBehaviour<AnimationQueue>();
+            _animationQueue.EnableRootBoneTranslationY = false;
+            _animationQueue.EnableRootBoneTranslationX = false;
+            _animationQueue.EnableRootBoneTranslationZ = false;
+            _animationQueue.EnableRootBoneScale = false;
 
             _dude = dudeEntity.GetBehaviour<ModelInstance>();
 
-            _animation.DefaultClip = new Animated.ClipPlaybackParameters
+            _animationQueue.DefaultClip = new AnimationQueue.ClipPlaybackParameters
             {
                 Clip = new RandomClip(content.Load<Clip>("Models/ZoeAnimations/idle01")),
                 FadeInTime = TimeSpan.FromSeconds(1f),
@@ -61,7 +62,7 @@ namespace GraphicsTests.Tests
 
             foreach (var name in _sequence)
             {
-                _animation.EnqueueClip(new Animated.ClipPlaybackParameters
+                _animationQueue.EnqueueClip(new AnimationQueue.ClipPlaybackParameters
                 {
                     Clip = content.Load<Clip>("Models/ZoeAnimations/" + name),
                     FadeInTime = TimeSpan.FromSeconds(0.1f),

@@ -45,5 +45,20 @@ namespace Myre.Graphics.Animation
                 Rotation = b.Rotation * Quaternion.Inverse(a.Rotation)
             };
         }
+
+        public void ToMatrix(out Matrix matrix)
+        {
+            Matrix s;
+            Matrix.CreateScale(ref Scale, out s);
+
+            Matrix r;
+            Matrix.CreateFromQuaternion(ref Rotation, out r);
+
+            Matrix t;
+            Matrix.CreateTranslation(ref Translation, out t);
+
+            Matrix.Multiply(ref s, ref r, out matrix);
+            Matrix.Multiply(ref matrix, ref t, out matrix);
+        }
     }
 }
