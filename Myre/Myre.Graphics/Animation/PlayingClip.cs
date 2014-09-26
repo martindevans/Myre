@@ -22,7 +22,6 @@ namespace Myre.Graphics.Animation
         public TimeSpan FadeOutTime { get; set; }
 
         private Transform[] _transforms;
-        private Transform[] _previousTransforms;
 
         private void Restart()
         {
@@ -60,14 +59,15 @@ namespace Myre.Graphics.Animation
 
             Animation = clipParameters.Clip;
             _channelFrames = new int[Animation.Channels.Length];
-            _previousTransforms = new Transform[Animation.Channels.Length];
             _transforms = new Transform[Animation.Channels.Length];
 
             Start();
         }
 
-        public void Update(TimeSpan elapsedTime)
+        public void Update(TimeSpan elapsedTime, out Transform previousRootTransform)
         {
+            previousRootTransform = Graphics.Animation.Transform.Identity;
+
             // Update the animation position.
             ElapsedTime += TimeSpan.FromSeconds(elapsedTime.TotalSeconds * TimeFactor);
 
@@ -88,8 +88,11 @@ namespace Myre.Graphics.Animation
                 while (channel[_channelFrames[i]].Time <= ElapsedTime)
                     _channelFrames[i]++;
 
+                //save root bone transform
+                if (Animation.RootBoneIndex == i)
+                    previousRootTransform = _transforms[i];
+
                 //Calculate new transform for this channel
-                _previousTransforms[i] = _transforms[i];
                 CalculateTransform(i, out _transforms[i]);
             }
         }
@@ -129,11 +132,6 @@ namespace Myre.Graphics.Animation
         public Transform Transform(int channel)
         {
             return _transforms[channel];
-        }
-
-        public Transform Delta(int channel)
-        {
-            return Graphics.Animation.Transform.Subtract(_transforms[channel], _previousTransforms[channel]);
         }
 
         private static readonly Pool<PlayingClip> _pool = new Pool<PlayingClip>();

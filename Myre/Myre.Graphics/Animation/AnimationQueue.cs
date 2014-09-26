@@ -177,12 +177,43 @@ namespace Myre.Graphics.Animation
 
         protected override void Update(float elapsedTime)
         {
-            UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime));
+            Transform oldRootFadingOut;
+            Transform oldRootFadingIn;
+            UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime), out oldRootFadingIn, out oldRootFadingOut);
+
             UpdateBoneTransforms(elapsedTime);
+
+            CalculateRootBoneDelta(ref oldRootFadingOut, ref oldRootFadingIn);
         }
 
-        private void UpdateActiveAnimations(TimeSpan dt)
+        private void CalculateRootBoneDelta(ref Transform oldRootFadingOut, ref Transform oldRootFadingIn)
         {
+            if (_fadingOut != null && _fadingIn != null)
+            {
+                var dOut = Transform.Subtract(_fadingOut.Transform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
+                var dIn = Transform.Subtract(_fadingIn.Transform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
+
+                RootBoneTransfomationDelta = dOut.Interpolate(dIn, _crossfadeProgress);
+            }
+            else if (_fadingOut != null)
+            {
+                RootBoneTransfomationDelta = Transform.Subtract(_fadingOut.Transform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
+            }
+            else if (_fadingIn != null)
+            {
+                RootBoneTransfomationDelta = Transform.Subtract(_fadingIn.Transform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
+            }
+            else
+            {
+                throw new InvalidOperationException("No root bone motion found");
+            }
+        }
+
+        private void UpdateActiveAnimations(TimeSpan dt, out Transform previousRootTransformFadingIn, out Transform previousRootTransformFadingOut)
+        {
+            previousRootTransformFadingIn = Transform.Identity;
+            previousRootTransformFadingOut = Transform.Identity;
+
             if (_fadingOut == null && _fadingIn == null)
                 InterruptClip(NextClip(), false);
 
@@ -196,7 +227,7 @@ namespace Myre.Graphics.Animation
 
             if (_fadingOut != null)
             {
-                _fadingOut.Update(dt);
+                _fadingOut.Update(dt, out previousRootTransformFadingOut);
 
                 //Check if this animation is entering it's final phase. If so, look for another animation in the queue to start playing
                 if (_fadingIn == null && _fadingOut.ElapsedTime >= _fadingOut.Animation.Duration - _fadingOut.FadeOutTime)
@@ -205,7 +236,7 @@ namespace Myre.Graphics.Animation
 
             if (_fadingIn != null)
             {
-                _fadingIn.Update(dt);
+                _fadingIn.Update(dt, out previousRootTransformFadingIn);
 
                 _crossfadeElapsed += dt;
                 _crossfadeProgress = (float)_crossfadeElapsed.TotalSeconds / (float)_crossfadeDuration.TotalSeconds;
@@ -240,17 +271,6 @@ namespace Myre.Graphics.Animation
                 else
                     transform.ToMatrix(out boneTransforms[boneIndex]);
             }
-
-            if (_fadingOut != null && _fadingIn != null)
-            {
-                RootBoneTransfomationDelta = _fadingOut.Delta(_fadingOut.Animation.RootBoneIndex).Interpolate(_fadingIn.Delta(_fadingIn.Animation.RootBoneIndex), _crossfadeProgress);
-            }
-            else if (_fadingOut != null)
-                RootBoneTransfomationDelta = _fadingOut.Delta(_fadingOut.Animation.RootBoneIndex);
-            else if (_fadingIn != null)
-                RootBoneTransfomationDelta = _fadingIn.Delta(_fadingIn.Animation.RootBoneIndex);
-            else
-                throw new InvalidOperationException("No root bone motion found");
         }
 
         private void BuildRootBoneMatrix(ref Transform transform, out Matrix m)

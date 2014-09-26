@@ -122,6 +122,8 @@ namespace GraphicsTests.Tests
         {
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
+
+            Console.WriteLine(_animationQueue.RootBoneTransfomationDelta.Translation);
         }
 
         public override void Draw(GameTime gameTime)
