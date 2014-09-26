@@ -37,7 +37,7 @@ namespace GraphicsTests.Tests
             var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty(new TypedName<ModelData>("model"), model);
-            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(10));
+            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(50f));
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
@@ -82,7 +82,7 @@ namespace GraphicsTests.Tests
             _scene.Add(cameraEntity);
 
             var ambientLight = kernel.Get<EntityDescription>();
-            ambientLight.AddProperty(new TypedName<Vector3>("sky_colour"), new Vector3(0.44f));
+            ambientLight.AddProperty(new TypedName<Vector3>("sky_colour"), new Vector3(0.44f, 0.44f, 0.74f));
             ambientLight.AddProperty(new TypedName<Vector3>("ground_colour"), new Vector3(0.24f, 0.35f, 0.24f));
             ambientLight.AddProperty(new TypedName<Vector3>("up"), Vector3.Up);
             ambientLight.AddBehaviour<AmbientLight>();
@@ -96,12 +96,11 @@ namespace GraphicsTests.Tests
             _scene.Add(sponza.Create());
 
             var spotLight = kernel.Get<EntityDescription>();
-            spotLight.AddProperty(new TypedName<Vector3>("position"), new Vector3(150, 50, 0));
-            spotLight.AddProperty(new TypedName<Vector3>("colour"), new Vector3(5));
-            spotLight.AddProperty(new TypedName<Vector3>("direction"), new Vector3(-1, 0, 0));
+            spotLight.AddProperty(new TypedName<Vector3>("position"), new Vector3(150, 50, -50));
+            spotLight.AddProperty(new TypedName<Vector3>("colour"), new Vector3(1));
+            spotLight.AddProperty(new TypedName<Vector3>("direction"), new Vector3(-1, 0, 0.25f));
             spotLight.AddProperty(new TypedName<float>("angle"), MathHelper.PiOver2);
             spotLight.AddProperty(new TypedName<float>("range"), 1000);
-            spotLight.AddProperty(new TypedName<Texture2D>("mask"), content.Load<Texture2D>("Chrysanthemum"));
             spotLight.AddProperty(new TypedName<int>("shadow_resolution"), 1024);
             spotLight.AddBehaviour<SpotLight>();
             var spotLightEntity = spotLight.Create();
@@ -112,9 +111,9 @@ namespace GraphicsTests.Tests
                   .Then<EdgeDetectComponent>()
                   .Then<Ssao>()
                   .Then<LightingComponent>()
-                //.Then<ToneMapComponent>()
                   .Then<TranslucentComponent>()
-                  .Show("gbuffer_normals")
+                  .Then<ToneMapComponent>()
+                  .Then<AntiAliasComponent>()
                   .Apply();
         }
 
@@ -122,15 +121,6 @@ namespace GraphicsTests.Tests
         {
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
-
-            var anim = _dude.Owner.GetBehaviour<Animated>();
-
-            //if (anim.CurrentlyPlaying.Name.Contains("walk"))
-            //{
-            //    Console.WriteLine(anim.RootBoneTransfomationDelta.Translation.Z);
-            //}
-
-            //_dude.Transform = Matrix.CreateTranslation(new Vector3(anim.RootBoneTransfomationDelta.Translation.X, 0, anim.RootBoneTransfomationDelta.Translation.Z));
         }
 
         public override void Draw(GameTime gameTime)

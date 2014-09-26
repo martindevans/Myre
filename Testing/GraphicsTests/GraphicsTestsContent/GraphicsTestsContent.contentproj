@@ -198,6 +198,9 @@
       <Name>zoe</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
+      <ProcessorParameters_DiffuseTexture>Models/zoe_01</ProcessorParameters_DiffuseTexture>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
