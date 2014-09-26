@@ -182,6 +182,7 @@ namespace Myre.Graphics.Animation
             UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime), out oldRootFadingIn, out oldRootFadingOut);
 
             UpdateBoneTransforms(elapsedTime);
+            Animated.UpdateWorldTransforms(_animation.SkinningData.SkeletonHierarchy, _animation.BoneTransforms, _animation.WorldTransforms);
 
             CalculateRootBoneDelta(ref oldRootFadingOut, ref oldRootFadingIn);
         }

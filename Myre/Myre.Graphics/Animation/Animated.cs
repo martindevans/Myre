@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Myre.Collections;
-using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Geometry;
 
@@ -21,9 +21,6 @@ namespace Myre.Graphics.Animation
         Matrix[] _worldTransforms;
         Matrix[] _skinTransforms;
 
-        /// <summary>
-        /// 
-        /// </summary>
         public Matrix[] BoneTransforms
         {
             get { return _boneTransforms; }
@@ -98,25 +95,37 @@ namespace Myre.Graphics.Animation
 
         protected override void Update(float elapsedTime)
         {
-            UpdateWorldTransforms();
+            UpdateSkinTransforms();
         }
 
-        private void UpdateWorldTransforms()
+        public static void UpdateWorldTransforms(int[] hierarchy, Matrix[] boneTransforms, Matrix[] worldTransforms)
         {
             // Root bone.
-            _worldTransforms[0] = _boneTransforms[0];
+            worldTransforms[0] = boneTransforms[0];
 
             // Child bones.
-            for (int bone = 1; bone < _worldTransforms.Length; bone++)
+            for (int bone = 1; bone < worldTransforms.Length; bone++)
             {
-                int parentBone = SkinningData.SkeletonHierarchy[bone];
+                int parentBone = hierarchy[bone];
 
                 //Multiply by parent bone transform
-                Matrix.Multiply(ref _boneTransforms[bone], ref _worldTransforms[parentBone], out _worldTransforms[bone]);
-
-                //Multiply by bind pose
-                Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
+                Matrix.Multiply(ref boneTransforms[bone], ref worldTransforms[parentBone], out worldTransforms[bone]);
             }
+        }
+
+        private void UpdateSkinTransforms()
+        {
+            //Parallelised skin transform calculation
+            Parallel.For(1, _worldTransforms.Length, UpdateSkinTransform);
+
+            //Serialised skin transform calculation
+            //for (int bone = 0; bone < _worldTransforms.Length; bone++)
+            //    Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
+        }
+
+        private void UpdateSkinTransform(int bone)
+        {
+            Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
         }
 
         public void SetRenderData(NamedBoxCollection metadata)
