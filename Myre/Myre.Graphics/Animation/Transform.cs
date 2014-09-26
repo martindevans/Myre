@@ -15,7 +15,14 @@ namespace Myre.Graphics.Animation
 
         public Transform Interpolate(Transform b, float amount)
         {
-            return new Transform
+            Transform result;
+            Interpolate(ref b, amount, out result);
+            return result;
+        }
+
+        public void Interpolate(ref Transform b, float amount, out Transform result)
+        {
+            result = new Transform
             {
                 Translation = Vector3.Lerp(Translation, b.Translation, amount),
                 Rotation = Rotation.Nlerp(b.Rotation, amount),

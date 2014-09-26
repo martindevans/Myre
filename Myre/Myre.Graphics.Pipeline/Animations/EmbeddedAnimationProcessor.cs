@@ -15,7 +15,7 @@ namespace Myre.Graphics.Pipeline.Animations
         public const long TICKS_PER_60_FPS = TimeSpan.TicksPerSecond / 60;
 
         private IList<BoneContent> _bones;
-        private Dictionary<string, int> _boneNames;
+        private Dictionary<string, ushort> _boneNames;
 
         public override ClipContent Process(MyreEmbeddedAnimationDefinition input, ContentProcessorContext context)
         {
@@ -29,7 +29,7 @@ namespace Myre.Graphics.Pipeline.Animations
 
             //Find the skeleton
             _bones = MeshHelper.FlattenSkeleton(MeshHelper.FindSkeleton(node));
-            _boneNames = _bones.Select((a, i) => new  { a, i }).ToDictionary(a => a.a.Name, a => a.i);
+            _boneNames = _bones.Select((a, i) => new  { a, i = i }).ToDictionary(a => a.a.Name, a => (ushort)a.i);
 
             //The "Root" bone is not necessarily the actual root of the tree
             //Find which bones are before and after the notional "Root" bone
@@ -55,7 +55,7 @@ namespace Myre.Graphics.Pipeline.Animations
             Parallel.ForEach(anim.Channels, channel =>
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
                 {
-                    int boneIndex = _boneNames[channel.Key];
+                    ushort boneIndex = _boneNames[channel.Key];
                     animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping).ToList();
                 }
             );
@@ -75,7 +75,7 @@ namespace Myre.Graphics.Pipeline.Animations
             return animationClip;
         }
 
-        private static IEnumerable<KeyframeContent> ProcessChannel(int boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping)
+        private static IEnumerable<KeyframeContent> ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping)
         {
             //Find keyframes for this channel
             var keyframes = channel

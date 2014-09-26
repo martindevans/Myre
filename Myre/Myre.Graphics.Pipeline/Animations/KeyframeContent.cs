@@ -9,14 +9,14 @@ namespace Myre.Graphics.Pipeline.Animations
     [ContentSerializerRuntimeType("Myre.Graphics.Animation.Keyframe, Myre.Graphics")]
     public class KeyframeContent
     {
-        public int Bone { get; set; }
+        public ushort Bone { get; set; }
         public TimeSpan Time { get; set; }
 
         public Vector3 Translation { get; set; }
         public Vector3 Scale { get; set; }
         public Quaternion Rotation { get; set; }
 
-        public KeyframeContent(int boneIndex, TimeSpan timeSpan, Vector3 position, Vector3 scale, Quaternion orientaton)
+        public KeyframeContent(ushort boneIndex, TimeSpan timeSpan, Vector3 position, Vector3 scale, Quaternion orientaton)
         {
             Bone = boneIndex;
             Time = timeSpan;

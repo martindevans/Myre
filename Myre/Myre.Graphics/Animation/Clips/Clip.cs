@@ -42,7 +42,7 @@ namespace Myre.Graphics.Animation.Clips
                     existingInstance.Channels[i][j] = input.ReadObject<Keyframe>();
             }
 
-            existingInstance.RootBoneIndex = input.ReadInt32();
+            existingInstance.RootBoneIndex = input.ReadUInt16();
 
             return existingInstance;
         }

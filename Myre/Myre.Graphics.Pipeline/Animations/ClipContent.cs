@@ -11,10 +11,10 @@ namespace Myre.Graphics.Pipeline.Animations
     [ContentSerializerRuntimeType("Myre.Graphics.Animation.Clip, Myre.Graphics")]
     public class ClipContent
     {
-        public int RootBoneIndex { get; private set; }
+        public ushort RootBoneIndex { get; private set; }
         public List<KeyframeContent>[] Channels { get; private set; }
 
-        public ClipContent(int boneCount, int rootBoneIndex)
+        public ClipContent(int boneCount, ushort rootBoneIndex)
         {
             RootBoneIndex = rootBoneIndex;
 

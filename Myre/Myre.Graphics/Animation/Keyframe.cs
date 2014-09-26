@@ -5,18 +5,13 @@ using Microsoft.Xna.Framework.Content;
 namespace Myre.Graphics.Animation
 {
     [Serializable]
-    public class Keyframe
+    public struct Keyframe
     {
-        public int Bone { get; set; }
-        public TimeSpan Time { get; set; }
+        public readonly ushort Bone;
+        public readonly TimeSpan Time;
+        public readonly Transform Transform;
 
-        public Transform Transform { get; set; }
-
-        internal Keyframe()
-        {
-        }
-
-        public Keyframe(int bone, TimeSpan time, Vector3 position, Vector3 scale, Quaternion orientaton)
+        public Keyframe(ushort bone, TimeSpan time, Vector3 position, Vector3 scale, Quaternion orientaton)
         {
             Bone = bone;
             Time = time;
@@ -39,19 +34,7 @@ namespace Myre.Graphics.Animation
     {
         protected override Keyframe Read(ContentReader input, Keyframe existingInstance)
         {
-            existingInstance = existingInstance ?? new Keyframe();
-
-            existingInstance.Bone = input.ReadInt32();
-            existingInstance.Time = new TimeSpan(input.ReadInt64());
-
-            existingInstance.Transform = new Transform
-            {
-                Translation = input.ReadVector3(),
-                Scale = input.ReadVector3(),
-                Rotation = input.ReadQuaternion()
-            };
-
-            return existingInstance;
+            return new Keyframe(input.ReadUInt16(), new TimeSpan(input.ReadInt64()), input.ReadVector3(), input.ReadVector3(), input.ReadQuaternion());
         }
     }
 }

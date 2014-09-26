@@ -90,30 +90,40 @@ namespace Myre.Graphics.Animation
 
                 //Calculate new transform for this channel
                 _previousTransforms[i] = _transforms[i];
-                _transforms[i] = CalculateTransform(i);
+                CalculateTransform(i, out _transforms[i]);
             }
         }
 
-        private Transform CalculateTransform(int channel)
+        private void CalculateTransform(int channel, out Transform transform)
         {
             int index = _channelFrames[channel];
 
-            //frame which is greater than or equal to the current time
-            var b = Animation.Channels[channel][index];
-            if (b.Time == ElapsedTime || index == 0)
-                return b.Transform;
+            unsafe
+            {
+                //frame which is greater than or equal to the current time
+                fixed (Keyframe* b = &Animation.Channels[channel][index])
+                {
+                    if (b->Time == ElapsedTime || index == 0)
+                    {
+                        transform = b->Transform;
+                        return;
+                    }
 
-            //Previous frame
-            var a = Animation.Channels[channel][index - 1];
+                    //Previous frame
+                    fixed (Keyframe* a = &Animation.Channels[channel][index - 1])
+                    {
 
-            //Interpolation factor between frames
-            var t = (float)((ElapsedTime.TotalSeconds - a.Time.TotalSeconds) / (b.Time.TotalSeconds - a.Time.TotalSeconds));
+                        //Interpolation factor between frames
+                        var t = (float) ((ElapsedTime.TotalSeconds - a->Time.TotalSeconds) / (b->Time.TotalSeconds - a->Time.TotalSeconds));
 
-            //Convert linear interpolation into some other easing function
-            var t2 = PlaybackParameters.Interpolator(t);
+                        //Convert linear interpolation into some other easing function
+                        var t2 = PlaybackParameters.Interpolator(t);
 
-            //Linearly interpolate frames
-            return a.Transform.Interpolate(b.Transform, t2);
+                        //Linearly interpolate frames
+                        transform = a->Transform.Interpolate(b->Transform, t2);
+                    }
+                }
+            }
         }
 
         public Transform Transform(int channel)
