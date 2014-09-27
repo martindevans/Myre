@@ -42,7 +42,7 @@ namespace Myre.Graphics.Animation.Clips
             get { return SelectedClip.Duration; }
         }
 
-        public int RootBoneIndex
+        public ushort RootBoneIndex
         {
             get { return SelectedClip.RootBoneIndex; }
         }

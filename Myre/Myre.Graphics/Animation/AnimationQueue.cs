@@ -5,6 +5,7 @@ using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Animation.Clips;
+using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Animation
 {
@@ -91,6 +92,7 @@ namespace Myre.Graphics.Animation
         }
 
         private Animated _animation;
+        private ModelInstance _model;
 
         private readonly Queue<ClipPlaybackParameters> _animationQueue = new Queue<ClipPlaybackParameters>();
 
@@ -105,6 +107,8 @@ namespace Myre.Graphics.Animation
         {
             get { return (_fadingIn ?? _fadingOut).Animation; }
         }
+
+        Matrix[] _boneTransforms;
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
@@ -134,6 +138,31 @@ namespace Myre.Graphics.Animation
             base.Initialised();
 
             _animation = Owner.GetBehaviour<Animated>();
+
+            _model = Owner.GetBehaviour<ModelInstance>();
+            _model.ModelDataChanged += ModelChanged;
+            ModelChanged(_model);
+        }
+
+        public override void Shutdown(INamedDataProvider shutdownData)
+        {
+            _model.ModelDataChanged -= ModelChanged;
+
+            base.Shutdown(shutdownData);
+        }
+
+        private void ModelChanged(ModelInstance model)
+        {
+            if (model != null && model.Model != null && model.Model.SkinningData != null)
+            {
+                _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
+                for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
+                    _model.Model.SkinningData.BindPose[i].ToMatrix(out _boneTransforms[i]);
+            }
+            else
+            {
+                _boneTransforms = null;
+            }
         }
 
         /// <summary>
@@ -177,32 +206,50 @@ namespace Myre.Graphics.Animation
 
         protected override void Update(float elapsedTime)
         {
+            //Chose which animations are playing
             Transform oldRootFadingOut;
             Transform oldRootFadingIn;
             UpdateActiveAnimations(TimeSpan.FromSeconds(elapsedTime), out oldRootFadingIn, out oldRootFadingOut);
 
-            UpdateBoneTransforms(elapsedTime);
-            Animated.UpdateWorldTransforms(_animation.SkinningData.SkeletonHierarchy, _animation.BoneTransforms, _animation.WorldTransforms);
+            //Calculate bone transforms and world transforms
+            UpdateBoneTransforms();
+            UpdateWorldTransforms();
 
+            //Calculate how far the root bone has transformed
             CalculateRootBoneDelta(ref oldRootFadingOut, ref oldRootFadingIn);
+        }
+
+        private void UpdateWorldTransforms()
+        {
+            // Root bone.
+            _animation.WorldTransforms[0] = _boneTransforms[0];
+
+            // Child bones.
+            for (int bone = 1; bone < _animation.WorldTransforms.Length; bone++)
+            {
+                int parentBone = _animation.SkinningData.SkeletonHierarchy[bone];
+
+                //Multiply by parent bone transform
+                Matrix.Multiply(ref _boneTransforms[bone], ref _animation.WorldTransforms[parentBone], out _animation.WorldTransforms[bone]);
+            }
         }
 
         private void CalculateRootBoneDelta(ref Transform oldRootFadingOut, ref Transform oldRootFadingIn)
         {
             if (_fadingOut != null && _fadingIn != null)
             {
-                var dOut = Transform.Subtract(_fadingOut.Transform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
-                var dIn = Transform.Subtract(_fadingIn.Transform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
+                var dOut = Transform.Subtract(_fadingOut.BoneTransform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
+                var dIn = Transform.Subtract(_fadingIn.BoneTransform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
 
                 RootBoneTransfomationDelta = dOut.Interpolate(dIn, _crossfadeProgress);
             }
             else if (_fadingOut != null)
             {
-                RootBoneTransfomationDelta = Transform.Subtract(_fadingOut.Transform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
+                RootBoneTransfomationDelta = Transform.Subtract(_fadingOut.BoneTransform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
             }
             else if (_fadingIn != null)
             {
-                RootBoneTransfomationDelta = Transform.Subtract(_fadingIn.Transform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
+                RootBoneTransfomationDelta = Transform.Subtract(_fadingIn.BoneTransform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
             }
             else
             {
@@ -250,27 +297,26 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        private void UpdateBoneTransforms(float deltaTime)
+        private void UpdateBoneTransforms()
         {
-            var boneTransforms = _animation.BoneTransforms;
-            for (int boneIndex = 0; boneIndex < boneTransforms.Length; boneIndex++)
+            for (int boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
             {
                 Transform transform;
                 if (_fadingOut != null && _fadingIn == null)
-                    transform = _fadingOut.Transform(boneIndex);
+                    transform = _fadingOut.BoneTransform(boneIndex);
                 else if (_fadingOut == null && _fadingIn != null)
-                    transform = _fadingIn.Transform(boneIndex);
+                    transform = _fadingIn.BoneTransform(boneIndex);
                 else if (_fadingOut != null && _fadingIn != null)
-                    transform = _fadingOut.Transform(boneIndex).Interpolate(_fadingIn.Transform(boneIndex), _crossfadeProgress);
+                    transform = _fadingOut.BoneTransform(boneIndex).Interpolate(_fadingIn.BoneTransform(boneIndex), _crossfadeProgress);
                 else
                     throw new InvalidOperationException("No active animations");
 
                 if (_fadingIn != null && boneIndex == _fadingIn.Animation.RootBoneIndex)
-                    BuildRootBoneMatrix(ref transform, out boneTransforms[boneIndex]);
+                    BuildRootBoneMatrix(ref transform, out _boneTransforms[boneIndex]);
                 else if (_fadingOut != null && boneIndex == _fadingOut.Animation.RootBoneIndex)
-                    BuildRootBoneMatrix(ref transform, out boneTransforms[boneIndex]);
+                    BuildRootBoneMatrix(ref transform, out _boneTransforms[boneIndex]);
                 else
-                    transform.ToMatrix(out boneTransforms[boneIndex]);
+                    transform.ToMatrix(out _boneTransforms[boneIndex]);
             }
         }
 

@@ -11,7 +11,7 @@ namespace Myre.Graphics.Animation.Clips
 
         /// <summary>
         /// This animation is about to start playing
-        /// if this aniamtion is set to loop, this will be called every time a iteration loop starts
+        /// if this animation is set to loop, this will be called every time a iteration loop starts
         /// </summary>
         void Start();
 
@@ -28,6 +28,6 @@ namespace Myre.Graphics.Animation.Clips
         /// <summary>
         /// Get the index of the root bone of this animation
         /// </summary>
-        int RootBoneIndex { get; }
+        ushort RootBoneIndex { get; }
     }
 }

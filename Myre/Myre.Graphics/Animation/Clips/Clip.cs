@@ -7,19 +7,27 @@ namespace Myre.Graphics.Animation.Clips
     public class Clip
         :IClip
     {
-        public string Name { get; internal set; }
-        public Keyframe[][] Channels { get; internal set; }
+        /// <summary>
+        /// The name of this animation
+        /// </summary>
+        public string Name { get; private set; }
 
-        public TimeSpan Duration { get; internal set; }
+        public Keyframe[][] Channels { get; private set; }
 
-        public int RootBoneIndex { get; internal set; }
+        public TimeSpan Duration { get; private set; }
+
+        public ushort RootBoneIndex { get; private set; }
 
         public void Start()
         {
         }
 
-        internal Clip()
+        internal Clip(string name, TimeSpan duration, Keyframe[][] channels, ushort rootBoneIndex)
         {
+            Name = name;
+            Channels = channels;
+            Duration = duration;
+            RootBoneIndex = rootBoneIndex;
         }
     }
 
@@ -27,24 +35,27 @@ namespace Myre.Graphics.Animation.Clips
     {
         protected override Clip Read(ContentReader input, Clip existingInstance)
         {
-            existingInstance = existingInstance ?? new Clip();
+            return new Clip(
+                input.AssetName,
+                new TimeSpan(input.ReadInt64()),
+                ReadChannels(input),
+                input.ReadUInt16()
+            );
+        }
 
-            existingInstance.Name = input.AssetName;
-
-            existingInstance.Duration = new TimeSpan(input.ReadInt64());
-
+        private Keyframe[][] ReadChannels(ContentReader input)
+        {
             int count = input.ReadInt32();
-            existingInstance.Channels = new Keyframe[count][];
+            var channels = new Keyframe[count][];
+
             for (int i = 0; i < count; i++)
             {
-                existingInstance.Channels[i] = new Keyframe[input.ReadInt32()];
-                for (int j = 0; j < existingInstance.Channels[i].Length; j++)
-                    existingInstance.Channels[i][j] = input.ReadObject<Keyframe>();
+                channels[i] = new Keyframe[input.ReadInt32()];
+                for (int j = 0; j < channels[i].Length; j++)
+                    channels[i][j] = input.ReadObject<Keyframe>();
             }
 
-            existingInstance.RootBoneIndex = input.ReadUInt16();
-
-            return existingInstance;
+            return channels;
         }
     }
 }

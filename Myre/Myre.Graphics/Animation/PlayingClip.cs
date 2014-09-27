@@ -129,7 +129,7 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        public Transform Transform(int channel)
+        public Transform BoneTransform(int channel)
         {
             return _transforms[channel];
         }

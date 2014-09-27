@@ -16,15 +16,9 @@ namespace Myre.Graphics.Animation
         #region fields
         private ModelInstance _model;
 
-        // Current animation transform matrices.
-        Matrix[] _boneTransforms;
+        // Current animation transform matrices
         Matrix[] _worldTransforms;
         Matrix[] _skinTransforms;
-
-        public Matrix[] BoneTransforms
-        {
-            get { return _boneTransforms; }
-        }
 
         public Matrix[] WorldTransforms
         {
@@ -77,16 +71,11 @@ namespace Myre.Graphics.Animation
         {
             if (model != null && model.Model != null && model.Model.SkinningData != null)
             {
-                _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
-                for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
-                    _model.Model.SkinningData.BindPose[i].ToMatrix(out _boneTransforms[i]);
-
                 _worldTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 _skinTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
             }
             else
             {
-                _boneTransforms = null;
                 _worldTransforms = null;
                 _skinTransforms = null;
             }
@@ -96,21 +85,6 @@ namespace Myre.Graphics.Animation
         protected override void Update(float elapsedTime)
         {
             UpdateSkinTransforms();
-        }
-
-        public static void UpdateWorldTransforms(int[] hierarchy, Matrix[] boneTransforms, Matrix[] worldTransforms)
-        {
-            // Root bone.
-            worldTransforms[0] = boneTransforms[0];
-
-            // Child bones.
-            for (int bone = 1; bone < worldTransforms.Length; bone++)
-            {
-                int parentBone = hierarchy[bone];
-
-                //Multiply by parent bone transform
-                Matrix.Multiply(ref boneTransforms[bone], ref worldTransforms[parentBone], out worldTransforms[bone]);
-            }
         }
 
         private void UpdateSkinTransforms()
