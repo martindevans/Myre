@@ -58,8 +58,8 @@ namespace Myre.Graphics.Animation
                 _parameters.Interpolator = Interpolation.Linear();
 
             Animation = clipParameters.Clip;
-            _channelFrames = new int[Animation.Channels.Length];
-            _transforms = new Transform[Animation.Channels.Length];
+            _channelFrames = new int[Animation.ChannelCount];
+            _transforms = new Transform[Animation.ChannelCount];
 
             Start();
         }
@@ -80,13 +80,10 @@ namespace Myre.Graphics.Animation
                 Restart();
             }
 
-            for (int i = 0; i < Animation.Channels.Length; i++)
+            for (int i = 0; i < Animation.ChannelCount; i++)
             {
-                var channel = Animation.Channels[i];
-
-                //Iterate up frames until we find the frame which is greater than the current time index for this channel
-                while (channel[_channelFrames[i]].Time <= ElapsedTime)
-                    _channelFrames[i]++;
+                //Advance frame number
+                _channelFrames[i] = Animation.FindChannelFrameIndex(i, _channelFrames[i], ElapsedTime);
 
                 //save root bone transform
                 if (Animation.RootBoneIndex == i)

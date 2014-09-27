@@ -7,12 +7,11 @@ namespace Myre.Graphics.Animation.Clips
     public class Clip
         :IClip
     {
-        /// <summary>
-        /// The name of this animation
-        /// </summary>
         public string Name { get; private set; }
 
         public Keyframe[][] Channels { get; private set; }
+
+        public int ChannelCount { get { return Channels.Length; } }
 
         public TimeSpan Duration { get; private set; }
 
@@ -28,6 +27,18 @@ namespace Myre.Graphics.Animation.Clips
             Channels = channels;
             Duration = duration;
             RootBoneIndex = rootBoneIndex;
+        }
+
+        public int FindChannelFrameIndex(int channel, int startIndex, TimeSpan elapsedTime)
+        {
+            var frames = Channels[channel];
+            var index = startIndex;
+
+            //Iterate up frames until we find the frame which is greater than the current time index for this channel
+            while (frames[index].Time <= elapsedTime)
+                index++;
+
+            return index;
         }
     }
 

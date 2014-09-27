@@ -21,6 +21,11 @@ namespace Myre.Graphics.Animation.Clips
         Keyframe[][] Channels { get; }
 
         /// <summary>
+        /// Get the number of channels in this animation
+        /// </summary>
+        int ChannelCount { get; }
+
+        /// <summary>
         /// The duration of this animation
         /// </summary>
         TimeSpan Duration { get; }
@@ -29,5 +34,14 @@ namespace Myre.Graphics.Animation.Clips
         /// Get the index of the root bone of this animation
         /// </summary>
         ushort RootBoneIndex { get; }
+
+        /// <summary>
+        /// Find the index of the next frame in the given channel which is greater than the given time
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="elapsedTime"></param>
+        /// <returns></returns>
+        int FindChannelFrameIndex(int channel, int startIndex, TimeSpan elapsedTime);
     }
 }

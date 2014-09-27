@@ -36,6 +36,11 @@ namespace Myre.Graphics.Animation.Clips
             get { return SelectedClip.Channels; }
         }
 
+        public int ChannelCount
+        {
+            get { return SelectedClip.ChannelCount; }
+        }
+
         public TimeSpan Duration
         {
             get { return SelectedClip.Duration; }
@@ -44,6 +49,11 @@ namespace Myre.Graphics.Animation.Clips
         public ushort RootBoneIndex
         {
             get { return SelectedClip.RootBoneIndex; }
+        }
+
+        public int FindChannelFrameIndex(int channel, int startIndex, TimeSpan elapsedTime)
+        {
+            return SelectedClip.FindChannelFrameIndex(channel, startIndex, elapsedTime);
         }
     }
 }
