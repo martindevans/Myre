@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
@@ -11,7 +10,7 @@ namespace Myre.Graphics.Animation
 {
     [DefaultManager(typeof(Manager<Animated>))]
     public class Animated
-        :ProcessBehaviour, ModelInstance.IRenderDataSupplier
+        :ParallelProcessBehaviour, ModelInstance.IRenderDataSupplier
     {
         #region fields
         private ModelInstance _model;
@@ -82,24 +81,15 @@ namespace Myre.Graphics.Animation
         }
         #endregion
 
-        protected override void Update(float elapsedTime)
+        protected override void ParallelUpdate(float elapsedTime)
         {
             UpdateSkinTransforms();
         }
 
         private void UpdateSkinTransforms()
         {
-            //Parallelised skin transform calculation
-            Parallel.For(1, _worldTransforms.Length, UpdateSkinTransform);
-
-            //Serialised skin transform calculation
-            //for (int bone = 0; bone < _worldTransforms.Length; bone++)
-            //    Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
-        }
-
-        private void UpdateSkinTransform(int bone)
-        {
-            Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
+            for (int bone = 0; bone < _worldTransforms.Length; bone++)
+                Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
         }
 
         public void SetRenderData(NamedBoxCollection metadata)
