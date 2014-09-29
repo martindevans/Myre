@@ -32,11 +32,6 @@ namespace Myre.Graphics.Animation.Clips
             get { return "RandomSelection(" + SelectedClip.Name + ")"; }
         }
 
-        public Keyframe[][] Channels
-        {
-            get { return SelectedClip.Channels; }
-        }
-
         public int ChannelCount
         {
             get { return SelectedClip.ChannelCount; }
@@ -52,9 +47,9 @@ namespace Myre.Graphics.Animation.Clips
             get { return SelectedClip.RootBoneIndex; }
         }
 
-        public int FindChannelFrameIndex(int channel, int startIndex, TimeSpan elapsedTime)
+        public IChannel GetChannel(int index)
         {
-            return SelectedClip.FindChannelFrameIndex(channel, startIndex, elapsedTime);
+            return SelectedClip.GetChannel(index);
         }
     }
 }

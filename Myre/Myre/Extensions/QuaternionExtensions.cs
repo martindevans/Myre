@@ -50,7 +50,24 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static Quaternion Nlerp(this Quaternion a, Quaternion b, float t)
         {
-            return Quaternion.Normalize(Quaternion.Lerp(a, b, t));
+            Quaternion q;
+            Nlerp(a, ref b, t, out q);
+            return q;
+        }
+
+        /// <summary>
+        /// Normalizing lerp from a to b, shortest path/non constant velocity
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static void Nlerp(this Quaternion a, ref Quaternion b, float t, out Quaternion result)
+        {
+            //return Quaternion.Normalize(Quaternion.Lerp(a, b, t));
+
+            Quaternion.Lerp(ref a, ref b, t, out result);
+            Quaternion.Normalize(ref result, out result);
         }
     }
 }

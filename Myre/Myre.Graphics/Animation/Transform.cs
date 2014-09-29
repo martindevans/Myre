@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using Microsoft.Xna.Framework;
 using Myre.Extensions;
 
@@ -13,6 +14,7 @@ namespace Myre.Graphics.Animation
         public Vector3 Scale;
         public Quaternion Rotation;
 
+        [Pure]
         public Transform Interpolate(Transform b, float amount)
         {
             Transform result;
@@ -22,12 +24,9 @@ namespace Myre.Graphics.Animation
 
         public void Interpolate(ref Transform b, float amount, out Transform result)
         {
-            result = new Transform
-            {
-                Translation = Vector3.Lerp(Translation, b.Translation, amount),
-                Rotation = Rotation.Nlerp(b.Rotation, amount),
-                Scale = Vector3.Lerp(Scale, b.Scale, amount)
-            };
+            Vector3.Lerp(ref Translation, ref b.Translation, amount, out result.Translation);
+            Rotation.Nlerp(ref b.Rotation, amount, out result.Rotation);
+            Vector3.Lerp(ref Scale, ref b.Scale, amount, out result.Scale);
         }
 
         /// <summary>

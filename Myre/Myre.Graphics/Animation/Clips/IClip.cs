@@ -16,16 +16,6 @@ namespace Myre.Graphics.Animation.Clips
         void Start();
 
         /// <summary>
-        /// The keyframes of this animation in time order, split by channel
-        /// </summary>
-        Keyframe[][] Channels { get; }
-
-        /// <summary>
-        /// Get the number of channels in this animation
-        /// </summary>
-        int ChannelCount { get; }
-
-        /// <summary>
         /// The duration of this animation
         /// </summary>
         TimeSpan Duration { get; }
@@ -36,12 +26,36 @@ namespace Myre.Graphics.Animation.Clips
         ushort RootBoneIndex { get; }
 
         /// <summary>
-        /// Find the index of the next frame in the given channel which is greater than the given time
+        /// Get the number of channels in this animation
         /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="elapsedTime"></param>
+        int ChannelCount { get; }
+
+        /// <summary>
+        /// Get the channel at the given index
+        /// </summary>
+        /// <param name="index"></param>
         /// <returns></returns>
-        int FindChannelFrameIndex(int channel, int startIndex, TimeSpan elapsedTime);
+        IChannel GetChannel(int index);
+    }
+
+    public interface IChannel
+    {
+        /// <summary>
+        /// The index of the bone this channel controls
+        /// </summary>
+        int BoneIndex { get; }
+
+        /// <summary>
+        /// Find the index of the frame for the given timestamp
+        /// </summary>
+        /// <param name="time"></param>
+        /// <param name="startIndex"></param>
+        int SeekToTimestamp(TimeSpan time, int startIndex = 0);
+
+        /// <summary>
+        /// Get the frame at the given index
+        /// </summary>
+        /// <param name="index"></param>
+        Keyframe BoneTransform(int index);
     }
 }

@@ -44,7 +44,7 @@ namespace Myre.Graphics.Animation
             for (int i = 0; i < _channelFrames.Length; i++)
             {
                 _channelFrames[i] = 0;
-                _transforms[i] = Animation.Channels[i][0].Transform;
+                _transforms[i] = Animation.GetChannel(i).BoneTransform(0).Transform;
             }
         }
 
@@ -82,48 +82,43 @@ namespace Myre.Graphics.Animation
 
             for (int i = 0; i < Animation.ChannelCount; i++)
             {
+                IChannel channel = Animation.GetChannel(i);
+
                 //Advance frame number
-                _channelFrames[i] = Animation.FindChannelFrameIndex(i, _channelFrames[i], ElapsedTime);
+                _channelFrames[i] = channel.SeekToTimestamp(ElapsedTime, _channelFrames[i]);
 
                 //save root bone transform
                 if (Animation.RootBoneIndex == i)
                     previousRootTransform = _transforms[i];
 
                 //Calculate new transform for this channel
-                CalculateTransform(i, out _transforms[i]);
+                CalculateTransform(channel, out _transforms[i]);
             }
         }
 
-        private void CalculateTransform(int channel, out Transform transform)
+        private void CalculateTransform(IChannel channel, out Transform transform)
         {
-            int index = _channelFrames[channel];
+            int frameIndex = _channelFrames[channel.BoneIndex];
 
-            unsafe
+            //frame which is greater than or equal to the current time
+            Keyframe b = channel.BoneTransform(frameIndex);
+            if (b.Time == ElapsedTime || frameIndex == 0)
             {
-                //frame which is greater than or equal to the current time
-                fixed (Keyframe* b = &Animation.Channels[channel][index])
-                {
-                    if (b->Time == ElapsedTime || index == 0)
-                    {
-                        transform = b->Transform;
-                        return;
-                    }
-
-                    //Previous frame
-                    fixed (Keyframe* a = &Animation.Channels[channel][index - 1])
-                    {
-
-                        //Interpolation factor between frames
-                        var t = (float) ((ElapsedTime.TotalSeconds - a->Time.TotalSeconds) / (b->Time.TotalSeconds - a->Time.TotalSeconds));
-
-                        //Convert linear interpolation into some other easing function
-                        var t2 = PlaybackParameters.Interpolator(t);
-
-                        //Linearly interpolate frames
-                        transform = a->Transform.Interpolate(b->Transform, t2);
-                    }
-                }
+                transform = b.Transform;
+                return;
             }
+
+            //Previous frame
+            Keyframe a = channel.BoneTransform(frameIndex - 1);
+
+            //Interpolation factor between frames
+            var t = (float) ((ElapsedTime.TotalSeconds - a.Time.TotalSeconds) / (b.Time.TotalSeconds - a.Time.TotalSeconds));
+
+            //Convert linear interpolation into some other easing function
+            var t2 = PlaybackParameters.Interpolator(t);
+
+            //Linearly interpolate frames
+            transform = a.Transform.Interpolate(b.Transform, t2);
         }
 
         public Transform BoneTransform(int channel)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
@@ -232,6 +233,60 @@ namespace Myre.Graphics.Animation
                 //Multiply by parent bone transform
                 Matrix.Multiply(ref _boneTransforms[bone], ref _animation.WorldTransforms[parentBone], out _animation.WorldTransforms[bone]);
             }
+
+            Matrix[] calculatedBones = new Matrix[_animation.WorldTransforms.Length];
+            CalculateBoneTransforms(_animation.SkinningData.SkeletonHierarchy, _animation.WorldTransforms, calculatedBones);
+        }
+
+        /// <summary>
+        /// Calculate bone transforms from world transforms
+        /// </summary>
+        /// <param name="hierarchy"></param>
+        /// <param name="worldTransforms"></param>
+        /// <param name="calculatedBoneTransforms"></param>
+        private void CalculateBoneTransforms(IList<int> hierarchy, Matrix[] worldTransforms, Matrix[] calculatedBoneTransforms)
+        {
+            //Calculate inverse world transforms for each bone
+            Matrix[] inverseWorld = new Matrix[worldTransforms.Length];
+            for (int i = 0; i < calculatedBoneTransforms.Length; i++)
+                Matrix.Invert(ref worldTransforms[i], out inverseWorld[i]);
+
+            for (int bone = worldTransforms.Length - 1; bone >= 0; bone--)
+            {
+                int parentBone = hierarchy[bone];
+                if (parentBone == -1)
+                    calculatedBoneTransforms[bone] = worldTransforms[bone];
+                else
+                    Matrix.Multiply(ref worldTransforms[bone], ref inverseWorld[parentBone], out calculatedBoneTransforms[bone]);
+
+                var boneMaybe = calculatedBoneTransforms[bone];
+                var actualBone = _boneTransforms[bone];
+
+                bool m = Cmp(actualBone, boneMaybe, a => a.M11)
+                         && Cmp(actualBone, boneMaybe, a => a.M12)
+                         && Cmp(actualBone, boneMaybe, a => a.M13)
+                         && Cmp(actualBone, boneMaybe, a => a.M14)
+                         && Cmp(actualBone, boneMaybe, a => a.M21)
+                         && Cmp(actualBone, boneMaybe, a => a.M22)
+                         && Cmp(actualBone, boneMaybe, a => a.M23)
+                         && Cmp(actualBone, boneMaybe, a => a.M24)
+                         && Cmp(actualBone, boneMaybe, a => a.M31)
+                         && Cmp(actualBone, boneMaybe, a => a.M32)
+                         && Cmp(actualBone, boneMaybe, a => a.M33)
+                         && Cmp(actualBone, boneMaybe, a => a.M34)
+                         && Cmp(actualBone, boneMaybe, a => a.M41)
+                         && Cmp(actualBone, boneMaybe, a => a.M42)
+                         && Cmp(actualBone, boneMaybe, a => a.M43)
+                         && Cmp(actualBone, boneMaybe, a => a.M44);
+
+                if (!m)
+                    throw new NotImplementedException("It no worky!");
+            }
+        }
+
+        private bool Cmp(Matrix a, Matrix b, Func<Matrix, float> x)
+        {
+            return x(a) - x(b) < 0.0001f;
         }
 
         private void CalculateRootBoneDelta(ref Transform oldRootFadingOut, ref Transform oldRootFadingIn)
