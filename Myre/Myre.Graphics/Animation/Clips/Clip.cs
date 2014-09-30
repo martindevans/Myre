@@ -26,7 +26,7 @@ namespace Myre.Graphics.Animation.Clips
         internal Clip(string name, TimeSpan duration, IEnumerable<Keyframe[]> channels, ushort rootBoneIndex)
         {
             Name = name;
-            _channels = channels.Select((a, i) => new Channel(i, a)).ToArray();
+            _channels = channels.Select((a, i) => new Channel((ushort)i, a)).ToArray();
             Duration = duration;
             RootBoneIndex = rootBoneIndex;
         }
@@ -42,9 +42,9 @@ namespace Myre.Graphics.Animation.Clips
     {
         private readonly Keyframe[] _frames;
 
-        public int BoneIndex { get; private set; }
+        public ushort BoneIndex { get; private set; }
 
-        public Channel(int boneIndex, Keyframe[] frames)
+        public Channel(ushort boneIndex, Keyframe[] frames)
         {
             _frames = frames;
             BoneIndex = boneIndex;

@@ -43,7 +43,7 @@ namespace Myre.Graphics.Animation.Clips
         /// <summary>
         /// The index of the bone this channel controls
         /// </summary>
-        int BoneIndex { get; }
+        ushort BoneIndex { get; }
 
         /// <summary>
         /// Find the index of the frame for the given timestamp

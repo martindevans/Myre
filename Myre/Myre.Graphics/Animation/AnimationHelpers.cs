@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Animation
@@ -16,19 +13,24 @@ namespace Myre.Graphics.Animation
         /// <param name="calculatedBoneTransforms"></param>
         public static void CalculateBoneTransformsFromWorldTransforms(IList<int> hierarchy, Matrix[] worldTransforms, Matrix[] calculatedBoneTransforms)
         {
-            //Calculate inverse world transforms for each bone
-            Matrix[] inverseWorld = new Matrix[worldTransforms.Length];
-            for (int i = 0; i < calculatedBoneTransforms.Length; i++)
-                Matrix.Invert(ref worldTransforms[i], out inverseWorld[i]);
-
-            //Calculate bone transforms for each bone
-            for (int bone = 0; bone < worldTransforms.Length; bone++)
+            unsafe
             {
-                int parentBone = hierarchy[bone];
-                if (parentBone == -1)
-                    calculatedBoneTransforms[bone] = worldTransforms[bone];
-                else
-                    Matrix.Multiply(ref worldTransforms[bone], ref inverseWorld[parentBone], out calculatedBoneTransforms[bone]);
+                //Allocate a place to store the inverted transforms (on the stack to save allocations)
+                Matrix* inverseWorldTransforms = stackalloc Matrix[worldTransforms.Length];
+
+                //Calculate inverse world transforms for each bone
+                for (int i = 0; i < calculatedBoneTransforms.Length; i++)
+                    Matrix.Invert(ref worldTransforms[i], out inverseWorldTransforms[i]);
+
+                //Calculate bone transforms for each bone
+                for (int bone = 0; bone < worldTransforms.Length; bone++)
+                {
+                    int parentBone = hierarchy[bone];
+                    if (parentBone == -1)
+                        calculatedBoneTransforms[bone] = worldTransforms[bone];
+                    else
+                        Matrix.Multiply(ref worldTransforms[bone], ref inverseWorldTransforms[parentBone], out calculatedBoneTransforms[bone]);
+                }
             }
         }
 
