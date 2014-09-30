@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\Animated.cs" />
+    <Compile Include="Animation\AnimationHelpers.cs" />
     <Compile Include="Animation\AnimationQueue.cs" />
     <Compile Include="Animation\Clips\IClip.cs" />
     <Compile Include="Animation\Clips\RandomClip.cs" />
