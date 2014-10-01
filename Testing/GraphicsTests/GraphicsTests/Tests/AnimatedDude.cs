@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Myre;
 using Myre.Entities;
 using Myre.Graphics;
@@ -24,8 +25,11 @@ namespace GraphicsTests.Tests
 
         private readonly string[] _sequence = new string[]
         {
-            "walk-forward-0"
-            //"idle01", "idle02", "jump", "roll-backward-0", "roll-forward-0", "roll-left-0", "roll-right-0", "run-forward-0", "run-forward-1", "run-forward-2",
+            "walk-forward-0", "walk-forward-0", "walk-forward-0"
+            //"idle01", "idle02", "jump", "roll-backward-0", "roll-forward-0",
+            //"roll-left-0",
+            //"roll-right-0",
+            //"run-forward-0", "run-forward-1", "run-forward-2",
             //"run-forward_jump-0", "sitting", "strafe-left-0", "strafe-right-0", "swim-forward-0", "walk-backward-0", "walk-forward-0", "walk-forward-1", "walk-forward-2"
         };
 
@@ -37,7 +41,7 @@ namespace GraphicsTests.Tests
             var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty(new TypedName<ModelData>("model"), model);
-            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(50f));
+            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(50f) * Matrix.CreateTranslation(0, 0, -50));
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
@@ -54,10 +58,10 @@ namespace GraphicsTests.Tests
 
             _animationQueue.DefaultClip = new AnimationQueue.ClipPlaybackParameters
             {
-                Clip = new RandomClip(content.Load<Clip>("Models/ZoeAnimations/idle01")),
-                FadeInTime = TimeSpan.FromSeconds(1f),
-                FadeOutTime = TimeSpan.FromSeconds(0.5f),
-                Loop = false,
+                Clip = content.Load<Clip>("Models/ZoeAnimations/idle01"),
+                FadeInTime = TimeSpan.FromSeconds(0.25f),
+                FadeOutTime = TimeSpan.FromSeconds(0.25f),
+                Loop = true,
             };
 
             foreach (var name in _sequence)
@@ -67,11 +71,11 @@ namespace GraphicsTests.Tests
                     Clip = content.Load<Clip>("Models/ZoeAnimations/" + name),
                     FadeInTime = TimeSpan.FromSeconds(0.1f),
                     FadeOutTime = TimeSpan.FromSeconds(0.0f),
-                    Loop = true,
+                    Loop = false,
                 });
             }
 
-            var camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateTranslation(-20, -40, 0) * Matrix.CreateLookAt(new Vector3(0, 0, -200), new Vector3(0, 0, 0), Vector3.Up) };
+            var camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateLookAt(new Vector3(100, 50, -200), new Vector3(0, 20, 0), Vector3.Up) };
             camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
             var cameraDesc = kernel.Get<EntityDescription>();
             cameraDesc.AddProperty(new TypedName<Camera>("camera"));
@@ -120,10 +124,10 @@ namespace GraphicsTests.Tests
 
         public override void Update(GameTime gameTime)
         {
-            _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
 
-            Console.WriteLine(_animationQueue.RootBoneTransfomationDelta.Translation);
+            _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            _dude.Transform *= Matrix.CreateTranslation(50 * new Vector3(_animationQueue.RootBoneTransfomationDelta.Translation.X, 0, _animationQueue.RootBoneTransfomationDelta.Translation.Z));
         }
 
         public override void Draw(GameTime gameTime)

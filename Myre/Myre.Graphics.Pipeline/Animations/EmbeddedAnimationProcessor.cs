@@ -39,10 +39,10 @@ namespace Myre.Graphics.Pipeline.Animations
             ancestors.ExceptWith(descendents);
             ancestors.Remove(root.Name);
 
-            return ProcessAnimation(animation, input.StartTime, input.EndTime, ancestors, root.Name, input.FixLooping);
+            return ProcessAnimation(animation, input.StartTime, input.EndTime, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction);
         }
 
-        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, ISet<string> preRootBones, string rootBone, bool fixLooping)
+        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
@@ -56,7 +56,7 @@ namespace Myre.Graphics.Pipeline.Animations
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
                 {
                     ushort boneIndex = _boneNames[channel.Key];
-                    animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping).ToList();
+                    animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction).ToList();
                 }
             );
 
@@ -75,13 +75,13 @@ namespace Myre.Graphics.Pipeline.Animations
             return animationClip;
         }
 
-        private static IEnumerable<KeyframeContent> ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping)
+        private static IEnumerable<KeyframeContent> ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
         {
             //Find keyframes for this channel
             var keyframes = channel
                 .Value
                 .Where(k => k.Time >= startFrameTime)
-                .Where(k => k.Time <= endFrameTime);
+                .Where(k => k.Time < endFrameTime);
 
             LinkedList<KeyframeContent> animationKeyframes = new LinkedList<KeyframeContent>();
 
@@ -119,7 +119,8 @@ namespace Myre.Graphics.Pipeline.Animations
                 FixLooping(animationKeyframes, endFrameTime);
 
             //Remove keyframes that can be estimated by linear interpolation
-            LinearKeyframeReduction(animationKeyframes);
+            if (linearKeyframeReduction)
+                LinearKeyframeReduction(animationKeyframes);
 
             //Add these keyframes to the animation
             return animationKeyframes;

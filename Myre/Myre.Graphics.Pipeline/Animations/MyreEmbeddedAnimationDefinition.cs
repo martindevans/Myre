@@ -10,6 +10,7 @@ namespace Myre.Graphics.Pipeline.Animations
         public float EndTime;
         public string RootBone;
         public bool FixLooping;
+        public bool LinearKeyframeReduction;
 // ReSharper restore UnassignedField.Global
     }
 }

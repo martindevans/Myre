@@ -44,7 +44,25 @@ namespace Myre.Graphics.Animation
             for (int i = 0; i < _channelFrames.Length; i++)
             {
                 _channelFrames[i] = 0;
-                _transforms[i] = Animation.GetChannel(i).BoneTransform(0).Transform;
+
+                if (ElapsedTime == TimeSpan.FromSeconds(0))
+                    _transforms[i] = Animation.GetChannel(i).BoneTransform(0).Transform;
+                else
+                {
+                    _channelFrames[i] = Animation.GetChannel(i).SeekToTimestamp(ElapsedTime, 0);
+
+                    if (_channelFrames[i] == 0)
+                        _transforms[i] = Animation.GetChannel(i).BoneTransform(0).Transform;
+                    else
+                    {
+                        var a = Animation.GetChannel(i).BoneTransform(_channelFrames[i] - 1);
+                        var b = Animation.GetChannel(i).BoneTransform(_channelFrames[i]);
+
+                        var totalTime = ElapsedTime.TotalSeconds / (b.Time - a.Time).TotalSeconds;
+
+                        _transforms[i] = a.Transform.Interpolate(b.Transform, (float) totalTime);
+                    }
+                }
             }
         }
 
@@ -64,9 +82,9 @@ namespace Myre.Graphics.Animation
             Start();
         }
 
-        public void Update(TimeSpan elapsedTime, out Transform previousRootTransform)
+        public void Update(TimeSpan elapsedTime, out Transform rootDelta)
         {
-            previousRootTransform = Graphics.Animation.Transform.Identity;
+            rootDelta = Transform.Identity;
 
             // Update the animation position.
             ElapsedTime += TimeSpan.FromSeconds(elapsedTime.TotalSeconds * TimeFactor);
@@ -89,10 +107,20 @@ namespace Myre.Graphics.Animation
 
                 //save root bone transform
                 if (Animation.RootBoneIndex == i)
-                    previousRootTransform = _transforms[i];
+                {
+                    var oldTransform = _transforms[i];
 
-                //Calculate new transform for this channel
-                CalculateTransform(channel, out _transforms[i]);
+                    //Calculate new transform for this channel
+                    CalculateTransform(channel, out _transforms[i]);
+
+                    //Calculate the delta of the root bone
+                    rootDelta = Transform.Subtract(_transforms[i], oldTransform);
+                }
+                else
+                {
+                    //Calculate new transform for this channel
+                    CalculateTransform(channel, out _transforms[i]);
+                }
             }
         }
 
@@ -102,7 +130,7 @@ namespace Myre.Graphics.Animation
 
             //frame which is greater than or equal to the current time
             Keyframe b = channel.BoneTransform(frameIndex);
-            if (b.Time == ElapsedTime || frameIndex == 0)
+            if (b.Time == ElapsedTime)
             {
                 transform = b.Transform;
                 return;

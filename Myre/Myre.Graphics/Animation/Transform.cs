@@ -59,5 +59,12 @@ namespace Myre.Graphics.Animation
             Matrix.Multiply(ref s, ref r, out matrix);
             Matrix.Multiply(ref matrix, ref t, out matrix);
         }
+
+        public Matrix ToMatrix()
+        {
+            Matrix m;
+            ToMatrix(out m);
+            return m;
+        }
     }
 }

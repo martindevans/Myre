@@ -5,8 +5,9 @@
     <AnimationSourceFile>Models/zoe.fbx</AnimationSourceFile>
     <SourceTakeName>DefaultAction</SourceTakeName>
     <StartTime>19.8</StartTime>
-    <EndTime>23.6</EndTime>
+    <EndTime>23.56</EndTime>
     <RootBone>MotionRoot</RootBone>
 		<FixLooping>false</FixLooping>
+    <LinearKeyframeReduction>true</LinearKeyframeReduction>
   </Asset>
 </XnaContent>

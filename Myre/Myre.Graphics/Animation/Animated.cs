@@ -10,14 +10,15 @@ namespace Myre.Graphics.Animation
 {
     [DefaultManager(typeof(Manager<Animated>))]
     public class Animated
-        :ParallelProcessBehaviour, ModelInstance.IRenderDataSupplier
+        : ParallelProcessBehaviour, ModelInstance.IRenderDataSupplier
     {
         #region fields
+
         private ModelInstance _model;
 
         // Current animation transform matrices
-        Matrix[] _worldTransforms;
-        Matrix[] _skinTransforms;
+        private Matrix[] _worldTransforms;
+        private Matrix[] _skinTransforms;
 
         public Matrix[] WorldTransforms
         {

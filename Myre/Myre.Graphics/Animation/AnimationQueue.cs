@@ -219,22 +219,19 @@ namespace Myre.Graphics.Animation
             CalculateRootBoneDelta(ref oldRootFadingOut, ref oldRootFadingIn);
         }
 
-        private void CalculateRootBoneDelta(ref Transform oldRootFadingOut, ref Transform oldRootFadingIn)
+        private void CalculateRootBoneDelta(ref Transform fadingOutRootDelta, ref Transform fadingInRootDelta)
         {
             if (_fadingOut != null && _fadingIn != null)
             {
-                var dOut = Transform.Subtract(_fadingOut.BoneTransform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
-                var dIn = Transform.Subtract(_fadingIn.BoneTransform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
-
-                RootBoneTransfomationDelta = dOut.Interpolate(dIn, _crossfadeProgress);
+                RootBoneTransfomationDelta = fadingOutRootDelta.Interpolate(fadingInRootDelta, _crossfadeProgress);
             }
             else if (_fadingOut != null)
             {
-                RootBoneTransfomationDelta = Transform.Subtract(_fadingOut.BoneTransform(_fadingOut.Animation.RootBoneIndex), oldRootFadingOut);
+                RootBoneTransfomationDelta = fadingOutRootDelta;
             }
             else if (_fadingIn != null)
             {
-                RootBoneTransfomationDelta = Transform.Subtract(_fadingIn.BoneTransform(_fadingIn.Animation.RootBoneIndex), oldRootFadingIn);
+                RootBoneTransfomationDelta = fadingInRootDelta;
             }
             else
             {
@@ -242,10 +239,10 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        private void UpdateActiveAnimations(TimeSpan dt, out Transform previousRootTransformFadingIn, out Transform previousRootTransformFadingOut)
+        private void UpdateActiveAnimations(TimeSpan dt, out Transform fadingInRootDelta, out Transform fadingOutRootDelta)
         {
-            previousRootTransformFadingIn = Transform.Identity;
-            previousRootTransformFadingOut = Transform.Identity;
+            fadingInRootDelta = Transform.Identity;
+            fadingOutRootDelta = Transform.Identity;
 
             if (_fadingOut == null && _fadingIn == null)
                 InterruptClip(NextClip(), false);
@@ -260,16 +257,16 @@ namespace Myre.Graphics.Animation
 
             if (_fadingOut != null)
             {
-                _fadingOut.Update(dt, out previousRootTransformFadingOut);
+                _fadingOut.Update(dt, out fadingOutRootDelta);
 
                 //Check if this animation is entering it's final phase. If so, look for another animation in the queue to start playing
-                if (_fadingIn == null && _fadingOut.ElapsedTime >= _fadingOut.Animation.Duration - _fadingOut.FadeOutTime)
+                if (_fadingIn == null && _fadingOut.ElapsedTime >= _fadingOut.Animation.Duration - _fadingOut.FadeOutTime && (_animationQueue.Count > 0 || !_fadingOut.Loop))
                     InterruptClip(NextClip(), false);
             }
 
             if (_fadingIn != null)
             {
-                _fadingIn.Update(dt, out previousRootTransformFadingIn);
+                _fadingIn.Update(dt, out fadingInRootDelta);
 
                 _crossfadeElapsed += dt;
                 _crossfadeProgress = (float)_crossfadeElapsed.TotalSeconds / (float)_crossfadeDuration.TotalSeconds;

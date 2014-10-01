@@ -440,6 +440,20 @@
       <Processor>EffectProcessor</Processor>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\ZoeAnimations\roll-left-0.xml">
+      <Name>roll-left-0</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\ZoeAnimations\roll-right-0.xml">
+      <Name>roll-right-0</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
