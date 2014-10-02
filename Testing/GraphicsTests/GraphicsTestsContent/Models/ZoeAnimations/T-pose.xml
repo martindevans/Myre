@@ -3,8 +3,8 @@
   <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
     <AnimationSourceFile>Models/zoe.fbx</AnimationSourceFile>
     <SourceTakeName>DefaultAction</SourceTakeName>
-    <StartTime>0</StartTime>
-    <EndTime>0.36</EndTime>
+    <StartTime>0.28</StartTime>
+    <EndTime>0.32</EndTime>
     <RootBone>MotionRoot</RootBone>
 		<FixLooping>false</FixLooping>
     <LinearKeyframeReduction>true</LinearKeyframeReduction>

@@ -25,12 +25,14 @@ namespace GraphicsTests.Tests
 
         private readonly string[] _sequence = new string[]
         {
-            "walk-forward-0", "walk-forward-0", "walk-forward-0"
+            //"walk-forward-0", "walk-forward-0", "walk-forward-0"
             //"idle01", "idle02", "jump", "roll-backward-0", "roll-forward-0",
             //"roll-left-0",
             //"roll-right-0",
             //"run-forward-0", "run-forward-1", "run-forward-2",
             //"run-forward_jump-0", "sitting", "strafe-left-0", "strafe-right-0", "swim-forward-0", "walk-backward-0", "walk-forward-0", "walk-forward-1", "walk-forward-2"
+            "t-pose"
+
         };
 
         public AnimatedDude(IKernel kernel, ContentManager content, GraphicsDevice device)
@@ -58,7 +60,7 @@ namespace GraphicsTests.Tests
 
             _animationQueue.DefaultClip = new AnimationQueue.ClipPlaybackParameters
             {
-                Clip = content.Load<Clip>("Models/ZoeAnimations/idle01"),
+                Clip = content.Load<Clip>("Models/ZoeAnimations/t-pose"),
                 FadeInTime = TimeSpan.FromSeconds(0.25f),
                 FadeOutTime = TimeSpan.FromSeconds(0.25f),
                 Loop = true,

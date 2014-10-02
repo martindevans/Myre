@@ -417,6 +417,7 @@
       <Name>walk-forward-0</Name>
       <Importer>XmlImporter</Importer>
       <Processor>EmbeddedAnimationProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -26,7 +26,8 @@ namespace Myre.Graphics.Animation
         private void Restart()
         {
             //Move back by animation duration
-            ElapsedTime -= Animation.Duration;
+            while (ElapsedTime > Animation.Duration)
+                ElapsedTime -= Animation.Duration;
 
             SeekToStart();
         }
