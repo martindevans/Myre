@@ -25,13 +25,13 @@ namespace GraphicsTests.Tests
 
         private readonly string[] _sequence = new string[]
         {
-            //"walk-forward-0", "walk-forward-0", "walk-forward-0"
+            "walk-forward-0", "walk-forward-0", "walk-forward-0"
             //"idle01", "idle02", "jump", "roll-backward-0", "roll-forward-0",
             //"roll-left-0",
             //"roll-right-0",
             //"run-forward-0", "run-forward-1", "run-forward-2",
             //"run-forward_jump-0", "sitting", "strafe-left-0", "strafe-right-0", "swim-forward-0", "walk-backward-0", "walk-forward-0", "walk-forward-1", "walk-forward-2"
-            "t-pose"
+            //"t-pose"
 
         };
 
@@ -43,7 +43,7 @@ namespace GraphicsTests.Tests
             var model = content.Load<ModelData>(@"models/zoe");
             var dude = kernel.Get<EntityDescription>();
             dude.AddProperty(new TypedName<ModelData>("model"), model);
-            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(50f) * Matrix.CreateTranslation(0, 0, -50));
+            dude.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(50f) * Matrix.CreateTranslation(0, 0, -150));
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();

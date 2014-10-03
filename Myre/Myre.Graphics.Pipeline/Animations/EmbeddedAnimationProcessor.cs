@@ -157,8 +157,8 @@ namespace Myre.Graphics.Pipeline.Animations
         /// <param name="keyframes"></param>
         private static void LinearKeyframeReduction(LinkedList<KeyframeContent> keyframes)
         {
-            const float EPSILON_LENGTH   = 0.001f;      //1mm
-            const float EPSILON_COS_ANGLE = 0.999847f;  //1 degree
+            const float EPSILON_LENGTH   = 0.0000001f;
+            const float EPSILON_COS_ANGLE = 0.9999999f;
             const float EPSILON_SCALE    = 0.0000001f;
 
             if (keyframes.First == null || keyframes.First.Next == null || keyframes.First.Next.Next == null)
