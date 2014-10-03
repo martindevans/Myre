@@ -221,11 +221,15 @@ namespace Myre.Graphics.Pipeline.Models
             //save which vertices are assigned to which bone
             if (geometry.Vertices.Channels.Contains(VertexChannelNames.Weights(0)) && verticesPerBone != null)
             {
+                //Weights for this geometry, each index represents a single vertex (each vertex has multiple weights)
                 var weights = geometry.Vertices.Channels.Get<BoneWeightCollection>(VertexChannelNames.Weights(0));
+
                 for (int i = 0; i < weights.Count; i++)
                 {
-                    var maxBone = weights[i].Aggregate((a, b) => a.Weight > b.Weight ? a : b).BoneName;
-                    verticesPerBone[_boneIndices[maxBone]].Add(geometry.Vertices.Positions[i]);
+                    foreach (var weight in weights[i])
+                    {
+                        verticesPerBone[_boneIndices[weight.BoneName]].Add(geometry.Vertices.Positions[i]);
+                    }
                 }
             }
 
