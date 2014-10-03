@@ -157,9 +157,9 @@ namespace Myre.Graphics.Pipeline.Animations
         /// <param name="keyframes"></param>
         private static void LinearKeyframeReduction(LinkedList<KeyframeContent> keyframes)
         {
-            const float epsilonLength   = 0.0000001f;
-            const float epsilonCosAngle = 0.9999999f;
-            const float epsilonScale    = 0.0000001f;
+            const float EPSILON_LENGTH   = 0.001f;      //1mm
+            const float EPSILON_COS_ANGLE = 0.999847f;  //1 degree
+            const float EPSILON_SCALE    = 0.0000001f;
 
             if (keyframes.First == null || keyframes.First.Next == null || keyframes.First.Next.Next == null)
                 return;
@@ -180,7 +180,7 @@ namespace Myre.Graphics.Pipeline.Animations
                 Quaternion rotation = a.Rotation.Nlerp(c.Rotation, t);
 
                 //If it's a close enough guess, run with it and drop B
-                if ((translation - b.Translation).LengthSquared() < epsilonLength && Quaternion.Dot(rotation, b.Rotation) > epsilonCosAngle && (scale - b.Scale).LengthSquared() < epsilonScale)
+                if ((translation - b.Translation).LengthSquared() < EPSILON_LENGTH && Quaternion.Dot(rotation, b.Rotation) > EPSILON_COS_ANGLE && (scale - b.Scale).LengthSquared() < EPSILON_SCALE)
                 {
                     var n = node.Previous;
                     keyframes.Remove(node);

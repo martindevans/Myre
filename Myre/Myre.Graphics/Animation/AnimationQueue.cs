@@ -157,7 +157,7 @@ namespace Myre.Graphics.Animation
             {
                 _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
-                    _model.Model.SkinningData.BindPose[i].ToMatrix(out _boneTransforms[i]);
+                    _boneTransforms[i] = _model.Model.SkinningData.BindPose[i];
             }
             else
             {

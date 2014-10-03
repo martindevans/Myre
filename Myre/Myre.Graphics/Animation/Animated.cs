@@ -73,6 +73,9 @@ namespace Myre.Graphics.Animation
             {
                 _worldTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
                 _skinTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
+
+                var skinning = _model.Model.SkinningData;
+                AnimationHelpers.CalculateWorldTransformsFromBoneTransforms(skinning.SkeletonHierarchy, skinning.BindPose, _worldTransforms);
             }
             else
             {

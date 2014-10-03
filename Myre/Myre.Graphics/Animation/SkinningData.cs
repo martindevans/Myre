@@ -11,7 +11,7 @@ namespace Myre.Graphics.Animation
         /// Bindpose matrices for each bone in the skeleton,
         /// relative to the parent bone.
         /// </summary>
-        public Transform[] BindPose { get; internal set; }
+        public Matrix[] BindPose { get; internal set; }
 
         /// <summary>
         /// Vertex to bonespace transforms for each bone in the skeleton.
@@ -41,9 +41,9 @@ namespace Myre.Graphics.Animation
             existingInstance = existingInstance ?? new SkinningData();
 
             //Read bind pose
-            existingInstance.BindPose = new Transform[input.ReadInt32()];
+            existingInstance.BindPose = new Matrix[input.ReadInt32()];
             for (int i = 0; i < existingInstance.BindPose.Length; i++)
-                existingInstance.BindPose[i] = new Transform { Translation = input.ReadVector3(), Scale = input.ReadVector3(), Rotation = input.ReadQuaternion() };
+                existingInstance.BindPose[i] = new Transform { Translation = input.ReadVector3(), Scale = input.ReadVector3(), Rotation = input.ReadQuaternion() }.ToMatrix();
 
             //Read inverse bind pose
             existingInstance.InverseBindPose = new Matrix[input.ReadInt32()];
