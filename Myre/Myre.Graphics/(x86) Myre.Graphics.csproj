@@ -106,6 +106,7 @@
     <Compile Include="Deferred\LightManagers\DeferredSunLightManager.cs" />
     <Compile Include="Deferred\RestoreDepthPhase.cs" />
     <Compile Include="Deferred\Ssao.cs" />
+    <Compile Include="Extensions\MatrixExtensions.cs" />
     <Compile Include="Geometry\BoundingVolume.cs" />
     <Compile Include="Geometry\ICullable.cs" />
     <Compile Include="Geometry\IGeometryProvider.cs" />
@@ -192,6 +193,7 @@
       <Name>%28x86%29 Myre</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

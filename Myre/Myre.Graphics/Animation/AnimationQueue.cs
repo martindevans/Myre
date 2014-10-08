@@ -271,7 +271,7 @@ namespace Myre.Graphics.Animation
                 _crossfadeElapsed += dt;
                 _crossfadeProgress = (float)_crossfadeElapsed.TotalSeconds / (float)_crossfadeDuration.TotalSeconds;
 
-                if (_crossfadeProgress >= 1)
+                if (_crossfadeElapsed >= _crossfadeDuration)
                 {
                     _fadingOut = _fadingIn;
                     _fadingIn = null;
