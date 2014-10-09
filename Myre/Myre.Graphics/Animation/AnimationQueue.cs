@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Entities.Extensions;
 using Myre.Graphics.Animation.Clips;
 using Myre.Graphics.Geometry;
 
@@ -124,6 +125,12 @@ namespace Myre.Graphics.Animation
         public override void Initialise(INamedDataProvider initialisationData)
         {
             base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue(RootTranslationXName, _enableRootBoneTranslationX);
+            initialisationData.TryCopyValue(RootTranslationYName, _enableRootBoneTranslationY);
+            initialisationData.TryCopyValue(RootTranslationZName, _enableRootBoneTranslationZ);
+            initialisationData.TryCopyValue(EnableRootRotationName, _enableRootBoneRotation);
+            initialisationData.TryCopyValue(EnableRootScaleName, _enableRootBoneScale);
 
             if (initialisationData != null)
             {
