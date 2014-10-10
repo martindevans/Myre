@@ -39,7 +39,7 @@ namespace Myre.Entities.Behaviours
         /// <summary>
         /// Gets the manager this behaviour belongs to.
         /// </summary>
-        internal ManagerBinding CurrentManager;
+        internal ManagerBinding CurrentManager { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Behaviour"/> class.

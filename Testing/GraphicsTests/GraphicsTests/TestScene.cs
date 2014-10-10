@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,12 +6,14 @@ using Myre;
 using Myre.Collections;
 using Myre.Debugging.UI;
 using Myre.Entities;
-using Myre.Extensions;
 using Myre.Graphics;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
 using Myre.UI.InputDevices;
 using Ninject;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GraphicsTests
 {
@@ -27,17 +26,12 @@ namespace GraphicsTests
         SpotLight spotLight;
         Entity sun;
         Box<Vector2> resolution;
-        SpriteBatch sb;
-        Effect basic;
-        Property<Matrix> hebeTransform;
         bool paused;
         KeyboardState previousKeyboard;
 
         Vector3 cameraPosition;
         Vector3 cameraRotation;
         CameraScript cameraScript;
-
-        private ModelInstance _sponza;
 
         public Scene Scene
         {
@@ -66,9 +60,6 @@ namespace GraphicsTests
 
             scene = new Scene(kernel);
             this.game = game;
-
-            sb = new SpriteBatch(device);
-            basic = content.Load<Effect>("Basic");
 
             cameraPosition = new Vector3(100, 50, 0);
             
@@ -227,16 +218,6 @@ namespace GraphicsTests
             //var dudeEntity = dude.Create();
             //scene.Add(dudeEntity);
 
-            var lightBlocker = hebe.Create();
-            hebeTransform = lightBlocker.GetProperty(new TypedName<Matrix>("transform"));
-            lightBlocker.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
-            lightBlocker.GetProperty(new TypedName<Matrix>("transform")).Value = Matrix.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
-                                                                    * Matrix.CreateRotationY(MathHelper.PiOver2)
-                                                                    * Matrix.CreateTranslation(-150, 20, 0);
-            lightBlocker.GetProperty(new TypedName<bool>("is_static")).Value = false;
-            lightBlocker.GetProperty(ModelInstance.OpacityName).Value = 0.05f;
-            scene.Add(lightBlocker);
-
             var sponzaModel = content.Load<ModelData>(@"Sponza");
             var sponza = kernel.Get<EntityDescription>();
             sponza.AddProperty(new TypedName<ModelData>("model"));
@@ -248,8 +229,6 @@ namespace GraphicsTests
             sponzaEntity.GetProperty(new TypedName<Matrix>("transform")).Value = Matrix.Identity * Matrix.CreateScale(1);
             sponzaEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
             scene.Add(sponzaEntity);
-
-            _sponza = sponzaEntity.GetBehaviour<ModelInstance>();
 
             var renderer = scene.GetService<Renderer>();
             resolution = renderer.Data.Get<Vector2>("resolution");
@@ -375,11 +354,6 @@ namespace GraphicsTests
             //    100,
             //    (float)Math.Sin(-totalTime + 5) * 50);
             //spotLight.Direction = Vector3.Normalize(-spotLight.Position);
-
-            hebeTransform.Value = Matrix.CreateRotationX(MathHelper.PiOver2)
-                                * Matrix.CreateScale(0.1f)
-                                * Matrix.CreateRotationY((float)gameTime.TotalGameTime.TotalSeconds)
-                                * Matrix.CreateTranslation(new Vector3(-180, 230, 0));
 
             scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
         }

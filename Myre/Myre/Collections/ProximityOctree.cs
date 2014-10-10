@@ -155,17 +155,27 @@ namespace Myre.Collections
                 _position = position;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             public void Dispose()
             {
                 Dispose(true);
                 GC.SuppressFinalize(this);
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             ~ProximityToken()
             {
                 Dispose(false);
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="disposing"></param>
             private void Dispose(Boolean disposing)
             {
                 if (disposing && _currentNode != null)

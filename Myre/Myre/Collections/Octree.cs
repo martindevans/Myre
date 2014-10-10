@@ -10,6 +10,9 @@ namespace Myre.Collections
     /// </summary>
     public class Octree
     {
+        /// <summary>
+        /// The root node of this Octree
+        /// </summary>
         protected Node Root { get; private set; }
 
         /// <summary>
@@ -90,15 +93,24 @@ namespace Myre.Collections
                 private set;
             }
 
+            /// <summary>
+            /// The parent node of this node
+            /// </summary>
             protected Node Parent { get; private set; }
 
             Node[] _children = null;
 
+            /// <summary>
+            /// All the children of this node, either 8 or 0
+            /// </summary>
             protected IEnumerable<Node> Children
             {
                 get { return _children ?? new Node[0]; }
             }
 
+            /// <summary>
+            /// Indicates if this node is subdivided (i.e. if it has any children)
+            /// </summary>
             protected bool IsSubdivided
             {
                 get { return _children != null; }
@@ -162,6 +174,9 @@ namespace Myre.Collections
                         yield return descendant;
             }
 
+            /// <summary>
+            /// Called to indicates that this tree has been modified somehow
+            /// </summary>
             protected void NotifyNodeModified()
             {
                 Octree.InvokeNodeModified(this);

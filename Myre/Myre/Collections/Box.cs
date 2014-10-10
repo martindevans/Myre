@@ -47,6 +47,9 @@ namespace Myre.Collections
             }
         }
 
+        /// <summary>
+        /// The type of the value in this box
+        /// </summary>
         public Type Type
         {
             get { return typeof(T); }
@@ -194,11 +197,19 @@ namespace Myre.Collections
             box.Value = value;
         }
 
+        /// <summary>
+        /// Enumerate all the values in this collection
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<KeyValuePair<Key, IBox>> GetEnumerator()
         {
             return _values.GetEnumerator();
         }
 
+        /// <summary>
+        /// Enumerate this collection
+        /// </summary>
+        /// <returns></returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

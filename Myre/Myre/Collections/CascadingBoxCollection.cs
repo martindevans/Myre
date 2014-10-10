@@ -28,11 +28,24 @@ namespace Myre.Collections
             _enumerable = _parent.Where(a => _values.Contains(a.Key)).Append(_values);
         }
 
+        /// <summary>
+        /// Set the value with the given name
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Set<T>(TypedName<T> key, T value)
         {
             _values.Set<T>(key, value);
         }
 
+        /// <summary>
+        /// Get the value with the given name
+        /// </summary>
+        /// <typeparam name="T">Type of the value (inferred from the TypedName)</typeparam>
+        /// <param name="name">The name and type of this value</param>
+        /// <param name="useDefaultValue">Indicates if the default value should be used if no value can be found</param>
+        /// <returns></returns>
         public T GetValue<T>(TypedName<T> name, bool useDefaultValue = true)
         {
             T value;
@@ -43,6 +56,13 @@ namespace Myre.Collections
             return _values.GetValue<T>(name, useDefaultValue);
         }
 
+        /// <summary>
+        /// Try to get a value with the given name
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool TryGetValue<T>(TypedName<T> name, out T value)
         {
             if (_values.TryGetValue<T>(name, out value))
@@ -64,11 +84,19 @@ namespace Myre.Collections
             return _values.Get<T>(key.Name, defaultValue, create);
         }
 
+        /// <summary>
+        /// Enumerate all values in this collection
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator<KeyValuePair<string, IBox>> GetEnumerator()
         {
             return _enumerable.GetEnumerator();
         }
 
+        /// <summary>
+        /// Enumerate this collection
+        /// </summary>
+        /// <returns></returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

@@ -20,6 +20,13 @@ namespace Myre.Collections
             return box.Value;
         }
 
+        /// <summary>
+        /// Try to get the value with the given name
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool TryGetValue<T>(TypedName<T> name, out T value)
         {
             Box<T> box;
@@ -31,6 +38,12 @@ namespace Myre.Collections
             return box != null;
         }
 
+        /// <summary>
+        /// Set the value with the given name
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Set<T>(TypedName<T> key, T value)
         {
             Set<T>(key.Name, value);

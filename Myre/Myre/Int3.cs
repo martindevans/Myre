@@ -49,6 +49,10 @@ namespace Myre
             return new Vector3(X, Y, Z);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             unchecked
@@ -57,6 +61,11 @@ namespace Myre
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (obj is Int3)
@@ -79,6 +88,10 @@ namespace Myre
                 && Z == other.Z;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return string.Format("{0},{1},{2}", X, Y, Z);

@@ -21,6 +21,9 @@ namespace Myre
             _allowRepeats = allowRepeats;
         }
 
+        /// <summary>
+        /// Call all registered actions
+        /// </summary>
         public void Dispose()
         {
             if ((IsDisposed && _allowRepeats) || !IsDisposed)
@@ -34,6 +37,9 @@ namespace Myre
                 disposeAction();
         }
 
+        /// <summary>
+        /// Indicates if Dispose has been called
+        /// </summary>
         public bool IsDisposed { get; private set; }
 
         /// <summary>

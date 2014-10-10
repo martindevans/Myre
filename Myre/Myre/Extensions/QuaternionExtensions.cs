@@ -61,6 +61,7 @@ namespace Myre.Extensions
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <param name="t"></param>
+        /// <param name="result"></param>
         /// <returns></returns>
         public static void Nlerp(this Quaternion a, ref Quaternion b, float t, out Quaternion result)
         {

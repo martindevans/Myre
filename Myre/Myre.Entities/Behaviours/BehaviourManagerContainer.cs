@@ -30,8 +30,11 @@ namespace Myre.Entities.Behaviours
 
             _manager.Add(behaviour);
 
-            behaviour.CurrentManager.Handler = this;
-            behaviour.CurrentManager.ManagedAs = typeof(T);
+            behaviour.CurrentManager = new Behaviour.ManagerBinding
+            {
+                Handler = this,
+                ManagedAs = typeof(T)
+            };
         }
 
         public void Remove(T behaviour)
@@ -39,8 +42,11 @@ namespace Myre.Entities.Behaviours
             if (behaviour.CurrentManager.Handler != this)
                 return;
 
-            behaviour.CurrentManager.Handler = null;
-            behaviour.CurrentManager.ManagedAs = null;
+            behaviour.CurrentManager = new Behaviour.ManagerBinding
+            {
+                Handler = null,
+                ManagedAs = null
+            };
 
             _manager.Remove(behaviour);
         }

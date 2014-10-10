@@ -90,6 +90,9 @@ namespace Myre.Collections
             {
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
             protected override void Split()
             {
                 base.Split();
