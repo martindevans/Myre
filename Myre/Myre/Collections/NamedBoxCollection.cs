@@ -48,5 +48,16 @@ namespace Myre.Collections
         {
             Set<T>(key.Name, value);
         }
+
+        /// <summary>
+        /// Calls Set (key, value). This method allows you to use a collection initializer to initialize a NamedBoxCollection
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <typeparam name="T"></typeparam>
+        public void Add<T>(TypedName<T> key, T value)
+        {
+            Set(key, value);
+        }
     }
 }
