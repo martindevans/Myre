@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -38,6 +39,15 @@ namespace Myre.Debugging.UI
         /// Gets or sets the key used to toggle this <see cref="CommandConsole"/>.
         /// </summary>
         public Keys ToggleKey { get; set; }
+
+        private readonly TextWriter _writer;
+        public TextWriter Writer
+        {
+            get
+            {
+                return _writer;
+            }
+        }
 
         #region constructors
         /// <summary>
@@ -83,6 +93,7 @@ namespace Myre.Debugging.UI
             : base(parent)
         {
             _engine = new CommandEngine(assemblies);
+            _writer = new ConsoleWriter(this);
 
             PresentationParameters pp = game.GraphicsDevice.PresentationParameters;
             SetSize(0, pp.BackBufferHeight / 3);
