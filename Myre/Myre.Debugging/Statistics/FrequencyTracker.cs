@@ -25,7 +25,7 @@ namespace Myre.Debugging.Statistics
         {
             _lastUpdate = DateTime.Now;
             if (!string.IsNullOrEmpty(statisticName))
-                _statistic = Statistic.Get(statisticName);
+                _statistic = Statistic.Create(statisticName);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Myre.Debugging.Statistics
             {
                 Frequency = _counter;
                 if (_statistic != null)
-                    _statistic.Value = _counter;
+                    _statistic.Set(_counter);
                 _counter = 0;
                 _lastUpdate = now;
             }

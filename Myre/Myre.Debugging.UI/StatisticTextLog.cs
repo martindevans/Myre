@@ -53,7 +53,7 @@ namespace Myre.Debugging.UI
         /// <param name="accessInterval">The time between readings of the statistic.</param>
         public void AddStatistic(string statisticName, TimeSpan accessInterval)
         {
-            AddStatistic(Statistic.Get(statisticName), accessInterval);
+            AddStatistic(Statistic.Create(statisticName), accessInterval);
         }
 
         /// <summary>

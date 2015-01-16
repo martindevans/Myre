@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Myre.Debugging.Statistics
 {
@@ -8,7 +9,6 @@ namespace Myre.Debugging.Statistics
     /// A statistic which can be tracked by tools in the Myre.Debugging library.
     /// </summary>
     public sealed class Statistic
-        : IDisposableObject
     {
         static readonly ConcurrentDictionary<string, Statistic> _statistics = new ConcurrentDictionary<string, Statistic>();
 
@@ -19,7 +19,9 @@ namespace Myre.Debugging.Statistics
             {
                 get
                 {
-                    return _statistics[key];
+                    Statistic value;
+                    _statistics.TryGetValue(key, out value);
+                    return value;
                 }
             }
 
@@ -51,11 +53,50 @@ namespace Myre.Debugging.Statistics
         /// <value>The name.</value>
         public string Name { get; private set; }
 
+        private SpinLock _valueLock = new SpinLock();
+        private float _value;
+
         /// <summary>
-        /// Gets or sets the value.
+        /// Gets the value.
         /// </summary>
         /// <value>The value.</value>
-        public float Value { get; set; }
+        public float Value
+        {
+            get
+            {
+                return _value;
+            }
+        }
+
+        public void Add(float value)
+        {
+            bool taken = false;
+            _valueLock.Enter(ref taken);
+            try
+            {
+                _value += value;
+            }
+            finally
+            {
+                if (taken)
+                    _valueLock.Exit();
+            }
+        }
+
+        public void Set(float value)
+        {
+            bool taken = false;
+            _valueLock.Enter(ref taken);
+            try
+            {
+                _value = value;
+            }
+            finally
+            {
+                if (taken)
+                    _valueLock.Exit();
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -84,7 +125,7 @@ namespace Myre.Debugging.Statistics
         /// <param name="name">The name.</param>
         /// <param name="format"></param>
         /// <returns></returns>
-        public static Statistic Get(string name, string format = null)
+        public static Statistic Create(string name, string format = null)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
@@ -92,13 +133,6 @@ namespace Myre.Debugging.Statistics
             var stat = _statistics.GetOrAdd(name, a => new Statistic(name));
             stat.Format = format ?? stat.Format ?? "{0}";
             return stat;
-        }
-
-        public void Dispose()
-        {
-            Statistic _;
-            _statistics.TryRemove(Name, out _);
-            IsDisposed = true;
         }
     }
 }

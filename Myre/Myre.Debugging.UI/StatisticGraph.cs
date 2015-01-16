@@ -19,7 +19,7 @@ namespace Myre.Debugging.UI
         readonly Texture2D _texture;
 
         public StatisticGraph(Control parent, SpriteFont font, string statisticName, TimeSpan accessInterval)
-            : this(parent, font, Statistic.Get(statisticName), accessInterval)
+            : this(parent, font, Statistic.Create(statisticName), accessInterval)
         {
         }
 
