@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Myre.Collections;
 
 namespace Myre.Debugging.Statistics
 {
@@ -10,15 +10,40 @@ namespace Myre.Debugging.Statistics
     public sealed class Statistic
         : IDisposableObject
     {
-        static readonly Dictionary<string, Statistic> _statistics = new Dictionary<string, Statistic>();
-        static readonly ReadOnlyDictionary<string, Statistic> _readOnlyStatistics = new ReadOnlyDictionary<string, Statistic>(_statistics);
-// ReSharper disable ReturnTypeCanBeEnumerable.Global
-        public static ReadOnlyDictionary<string, Statistic> Statistics
-// ReSharper restore ReturnTypeCanBeEnumerable.Global
+        static readonly ConcurrentDictionary<string, Statistic> _statistics = new ConcurrentDictionary<string, Statistic>();
+
+        public class StatisticsCollection
+            : IEnumerable<KeyValuePair<string, Statistic>>
         {
-            get { return _readOnlyStatistics; }
+            public Statistic this[string key]
+            {
+                get
+                {
+                    return _statistics[key];
+                }
+            }
+
+            public IEnumerator<KeyValuePair<string, Statistic>> GetEnumerator()
+            {
+                return _statistics.GetEnumerator();
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
 
+        static readonly StatisticsCollection _statsCollection = new StatisticsCollection();
+// ReSharper disable once ReturnTypeCanBeEnumerable.Global
+        public static StatisticsCollection Statistics
+        {
+            get
+            {
+                return _statsCollection;
+            }
+        }
+        
 
         /// <summary>
         /// Gets the name.
@@ -64,20 +89,15 @@ namespace Myre.Debugging.Statistics
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            Statistic stat;
-            if (!_statistics.TryGetValue(name, out stat))
-            {
-                stat = new Statistic(name);
-                _statistics[name] = stat;
-            }
-
+            var stat = _statistics.GetOrAdd(name, a => new Statistic(name));
             stat.Format = format ?? stat.Format ?? "{0}";
             return stat;
         }
 
         public void Dispose()
         {
-            _statistics.Remove(Name);
+            Statistic _;
+            _statistics.TryRemove(Name, out _);
             IsDisposed = true;
         }
     }
