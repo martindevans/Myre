@@ -1,20 +1,8 @@
 ﻿using System.Collections.Generic;
+using Myre.Collections;
 
 namespace Myre.Entities.Events
 {
-    /// <summary>
-    /// A delegate for handling events through the Event.Sent handler.
-    /// </summary>
-    /// <typeparam name="T">The type of event data sent.</typeparam>
-    /// <param name="data">The event data sent.</param>
-    /// <param name="scope">The scope of the transmitted event.</param>
-    public delegate void MyreEventHandler<in T>(T data, object scope);
-
-    interface IEvent
-    {
-
-    }
-
     /// <summary>
     /// A class which represents an event for a specified data type.
     /// Instances of this type can be used to send events to listeners which have registered with this event.
@@ -26,17 +14,8 @@ namespace Myre.Entities.Events
         class Invocation
             : IEventInvocation
         {
-            static readonly Queue<Invocation> _pool = new Queue<Invocation>();
-            private static SpinLock _spinLock = new SpinLock();
-
             public Data Data;
             public Event<Data> Event;
-
-#if DEBUG
-// ReSharper disable NotAccessedField.Local (Debugging Aid)
-            public System.Diagnostics.StackTrace Stack;
-// ReSharper restore NotAccessedField.Local
-#endif
 
             public void Execute()
             {
@@ -44,38 +23,13 @@ namespace Myre.Entities.Events
                 //This makes events compatible with using them as a chained system where more recent handlers can temporarily block lower handlers (by modifying the event data)
                 for (int i = Event._listeners.Count - 1; i >= 0; i--)
                     Data = Event._listeners[i].HandleEvent(Data, Event._scope);
-
-                Event.TriggerEvent(Data);
             }
+
 
             public void Recycle()
             {
                 Data = default(Data);
-                try
-                {
-                    _spinLock.Lock();
-                    _pool.Enqueue(this);
-                }
-                finally
-                {
-                    _spinLock.Unlock();
-                }
-            }
-
-            public static Invocation Get()
-            {
-                try
-                {
-                    _spinLock.Lock();
-                    if (_pool.Count > 0)
-                        return _pool.Dequeue();
-                    else
-                        return new Invocation();
-                }
-                finally
-                {
-                    _spinLock.Unlock();
-                }
+                Pool<Invocation>.Instance.Return(this);
             }
         }
 
@@ -83,11 +37,6 @@ namespace Myre.Entities.Events
         private readonly object _scope;
         private readonly Event<Data> _global;
         private readonly List<IEventListener<Data>> _listeners;
-
-        /// <summary>
-        /// Occurs when data is sent along this event instance.
-        /// </summary>
-        public event MyreEventHandler<Data> Sent;
 
         /// <summary>
         /// Gets the service.
@@ -136,20 +85,11 @@ namespace Myre.Entities.Events
 
         private void Send(Data data, Event<Data> channel)
         {
-            Invocation invocation = Invocation.Get();
+            Invocation invocation = Pool<Invocation>.Instance.Get();
             invocation.Event = channel;
             invocation.Data = data;
-#if DEBUG
-            invocation.Stack = new System.Diagnostics.StackTrace();
-#endif
 
             _service.Queue(invocation);
-        }
-
-        private void TriggerEvent(Data data)
-        {
-            if (Sent != null)
-                Sent(data, _scope);
         }
     }
 }

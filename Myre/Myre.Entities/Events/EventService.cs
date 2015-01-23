@@ -1,13 +1,19 @@
-﻿using System;
+﻿using Myre.Entities.Services;
+using System;
 using System.Collections.Generic;
-using Myre.Entities.Services;
 
 namespace Myre.Entities.Events
 {
     interface IEventInvocation
-        : IRecycleable
     {
         void Execute();
+
+        void Recycle();
+    }
+
+    interface IEvent
+    {
+
     }
 
     /// <summary>

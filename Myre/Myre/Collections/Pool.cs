@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
 namespace Myre.Collections
 {
     /// <summary>
     /// Maintains pool of class instances.
     /// </summary>
-    /// <typeparam name="T">
-    /// The type of object to store. It must define a parameterless constructor, 
-    /// and may implement <see cref="IRecycleable"/>.</typeparam>
+    /// <typeparam name="T"> The type of object to store. It must define a parameterless constructor</typeparam>
     public class Pool<T> where T : class, new()
     {
         private static readonly Pool<T> _instance = new Pool<T>();
@@ -23,8 +21,8 @@ namespace Myre.Collections
             }
         }
 
-        readonly Stack<T> _items;
-        readonly bool _isResetableType;
+        private readonly ConcurrentStack<T> _items;
+        private readonly bool _recycleable;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Pool&lt;T&gt;"/> class.
@@ -40,10 +38,11 @@ namespace Myre.Collections
         /// <param name="initialCapacity">The initial number of elements contained within the <see cref="Pool&lt;T&gt;"/>.</param>
         public Pool(int initialCapacity)
         {
-            _isResetableType = typeof(IRecycleable).IsAssignableFrom(typeof(T));
-            _items = new Stack<T>(initialCapacity);
+            _items = new ConcurrentStack<T>();
             for (int i = 0; i < initialCapacity; i++)
                 _items.Push(new T());
+
+            _recycleable = typeof(IRecycleable).IsAssignableFrom(typeof(T));
         }
 
         /// <summary>
@@ -52,21 +51,19 @@ namespace Myre.Collections
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Get()
         {
-            if (_items.Count > 0)
+            T item;
+            if (!_items.TryPop(out item))
             {
-                T item = _items.Pop();
-                if (_isResetableType)
-                {
-                    var recycleable = item as IRecycleable;
-                    if (recycleable != null)
-                    {
-                        recycleable.Recycle();
-                    }
-                }
-                return item;
+                item = new T();
+            }
+            else if (_recycleable)
+            {
+                var recycleable = item as IRecycleable;
+                if (recycleable != null)
+                    recycleable.Recycle();
             }
 
-            return new T();
+            return item;
         }
 
         /// <summary>

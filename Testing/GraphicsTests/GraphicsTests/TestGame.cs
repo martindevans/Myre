@@ -113,7 +113,7 @@ namespace GraphicsTests
             var statLog = new StatisticTextLog(ui.Root, Content.Load<SpriteFont>("Consolas"), true);
             statLog.SetPoint(Points.TopLeft, 10, 10);
 
-            frameTime = Statistic.Get("Misc.Time", "{0:00.00}ms");
+            frameTime = Statistic.Create("Misc.Time", "{0:00.00}ms");
             fps = new FrequencyTracker("Misc.FPS");
 
             var console = new CommandConsole(this, Content.Load<SpriteFont>("Consolas"), ui.Root);
@@ -158,7 +158,7 @@ namespace GraphicsTests
                 this.Exit();
 
             fps.Pulse();
-            frameTime.Value = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            frameTime.Set((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             //framerate.Write(gameTime.ElapsedGameTime.TotalMilliseconds.ToString() + ",");
 
