@@ -335,7 +335,7 @@ namespace Myre.Entities
         /// <param name="type">The type.</param>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public Behaviour GetBehaviour(Type type, string name = null)
+        public Behaviour GetBehaviour(Type type, string name)
         {
             Behaviour[] array;
             if (_behaviours.TryGetValue(type, out array))
@@ -373,7 +373,7 @@ namespace Myre.Entities
         /// <typeparam name="T">The type.</typeparam>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public T GetBehaviour<T>(string name = null)
+        public T GetBehaviour<T>(string name)
         {
             return (T)(object)GetBehaviour(typeof(T), name);
         }

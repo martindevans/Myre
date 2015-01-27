@@ -49,7 +49,7 @@ namespace Myre.Graphics.Animation
         {
             base.Initialise(initialisationData);
 
-            _model = Owner.GetBehaviour<ModelInstance>();
+            _model = Owner.GetBehaviour<ModelInstance>(Name);
         }
 
         protected override void Initialised()

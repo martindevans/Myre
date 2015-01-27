@@ -144,9 +144,9 @@ namespace Myre.Graphics.Animation
         {
             base.Initialised();
 
-            _animation = Owner.GetBehaviour<Animated>();
+            _animation = Owner.GetBehaviour<Animated>(Name);
 
-            _model = Owner.GetBehaviour<ModelInstance>();
+            _model = Owner.GetBehaviour<ModelInstance>(Name);
             _model.ModelDataChanged += ModelChanged;
             ModelChanged(_model);
         }
