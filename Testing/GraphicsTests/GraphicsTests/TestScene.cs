@@ -124,7 +124,7 @@ namespace GraphicsTests
                 entity.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(0, 5, 0);
                 entity.GetProperty(new TypedName<float>("range")).Value = 200;
 
-                var light = entity.GetBehaviour<PointLight>();
+                var light = entity.GetBehaviour<PointLight>(null);
                 light.Colour = Vector3.Normalize(new Vector3(0.1f + (float)rng.NextDouble(), 0.1f + (float)rng.NextDouble(), 0.1f + (float)rng.NextDouble())) * 10;
                 lights.Add(light);
             }
@@ -148,7 +148,7 @@ namespace GraphicsTests
                 spotLightEntity.GetProperty(new TypedName<float>("range")).Value = 500;
                 spotLightEntity.GetProperty(new TypedName<Texture2D>("mask")).Value = content.Load<Texture2D>("Chrysanthemum");
                 spotLightEntity.GetProperty(new TypedName<int>("shadow_resolution")).Value = 1024;
-                this.spotLight = spotLightEntity.GetBehaviour<SpotLight>();
+                this.spotLight = spotLightEntity.GetBehaviour<SpotLight>(null);
                 scene.Add(spotLightEntity);
             }
 

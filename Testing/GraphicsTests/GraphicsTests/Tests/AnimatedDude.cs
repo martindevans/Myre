@@ -50,13 +50,13 @@ namespace GraphicsTests.Tests
             dude.AddBehaviour<AnimationQueue>();
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
-            _animationQueue = dudeEntity.GetBehaviour<AnimationQueue>();
+            _animationQueue = dudeEntity.GetBehaviour<AnimationQueue>(null);
             _animationQueue.EnableRootBoneTranslationY = false;
             _animationQueue.EnableRootBoneTranslationX = false;
             _animationQueue.EnableRootBoneTranslationZ = false;
             _animationQueue.EnableRootBoneScale = false;
 
-            _dude = dudeEntity.GetBehaviour<ModelInstance>();
+            _dude = dudeEntity.GetBehaviour<ModelInstance>(null);
 
             _animationQueue.DefaultClip = new AnimationQueue.ClipPlaybackParameters
             {
