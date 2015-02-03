@@ -17,6 +17,11 @@ namespace Myre.StateManagement
         /// <value>The manager.</value>
         public ScreenManager Manager { get; internal set; }
 
+        ~Screen()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Updates the screen.
         /// </summary>
@@ -130,7 +135,13 @@ namespace Myre.StateManagement
         {
         }
 
-        public virtual void Dispose()
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
         {
         }
     }
