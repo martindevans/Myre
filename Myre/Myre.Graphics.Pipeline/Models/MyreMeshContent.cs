@@ -42,8 +42,17 @@ namespace Myre.Graphics.Pipeline.Models
             output.Write(value.Name);
             output.Write(value.VertexCount);
             output.Write(value.TriangleCount);
-            output.WriteObject(value.VertexBuffer);
-            output.WriteObject(value.IndexBuffer);
+
+            bool hasVertexData = value.VertexBuffer.VertexData.Length > 0;
+            output.Write(hasVertexData);
+            if (hasVertexData)
+                output.WriteObject(value.VertexBuffer);
+
+            bool hasIndexData = value.IndexBuffer.Count > 0;
+            output.Write(hasIndexData);
+            if (hasIndexData)
+                output.WriteObject(value.IndexBuffer);
+
             output.Write(value.StartIndex);
             output.Write(value.BaseVertex);
             output.Write(value.MinVertexIndex);

@@ -104,6 +104,8 @@ namespace Myre.Entities
                     handler.Add(behaviour);
             }
 
+            entity.Initialised();
+
             _entities.Add(entity);
         }
 

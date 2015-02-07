@@ -104,7 +104,7 @@ namespace GraphicsTests.Tests
 
             fullPlan.Apply();
 
-            base.OnShown();
+            base.BeginTransitionOn();
 
             //var game = kernel.Get<TestGame>();
             game.DisplayUI = true;

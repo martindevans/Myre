@@ -41,6 +41,21 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Myre.Graphics.Pipeline\Myre.Graphics.Pipeline.csproj">
+      <Project>{65716e12-a629-449b-91a3-bf1a1abeb56a}</Project>
+      <Name>Myre.Graphics.Pipeline</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Cousine-Regular-Latin.ttf">
+      <Name>Cousine-Regular-Latin</Name>
+      <Importer>TtfFontImporter</Importer>
+      <Processor>VertexFileFontProcessor</Processor>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

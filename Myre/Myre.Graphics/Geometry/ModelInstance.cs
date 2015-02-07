@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Debugging.Statistics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Materials;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Myre.Graphics.Geometry
@@ -167,8 +167,8 @@ namespace Myre.Graphics.Geometry
             }
 
 #if PROFILE
-            private static readonly Statistic _polysDrawnStat = Statistic.Get("Graphics.Primitives");
-            private static readonly Statistic _drawsStat = Statistic.Get("Graphics.Draws");
+            private static readonly Statistic _polysDrawnStat = Statistic.Create("Graphics.Primitives");
+            private static readonly Statistic _drawsStat = Statistic.Create("Graphics.Draws");
 #endif
 
             private readonly GraphicsDevice _device;
@@ -195,11 +195,12 @@ namespace Myre.Graphics.Geometry
 
             public override void Add(ModelInstance behaviour)
             {
-                if (behaviour.Model != null)
-                    MeshesAdded(behaviour, behaviour.Model.Meshes);
                 behaviour.ModelDataChanged += Changed;
                 behaviour.ModelMeshAdded += AddMesh;
                 behaviour.ModelMeshAdded += RemoveMesh;
+
+                if (behaviour.Model != null)
+                    MeshesAdded(behaviour, behaviour.Model.Meshes);
 
                 base.Add(behaviour);
             }
@@ -315,14 +316,14 @@ namespace Myre.Graphics.Geometry
                 meshes.Sort(RenderDataComparator);
             }
 
-            private int RenderDataComparator(MeshRenderData a, MeshRenderData b)
+            private static int RenderDataComparator(MeshRenderData a, MeshRenderData b)
             {
                 if (a.Instances.Count > 0 && b.Instances.Count > 0)
                     return CompareWorldViews(ref a.Instances[0].WorldView, ref b.Instances[0].WorldView);
                 return a.Instances.Count.CompareTo(b.Instances.Count);
             }
 
-            private void CalculateWorldViews(List<MeshRenderData> batches, Matrix cameraView)
+            private static void CalculateWorldViews(List<MeshRenderData> batches, Matrix cameraView)
             {
                 for (int b = 0; b < batches.Count; b++)
                 {
@@ -353,6 +354,11 @@ namespace Myre.Graphics.Geometry
             private void DrawMesh(MeshRenderData data, NamedBoxCollection metadata)
             {
                 var mesh = data.Mesh;
+
+                //Early exit for null meshes
+                if (mesh.VertexBuffer == null || mesh.IndexBuffer == null)
+                    return;
+
                 _device.SetVertexBuffer(mesh.VertexBuffer);
                 _device.Indices = mesh.IndexBuffer;
 
@@ -371,7 +377,7 @@ namespace Myre.Graphics.Geometry
 
                     instance.Instance.ApplyRendererData(metadata);
 
-                    world.Value = instance.Instance.Transform;
+                    world.Value = mesh.MeshTransform * instance.Instance.Transform;
                     worldView.Value = instance.WorldView;
                     if (instance.Instance._ignoreProjectionMatrix.Value)
                         worldViewProjection.Value = worldView.Value;
@@ -402,8 +408,8 @@ namespace Myre.Graphics.Geometry
                         }
 
 #if PROFILE
-                        _polysDrawnStat.Value += mesh.TriangleCount;
-                        _drawsStat.Value++;
+                        _polysDrawnStat.Add(mesh.TriangleCount);
+                        _drawsStat.Add(1);
 #endif
                     }
                 }
@@ -442,6 +448,9 @@ namespace Myre.Graphics.Geometry
 
             private void RegisterMeshParts(Mesh mesh, List<MeshInstance> meshInstances)
             {
+                if (mesh.Materials == null)
+                    return;
+
                 foreach (var material in mesh.Materials)
                 {
                     List<MeshRenderData> data;

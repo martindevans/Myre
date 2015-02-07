@@ -245,7 +245,10 @@ namespace Myre.Entities
                 if (!item.IsReady)
                     item.Initialise(initialisationData);
             }
+        }
 
+        internal void Initialised()
+        {
             //Ok everything has been initialised
             foreach (var item in Behaviours)
                 item.Initialised();

@@ -116,6 +116,10 @@
     <Compile Include="Geometry\ModelData.cs" />
     <Compile Include="Geometry\ModelInstance.cs" />
     <Compile Include="Geometry\OrientedBoundingBox.cs" />
+    <Compile Include="Geometry\Text\StringModelData.cs" />
+    <Compile Include="Geometry\Text\VertexCharacter.cs" />
+    <Compile Include="Geometry\Text\VertexFont.cs" />
+    <Compile Include="Geometry\VertexPositionTextureNormalBinormalTangent.cs" />
     <Compile Include="IRenderable.cs" />
     <Compile Include="Lighting\AmbientLight.cs" />
     <Compile Include="Lighting\PointLight.cs" />

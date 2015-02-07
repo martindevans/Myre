@@ -90,6 +90,10 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Testing\packages\Ninject.3.2.2.0\lib\net40\Ninject.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -117,10 +121,22 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Myre.Entities\%28x86%29 Myre.Entities.csproj">
+      <Project>{5CDABE8C-7C9C-4163-8C85-FEA731088239}</Project>
+      <Name>%28x86%29 Myre.Entities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Myre.Graphics.Content\Myre.Graphics.Content.contentproj">
       <Project>{EC58850F-3960-426A-BE7D-7DFB67CB00A8}</Project>
       <Name>Myre.Graphics.Content</Name>
       <XnaReferenceType>Content</XnaReferenceType>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre.Graphics\%28x86%29 Myre.Graphics.csproj">
+      <Project>{fc3d8e34-3333-42fb-9b47-3a273b1b50d8}</Project>
+      <Name>%28x86%29 Myre.Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\%28x86%29 Myre.csproj">
+      <Project>{FDB5A9D8-9266-4F7B-BDE7-D4E720F5B45F}</Project>
+      <Name>%28x86%29 Myre</Name>
     </ProjectReference>
     <ProjectReference Include="..\ContentBuilderGameContent\ContentBuilderGameContent.contentproj">
       <Name>ContentBuilderGameContent</Name>

@@ -141,8 +141,13 @@ namespace Myre.StateManagement
             GC.SuppressFinalize(this);
         }
 
+        private bool _disposed = false;
         protected virtual void Dispose(bool disposing)
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
         }
     }
 }

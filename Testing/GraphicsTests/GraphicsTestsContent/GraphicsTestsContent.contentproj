@@ -113,6 +113,13 @@
       <ProcessorParameters_TextureFormat>NoChange</ProcessorParameters_TextureFormat>
       <ProcessorParameters_PremultiplyAlpha>False</ProcessorParameters_PremultiplyAlpha>
     </Compile>
+    <Compile Include="Fonts\Cousine-Regular-Latin.ttf">
+      <Name>Cousine-Regular-Latin</Name>
+      <Importer>TtfFontImporter</Importer>
+      <Processor>VertexFileFontProcessor</Processor>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
+    </Compile>
     <None Include="FullScreenQuad.fxh">
       <Name>FullScreenQuad</Name>
       <Importer>EffectImporter</Importer>

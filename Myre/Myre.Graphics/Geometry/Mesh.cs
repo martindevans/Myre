@@ -20,7 +20,7 @@ namespace Myre.Graphics.Geometry
         public int StartIndex { get; set; }
         public int BaseVertex { get; set; }
         public int MinVertexIndex { get; set; }
-        //public ModelBone ParentBone { get; set; }
+        public Matrix MeshTransform { get; set; }
 
         public void Dispose()
         {
@@ -61,18 +61,19 @@ namespace Myre.Graphics.Geometry
         {
             var mesh = existingInstance ?? new Mesh();
 
-            //mesh.ParentBone = input.ReadObject<ModelBone>();
-
-            //var size = input.ReadInt32();
-            //mesh.Parts = new MeshPart[size];
-            //for (int i = 0; i < size; i++)
-            //    mesh.Parts[i] = input.ReadObject<MeshPart>();
+            mesh.MeshTransform = Matrix.Identity;
 
             mesh.Name = input.ReadString();
             mesh.VertexCount = input.ReadInt32();
             mesh.TriangleCount = input.ReadInt32();
-            mesh.VertexBuffer = input.ReadObject<VertexBuffer>();
-            mesh.IndexBuffer = input.ReadObject<IndexBuffer>();
+
+            bool hasVertexData = input.ReadBoolean();
+            if (hasVertexData)
+                mesh.VertexBuffer = input.ReadObject<VertexBuffer>();
+
+            bool hasIndexData = input.ReadBoolean();
+            if (hasIndexData)
+                mesh.IndexBuffer = input.ReadObject<IndexBuffer>();
 
             mesh.StartIndex = input.ReadInt32();
             mesh.BaseVertex = input.ReadInt32();

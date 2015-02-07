@@ -37,15 +37,26 @@ namespace Myre.Graphics.Geometry
         public void Add(Mesh m)
         {
             _meshes.Add(m);
-            MeshAdded(this, m);
+
+            if (MeshAdded != null)
+                MeshAdded(this, m);
         }
 
         public bool Remove(Mesh m)
         {
             bool removed = _meshes.Remove(m);
-            if (removed)
+            if (removed && MeshRemoved != null)
                 MeshRemoved(this, m);
             return removed;
+        }
+
+        public void Clear()
+        {
+            if (MeshRemoved != null)
+                foreach (var mesh in _meshes)
+                    MeshRemoved(this, mesh);
+
+            _meshes.Clear();
         }
 
         public void Dispose()

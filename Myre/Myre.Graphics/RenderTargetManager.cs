@@ -63,8 +63,8 @@ namespace Myre.Graphics
     public static class RenderTargetManager
     {
 #if PROFILE
-        private static readonly Statistic _numRenderTargets = Statistic.Get("Graphics.RTs");
-        private static readonly Statistic _renderTargetMemory = Statistic.Get("Graphics.RT_Memory", "{0:0.00}MB");
+        private static readonly Statistic _numRenderTargets = Statistic.Create("Graphics.RTs");
+        private static readonly Statistic _renderTargetMemory = Statistic.Create("Graphics.RT_Memory", "{0:0.00}MB");
 #endif
 
         private static readonly Dictionary<RenderTargetInfo, Stack<RenderTarget2D>> _pool = new Dictionary<RenderTargetInfo, Stack<RenderTarget2D>>();
@@ -109,7 +109,7 @@ namespace Myre.Graphics
             }
 
 #if PROFILE
-            _numRenderTargets.Value++;
+            _numRenderTargets.Add(1);
 
             var resolution = target.Width * target.Height;
             float size = resolution * target.Format.FormatSize();
@@ -118,7 +118,7 @@ namespace Myre.Graphics
             if (info.MipMap)
                 size *= 1.33f;
             size += resolution * target.DepthStencilFormat.FormatSize();
-            _renderTargetMemory.Value += size / (1024 * 1024);
+            _renderTargetMemory.Add(size / (1024 * 1024));
 #endif
 
 #if DEBUG

@@ -84,8 +84,8 @@ namespace Myre.Graphics
 #endif
 
 #if PROFILE
-            Statistic.Get("Graphics.Primitives").Value = 0;
-            Statistic.Get("Graphics.Draws").Value = 0;
+            Statistic.Create("Graphics.Primitives").Set(0);
+            Statistic.Create("Graphics.Draws").Set(0);
 #endif
 
             foreach (var view in _views)

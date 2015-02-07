@@ -115,6 +115,7 @@
     <Compile Include="Tests\RenderPhaseDependancyTest.cs" />
     <Compile Include="Tests\RenderPhaseTest.cs" />
     <Compile Include="Tests\SsaoTest.cs" />
+    <Compile Include="Tests\TextTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

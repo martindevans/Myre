@@ -1,29 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using System;
+using System.IO;
+using System.Windows.Forms;
+using Myre.Graphics.Geometry.Text;
 
 namespace ContentBuilderGame
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class Game1 : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        GraphicsDeviceManager _graphics;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -35,8 +27,6 @@ namespace ContentBuilderGame
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             MessageBox.Show("The only function of this project is to trigger rebuild of Myre.Graphics.Content");
 
             base.Initialize();
@@ -48,35 +38,22 @@ namespace ContentBuilderGame
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            var ff = Content.Load<VertexFont>("Cousine-Regular-Latin");
+            Console.WriteLine(ff);
 
-            // TODO: use this.Content to load your game content here
-        }
+            //Print out all built content names (prints out exactly the string you need to pass into content.Load)
+            var files = Directory.GetFiles(Content.RootDirectory, "*.xnb", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var f = file;
+                if (f.StartsWith(Content.RootDirectory + Path.DirectorySeparatorChar))
+                    f = f.Remove(0, Content.RootDirectory.Length + 1);
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
+                if (f.EndsWith(".xnb"))
+                    f = f.Remove(f.Length - 4, 4);
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
-        {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
-            // TODO: Add your update logic here
-
-            base.Update(gameTime);
+                Console.WriteLine(f);
+            }
         }
 
         /// <summary>
@@ -86,8 +63,6 @@ namespace ContentBuilderGame
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }

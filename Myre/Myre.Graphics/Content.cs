@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using Microsoft.Xna.Framework.Content;
+using System;
 using System.IO;
-using Microsoft.Xna.Framework.Content;
 
 namespace Myre.Graphics
 {
@@ -14,11 +13,7 @@ namespace Myre.Graphics
         {
             _content = content;
 
-#if WINDOWS
             _manager = new ResourceContentManager(services, x86Resources.ResourceManager);
-#else
-            _manager = new ResourceContentManager(services, XboxResources.ResourceManager);
-#endif
         }
 
         public static T Load<T>(string resource)
