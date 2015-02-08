@@ -335,14 +335,6 @@ namespace Myre.Graphics.Pipeline.Models
         #region vertex channel processing
         private readonly Dictionary<string, Action<GeometryContent, VertexChannel>> _vertexChannelProcessors = new Dictionary<string, Action<GeometryContent, VertexChannel>>();
 
-        public BaseModelProcessor()
-        {
-            GBufferTechnique = null;
-            ShadowEffectName = null;
-            TranslucentEffectName = null;
-            GBufferEffectName = null;
-        }
-
         protected void AddChannelProcessor<T>(string name, Action<GeometryContent, VertexChannel<T>> processor)
         {
             _vertexChannelProcessors[name] = (a, b) => processor(a, (VertexChannel<T>)b);

@@ -61,10 +61,9 @@
     <Compile Include="Animations\MyreEmbeddedAnimationDefinition.cs" />
     <Compile Include="Animations\SkinningDataContent.cs" />
     <Compile Include="ByteImporter.cs" />
-    <Compile Include="Fonts\BaseVertexFontProcessor.cs" />
+    <Compile Include="Fonts\VertexFileFontProcessor.cs" />
     <Compile Include="Fonts\TtfFontImporter.cs" />
     <Compile Include="Fonts\VertexFontContent.cs" />
-    <Compile Include="Fonts\VertexFileFontProcessor.cs" />
     <Compile Include="Materials\MyreMaterialContent.cs" />
     <Compile Include="Materials\MyreMaterialDefinition.cs" />
     <Compile Include="Materials\MyreMaterialProcessor.cs" />

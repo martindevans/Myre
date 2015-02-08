@@ -15,7 +15,6 @@ namespace Myre.Graphics.Geometry.Text
         public static readonly TypedName<string> StringName = new TypedName<string>("string");
         public static readonly TypedName<VertexFont> FontName = new TypedName<VertexFont>("font");
         public static readonly TypedName<float> ThicknessName = new TypedName<float>("thickness");
-        public static readonly TypedName<Dictionary<string, Material>> MaterialsName = new TypedName<Dictionary<string, Material>>("materials");
 
         private Property<string> _string;
         public string String
@@ -68,8 +67,6 @@ namespace Myre.Graphics.Geometry.Text
 
         private Property<ModelData> _model;
 
-        private Dictionary<string, Material> _materials = new Dictionary<string, Material>();
-
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             base.CreateProperties(context);
@@ -87,7 +84,6 @@ namespace Myre.Graphics.Geometry.Text
             initialisationData.TryCopyValue(FontName, _font);
             initialisationData.TryCopyValue(StringName, _string);
             initialisationData.TryCopyValue(ThicknessName, _thickness);
-            initialisationData.TryCopyValue(MaterialsName, a => _materials = a);
 
             _string.PropertySet += StringChanged;
             _font.PropertySet += FontChanged;
@@ -222,7 +218,7 @@ namespace Myre.Graphics.Geometry.Text
                 BaseVertex = m.BaseVertex,
                 BoundingSphere = m.BoundingSphere,
                 IndexBuffer = m.IndexBuffer,
-                Materials = _materials,  //todo: Do I need to clone the materials, or can they be shared?
+                Materials = m.Materials,  //todo: Do I need to clone the materials, or can they be shared?
                 MeshTransform = m.MeshTransform,
                 MinVertexIndex = m.MinVertexIndex,
                 Name = m.Name,

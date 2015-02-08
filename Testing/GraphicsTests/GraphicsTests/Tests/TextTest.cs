@@ -69,7 +69,6 @@ namespace GraphicsTests.Tests
                 { StringModelData.FontName, _content.Load<VertexFont>("Fonts/Cousine-Regular-Latin") },
                 { StringModelData.StringName, "Hello, World" },
                 { StringModelData.ThicknessName, 1 },
-                { StringModelData.MaterialsName, null }
             };
 
             _scene.Add(textEnt, init);
