@@ -163,6 +163,16 @@ namespace Myre.Graphics {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] FXAA {
+            get {
+                object obj = ResourceManager.GetObject("FXAA", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Gamma {
             get {
                 object obj = ResourceManager.GetObject("Gamma", resourceCulture);

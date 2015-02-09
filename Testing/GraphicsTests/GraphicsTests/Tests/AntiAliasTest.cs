@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Myre.Graphics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Graphics.Translucency;
 using Ninject;
 using Myre.Entities;
 using Microsoft.Xna.Framework.Content;
@@ -24,6 +25,10 @@ namespace GraphicsTests.Tests
         private ContentManager content;
         private GraphicsDevice device;
         private TestScene scene;
+        private Renderer _renderer;
+
+        private RenderPlan _fullPlan;
+        private RenderPlan _noAaPlan;
 
         public AntiAliasTest(
             IKernel kernel,
@@ -40,17 +45,28 @@ namespace GraphicsTests.Tests
         {
             scene = kernel.Get<TestScene>();
 
-            var toneMap = kernel.Get<ToneMapComponent>();
-            var renderer = scene.Scene.GetService<Renderer>();
-            renderer.StartPlan()
-                .Then<GeometryBufferComponent>()
-                .Then<EdgeDetectComponent>()
-                .Then<Ssao>()
-                .Then<LightingComponent>()
-                .Then(toneMap)
-                .Then<AntiAliasComponent>()
-                .Show("antialiased")
-                .Apply();
+            _renderer = scene.Scene.GetService<Renderer>();
+
+            _fullPlan = _renderer.StartPlan()
+                               .Then<GeometryBufferComponent>()
+                               .Then<EdgeDetectComponent>()
+                               .Then<Ssao>()
+                               .Then<LightingComponent>()
+                               .Then<RestoreDepthPhase>()
+                               .Then<TranslucentComponent>()
+                               .Then<ToneMapComponent>()
+                               .Then<AntiAliasComponent>()
+                               .Show("antialiased");
+
+            _noAaPlan = _renderer.StartPlan()
+                               .Then<GeometryBufferComponent>()
+                               .Then<EdgeDetectComponent>()
+                               .Then<Ssao>()
+                               .Then<LightingComponent>()
+                               .Then<RestoreDepthPhase>()
+                               .Then<TranslucentComponent>()
+                               .Then<ToneMapComponent>()
+                               .Show("tonemapped");
 
             base.OnShown();
         }
@@ -59,6 +75,15 @@ namespace GraphicsTests.Tests
         {
             scene.Update(gameTime);
             base.Update(gameTime);
+
+            if (!Keyboard.GetState().IsKeyDown(Keys.F))
+            {
+                _fullPlan.Apply();
+            }
+            else
+            {
+                _noAaPlan.Apply();
+            }
         }
 
         public override void Draw(GameTime gameTime)

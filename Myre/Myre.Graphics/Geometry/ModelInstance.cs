@@ -155,7 +155,7 @@ namespace Myre.Graphics.Geometry
 
                 public void UpdateBounds()
                 {
-                    Bounds = Mesh.BoundingSphere.Transform(Instance.Transform);
+                    Bounds = Mesh.BoundingSphere.Transform(Mesh.MeshTransform * Instance.Transform);
                 }
             }
 
@@ -197,7 +197,7 @@ namespace Myre.Graphics.Geometry
             {
                 behaviour.ModelDataChanged += Changed;
                 behaviour.ModelMeshAdded += AddMesh;
-                behaviour.ModelMeshAdded += RemoveMesh;
+                behaviour.ModelMeshRemoved += RemoveMesh;
 
                 if (behaviour.Model != null)
                     MeshesAdded(behaviour, behaviour.Model.Meshes);
@@ -331,7 +331,7 @@ namespace Myre.Graphics.Geometry
                     for (int i = 0; i < meshInstances.Count; i++)
                     {
                         var instance = meshInstances[i];
-                        Matrix world = instance.Instance.Transform;
+                        Matrix world = instance.Mesh.MeshTransform * instance.Instance.Transform;
                         if (instance.Instance._ignoreViewMatrix.Value)
                             instance.WorldView = world;
                         else
@@ -377,7 +377,7 @@ namespace Myre.Graphics.Geometry
 
                     instance.Instance.ApplyRendererData(metadata);
 
-                    world.Value = mesh.MeshTransform * instance.Instance.Transform;
+                    world.Value = instance.Instance.Transform;
                     worldView.Value = instance.WorldView;
                     if (instance.Instance._ignoreProjectionMatrix.Value)
                         worldViewProjection.Value = worldView.Value;
@@ -405,11 +405,14 @@ namespace Myre.Graphics.Geometry
                             _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, mesh.MinVertexIndex, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
 
                             offset += primitiveCount;
+
+#if PROFILE
+                            _drawsStat.Add(1);
+#endif
                         }
 
 #if PROFILE
                         _polysDrawnStat.Add(mesh.TriangleCount);
-                        _drawsStat.Add(1);
 #endif
                     }
                 }

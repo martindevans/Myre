@@ -275,7 +275,7 @@ namespace Myre.Graphics.Pipeline.Fonts
                 var bBot = new Vector3(b.Xf, -0.5f, b.Yf);
 
                 CreateTriangle(bTop, aTop, aBot, vertices, indices);
-                CreateTriangle(bTop, bBot, aBot, vertices, indices);
+                CreateTriangle(bTop, aBot, bBot, vertices, indices);
             }
         }
 
@@ -311,10 +311,10 @@ namespace Myre.Graphics.Pipeline.Fonts
             List<int> outputIndices = new List<int>();
 
             //generate triangle mesh (upper face)
-            polys.SelectMany(a => a.Triangles).ForEach(t => CreateTriangle(t, 0.5f, false, outputVertices, outputIndices));
+            polys.SelectMany(a => a.Triangles).ForEach(t => CreateTriangle(t, 0.5f, true, outputVertices, outputIndices));
 
             //generate triangle mesh (lower face, all triangles reversed in order)
-            polys.SelectMany(a => a.Triangles).ForEach(t => CreateTriangle(t, -0.5f, true, outputVertices, outputIndices));
+            polys.SelectMany(a => a.Triangles).ForEach(t => CreateTriangle(t, -0.5f, false, outputVertices, outputIndices));
 
             //generate connecting triangles
             foreach (var polygon in polygons)
@@ -364,7 +364,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             return new Polygon(points);
         }
 
-        private static void CreateTriangle(DelaunayTriangle triangle, float yOffset, bool flip, List<Vector3> vertices, List<int> indices)
+        private static void CreateTriangle(DelaunayTriangle triangle, float yOffset, bool flip, ICollection<Vector3> vertices, List<int> indices)
         {
             //indices of points (reversed or not?)
             var x = flip ? 0 : 2;
@@ -378,7 +378,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             CreateTriangle(a, b, c, vertices, indices);
         }
 
-        private static void CreateTriangle(Vector3 a, Vector3 b, Vector3 c, List<Vector3> vertices, List<int> indices)
+        private static void CreateTriangle(Vector3 a, Vector3 b, Vector3 c, ICollection<Vector3> vertices, List<int> indices)
         {
             //Find or create indices
             var ai = Index(vertices, a);

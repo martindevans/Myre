@@ -94,6 +94,9 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
+    <None Include="Fxaa3_11.fxh">
+      <Name>Fxaa3_11</Name>
+    </None>
     <None Include="GammaCorrection.fxh">
       <Name>GammaCorrection</Name>
     </None>
@@ -163,6 +166,13 @@
     <None Include="ToneMapFunctions.fxh">
       <Name>ToneMapFunctions</Name>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FXAA.fx">
+      <Name>FXAA</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

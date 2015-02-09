@@ -38,8 +38,7 @@ namespace ContentBuilderGame
         /// </summary>
         protected override void LoadContent()
         {
-            var ff = Content.Load<VertexFont>("Cousine-Regular-Latin");
-            Console.WriteLine(ff);
+            base.LoadContent();
 
             //Print out all built content names (prints out exactly the string you need to pass into content.Load)
             var files = Directory.GetFiles(Content.RootDirectory, "*.xnb", SearchOption.AllDirectories);
@@ -54,6 +53,8 @@ namespace ContentBuilderGame
 
                 Console.WriteLine(f);
             }
+
+            Exit();
         }
 
         /// <summary>
