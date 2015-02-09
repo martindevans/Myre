@@ -2,6 +2,9 @@
 
 namespace Myre.Graphics
 {
+    /// <summary>
+    /// A renderer component which simply creates a texture resource and clears it to black
+    /// </summary>
     public class CreateTargetComponent
         : RendererComponent
     {

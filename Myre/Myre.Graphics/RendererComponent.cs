@@ -167,6 +167,7 @@ namespace Myre.Graphics
     /// while providing its' output a a resource for other renderer components to consume.
     /// </summary>
     public abstract class RendererComponent
+        : IDisposable
     {
         internal RenderPlan Plan;
 
@@ -193,6 +194,11 @@ namespace Myre.Graphics
             get { return _context.Outputs.Select(a => a.Name); }
         }
 
+        ~RendererComponent()
+        {
+            Dispose(false);
+        }
+
         /// <summary>
         /// Initialised this renderer component.
         /// </summary>
@@ -206,6 +212,21 @@ namespace Myre.Graphics
         {
             Initialised = true;
             _context = context;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            _disposed = true;
         }
 
         /// <summary>
@@ -233,55 +254,5 @@ namespace Myre.Graphics
         {
             Plan.SetResource(name, resource);
         }
-
-        /*
-        public class Resource
-        {
-            public string Name;
-            public Action<Renderer, Resource> Finaliser;
-            public bool IsLeftSet;
-
-            public Resource()
-            {
-                Name = null;
-                Finaliser = (r, o) => r.FreeResource(o.Name);
-            }
-
-            internal void Finalise(Renderer renderer)
-            {
-                if (Finaliser != null)
-                    Finaliser(renderer, this);
-            }
-        }
-
-        public class Input
-        {
-            public string Name;
-            public bool Optional;
-        }
-
-        public ReadOnlyCollection<Input> InputResources { get; private set; }
-        public ReadOnlyCollection<Resource> OutputResources { get; private set; }
-        public RenderTargetInfo? OutputTarget { get; private set; }
-        public bool Initialised { get; private set; }
-        
-        protected abstract void SpecifyResources(IList<Input> inputResources, IList<Resource> outputResources, out RenderTargetInfo? outputTarget);
-        protected internal abstract bool ValidateInput(RenderTargetInfo? previousRenderTarget);
-
-        internal void SpecifyResources()
-        {
-            var inputs = new List<Input>();
-            var outputs = new List<Resource>();
-            RenderTargetInfo? outputTarget;
-            SpecifyResources(inputs, outputs, out outputTarget);
-
-            this.InputResources = new ReadOnlyCollection<Input>(inputs);
-            this.OutputResources = new ReadOnlyCollection<Resource>(outputs);
-            this.OutputTarget = outputTarget;
-        }
-
-        public abstract RenderTarget2D Draw(Renderer renderer);
-        public virtual void Initialise(Renderer renderer) { Initialised = true; }
-         */
     }
 }

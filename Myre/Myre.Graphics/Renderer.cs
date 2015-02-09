@@ -71,6 +71,14 @@ namespace Myre.Graphics
             base.Initialise(scene);
         }
 
+        protected override void Dispose(bool disposeManagedResources)
+        {
+            base.Dispose(disposeManagedResources);
+
+            if (disposeManagedResources)
+                Plan.Dispose();
+        }
+
         public override void Update(float elapsedTime)
         {
             _data.Set<float>("timedelta", elapsedTime);

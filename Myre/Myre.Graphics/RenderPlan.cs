@@ -8,7 +8,7 @@ using Ninject;
 namespace Myre.Graphics
 {
     public class RenderPlan
-        : ICloneable
+        : ICloneable, IDisposable
     {
         public struct Output
         {
@@ -98,11 +98,37 @@ namespace Myre.Graphics
             _output = previous._output;
         }
 
+        ~RenderPlan()
+        {
+            Dispose(false);
+        }
+
         private void Initialise()
         {
             _freePoints = (from resource in _resourceLastUsed
                            orderby resource.Value ascending
                            select new FreePoint {Name = resource.Key, Index = resource.Value}).ToArray();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed = false;
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                foreach (var rendererComponent in Components)
+                    rendererComponent.Dispose();
+            }
+
+            _disposed = true;
         }
 
         private static RendererComponent[] Append(RendererComponent[] components, RendererComponent next)
