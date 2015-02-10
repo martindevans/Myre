@@ -88,7 +88,7 @@ namespace GraphicsTests.Tests
             var init = new NamedBoxCollection {
                 { StringModelData.FontName, _content.Load<VertexFont>("Fonts/Cousine-Regular-Latin") },
                 { StringModelData.StringName, "Hello, World" },
-                { StringModelData.ThicknessName, 1 },
+                { StringModelData.ThicknessName, 25 },
             };
 
             _scene.Add(textEnt, init);

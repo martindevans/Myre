@@ -1,11 +1,7 @@
-﻿using System.Drawing.Text;
-using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Myre.Extensions;
-using Myre.Graphics.Pipeline.Materials;
 using Myre.Graphics.Pipeline.Models;
 using Poly2Tri;
 using Poly2Tri.Triangulation.Delaunay;
@@ -16,8 +12,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Myre.Graphics.Pipeline.Fonts
 {
@@ -143,10 +142,11 @@ namespace Myre.Graphics.Pipeline.Fonts
             //Create raw mesh (position data)
             int[] indices;
             Vector3[] vertices;
-            GetGlyphMesh(f, c, out vertices, out indices);
+            Vector2[] texCoords;
+            GetGlyphMesh(f, c, out vertices, out indices, out texCoords);
 
             //Create XNA mesh (generate normal, binormal and tangent channels)
-            var meshContent = CreateGeometry(indices, vertices);
+            var meshContent = CreateGeometry(indices, vertices, texCoords);
 
             //Return a vertex character
             return new VertexCharacterContent(
@@ -157,7 +157,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             );
         }
 
-        private static MeshContent CreateGeometry(int[] indices, Vector3[] vertices)
+        private static MeshContent CreateGeometry(int[] indices, Vector3[] vertices, Vector2[] texCoords)
         {
             //Copy positions into mesh
             MeshContent mc = new MeshContent();
@@ -168,7 +168,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             var geometry = new GeometryContent();
             geometry.Vertices.AddRange(indices.Distinct());
             geometry.Indices.AddRange(indices);
-            geometry.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(0), typeof(Vector2), null);
+            geometry.Vertices.Channels.Add(VertexChannelNames.TextureCoordinate(0), typeof(Vector2), texCoords);
             geometry.Vertices.Channels.Add(VertexChannelNames.Normal(0), typeof(Vector3), null);
             mc.Geometry.Add(geometry);
 
@@ -262,7 +262,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             }
         }
 
-        private static void GenerateVerticalFaces(Polygon polygon, List<Vector3> vertices, List<int> indices)
+        private static void GenerateVerticalFaces(Polygon polygon, ICollection<Vector3> vertices, List<int> indices)
         {
             for (int i = 0; i < polygon.Points.Count; i++)
             {
@@ -279,7 +279,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             }
         }
 
-        private void GetGlyphMesh(Font font, char character, out Vector3[] vertices, out int[] indices)
+        private void GetGlyphMesh(Font font, char character, out Vector3[] vertices, out int[] indices, out Vector2[] texCoords)
         {
             // Get points which make up the character
             PointF[] pts;
@@ -288,6 +288,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             {
                 vertices = new Vector3[0];
                 indices = new int[0];
+                texCoords = new Vector2[0];
                 return;
             }
 
@@ -322,6 +323,21 @@ namespace Myre.Graphics.Pipeline.Fonts
 
             vertices = outputVertices.ToArray();
             indices = outputIndices.ToArray();
+            texCoords = CreateTextureData(outputVertices);
+        }
+
+        private Vector2[] CreateTextureData(List<Vector3> vertexPositions)
+        {
+            Vector2 min = vertexPositions.Select(a => a.XZ()).Aggregate(new Vector2(float.MaxValue), (a, b) => new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y)));
+            Vector2 max = vertexPositions.Select(a => a.XZ()).Aggregate(new Vector2(float.MinValue), (a, b) => new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y)));
+            var range = max - min;
+
+            return vertexPositions.Select(a => {
+                var uv = (a.XZ() - min) / range;
+                if (a.Y < 0)
+                    uv = Vector2.One - uv;
+                return uv;
+            }).ToArray();
         }
 
         private Polygon Simplify(Polygon polygon)

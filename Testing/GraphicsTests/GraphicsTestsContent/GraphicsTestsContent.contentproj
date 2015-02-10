@@ -119,6 +119,7 @@
       <Processor>VertexFileFontProcessor</Processor>
       <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
+      <ProcessorParameters_DiffuseTexture>./Chrysanthemum</ProcessorParameters_DiffuseTexture>
     </Compile>
     <None Include="FullScreenQuad.fxh">
       <Name>FullScreenQuad</Name>

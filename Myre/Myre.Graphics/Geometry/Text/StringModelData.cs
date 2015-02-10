@@ -157,7 +157,7 @@ namespace Myre.Graphics.Geometry.Text
                 cache2.Add(m);
 
                 //Move mesh into position
-                m.MeshTransform = Matrix.CreateTranslation(pen, 0, 0);
+                m.MeshTransform = Matrix.CreateScale(1, _thickness.Value, 1) * Matrix.CreateTranslation(pen, 0, 0);
                 _model.Value.Add(m);
 
                 //Update pen position

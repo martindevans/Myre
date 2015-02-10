@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Graphics.Geometry
 {
+    /// <summary>
+    /// Defines the vertex format Myre wants for default Gbuffer rendering. If you define your own Vertex type, include at least this information
+    /// </summary>
     public struct VertexPositionTextureNormalBinormalTangent
         : IVertexType
     {
