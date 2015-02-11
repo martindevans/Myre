@@ -22,6 +22,11 @@ namespace Myre.Graphics.Geometry
         public int MinVertexIndex { get; set; }
         public Matrix MeshTransform { get; set; }
 
+        public Mesh()
+        {
+            MeshTransform = Matrix.Identity;
+        }
+
         public void Dispose()
         {
             Dispose(true);
