@@ -1,5 +1,6 @@
 #include "SkinningHeader.fxh"
 #include "EncodeNormals.fxh"
+#include "DepthHeader.fxh"
 
 uniform float4x4 WorldView : WORLDVIEW;
 uniform float4x4 Projection : PROJECTION;
@@ -65,7 +66,7 @@ DefaultVertexShaderOutput DefaultVertexShaderFunction(DefaultVertexShaderInput i
     float4 viewPosition = mul(input.Position, WorldView);
     
 	output.PositionCS = mul(viewPosition, Projection);
-	output.Depth = -viewPosition.z / FarClip;
+	output.Depth = CalculateDepth(viewPosition, FarClip);
 	output.TexCoord = input.TexCoord;
 
 	output.TangentToView[0] = mul(input.Tangent, WorldView);

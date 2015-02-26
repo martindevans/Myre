@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities.Services;
-using Myre.Graphics.Geometry;
+using System.Collections.Generic;
 
 namespace Myre.Graphics.Translucency.Particles
 {

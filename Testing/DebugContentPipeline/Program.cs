@@ -99,7 +99,7 @@ namespace DebugContentPipeline
         ///       Example:
         ///               private const string SingleItem = @"dude.fbx";
         /// </summary>
-        private const string SingleItem = @"Fonts/Cousine-Regular-Latin.ttf";
+        private const string SingleItem = @"SplatterDecal.decal";
 
         /// <summary>
         /// TODO: Set the XnaProfile to HiDef or Reach, depending on your target graphics profile.
@@ -152,6 +152,8 @@ namespace DebugContentPipeline
             // To read the build output in the console window, place a breakpoint on the
             // Debug.WriteLine statement below.
             Debug.WriteLine("Build " + (succeeded ? "Succeeded." : "Failed."));
+
+            Console.ReadKey();
         }
 
         #region Additional, rarely-changing property values

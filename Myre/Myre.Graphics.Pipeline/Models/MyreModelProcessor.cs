@@ -119,7 +119,5 @@ namespace Myre.Graphics.Pipeline.Models
             if (boneCollectionsWithZeroWeights)
                 Context.Logger.LogWarning("", geometry.Identity, "BonesWeightCollections with zero weights found in geometry.");
         }
-
-        
     }
 }

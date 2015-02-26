@@ -40,9 +40,9 @@ namespace Myre.Graphics.Deferred
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 
-            var depth = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Single, DepthFormat.Depth24Stencil8, name:"depth");
-            var normals = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Rgba1010102, name:"normals");
-            var diffuse = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Color, name:"diffuse");
+            var depth = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Single, DepthFormat.Depth24Stencil8, name:"depth", usage: RenderTargetUsage.PreserveContents);
+            var normals = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Rgba1010102, name: "normals", usage: RenderTargetUsage.PreserveContents);
+            var diffuse = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Color, name: "diffuse", usage: RenderTargetUsage.PreserveContents);
 
             device.SetRenderTargets(depth, normals, diffuse);
             device.BlendState = BlendState.Opaque;

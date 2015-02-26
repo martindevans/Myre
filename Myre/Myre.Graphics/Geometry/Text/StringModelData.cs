@@ -3,7 +3,6 @@ using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
-using Myre.Graphics.Materials;
 using System.Collections.Generic;
 using System.Linq;
 

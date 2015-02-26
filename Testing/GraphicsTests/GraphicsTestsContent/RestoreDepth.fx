@@ -36,7 +36,7 @@ technique Technique1
     {
         // TODO: set renderstates here.
 
-        VertexShader = compile vs_2_0 FullScreenQuadFrustumCornerVS();//VertexShaderFunction();
+        VertexShader = compile vs_2_0 FullScreenQuadFrustumCornerVS();
         PixelShader = compile ps_2_0 PixelShaderFunction();
     }
 }

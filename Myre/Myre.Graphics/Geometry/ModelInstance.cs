@@ -171,6 +171,7 @@ namespace Myre.Graphics.Geometry
             private static readonly Statistic _drawsStat = Statistic.Create("Graphics.Draws");
 #endif
 
+            #region fields
             private readonly GraphicsDevice _device;
             private readonly Pool<MeshInstance> _meshInstancePool;
             private readonly Dictionary<Mesh, List<MeshInstance>> _instances;
@@ -179,6 +180,7 @@ namespace Myre.Graphics.Geometry
             private readonly List<MeshInstance> _buffer;
             private readonly List<MeshInstance> _visibleInstances;
             private readonly BoundingVolume _bounds;
+            #endregion
 
             public Manager(
                 GraphicsDevice device)
@@ -193,6 +195,7 @@ namespace Myre.Graphics.Geometry
                 _bounds = new BoundingVolume();
             }
 
+            #region add/remove
             public override void Add(ModelInstance behaviour)
             {
                 behaviour.ModelDataChanged += Changed;
@@ -259,6 +262,7 @@ namespace Myre.Graphics.Geometry
 
                 return base.Remove(behaviour);
             }
+            #endregion
 
             public void Draw(string phase, NamedBoxCollection metadata)
             {

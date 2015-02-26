@@ -61,6 +61,7 @@
     <Compile Include="Animations\MyreEmbeddedAnimationDefinition.cs" />
     <Compile Include="Animations\SkinningDataContent.cs" />
     <Compile Include="ByteImporter.cs" />
+    <Compile Include="XmlImporter.cs" />
     <Compile Include="Fonts\VertexFileFontProcessor.cs" />
     <Compile Include="Fonts\TtfFontImporter.cs" />
     <Compile Include="Fonts\VertexFontContent.cs" />
@@ -107,6 +108,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.ContentPipelineExtensions.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

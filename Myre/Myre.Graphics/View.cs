@@ -39,6 +39,7 @@ namespace Myre.Graphics
             metadata.Set("activeview", this);
             metadata.Set("resolution", new Vector2(_viewport.Value.Width, _viewport.Value.Height));
             metadata.Set("viewport", _viewport.Value);
+            metadata.Set("aspectratio", _viewport.Value.AspectRatio);
             _camera.Value.SetMetadata(metadata);
         }
 

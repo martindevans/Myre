@@ -27,7 +27,7 @@ namespace Myre.Graphics.Geometry
             Add(Flip(frustum.Top));
         }
 
-        private Plane Flip(Plane plane)
+        private static Plane Flip(Plane plane)
         {
             return new Plane(-plane.Normal, -plane.D);
         }

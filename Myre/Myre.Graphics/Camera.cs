@@ -89,6 +89,14 @@ namespace Myre.Graphics
             }
         }
 
+        public Vector3 Position
+        {
+            get
+            {
+                return _inverseView.Translation;
+            }
+        }
+
         private void Update()
         {
             Matrix.Multiply(ref _view, ref _projection, out _viewProjection);
@@ -111,7 +119,7 @@ namespace Myre.Graphics
             metadata.Set("viewfrustum", Bounds);
             metadata.Set("nearclip", NearClip);
             metadata.Set("farclip", FarClip);
-            metadata.Set("cameraposition", -_view.Translation);
+            metadata.Set("cameraposition", Position);
 
             _bounds.GetCorners(_frustumCorners);
             for (int i = 0; i < 4; i++)
