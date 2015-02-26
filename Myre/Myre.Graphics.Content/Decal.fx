@@ -82,19 +82,13 @@ float3 CalculatePixelWorldPosition(in float4 positionCS, in float4 positionVS, i
 	);
 	float4 sampledDepth = tex2D(depthSampler, texCoord);
 
-	//Clip this pixel if it fails the Z test
+	//Z clip this pixel
 	if (zTest)
-	{
-		float depthDelta = sampledDepth - depth;
-		clip(depthDelta);
-	}
+		ZTest(sampledDepth, depth);
 
 	//Calculate view position of this pixel
 	float3 frustumRay = positionVS.xyz * (FarClip / -positionVS.z);
-	float3 viewPosition = frustumRay * sampledDepth.x;
-
-	//Calculate world position of this pixel
-	return mul(float4(viewPosition, 1), InvView).xyz;
+	return ReconstructWorldPosition(frustumRay, sampledDepth.x, InvView);
 }
 
 float3 ClipPixelNormal(float3 worldPosition, out float3 tangent, out float3 binormal)
