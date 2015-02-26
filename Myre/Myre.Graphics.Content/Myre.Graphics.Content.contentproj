@@ -83,6 +83,9 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
+    <None Include="DepthHeader.fxh">
+      <Name>DepthHeader</Name>
+    </None>
     <None Include="EncodeNormals.fxh">
       <Name>EncodeNormals</Name>
     </None>
@@ -170,6 +173,18 @@
   <ItemGroup>
     <Compile Include="FXAA.fx">
       <Name>FXAA</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Decal.fx">
+      <Name>Decal</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="DecalBufferMix.fx">
+      <Name>DecalBufferMix</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>

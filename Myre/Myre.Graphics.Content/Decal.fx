@@ -1,5 +1,5 @@
-#include "../EncodeNormals.fxh"
-#include "../DepthHeader.fxh"
+#include "EncodeNormals.fxh"
+#include "DepthHeader.fxh"
 
 uniform float4x4 InvWorld : INVERSEWORLD;
 uniform float4x4 View : VIEW;

@@ -186,6 +186,8 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\AmbientLight.xnb" />
+    <None Include="Resources\Decal.xnb" />
+    <None Include="Resources\DecalBufferMix.xnb" />
     <None Include="Resources\DirectionalLight.xnb" />
     <None Include="Resources\FXAA.xnb" />
     <None Include="Resources\ParticleSystem.xnb" />

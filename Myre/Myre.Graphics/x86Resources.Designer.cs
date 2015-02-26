@@ -123,6 +123,26 @@ namespace Myre.Graphics {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Decal {
+            get {
+                object obj = ResourceManager.GetObject("Decal", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] DecalBufferMix {
+            get {
+                object obj = ResourceManager.GetObject("DecalBufferMix", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] DirectionalLight {
             get {
                 object obj = ResourceManager.GetObject("DirectionalLight", resourceCulture);

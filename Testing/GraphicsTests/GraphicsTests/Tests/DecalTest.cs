@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using Myre;
 using Myre.Collections;
 using Myre.Entities;
+using Myre.Extensions;
 using Myre.Graphics;
 using Myre.Graphics.Deferred;
 using Myre.Graphics.Deferred.Decals;
@@ -41,6 +42,7 @@ namespace GraphicsTests.Tests
                   .Then<TranslucentComponent>()
                   .Then<ToneMapComponent>()
                   .Then<AntiAliasComponent>()
+                  //.Show("gbuffer_normals")
                   .Apply();
 
             _camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateLookAt(new Vector3(100, 50, -200), new Vector3(0, 0, 0), Vector3.Up) };
@@ -82,19 +84,16 @@ namespace GraphicsTests.Tests
             var decal = kernel.Get<EntityDescription>();
             decal.AddBehaviour<Decal>();
 
-            _scene.Add(decal.Create(), new NamedBoxCollection {
-                { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
-                { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                { Decal.TransformName, Matrix.CreateScale(30, 50, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, 0, 0) },
-                { Decal.AngleCutoffName, MathHelper.PiOver4 }
-            });
-
-            //_scene.Add(decal.Create(), new NamedBoxCollection {
-            //    { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
-            //    { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-            //    { Decal.TransformName, Matrix.CreateScale(30, 10, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, 10, 10) },
-            //    { Decal.AngleCutoffName, MathHelper.PiOver4 }
-            //});
+            Random r = new Random();
+            for (int i = 0; i < 50; i++)
+            {
+                _scene.Add(decal.Create(), new NamedBoxCollection {
+                    { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
+                    { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
+                    { Decal.TransformName, Matrix.CreateScale(30, 5, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, r.Next(-200, 200), r.Next(-100, 100)) },
+                    { Decal.AngleCutoffName, MathHelper.PiOver4 }
+                });
+            }
         }
 
         public override void Update(GameTime gameTime)
@@ -103,7 +102,8 @@ namespace GraphicsTests.Tests
 
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            var time = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var deltaTime = gameTime.Seconds();
+            var time = gameTime.TotalSeconds();
 
             MouseState mouse = Mouse.GetState();
             KeyboardState keyboard = Keyboard.GetState();
@@ -115,8 +115,8 @@ namespace GraphicsTests.Tests
                 var mousePosition = new Vector2(mouse.X, mouse.Y);
                 var mouseDelta = mousePosition - resolution / 2;
 
-                _cameraRotation.Y -= mouseDelta.X * time * 0.1f;
-                _cameraRotation.X -= mouseDelta.Y * time * 0.1f;
+                _cameraRotation.Y -= mouseDelta.X * deltaTime * 0.1f;
+                _cameraRotation.X -= mouseDelta.Y * deltaTime * 0.1f;
 
                 var rotation = Matrix.CreateFromYawPitchRoll(_cameraRotation.Y, _cameraRotation.X, _cameraRotation.Z);
                 var forward = Vector3.TransformNormal(Vector3.Forward, rotation);
@@ -126,13 +126,13 @@ namespace GraphicsTests.Tests
                 right.Normalize();
 
                 if (keyboard.IsKeyDown(Keys.W))
-                    _cameraPosition += forward * time * 50;
+                    _cameraPosition += forward * deltaTime * 50;
                 if (keyboard.IsKeyDown(Keys.S))
-                    _cameraPosition -= forward * time * 50f;
+                    _cameraPosition -= forward * deltaTime * 50f;
                 if (keyboard.IsKeyDown(Keys.A))
-                    _cameraPosition -= right * time * 50f;
+                    _cameraPosition -= right * deltaTime * 50f;
                 if (keyboard.IsKeyDown(Keys.D))
-                    _cameraPosition += right * time * 50f;
+                    _cameraPosition += right * deltaTime * 50f;
 
                 _camera.View = Matrix.CreateLookAt(_cameraPosition, _cameraPosition + forward, Vector3.Cross(right, forward));
 

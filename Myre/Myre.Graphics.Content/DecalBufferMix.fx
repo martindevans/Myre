@@ -1,5 +1,5 @@
-#include "../FullScreenQuad.fxh"
-#include "../EncodeNormals.fxh"
+#include "FullScreenQuad.fxh"
+#include "EncodeNormals.fxh"
 
 uniform texture GbufferDiffuse;
 sampler gbufferDiffuseSampler = sampler_state
