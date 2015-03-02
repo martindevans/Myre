@@ -22,12 +22,8 @@ namespace Myre.Graphics.Deferred
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
             // define inputs
-            context.DefineInput("gbuffer_depth");
+            context.DefineInput("gbuffer_depth");   //used implicitly with GBUFFER_DEPTH semantic
 
-            // define outputs
-            foreach (var resource in context.SetRenderTargets)
-                context.DefineOutput(resource);
-            
             base.Initialise(renderer, context);
         }
 

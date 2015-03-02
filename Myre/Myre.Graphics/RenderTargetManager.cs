@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Debugging.Statistics;
 using Myre.Extensions;
@@ -140,7 +141,14 @@ namespace Myre.Graphics
 #endif
 
             GetPool(info).Push(target);
-            target.Tag = null;
+
+#if DEBUG
+            //Set the tag to the stacktrace of where this target was recycled
+            //This helps diagnose double free bugs
+            //target.Tag = new StackTrace();
+#else
+            //target.Tag = null;
+#endif
         }
 
         private static Stack<RenderTarget2D> GetPool(RenderTargetInfo info)

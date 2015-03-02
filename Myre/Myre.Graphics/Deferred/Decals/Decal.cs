@@ -20,6 +20,7 @@ namespace Myre.Graphics.Deferred.Decals
         public static readonly TypedName<Texture2D> DiffuseName = new TypedName<Texture2D>("diffuse_texture");
         public static readonly TypedName<Texture2D> NormalName = new TypedName<Texture2D>("normal_texture");
         public static readonly TypedName<float> AngleCutoffName = new TypedName<float>("angle_cutoff");
+        public static readonly TypedName<bool> TemporaryName = new TypedName<bool>("temporary");
 
         private Vector3 _decalDirection;
 
@@ -77,6 +78,12 @@ namespace Myre.Graphics.Deferred.Decals
             }
         }
 
+        private bool _temporary = true;
+        public bool Temporary
+        {
+            get { return _temporary; }
+        }
+
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             _transform = context.CreateProperty(TransformName);
@@ -101,6 +108,7 @@ namespace Myre.Graphics.Deferred.Decals
             initialisationData.TryCopyValue(_normal);
             if (!initialisationData.TryCopyValue(_angleCutoff))
                 _angleCutoff.Value = MathHelper.Pi;
+            initialisationData.TryCopyValue(TemporaryName, ref _temporary);
         }
 
         public class Manager
@@ -162,6 +170,41 @@ namespace Myre.Graphics.Deferred.Decals
             private static readonly Statistic _polysDrawnStat = Statistic.Create("Graphics.Primitives");
             private static readonly Statistic _drawsStat = Statistic.Create("Graphics.Draws");
 #endif
+
+            public int MaxTemporaryDecals { get; set; }
+
+            private int _temporaryCount = 0;
+
+            public Manager()
+            {
+                MaxTemporaryDecals = 64;
+            }
+
+            public override void Add(Decal behaviour)
+            {
+                base.Add(behaviour);
+
+                if (behaviour.Temporary)
+                    _temporaryCount++;
+
+                if (MaxTemporaryDecals > 0 && MaxTemporaryDecals < _temporaryCount)
+                {
+                    var tmp = Behaviours.Find(a => a.Temporary);
+                    if (tmp != null)
+                        Remove(tmp);
+                }
+            }
+
+            public override bool Remove(Decal behaviour)
+            {
+                if (!base.Remove(behaviour))
+                    return false;
+
+                if (behaviour.Temporary)
+                    _temporaryCount--;
+
+                return true;
+            }
 
             public void Draw(Renderer renderer)
             {

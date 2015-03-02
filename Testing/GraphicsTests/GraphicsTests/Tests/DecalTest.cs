@@ -84,13 +84,13 @@ namespace GraphicsTests.Tests
             var decal = kernel.Get<EntityDescription>();
             decal.AddBehaviour<Decal>();
 
-            Random r = new Random();
+            Random r = new Random(2);
             for (int i = 0; i < 50; i++)
             {
                 _scene.Add(decal.Create(), new NamedBoxCollection {
                     { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
                     { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                    { Decal.TransformName, Matrix.CreateScale(30, 5, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, r.Next(-200, 200), r.Next(-100, 100)) },
+                    { Decal.TransformName, Matrix.CreateScale(30, 5, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, r.Next(-100, 100), r.Next(-100, 100)) },
                     { Decal.AngleCutoffName, MathHelper.PiOver4 }
                 });
             }

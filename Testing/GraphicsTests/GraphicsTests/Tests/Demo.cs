@@ -28,6 +28,8 @@ namespace GraphicsTests.Tests
         private RenderPlan lightingPlan;
         private RenderPlan edgeDetectPlan;
         private RenderPlan normalPlan;
+        private RenderPlan depthPlan;
+        private RenderPlan diffusePlan;
 
         public Demo(
             IKernel kernel,
@@ -98,9 +100,16 @@ namespace GraphicsTests.Tests
 
             normalPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
-                .Then<EdgeDetectComponent>()
                 .Then(new AntiAliasComponent(kernel.Get<GraphicsDevice>(), "gbuffer_normals"))
                 .Show("antialiased");
+
+            depthPlan = renderer.StartPlan()
+                .Then<GeometryBufferComponent>()
+                .Show("gbuffer_depth");
+
+            diffusePlan = renderer.StartPlan()
+                .Then<GeometryBufferComponent>()
+                .Show("gbuffer_diffuse");
 
             fullPlan.Apply();
 
@@ -122,6 +131,10 @@ namespace GraphicsTests.Tests
                 lightingPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D5))
                 normalPlan.Apply();
+            else if (keyboard.IsKeyDown(Keys.D6))
+                depthPlan.Apply();
+            else if (keyboard.IsKeyDown(Keys.D7))
+                diffusePlan.Apply();
             else
                 fullPlan.Apply();
 
