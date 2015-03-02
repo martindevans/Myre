@@ -1,14 +1,17 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
-using Myre.Debugging.Statistics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using Ninject;
+using System;
+
+#if PROFILE
+using Myre.Debugging.Statistics;
+#endif
 
 namespace Myre.Graphics.Deferred.Decals
 {
@@ -189,9 +192,9 @@ namespace Myre.Graphics.Deferred.Decals
 
                 if (MaxTemporaryDecals > 0 && MaxTemporaryDecals < _temporaryCount)
                 {
-                    var tmp = Behaviours.Find(a => a.Temporary);
+                    var tmp = Behaviours.Find(a => a.Temporary && !a.Owner.IsDisposed);
                     if (tmp != null)
-                        Remove(tmp);
+                        tmp.Owner.Dispose();
                 }
             }
 

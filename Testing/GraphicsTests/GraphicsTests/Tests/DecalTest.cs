@@ -85,7 +85,7 @@ namespace GraphicsTests.Tests
             decal.AddBehaviour<Decal>();
 
             Random r = new Random(2);
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 150; i++)
             {
                 _scene.Add(decal.Create(), new NamedBoxCollection {
                     { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
