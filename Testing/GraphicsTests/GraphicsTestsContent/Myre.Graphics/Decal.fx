@@ -1,5 +1,5 @@
-#include "EncodeNormals.fxh"
-#include "DepthHeader.fxh"
+#include "../EncodeNormals.fxh"
+#include "../DepthHeader.fxh"
 
 uniform float4x4 InvWorld : INVERSEWORLD;
 uniform float4x4 View : VIEW;
@@ -65,7 +65,7 @@ DefaultVertexShaderOutput DefaultVertexShaderFunction(DefaultVertexShaderInput i
 
 	float4 viewPosition = mul(input.Position, WorldView);
 
-		output.Position = mul(viewPosition, Projection);
+	output.Position = mul(viewPosition, Projection);
 	output.Depth = CalculateDepth(viewPosition, FarClip);
 	output.PositionCS = output.Position;
 	output.PositionVS = viewPosition;
@@ -80,27 +80,27 @@ float3 CalculatePixelWorldPosition(in float4 positionCS, in float4 positionVS, i
 		float2 texCoord = float2(
 		(1 + screenPos.x) / 2 + (0.5 / Resolution.x),
 		(1 - screenPos.y) / 2 + (0.5 / Resolution.y)
-		);
+	);
 	float4 sampledDepth = tex2D(depthSampler, texCoord);
 
-		//Z clip this pixel
-		if (zTest)
-			ZTest(sampledDepth, depth);
+	//Z clip this pixel
+	if (zTest)
+		ZTest(sampledDepth, depth);
 
 	//Calculate view position of this pixel
 	float3 frustumRay = positionVS.xyz * (FarClip / -positionVS.z);
-		return ReconstructWorldPosition(frustumRay, sampledDepth.x, InvView);
+	return ReconstructWorldPosition(frustumRay, sampledDepth.x, InvView);
 }
 
 float3 ClipPixelNormal(float3 worldPosition, out float3 tangent, out float3 binormal, out float alpha)
 {
 	//Calculate the surface normal of this pixel from the change in world position
 	float3 ddxWp = ddx(worldPosition);
-		float3 ddyWp = ddy(worldPosition);
-		float3 normal = normalize(cross(ddyWp, ddxWp));
+	float3 ddyWp = ddy(worldPosition);
+	float3 normal = normalize(cross(ddyWp, ddxWp));
 
-		//Calculate angle between surface normal and decal direction
-		float angle = acos(dot(-normal, DecalDirection));
+	//Calculate angle between surface normal and decal direction
+	float angle = acos(dot(-normal, DecalDirection));
 
 	//If difference is negative that means angle is bigger than allowed
 	float difference = DecalDirectionClip - angle;
@@ -119,7 +119,7 @@ float3 ClipPixelNormal(float3 worldPosition, out float3 tangent, out float3 bino
 float2 CalculateDecalTexCoord(float3 worldPosition)
 {
 	float4 objectPosition = mul(float4(worldPosition, 1), InvWorld);
-		clip(0.5 - abs(objectPosition.xyz));
+	clip(0.5 - abs(objectPosition.xyz));
 
 	return objectPosition.xz + 0.5;
 }
@@ -133,14 +133,14 @@ float4 NormalValue(float2 decalTexCoord, float3 pixelNormal, float3 pixelTangent
 {
 	//Sample normal value from normal map
 	float4 normalSample = tex2D(normalSampler, decalTexCoord);
-		float3 normal = normalize(normalSample.xyz * 2 - 1);
+	float3 normal = normalize(normalSample.xyz * 2 - 1);
 
-		//Construct a tangent space to view space conversion
-		float3x3 tangentToView;
+	//Construct a tangent space to view space conversion
+	float3x3 tangentToView;
 	tangentToView[0] = mul(pixelTangent, View);
 	tangentToView[1] = mul(pixelBinormal, View);
 	tangentToView[2] = mul(pixelNormal, View);
-
+	
 	//Convert normal into view space
 	normal = mul(normal, tangentToView);
 
@@ -154,17 +154,17 @@ void PixelShaderFunction(uniform bool outputNormals, uniform bool outputDiffuse,
 	out float4 out_diffuse : COLOR1)
 {
 	float3 worldPosition = CalculatePixelWorldPosition(input.PositionCS, input.PositionVS, input.Depth, zTest);
-		float2 decalTexCoord = CalculateDecalTexCoord(worldPosition);
+	float2 decalTexCoord = CalculateDecalTexCoord(worldPosition);
 
-		float3 pixelTangent;
+	float3 pixelTangent;
 	float3 pixelBinormal;
 	float alpha;
 	float3 pixelNormal = ClipPixelNormal(worldPosition, pixelTangent, pixelBinormal, alpha);
 
-		if (outputDiffuse)
-			out_diffuse = DiffuseValue(decalTexCoord, alpha);
-		else
-			out_diffuse = float4(0, 0, 0, 0);
+	if (outputDiffuse)
+		out_diffuse = DiffuseValue(decalTexCoord, alpha);
+	else
+		out_diffuse = float4(0, 0, 0, 0);
 
 	if (outputNormals)
 		out_normal = NormalValue(decalTexCoord, pixelNormal, pixelTangent, pixelBinormal);
@@ -174,11 +174,11 @@ void PixelShaderFunction(uniform bool outputNormals, uniform bool outputDiffuse,
 
 technique ZTestedDecalDiffuseNormal
 {
-	pass Pass1
-	{
+    pass Pass1
+    {
 		VertexShader = compile vs_3_0 DefaultVertexShaderFunction();
 		PixelShader = compile ps_3_0 PixelShaderFunction(true, true, true);
-	}
+    }
 }
 
 technique ZTestedDecalDiffuse

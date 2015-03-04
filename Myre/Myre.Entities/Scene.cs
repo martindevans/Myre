@@ -86,7 +86,7 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <param name="initialisationData">Data to initialise the entity with.</param>
-        public void Add(Entity entity, INamedDataProvider initialisationData = null)
+        public Entity Add(Entity entity, INamedDataProvider initialisationData = null)
         {
             if (entity.Scene != null)
                 throw new InvalidOperationException("Cannot add an entity to a scene if it is in a scene already");
@@ -107,6 +107,8 @@ namespace Myre.Entities
             entity.Initialised();
 
             _entities.Add(entity);
+
+            return entity;
         }
 
         private Type SearchForDefaultManager(Type behaviourType)

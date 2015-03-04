@@ -26,6 +26,7 @@ namespace GraphicsTests.Tests
         Vector3 _cameraPosition;
         Vector3 _cameraRotation;
         private readonly Camera _camera;
+        private Decal _decal;
 
         public DecalTest(IKernel kernel, ContentManager content, GraphicsDevice device)
             : base("Decal Test", kernel)
@@ -36,7 +37,6 @@ namespace GraphicsTests.Tests
                   .Then<GeometryBufferComponent>()
                   .Then<DecalComponent>()
                   .Then<DecalMixComponent>()
-                  .Then(new RestoreDepthPhase(device) { ClearDepth = false })
                   .Then<Ssao>()
                   .Then<LightingComponent>()
                   .Then<TranslucentComponent>()
@@ -84,16 +84,44 @@ namespace GraphicsTests.Tests
             var decal = kernel.Get<EntityDescription>();
             decal.AddBehaviour<Decal>();
 
-            Random r = new Random(2);
-            for (int i = 0; i < 150; i++)
-            {
-                _scene.Add(decal.Create(), new NamedBoxCollection {
-                    { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
-                    { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                    { Decal.TransformName, Matrix.CreateScale(30, 5, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, r.Next(-100, 100), r.Next(-100, 100)) },
-                    { Decal.AngleCutoffName, MathHelper.PiOver4 }
-                });
-            }
+            //Random r = new Random(2);
+            //for (int i = 0; i < 150; i++)
+            //{
+            //    _scene.Add(decal.Create(), new NamedBoxCollection {
+            //        { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
+            //        { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
+            //        { Decal.TransformName, Matrix.CreateScale(30, 5, 30) * Matrix.CreateRotationX(MathHelper.PiOver2) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-130, r.Next(-100, 100), r.Next(-100, 100)) },
+            //        { Decal.AngleCutoffName, MathHelper.PiOver4 }
+            //    });
+            //}
+
+            _decal = _scene.Add(decal.Create(), new NamedBoxCollection {
+                { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
+                { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
+                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 0) },
+                { Decal.AngleCutoffName, MathHelper.Pi / 3.65f }
+            }).GetBehaviour<Decal>(null);
+
+            _scene.Add(decal.Create(), new NamedBoxCollection {
+                { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
+                { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
+                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 40) },
+                { Decal.AngleCutoffName, MathHelper.Pi / 3 }
+            });
+
+            _scene.Add(decal.Create(), new NamedBoxCollection {
+                { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
+                { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
+                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 80) },
+                { Decal.AngleCutoffName, MathHelper.Pi / 2 }
+            });
+
+            _scene.Add(decal.Create(), new NamedBoxCollection {
+                { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
+                { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
+                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 120) },
+                { Decal.AngleCutoffName, MathHelper.Pi }
+            });
         }
 
         public override void Update(GameTime gameTime)

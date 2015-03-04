@@ -7,7 +7,7 @@ using Myre.Entities.Extensions;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using Ninject;
-using System;
+
 
 #if PROFILE
 using Myre.Debugging.Statistics;
@@ -92,7 +92,7 @@ namespace Myre.Graphics.Deferred.Decals
             _transform = context.CreateProperty(TransformName);
             _transform.PropertySet += (p, o, n) => {
                 _inverseTransform = Matrix.Invert(n);
-                _decalDirection = Vector3.TransformNormal(Vector3.Up, n);
+                _decalDirection = Vector3.Normalize(Vector3.TransformNormal(Vector3.Down, n));
             };
 
             _diffuse = context.CreateProperty(DiffuseName);
@@ -254,7 +254,7 @@ namespace Myre.Graphics.Deferred.Decals
                     if (behaviour.Normal != null)
                         material.Parameters["Normal"].SetValue(behaviour.Normal);
                     material.Parameters["DecalDirection"].SetValue(behaviour._decalDirection);
-                    material.Parameters["DecalDirectionClip"].SetValue((float) Math.Cos(behaviour.AngleCutoff));
+                    material.Parameters["DecalDirectionClip"].SetValue(MathHelper.Clamp(behaviour.AngleCutoff, 0, MathHelper.Pi));
 
                     if (cameraIntersectsDecal)
                         renderer.Device.RasterizerState = RasterizerState.CullClockwise;
