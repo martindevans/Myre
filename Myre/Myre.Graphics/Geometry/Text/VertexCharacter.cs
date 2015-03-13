@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Myre.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,20 +23,20 @@ namespace Myre.Graphics.Geometry.Text
         private readonly Mesh _mesh;
         public Mesh Mesh { get { return _mesh; } }
 
-        private readonly float _width;
-        public float Width { get { return _width; } }
+        private readonly Vector2 _size;
+        public Vector2 Size { get { return _size; } }
 
         private readonly char _character;
         public char Character { get { return _character; } }
 
-        public VertexCharacter(char c, IEnumerable<KeyValuePair<char, float>> kerning, Mesh mesh, float width)
+        public VertexCharacter(char c, IEnumerable<KeyValuePair<char, float>> kerning, Mesh mesh, Vector2 width)
         {
             _character = c;
 
             _characterKerning = kerning.ToDictionary(a => a.Key, a => a.Value);
             _readonlyCharacterKerning = new ReadOnlyDictionary<char, float>(_characterKerning);
 
-            _width = width;
+            _size = width;
 
             _mesh = mesh;
         }
@@ -66,9 +67,9 @@ namespace Myre.Graphics.Geometry.Text
             var model = input.ReadObject<Mesh>();
 
             //read width
-            var width = input.ReadSingle();
+            var size = input.ReadVector2();
 
-            return new VertexCharacter(character, kerning, model, width);
+            return new VertexCharacter(character, kerning, model, size);
         }
     }
 }

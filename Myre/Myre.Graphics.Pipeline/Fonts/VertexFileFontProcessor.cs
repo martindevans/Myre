@@ -153,7 +153,7 @@ namespace Myre.Graphics.Pipeline.Fonts
                 c,
                 GetKerningTable(g, f, c, IncludedCharacters()),
                 ProcessMesh(meshContent).Single(),
-                GetSize(g, f, c.ToString(CultureInfo.InvariantCulture)).X
+                GetSize(g, f, c.ToString(CultureInfo.InvariantCulture))
             );
         }
 

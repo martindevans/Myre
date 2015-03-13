@@ -30,6 +30,7 @@ namespace GraphicsTests.Tests
         private RenderPlan normalPlan;
         private RenderPlan depthPlan;
         private RenderPlan diffusePlan;
+        private RenderPlan noAAPlan;
 
         public Demo(
             IKernel kernel,
@@ -78,7 +79,6 @@ namespace GraphicsTests.Tests
                                .Then<ToneMapComponent>()
                                .Then<AntiAliasComponent>()
                                .Show("antialiased");
-
             ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<EdgeDetectComponent>()
@@ -111,6 +111,16 @@ namespace GraphicsTests.Tests
                 .Then<GeometryBufferComponent>()
                 .Show("gbuffer_diffuse");
 
+            noAAPlan = renderer.StartPlan()
+                               .Then<GeometryBufferComponent>()
+                               .Then<EdgeDetectComponent>()
+                               .Then<Ssao>()
+                               .Then<LightingComponent>()
+                               .Then<RestoreDepthPhase>()
+                               .Then<TranslucentComponent>()
+                               .Then<ToneMapComponent>()
+                               .Show("tonemapped");
+
             fullPlan.Apply();
 
             base.BeginTransitionOn();
@@ -135,6 +145,8 @@ namespace GraphicsTests.Tests
                 depthPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D7))
                 diffusePlan.Apply();
+            else if (keyboard.IsKeyDown(Keys.D8))
+                noAAPlan.Apply();
             else
                 fullPlan.Apply();
 

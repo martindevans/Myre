@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Myre.Graphics.Pipeline.Models;
@@ -38,14 +39,14 @@ namespace Myre.Graphics.Pipeline.Fonts
 
         public MyreMeshContent Mesh { get; private set; }
 
-        public float Width { get; private set; }
+        public Vector2 Size { get; private set; }
 
         public char Character { get; private set; }
 
-        public VertexCharacterContent(char c, Dictionary<char, float> horizontalCharacterKerning, MyreMeshContent mesh, float width)
+        public VertexCharacterContent(char c, Dictionary<char, float> horizontalCharacterKerning, MyreMeshContent mesh, Vector2 size)
         {
             Character = c;
-            Width = width;
+            Size = size;
             Mesh = mesh;
             HorizontalCharacterKerning = horizontalCharacterKerning;
         }
@@ -71,7 +72,7 @@ namespace Myre.Graphics.Pipeline.Fonts
             output.WriteObject(value.Mesh);
 
             //Write out width
-            output.Write(value.Width);
+            output.Write(value.Size);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

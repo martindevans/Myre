@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -26,7 +25,6 @@ namespace GraphicsTests.Tests
         Vector3 _cameraPosition;
         Vector3 _cameraRotation;
         private readonly Camera _camera;
-        private Decal _decal;
 
         public DecalTest(IKernel kernel, ContentManager content, GraphicsDevice device)
             : base("Decal Test", kernel)
@@ -95,12 +93,12 @@ namespace GraphicsTests.Tests
             //    });
             //}
 
-            _decal = _scene.Add(decal.Create(), new NamedBoxCollection {
+            _scene.Add(decal.Create(), new NamedBoxCollection {
                 { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
                 { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
                 { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 0) },
                 { Decal.AngleCutoffName, MathHelper.Pi / 3.65f }
-            }).GetBehaviour<Decal>(null);
+            });
 
             _scene.Add(decal.Create(), new NamedBoxCollection {
                 { Decal.NormalName, content.Load<Texture2D>("randomnormals") },

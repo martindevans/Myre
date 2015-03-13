@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
@@ -86,6 +87,7 @@ namespace Myre.Graphics.Geometry.Text
 
             _string.PropertySet += StringChanged;
             _font.PropertySet += FontChanged;
+            //_anchor.PropertySet += AnchorChanged;
         }
 
         protected override void Initialised()
@@ -127,6 +129,7 @@ namespace Myre.Graphics.Geometry.Text
             //Get the characters which make up this string
             var characters = GetCharacters(str);
 
+            var height = 0f;
             var pen = 0f;
             for (int i = 0; i < characters.Length; i++)
             {
@@ -160,7 +163,8 @@ namespace Myre.Graphics.Geometry.Text
                 _model.Value.Add(m);
 
                 //Update pen position
-                pen += character.Width;
+                pen += character.Size.X;
+                height = Math.Max(height, character.Size.Y);
 
                 //If there is a following character move pen by kerning distance between this character pair
                 if (i != str.Length - 1)
@@ -175,6 +179,11 @@ namespace Myre.Graphics.Geometry.Text
             //Clean up caches
             CleanCache(_scratchPad, true);
             CleanCache(_characterCache, false);
+
+            //Move characters back by half string length to center the string
+            Matrix offset = Matrix.CreateTranslation(-pen / 2, 0, -height / 2);
+            foreach (var mesh in _model.Value.Meshes)
+                mesh.MeshTransform *= offset;
         }
 
         private readonly List<char> _cleanup = new List<char>();
