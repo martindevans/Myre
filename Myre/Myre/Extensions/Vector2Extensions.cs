@@ -116,5 +116,144 @@ namespace Myre.Extensions
 
             return true;
         }
+
+        /// <summary>
+        /// Rearrange elements in a vector2
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 XX(this Vector2 v)
+        {
+            return new Vector2(v.X, v.X);
+        }
+
+        /// <summary>
+        /// Rearrange elements in a vector2
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 XY(this Vector2 v)
+        {
+            return new Vector2(v.X, v.Y);
+        }
+
+        /// <summary>
+        /// Rearrange elements in a vector2
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 YX(this Vector2 v)
+        {
+            return new Vector2(v.Y, v.X);
+        }
+
+        /// <summary>
+        /// Rearrange elements in a vector2
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 YY(this Vector2 v)
+        {
+            return new Vector2(v.Y, v.Y);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static Vector3 _XY(this Vector2 v, float x)
+        {
+            return new Vector3(x, v.X, v.Y);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static Vector3 X_Y(this Vector2 v, float y)
+        {
+            return new Vector3(v.X, y, v.Y);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static Vector3 XY_(this Vector2 v, float z)
+        {
+            return new Vector3(v.X, v.Y, z);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static Vector3 _XX(this Vector2 v, float x)
+        {
+            return new Vector3(x, v.X, v.X);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static Vector3 X_X(this Vector2 v, float y)
+        {
+            return new Vector3(v.X, y, v.X);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static Vector3 XX_(this Vector2 v, float z)
+        {
+            return new Vector3(v.X, v.X, z);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static Vector3 _YY(this Vector2 v, float x)
+        {
+            return new Vector3(x, v.Y, v.Y);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static Vector3 Y_Y(this Vector2 v, float y)
+        {
+            return new Vector3(v.Y, y, v.Y);
+        }
+
+        /// <summary>
+        /// Create a new vector3
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
+        public static Vector3 YY_(this Vector2 v, float z)
+        {
+            return new Vector3(v.Y, v.Y, z);
+        }
     }
 }
