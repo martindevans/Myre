@@ -19,7 +19,12 @@ namespace Myre.Entities.Extensions
         /// <returns></returns>
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, Behaviour behaviour, TypedName<T> name, Property<T> property, bool appended = true, bool fallback = true)
         {
-            return TryCopyValue<T>(dataProvider, behaviour, name, v => property.Value = v, appended, fallback);
+            return TryCopyValue<T>(dataProvider, behaviour.Name, name, property, appended, fallback);
+        }
+
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string nameSpace, TypedName<T> name, Property<T> property, bool appended = true, bool fallback = true)
+        {
+            return TryCopyValue<T>(dataProvider, nameSpace, name, v => property.Value = v, appended, fallback);
         }
 
         /// <summary>
@@ -35,6 +40,11 @@ namespace Myre.Entities.Extensions
         /// <returns></returns>
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, Behaviour behaviour, TypedName<T> name, Action<T> action, bool appended = true, bool fallback = true)
         {
+            return TryCopyValue<T>(dataProvider, behaviour.Name, name, action, appended, fallback);
+        }
+
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string nameSpace, TypedName<T> name, Action<T> action, bool appended = true, bool fallback = true)
+        {
             if (dataProvider == null)
                 return false;
 
@@ -42,7 +52,7 @@ namespace Myre.Entities.Extensions
                 return Try(dataProvider, name, action);
             else
             {
-                if (Try(dataProvider, name + behaviour.Name, action))
+                if (Try(dataProvider, name + nameSpace, action))
                     return true;
                 else if (fallback)
                     return Try(dataProvider, name, action);
@@ -53,8 +63,13 @@ namespace Myre.Entities.Extensions
 
         public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, Behaviour behaviour, TypedName<T> name, out T field, bool appended = true, bool fallback = true)
         {
+            return TryCopyValue(dataProvider, behaviour.Name, name, out field, appended, fallback);
+        }
+
+        public static bool TryCopyValue<T>(this INamedDataProvider dataProvider, string nameSpace, TypedName<T> name, out T field, bool appended = true, bool fallback = true)
+        {
             T f = default(T);
-            var result = TryCopyValue(dataProvider, behaviour, name, a => f = a, appended, fallback);
+            var result = TryCopyValue(dataProvider, nameSpace, name, a => f = a, appended, fallback);
             field = f;
             return result;
         }
