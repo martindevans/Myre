@@ -9,6 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#if PROFILE
+using Myre.Debugging.Statistics;
+#endif
+
 namespace Myre.Graphics.Geometry
 {
     [DefaultManager(typeof(Manager))]
