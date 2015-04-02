@@ -27,6 +27,6 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("2.7.0")]
+[assembly: AssemblyVersion("3.0.0")]
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("MyreTests")]

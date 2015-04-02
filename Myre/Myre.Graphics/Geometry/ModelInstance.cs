@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
-using Myre.Debugging.Statistics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Entities.Extensions;
 using Myre.Graphics.Materials;
 using System;
 using System.Collections.Generic;
@@ -101,14 +101,21 @@ namespace Myre.Graphics.Geometry
             _isStatic = context.CreateProperty(IsStaticName);
             _isInvisible = context.CreateProperty(IsInvisibleName);
             _opacity = context.CreateProperty(OpacityName, 1);
-            _ignoreViewMatrix = context.CreateProperty(IgnoreViewMatrixName, false);
-            _ignoreProjectionMatrix = context.CreateProperty(IgnoreProjectionMatrixName, false);
+            _ignoreViewMatrix = context.CreateProperty(IgnoreViewMatrixName);
+            _ignoreProjectionMatrix = context.CreateProperty(IgnoreProjectionMatrixName);
 
             base.CreateProperties(context);
         }
 
         public override void Initialise(INamedDataProvider initialisationData)
         {
+            initialisationData.TryCopyValue(this, TransformName, _transform);
+            initialisationData.TryCopyValue(this, IsStaticName, _isStatic);
+            initialisationData.TryCopyValue(this, IsInvisibleName, _isInvisible);
+            initialisationData.TryCopyValue(this, OpacityName, _opacity);
+            initialisationData.TryCopyValue(this, IgnoreViewMatrixName, _ignoreViewMatrix);
+            initialisationData.TryCopyValue(this, IgnoreProjectionMatrixName, _ignoreProjectionMatrix);
+
             HookEvents(_model.Value);
             _model.PropertySet += (p, o, n) =>
             {

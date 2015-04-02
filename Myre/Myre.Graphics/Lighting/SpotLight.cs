@@ -102,15 +102,15 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(_colourName, _colour);
-            initialisationData.TryCopyValue(_positionName, _position);
-            initialisationData.TryCopyValue(_directionName, _direction);
-            initialisationData.TryCopyValue(_angleName, _angle);
-            initialisationData.TryCopyValue(_rangeName, _range);
-            initialisationData.TryCopyValue(_maskName, _mask);
-            initialisationData.TryCopyValue(_shadowResolutionName, _shadowResolution);
-            initialisationData.TryCopyValue(_activeName, _active);
-            initialisationData.TryCopyValue(_falloffName, _falloff);
+            initialisationData.TryCopyValue(this, _colourName, _colour);
+            initialisationData.TryCopyValue(this, _positionName, _position);
+            initialisationData.TryCopyValue(this, _directionName, _direction);
+            initialisationData.TryCopyValue(this, _angleName, _angle);
+            initialisationData.TryCopyValue(this, _rangeName, _range);
+            initialisationData.TryCopyValue(this, _maskName, _mask);
+            initialisationData.TryCopyValue(this, _shadowResolutionName, _shadowResolution);
+            initialisationData.TryCopyValue(this, _activeName, _active);
+            initialisationData.TryCopyValue(this, _falloffName, _falloff);
         }
     }
 }

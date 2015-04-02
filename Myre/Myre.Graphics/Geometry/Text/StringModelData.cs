@@ -81,9 +81,9 @@ namespace Myre.Graphics.Geometry.Text
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(FontName, _font);
-            initialisationData.TryCopyValue(StringName, _string);
-            initialisationData.TryCopyValue(ThicknessName, _thickness);
+            initialisationData.TryCopyValue(this, FontName, _font);
+            initialisationData.TryCopyValue(this, StringName, _string);
+            initialisationData.TryCopyValue(this, ThicknessName, _thickness);
 
             _string.PropertySet += StringChanged;
             _font.PropertySet += FontChanged;

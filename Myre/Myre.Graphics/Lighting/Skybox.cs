@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(_textureName, _texture);
-            initialisationData.TryCopyValue(_brightnessName, _brightness);
-            initialisationData.TryCopyValue(_gammaCorrectName, _gammaCorrect);
+            initialisationData.TryCopyValue(this, _textureName, _texture);
+            initialisationData.TryCopyValue(this, _brightnessName, _brightness);
+            initialisationData.TryCopyValue(this, _gammaCorrectName, _gammaCorrect);
         }
     }
 }

@@ -106,12 +106,12 @@ namespace Myre.Graphics.Deferred.Decals
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(_transform);
-            initialisationData.TryCopyValue(_diffuse);
-            initialisationData.TryCopyValue(_normal);
-            if (!initialisationData.TryCopyValue(_angleCutoff))
+            initialisationData.TryCopyValue(this, TransformName, _transform);
+            initialisationData.TryCopyValue(this, DiffuseName, _diffuse);
+            initialisationData.TryCopyValue(this, NormalName, _normal);
+            if (!initialisationData.TryCopyValue(this, AngleCutoffName, _angleCutoff))
                 _angleCutoff.Value = MathHelper.Pi;
-            initialisationData.TryCopyValue(TemporaryName, ref _temporary);
+            initialisationData.TryCopyValue(this, TemporaryName, out _temporary);
         }
 
         public class Manager

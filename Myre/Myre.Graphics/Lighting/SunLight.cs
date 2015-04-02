@@ -56,10 +56,10 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(ColourName, _colour);
-            initialisationData.TryCopyValue(DirectionName, _direction);
-            initialisationData.TryCopyValue(ShadowResolutionName, _shadowResolution);
-            initialisationData.TryCopyValue(ActiveName, _active);
+            initialisationData.TryCopyValue(this, ColourName, _colour);
+            initialisationData.TryCopyValue(this, DirectionName, _direction);
+            initialisationData.TryCopyValue(this, ShadowResolutionName, _shadowResolution);
+            initialisationData.TryCopyValue(this, ActiveName, _active);
         }
     }
 }

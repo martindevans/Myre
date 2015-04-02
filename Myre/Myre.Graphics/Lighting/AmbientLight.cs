@@ -8,9 +8,9 @@ namespace Myre.Graphics.Lighting
     public class AmbientLight
         : Behaviour
     {
-        private const string SKY_COLOUR_NAME = "sky_colour";
-        private const string GROUND_COLOUR_NAME = "ground_colour";
-        private const string UP_NAME = "up";
+        public static readonly TypedName<Vector3> SkyColourName = new TypedName<Vector3>("sky_colour");
+        public static readonly TypedName<Vector3> GroundColourName = new TypedName<Vector3>("ground_colour");
+        public static readonly TypedName<Vector3> UpName = new TypedName<Vector3>("up");
 
         private Property<Vector3> _skyColour;
         private Property<Vector3> _groundColour;
@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _skyColour = context.CreateProperty(new TypedName<Vector3>(SKY_COLOUR_NAME), Color.LightSkyBlue.ToVector3());
-            _groundColour = context.CreateProperty(new TypedName<Vector3>(GROUND_COLOUR_NAME), Color.LightGray.ToVector3());
-            _up = context.CreateProperty(new TypedName<Vector3>(UP_NAME), Vector3.Up);
+            _skyColour = context.CreateProperty(SkyColourName, Color.LightSkyBlue.ToVector3());
+            _groundColour = context.CreateProperty(GroundColourName, Color.LightGray.ToVector3());
+            _up = context.CreateProperty(UpName, Vector3.Up);
 
             base.CreateProperties(context);
         }
@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(SKY_COLOUR_NAME, _skyColour);
-            initialisationData.TryCopyValue(GROUND_COLOUR_NAME, _groundColour);
-            initialisationData.TryCopyValue(UP_NAME, _up);
+            initialisationData.TryCopyValue(this, SkyColourName, _skyColour);
+            initialisationData.TryCopyValue(this, GroundColourName, _groundColour);
+            initialisationData.TryCopyValue(this, UpName, _up);
         }
     }
 }

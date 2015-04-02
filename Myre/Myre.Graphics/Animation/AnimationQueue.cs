@@ -126,11 +126,11 @@ namespace Myre.Graphics.Animation
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(RootTranslationXName, _enableRootBoneTranslationX);
-            initialisationData.TryCopyValue(RootTranslationYName, _enableRootBoneTranslationY);
-            initialisationData.TryCopyValue(RootTranslationZName, _enableRootBoneTranslationZ);
-            initialisationData.TryCopyValue(EnableRootRotationName, _enableRootBoneRotation);
-            initialisationData.TryCopyValue(EnableRootScaleName, _enableRootBoneScale);
+            initialisationData.TryCopyValue(this, RootTranslationXName, _enableRootBoneTranslationX);
+            initialisationData.TryCopyValue(this, RootTranslationYName, _enableRootBoneTranslationY);
+            initialisationData.TryCopyValue(this, RootTranslationZName, _enableRootBoneTranslationZ);
+            initialisationData.TryCopyValue(this, EnableRootRotationName, _enableRootBoneRotation);
+            initialisationData.TryCopyValue(this, EnableRootScaleName, _enableRootBoneScale);
 
             if (initialisationData != null)
             {
