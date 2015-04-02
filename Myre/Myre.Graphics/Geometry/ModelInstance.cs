@@ -24,16 +24,16 @@ namespace Myre.Graphics.Geometry
         public static readonly TypedName<bool> IsStaticName = new TypedName<bool>("is_static");
         public static readonly TypedName<bool> IsInvisibleName = new TypedName<bool>("is_invisible");
         public static readonly TypedName<float> OpacityName = new TypedName<float>("opacity");
-        public static readonly TypedName<bool> IgnoreViewMatrixName = new TypedName<bool>("ignore_view_matrix");
-        public static readonly TypedName<bool> IgnoreProjectionMatrixName = new TypedName<bool>("ignore_projection_matrix");
+        public static readonly TypedName<Matrix?> CustomViewMatrixName = new TypedName<Matrix?>("custom_view_matrix");
+        public static readonly TypedName<Matrix?> CustomProjectionMatrixName = new TypedName<Matrix?>("custom_projection_matrix");
 
         private Property<ModelData> _model;
         private Property<Matrix> _transform;
         private Property<bool> _isStatic;
         private Property<bool> _isInvisible;
         private Property<float> _opacity;
-        private Property<bool> _ignoreViewMatrix;
-        private Property<bool> _ignoreProjectionMatrix;
+        private Property<Matrix?> _customViewMatrix;
+        private Property<Matrix?> _customProjectionMatrix;
 
         private IRenderDataSupplier[] _renderDataSuppliers;
 
@@ -105,8 +105,8 @@ namespace Myre.Graphics.Geometry
             _isStatic = context.CreateProperty(IsStaticName);
             _isInvisible = context.CreateProperty(IsInvisibleName);
             _opacity = context.CreateProperty(OpacityName, 1);
-            _ignoreViewMatrix = context.CreateProperty(IgnoreViewMatrixName);
-            _ignoreProjectionMatrix = context.CreateProperty(IgnoreProjectionMatrixName);
+            _customViewMatrix = context.CreateProperty(CustomViewMatrixName);
+            _customProjectionMatrix = context.CreateProperty(CustomProjectionMatrixName);
 
             base.CreateProperties(context);
         }
@@ -117,8 +117,8 @@ namespace Myre.Graphics.Geometry
             initialisationData.TryCopyValue(this, IsStaticName, _isStatic);
             initialisationData.TryCopyValue(this, IsInvisibleName, _isInvisible);
             initialisationData.TryCopyValue(this, OpacityName, _opacity);
-            initialisationData.TryCopyValue(this, IgnoreViewMatrixName, _ignoreViewMatrix);
-            initialisationData.TryCopyValue(this, IgnoreProjectionMatrixName, _ignoreProjectionMatrix);
+            initialisationData.TryCopyValue(this, CustomViewMatrixName, _customViewMatrix);
+            initialisationData.TryCopyValue(this, CustomProjectionMatrixName, _customProjectionMatrix);
 
             HookEvents(_model.Value);
             _model.PropertySet += (p, o, n) =>
@@ -347,8 +347,8 @@ namespace Myre.Graphics.Geometry
                     {
                         var instance = meshInstances[i];
                         Matrix world = instance.Mesh.MeshTransform * instance.Instance.Transform;
-                        if (instance.Instance._ignoreViewMatrix.Value)
-                            instance.WorldView = world;
+                        if (instance.Instance._customViewMatrix.Value.HasValue)
+                            instance.WorldView = world * instance.Instance._customViewMatrix.Value.Value;
                         else
                             Matrix.Multiply(ref world, ref cameraView, out instance.WorldView);
                     }
@@ -361,7 +361,7 @@ namespace Myre.Graphics.Geometry
                 {
                     item.UpdateBounds();
                     //If this item ignores the view and projection matrices all bets are off. Just pass it and let the graphics device deal with it
-                    if (item.Instance._ignoreViewMatrix.Value || item.Instance._ignoreProjectionMatrix.Value || volume.Intersects(item.Bounds))
+                    if (item.Instance._customViewMatrix.Value.HasValue || item.Instance._customProjectionMatrix.Value.HasValue || volume.Intersects(item.Bounds))
                         meshInstances.Add(item);
                 }
             }
@@ -394,8 +394,8 @@ namespace Myre.Graphics.Geometry
 
                     world.Value = instance.Instance.Transform;
                     worldView.Value = instance.WorldView;
-                    if (instance.Instance._ignoreProjectionMatrix.Value)
-                        worldViewProjection.Value = worldView.Value;
+                    if (instance.Instance._customProjectionMatrix.Value.HasValue)
+                        worldViewProjection.Value = worldView.Value * instance.Instance._customProjectionMatrix.Value.Value;
                     else
                         worldViewProjection.Value = worldView.Value * projection.Value;
 
