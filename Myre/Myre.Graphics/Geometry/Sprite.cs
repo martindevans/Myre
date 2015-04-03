@@ -192,6 +192,10 @@ namespace Myre.Graphics.Geometry
             _isInvisible = context.CreateProperty(ModelInstance.IsInvisibleName);
         }
 
+        protected virtual void Prepare()
+        {
+        }
+
         private void Draw(SpriteBatch batch)
         {
             batch.Draw(Texture, Position, SourceRectangle, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
@@ -208,8 +212,12 @@ namespace Myre.Graphics.Geometry
             public void Draw(Viewport view, SpriteBatch batch)
             {
                 foreach (var sprite in Behaviours)
+                {
+                    sprite.Prepare();
+
                     if (!sprite.IsInvisible && sprite.IsInView(view))
                         sprite.Draw(batch);
+                }
             }
         }
     }
