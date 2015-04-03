@@ -121,6 +121,7 @@
     <Compile Include="Geometry\ModelData.cs" />
     <Compile Include="Geometry\ModelInstance.cs" />
     <Compile Include="Geometry\OrientedBoundingBox.cs" />
+    <Compile Include="Geometry\Sprite.cs" />
     <Compile Include="Geometry\Text\StringModelData.cs" />
     <Compile Include="Geometry\Text\VertexCharacter.cs" />
     <Compile Include="Geometry\Text\VertexFont.cs" />
