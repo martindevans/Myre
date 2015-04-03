@@ -75,11 +75,22 @@ namespace Myre.Entities
             }
         }
 
-        private readonly Dictionary<String, IProperty> _properties;
+        private struct PropertyKey
+        {
+            public readonly string Name;
+            public readonly Type Type;
+
+            public PropertyKey(string name, Type type)
+            {
+                Type = type;
+                Name = name;
+            }
+        }
+
+        private readonly Dictionary<PropertyKey, IProperty> _properties;
         private readonly Dictionary<Type, Behaviour[]> _behaviours;
 
         private readonly List<IProperty> _propertiesList;
-        private readonly List<Behaviour> _behavioursList;
 
         public EntityVersion Version { get; private set; }
 
@@ -125,14 +136,14 @@ namespace Myre.Entities
 
             // create public read-only collections
             _propertiesList = new List<IProperty>(properties);
-            _behavioursList = new List<Behaviour>(behaviours);
+            List<Behaviour> behavioursList = new List<Behaviour>(behaviours);
             Properties = new ReadOnlyCollection<IProperty>(_propertiesList);
-            Behaviours = new ReadOnlyCollection<Behaviour>(_behavioursList);
+            Behaviours = new ReadOnlyCollection<Behaviour>(behavioursList);
 
             // add properties
-            _properties = new Dictionary<String, IProperty>();
+            _properties = new Dictionary<PropertyKey, IProperty>();
             foreach (var item in Properties)
-                _properties.Add(item.Name, item);
+                _properties.Add(new PropertyKey(item.Name, item.Type), item);
 
             // sort behaviours by their type
             var catagorised = new Dictionary<Type, List<Behaviour>>();
@@ -303,9 +314,9 @@ namespace Myre.Entities
                 Version.Creator.Recycle(this);
         }
 
-        internal void AddProperty(IProperty property)
+        private void AddProperty(IProperty property)
         {
-            _properties.Add(property.Name, property);
+            _properties.Add(new PropertyKey(property.Name, property.Type), property);
             _propertiesList.Add(property);
         }
 
@@ -313,11 +324,12 @@ namespace Myre.Entities
         /// Gets the property with the specified name.
         /// </summary>
         /// <param name="name">The name of the propery.</param>
+        /// <param name="type">The type of the value contained in this property</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public IProperty GetProperty(String name)
+        public IProperty GetProperty(String name, Type type)
         {
             IProperty property;
-            _properties.TryGetValue(name, out property);
+            _properties.TryGetValue(new PropertyKey(name, type), out property);
             return property;
         }
 
@@ -329,7 +341,7 @@ namespace Myre.Entities
         /// <returns>The property with the specified name and data type.</returns>
         public Property<T> GetProperty<T>(TypedName<T> name)
         {
-            return GetProperty(name.Name) as Property<T>;
+            return GetProperty(name.Name, typeof(T)) as Property<T>;
         }
 
         /// <summary>
