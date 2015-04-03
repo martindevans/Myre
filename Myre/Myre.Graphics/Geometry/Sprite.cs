@@ -137,6 +137,19 @@ namespace Myre.Graphics.Geometry
             }
         }
 
+        private Property<bool> _isInvisible;
+        public bool IsInvisible
+        {
+            get
+            {
+                return _isInvisible.Value;
+            }
+            set
+            {
+                _isInvisible.Value = value;
+            }
+        }
+
         private Rectangle MaximumBounds
         {
             get
@@ -176,6 +189,7 @@ namespace Myre.Graphics.Geometry
             _scale = context.CreateProperty(ScaleName);
             _spriteEffects = context.CreateProperty(SpriteEffectsName);
             _layerDepth = context.CreateProperty(LayerDepthName);
+            _isInvisible = context.CreateProperty(ModelInstance.IsInvisibleName);
         }
 
         private void Draw(SpriteBatch batch)
@@ -183,9 +197,9 @@ namespace Myre.Graphics.Geometry
             batch.Draw(Texture, Position, SourceRectangle, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
         }
 
-        private bool IsVisible(Viewport view)
+        private bool IsInView(Viewport view)
         {
-            return view.Bounds.Intersects(MaximumBounds);
+            return  view.Bounds.Intersects(MaximumBounds);
         }
 
         internal class Manager
@@ -194,7 +208,7 @@ namespace Myre.Graphics.Geometry
             public void Draw(Viewport view, SpriteBatch batch)
             {
                 foreach (var sprite in Behaviours)
-                    if (sprite.IsVisible(view))
+                    if (!sprite.IsInvisible && sprite.IsInView(view))
                         sprite.Draw(batch);
             }
         }
