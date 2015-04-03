@@ -192,7 +192,7 @@ namespace Myre.Graphics.Geometry
             _isInvisible = context.CreateProperty(ModelInstance.IsInvisibleName);
         }
 
-        protected virtual void Prepare()
+        protected virtual void Prepare(View view)
         {
         }
 
@@ -201,19 +201,19 @@ namespace Myre.Graphics.Geometry
             batch.Draw(Texture, Position, SourceRectangle, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
         }
 
-        private bool IsInView(Viewport view)
+        private bool IsInView(View view)
         {
-            return  view.Bounds.Intersects(MaximumBounds);
+            return  view.Viewport.Bounds.Intersects(MaximumBounds);
         }
 
         internal class Manager
             : BehaviourManager<Sprite>
         {
-            public void Draw(Viewport view, SpriteBatch batch)
+            public void Draw(View view, SpriteBatch batch)
             {
                 foreach (var sprite in Behaviours)
                 {
-                    sprite.Prepare();
+                    sprite.Prepare(view);
 
                     if (!sprite.IsInvisible && sprite.IsInView(view))
                         sprite.Draw(batch);
@@ -238,7 +238,7 @@ namespace Myre.Graphics.Geometry
 
         public override void Draw(Renderer renderer)
         {
-            var viewport = renderer.Data.Get<Viewport>("viewport");
+            var viewport = renderer.Data.Get<View>("activeview");
 
             _batch.Begin();
             _sprites.Draw(viewport.Value, _batch);
