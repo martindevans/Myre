@@ -16,7 +16,7 @@ using Myre.UI.InputDevices;
 
 namespace GraphicsTests
 {
-    abstract class TestScreen
+    public abstract class TestScreen
         : Screen
     {
         protected readonly TestGame Game;

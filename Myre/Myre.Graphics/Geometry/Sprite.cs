@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
-using Myre.Graphics.Deferred.Decals;
+using Myre.Entities.Extensions;
 
 namespace Myre.Graphics.Geometry
 {
-    [DefaultManager(typeof(Decal.Manager))]
+    [DefaultManager(typeof(Manager))]
     public class Sprite
         : Behaviour
     {
@@ -192,6 +193,22 @@ namespace Myre.Graphics.Geometry
             _isInvisible = context.CreateProperty(ModelInstance.IsInvisibleName);
         }
 
+        public override void Initialise(INamedDataProvider initialisationData)
+        {
+            base.Initialise(initialisationData);
+
+            initialisationData.TryCopyValue(this, TextureName, _texture);
+            initialisationData.TryCopyValue(this, PositionName, _position);
+            initialisationData.TryCopyValue(this, SourceRectangleName, _sourceRectangle);
+            initialisationData.TryCopyValue(this, ColorName, _color);
+            initialisationData.TryCopyValue(this, RotationName, _rotation);
+            initialisationData.TryCopyValue(this, OriginName, _origin);
+            initialisationData.TryCopyValue(this, ScaleName, _scale);
+            initialisationData.TryCopyValue(this, SpriteEffectsName, _spriteEffects);
+            initialisationData.TryCopyValue(this, LayerDepthName, _layerDepth);
+            initialisationData.TryCopyValue(this, ModelInstance.IsInvisibleName, _isInvisible);
+        }
+
         protected virtual void Prepare(View view)
         {
         }
@@ -231,6 +248,12 @@ namespace Myre.Graphics.Geometry
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
             base.Initialise(renderer, context);
+
+            // define inputs
+            context.DefineInput(context.SetRenderTargets[0].Name);
+
+            //define outputs
+            context.DefineOutput(context.SetRenderTargets[0], true);
 
             _batch = new SpriteBatch(renderer.Device);
             _sprites = renderer.Scene.GetManager<Sprite.Manager>();
