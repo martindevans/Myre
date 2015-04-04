@@ -75,19 +75,7 @@ namespace Myre.Entities
             }
         }
 
-        private struct PropertyKey
-        {
-            public readonly string Name;
-            public readonly Type Type;
-
-            public PropertyKey(string name, Type type)
-            {
-                Type = type;
-                Name = name;
-            }
-        }
-
-        private readonly Dictionary<PropertyKey, IProperty> _properties;
+        private readonly Dictionary<NameWithType, IProperty> _properties;
         private readonly Dictionary<Type, Behaviour[]> _behaviours;
 
         private readonly List<IProperty> _propertiesList;
@@ -141,9 +129,9 @@ namespace Myre.Entities
             Behaviours = new ReadOnlyCollection<Behaviour>(behavioursList);
 
             // add properties
-            _properties = new Dictionary<PropertyKey, IProperty>();
+            _properties = new Dictionary<NameWithType, IProperty>();
             foreach (var item in Properties)
-                _properties.Add(new PropertyKey(item.Name, item.Type), item);
+                _properties.Add(new NameWithType(item.Name, item.Type), item);
 
             // sort behaviours by their type
             var catagorised = new Dictionary<Type, List<Behaviour>>();
@@ -316,7 +304,7 @@ namespace Myre.Entities
 
         private void AddProperty(IProperty property)
         {
-            _properties.Add(new PropertyKey(property.Name, property.Type), property);
+            _properties.Add(new NameWithType(property.Name, property.Type), property);
             _propertiesList.Add(property);
         }
 
@@ -329,7 +317,7 @@ namespace Myre.Entities
         public IProperty GetProperty(String name, Type type)
         {
             IProperty property;
-            _properties.TryGetValue(new PropertyKey(name, type), out property);
+            _properties.TryGetValue(new NameWithType(name, type), out property);
             return property;
         }
 

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Myre.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using Myre.Extensions;
 
 namespace Myre.Collections
 {
@@ -10,7 +9,7 @@ namespace Myre.Collections
     /// When setting the value it will be set in this instance, potentionally overriding the parent.
     /// </summary>
     public class CascadingBoxCollection
-        :MarshalByRefObject, INamedDataCollection
+        : INamedDataCollection
     {
         private readonly INamedDataProvider _parent;
         private readonly NamedBoxCollection _values;
@@ -25,7 +24,7 @@ namespace Myre.Collections
             _parent = parent;
             _values = new NamedBoxCollection();
 
-            _enumerable = _parent.Where(a => _values.Contains(a.Key)).Append(_values);
+            _enumerable = _parent.Where(a => _values.Contains(a.Key, a.Value.Type)).Append(_values);
         }
 
         /// <summary>

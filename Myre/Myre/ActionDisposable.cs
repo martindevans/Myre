@@ -7,7 +7,7 @@ namespace Myre
     /// A disposable object which calls an action when it is disposed
     /// </summary>
     public sealed class ActionDisposable
-        :MarshalByRefObject, IDisposable, IDisposableObject
+        : IDisposable, IDisposableObject
     {
         private readonly bool _allowRepeats;
         private readonly List<Action> _disposeActions = new List<Action>();

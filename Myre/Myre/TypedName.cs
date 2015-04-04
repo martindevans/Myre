@@ -61,4 +61,33 @@ namespace Myre
             return new TypedName<T>(name);
         }
     }
+
+    /// <summary>
+    /// A string with an associated Type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    [Serializable]
+    public struct NameWithType
+    {
+        /// <summary>
+        /// The name
+        /// </summary>
+        public readonly string Name;
+
+        /// <summary>
+        /// The type
+        /// </summary>
+        public readonly Type Type;
+
+        /// <summary>
+        /// Construct a new NameWithType
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        public NameWithType(string name, Type type)
+        {
+            Name = name;
+            Type = type;
+        }
+    }
 }
