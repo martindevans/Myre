@@ -209,8 +209,9 @@ namespace Myre.Graphics.Geometry
             initialisationData.TryCopyValue(this, ModelInstance.IsInvisibleName, _isInvisible);
         }
 
-        protected virtual void Prepare(View view)
+        protected virtual bool Prepare(View view)
         {
+            return true;
         }
 
         private void Draw(SpriteBatch batch)
@@ -220,7 +221,7 @@ namespace Myre.Graphics.Geometry
 
         private bool IsInView(View view)
         {
-            return  view.Viewport.Bounds.Intersects(MaximumBounds);
+            return view.Viewport.Bounds.Intersects(MaximumBounds);
         }
 
         internal class Manager
@@ -230,7 +231,8 @@ namespace Myre.Graphics.Geometry
             {
                 foreach (var sprite in Behaviours)
                 {
-                    sprite.Prepare(view);
+                    if (!sprite.Prepare(view))
+                        continue;
 
                     if (!sprite.IsInvisible && sprite.IsInView(view))
                         sprite.Draw(batch);
