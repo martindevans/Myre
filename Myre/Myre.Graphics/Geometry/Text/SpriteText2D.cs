@@ -4,17 +4,17 @@ using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
-using Myre.Graphics.Geometry.Text;
+using System;
 
-namespace Myre.Graphics.Geometry
+namespace Myre.Graphics.Geometry.Text
 {
     [DefaultManager(typeof(Manager))]
-    public class Sprite
+    public class SpriteText2D
         : Behaviour
     {
-        public static readonly TypedName<Texture2D> TextureName = new TypedName<Texture2D>("texture");
+        public static readonly TypedName<SpriteFont> FontName = new TypedName<SpriteFont>("font");
         public static readonly TypedName<Vector2> PositionName = new TypedName<Vector2>("position");
-        public static readonly TypedName<Rectangle?> SourceRectangleName = new TypedName<Rectangle?>("source_rectangle");
+        public static readonly TypedName<string> StringName = new TypedName<string>("string");
         public static readonly TypedName<Color> ColorName = new TypedName<Color>("colour");
         public static readonly TypedName<float> RotationName = new TypedName<float>("rotation");
         public static readonly TypedName<Vector2> OriginName = new TypedName<Vector2>("origin");
@@ -22,20 +22,20 @@ namespace Myre.Graphics.Geometry
         public static readonly TypedName<SpriteEffects> SpriteEffectsName = new TypedName<SpriteEffects>("sprite_effects");
         public static readonly TypedName<float> LayerDepthName = new TypedName<float>("layer_depth");
 
-        private Property<Texture2D> _texture;
-        public Texture2D Texture
+        private Property<SpriteFont> _font;
+        public SpriteFont Font
         {
             get
             {
-                return _texture.Value;
+                return _font.Value;
             }
             set
             {
-                _texture.Value = value;
+                _font.Value = value;
             }
         }
 
-        private Property<Vector2> _position; 
+        private Property<Vector2> _position;
         public Vector2 Position
         {
             get
@@ -48,16 +48,16 @@ namespace Myre.Graphics.Geometry
             }
         }
 
-        private Property<Rectangle?> _sourceRectangle;
-        public Rectangle? SourceRectangle
+        private Property<string> _string;
+        public string String
         {
             get
             {
-                return _sourceRectangle.Value;
+                return _string.Value;
             }
             set
             {
-                _sourceRectangle.Value = value;
+                _string.Value = value;
             }
         }
 
@@ -152,39 +152,13 @@ namespace Myre.Graphics.Geometry
             }
         }
 
-        private Rectangle MaximumBounds
-        {
-            get
-            {
-                if (_texture.Value == null)
-                    return new Rectangle(int.MaxValue, int.MaxValue, 0, 0);
-
-                //Manhattan length of the diagonal (scaled)
-                var diagonal = new Vector2(_texture.Value.Width / 2 + _texture.Value.Height / 2) * Scale;
-
-                //Position of the bottom left
-                var pos = _position.Value - diagonal;
-
-                return new Rectangle(
-                    //Position, rounded *down* (loss of 1)
-                    (int)pos.X,
-                    (int)pos.Y,
-
-                    //Width, rounded *down* (loss of 1)
-                    //Add on 2 to make up for the potential 2 lost
-                    (int)(diagonal.X * 2) + 2,
-                    (int)(diagonal.Y * 2) + 2
-                );
-            }
-        }
-
         public override void CreateProperties(Entity.ConstructionContext context)
         {
             base.CreateProperties(context);
 
-            _texture = context.CreateProperty(TextureName);
+            _font = context.CreateProperty(FontName);
             _position = context.CreateProperty(PositionName);
-            _sourceRectangle = context.CreateProperty(SourceRectangleName);
+            _string = context.CreateProperty(StringName);
             _color = context.CreateProperty(ColorName);
             _rotation = context.CreateProperty(RotationName);
             _origin = context.CreateProperty(OriginName);
@@ -198,9 +172,9 @@ namespace Myre.Graphics.Geometry
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(this, TextureName, _texture);
+            initialisationData.TryCopyValue(this, FontName, _font);
             initialisationData.TryCopyValue(this, PositionName, _position);
-            initialisationData.TryCopyValue(this, SourceRectangleName, _sourceRectangle);
+            initialisationData.TryCopyValue(this, StringName, _string);
             initialisationData.TryCopyValue(this, ColorName, _color);
             initialisationData.TryCopyValue(this, RotationName, _rotation);
             initialisationData.TryCopyValue(this, OriginName, _origin);
@@ -208,25 +182,35 @@ namespace Myre.Graphics.Geometry
             initialisationData.TryCopyValue(this, SpriteEffectsName, _spriteEffects);
             initialisationData.TryCopyValue(this, LayerDepthName, _layerDepth);
             initialisationData.TryCopyValue(this, ModelInstance.IsInvisibleName, _isInvisible);
+
+            _font.PropertySet += (_, __, ___) => RecalculateBounds();
+            _string.PropertySet += (_, __, ___) => RecalculateBounds();
+            RecalculateBounds();
         }
 
-        protected virtual bool Prepare(View view)
+        private Vector2 _stringBounds;
+        private void RecalculateBounds()
+        {
+            _stringBounds = _font.Value.MeasureString(_string.Value);
+        }
+
+        private bool Prepare(View view)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool IsInView(View view)
         {
             return true;
         }
 
         private void Draw(SpriteBatch batch)
         {
-            batch.Draw(Texture, Position, SourceRectangle, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
-        }
-
-        private bool IsInView(View view)
-        {
-            return view.Viewport.Bounds.Intersects(MaximumBounds);
+            batch.DrawString(Font, String, Position, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
         }
 
         internal class Manager
-            : BehaviourManager<Sprite>
+            : BehaviourManager<SpriteText2D>
         {
             public void Draw(View view, SpriteBatch batch)
             {
@@ -239,40 +223,6 @@ namespace Myre.Graphics.Geometry
                         sprite.Draw(batch);
                 }
             }
-        }
-    }
-
-    public class SpriteComponent
-        : RendererComponent
-    {
-        private SpriteBatch _batch;
-
-        private Sprite.Manager _sprites;
-        private SpriteText2D.Manager _text;
-
-        public override void Initialise(Renderer renderer, ResourceContext context)
-        {
-            base.Initialise(renderer, context);
-
-            // define inputs
-            context.DefineInput(context.SetRenderTargets[0].Name);
-
-            //define outputs
-            context.DefineOutput(context.SetRenderTargets[0], true);
-
-            _batch = new SpriteBatch(renderer.Device);
-            _sprites = renderer.Scene.GetManager<Sprite.Manager>();
-            _text = renderer.Scene.GetManager<SpriteText2D.Manager>();
-        }
-
-        public override void Draw(Renderer renderer)
-        {
-            var viewport = renderer.Data.Get<View>("activeview");
-
-            _batch.Begin();
-            _sprites.Draw(viewport.Value, _batch);
-            _text.Draw(viewport.Value, _batch);
-            _batch.End();
         }
     }
 }
