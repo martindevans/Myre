@@ -93,7 +93,7 @@ namespace Myre.Entities.Behaviours
                     if (item.Owner != null && !item.Owner.IsDisposed)
                     {
                         unchecked { item._counter++; }  //Don't really care if this overflows
-                        if (item._counter % (item.Period + 1) == item.Period)
+                        if (item.Period == 0 || (item.Period != uint.MaxValue && item._counter % (item.Period + 1) == item.Period))
                             item.Update(elapsedTime);
                     }
                 }
