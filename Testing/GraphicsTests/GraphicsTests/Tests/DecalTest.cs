@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -25,6 +27,8 @@ namespace GraphicsTests.Tests
         Vector3 _cameraPosition;
         Vector3 _cameraRotation;
         private readonly Camera _camera;
+
+        private Random _random = new Random();
 
         public DecalTest(IKernel kernel, ContentManager content, GraphicsDevice device)
             : base("Decal Test", kernel)
@@ -133,6 +137,9 @@ namespace GraphicsTests.Tests
 
             MouseState mouse = Mouse.GetState();
             KeyboardState keyboard = Keyboard.GetState();
+
+            foreach (var decals in _scene.Entities.Select(a => a.GetBehaviour<Decal>(null)).Where(a => a != null))
+                decals.Color = new Vector4(time % 1, 1, 1, 1);
 
             Game.IsMouseVisible = false;
             if (mouse.IsButtonDown(MouseButtons.Right))

@@ -24,6 +24,7 @@ namespace Myre.Graphics.Deferred.Decals
         public static readonly TypedName<Texture2D> NormalName = new TypedName<Texture2D>("normal_texture");
         public static readonly TypedName<float> AngleCutoffName = new TypedName<float>("angle_cutoff");
         public static readonly TypedName<bool> TemporaryName = new TypedName<bool>("temporary");
+        public static readonly TypedName<Vector4> ColorName = new TypedName<Vector4>("color");
 
         private Vector3 _decalDirection;
 
@@ -81,6 +82,19 @@ namespace Myre.Graphics.Deferred.Decals
             }
         }
 
+        private Property<Vector4> _color;
+        public Vector4 Color
+        {
+            get
+            {
+                return _color.Value;
+            }
+            set
+            {
+                _color.Value = value;
+            }
+        }
+
         private bool _temporary = true;
         public bool Temporary
         {
@@ -98,6 +112,7 @@ namespace Myre.Graphics.Deferred.Decals
             _diffuse = context.CreateProperty(DiffuseName);
             _normal = context.CreateProperty(NormalName);
             _angleCutoff = context.CreateProperty(AngleCutoffName, MathHelper.Pi);
+            _color = context.CreateProperty(ColorName, Vector4.One);
 
             base.CreateProperties(context);
         }
@@ -112,6 +127,7 @@ namespace Myre.Graphics.Deferred.Decals
             if (!initialisationData.TryCopyValue(this, AngleCutoffName, _angleCutoff))
                 _angleCutoff.Value = MathHelper.Pi;
             initialisationData.TryCopyValue(this, TemporaryName, out _temporary);
+            initialisationData.TryCopyValue(this, ColorName, _color);
         }
 
         public class Manager
@@ -255,6 +271,7 @@ namespace Myre.Graphics.Deferred.Decals
                         material.Parameters["Normal"].SetValue(behaviour.Normal);
                     material.Parameters["DecalDirection"].SetValue(behaviour._decalDirection);
                     material.Parameters["DecalDirectionClip"].SetValue(MathHelper.Clamp(behaviour.AngleCutoff, 0, MathHelper.Pi));
+                    material.Parameters["DecalColor"].SetValue(behaviour.Color);
 
                     if (cameraIntersectsDecal)
                         renderer.Device.RasterizerState = RasterizerState.CullClockwise;

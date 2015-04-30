@@ -13,6 +13,8 @@ uniform float3 DecalDirection;
 uniform float DecalDirectionClip;
 uniform float AngleFadeWidth = 0.17;
 
+uniform float4 DecalColor;
+
 uniform texture Depth : GBUFFER_DEPTH;
 sampler depthSampler = sampler_state
 {
@@ -126,7 +128,7 @@ float2 CalculateDecalTexCoord(float3 worldPosition)
 
 float4 DiffuseValue(float2 decalTexCoord, float alpha)
 {
-	return tex2D(diffuseSampler, decalTexCoord) * float4(1, 1, 1, alpha);
+	return tex2D(diffuseSampler, decalTexCoord) * DecalColor * float4(1, 1, 1, alpha);
 }
 
 float4 NormalValue(float2 decalTexCoord, float3 pixelNormal, float3 pixelTangent, float3 pixelBinormal)
