@@ -61,6 +61,8 @@
     <Compile Include="Animations\MyreEmbeddedAnimationDefinition.cs" />
     <Compile Include="Animations\SkinningDataContent.cs" />
     <Compile Include="ByteImporter.cs" />
+    <Compile Include="Passthrough\PassthroughImporter.cs" />
+    <Compile Include="Passthrough\PassthroughProcessor.cs" />
     <Compile Include="XmlImporter.cs" />
     <Compile Include="Fonts\VertexFileFontProcessor.cs" />
     <Compile Include="Fonts\TtfFontImporter.cs" />
