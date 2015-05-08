@@ -12,7 +12,7 @@ namespace Myre.Graphics.Animation
 {
     [DefaultManager(typeof(Manager<AnimationQueue>))]
     public class AnimationQueue
-        : ProcessBehaviour
+        : ParallelProcessBehaviour
     {
         public static readonly TypedName<ClipPlaybackParameters> DefaultClipName = new TypedName<ClipPlaybackParameters>("animation_default_clip");
         public static readonly TypedName<Transform> RootTransformName = new TypedName<Transform>("animation_root_transform");
@@ -211,7 +211,7 @@ namespace Myre.Graphics.Animation
             _crossfadeElapsed = TimeSpan.Zero;
         }
 
-        protected override void Update(float elapsedTime)
+        protected override void ParallelUpdate(float elapsedTime)
         {
             //Chose which animations are playing
             Transform oldRootFadingOut;

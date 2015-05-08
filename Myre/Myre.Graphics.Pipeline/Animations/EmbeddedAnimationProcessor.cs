@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -33,7 +34,7 @@ namespace Myre.Graphics.Pipeline.Animations
 
             //The "Root" bone is not necessarily the actual root of the tree
             //Find which bones are before and after the notional "Root" bone
-            var root = _bones[_boneNames[input.RootBone]];
+            var root = _bones[Lookup(_boneNames, input.RootBone)];
             HashSet<string> descendents = new HashSet<string>(Descendents(root).Select(b => b.Name)); //Descendents of root obviously come after root (tautology)
             HashSet<string> ancestors = new HashSet<string>(_bones.Select(b => b.Name));              //Set of all bones, minus descendents and minus the root itself must be all ancestors of root
             ancestors.ExceptWith(descendents);
@@ -47,7 +48,9 @@ namespace Myre.Graphics.Pipeline.Animations
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
 
-            ClipContent animationClip = new ClipContent(_boneNames.Count, _boneNames[rootBone]);
+            ClipContent animationClip = new ClipContent(_boneNames.Count, Lookup(_boneNames, rootBone));
+            if (_boneNames.Count == 0)
+                throw new InvalidOperationException("Animation must have at least 1 bone channel");
 
             var startFrameTime = TimeSpan.FromSeconds(startTime);
             var endFrameTime = TimeSpan.FromSeconds(endTime);
@@ -55,7 +58,7 @@ namespace Myre.Graphics.Pipeline.Animations
             Parallel.ForEach(anim.Channels, channel =>
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
                 {
-                    ushort boneIndex = _boneNames[channel.Key];
+                    ushort boneIndex = Lookup(_boneNames, channel.Key);
                     animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction).ToList();
                 }
             );
@@ -206,6 +209,15 @@ namespace Myre.Graphics.Pipeline.Animations
                 throw new ArgumentException("Last frame comes after the end of the animation", "endFrameTime");
             else
                 animationKeyframes.AddLast(new KeyframeContent(animationKeyframes.Last.Value.Bone, endFrameTime, animationKeyframes.First.Value.Translation, animationKeyframes.First.Value.Scale, animationKeyframes.First.Value.Rotation));
+        }
+
+        private static ushort Lookup(IDictionary<string, ushort> dict, string key)
+        {
+            ushort value;
+            if (dict.TryGetValue(key, out value))
+                return value;
+
+            throw new KeyNotFoundException(string.Format("Failed to find bone \"{0}\", options are {1}", key, string.Join(",", dict.Keys)));
         }
     }
 }
