@@ -12,11 +12,13 @@ namespace Myre.Graphics.Pipeline.Animations
     public class ClipContent
     {
         public ushort RootBoneIndex { get; private set; }
+        public string[] BoneNames { get; private set; }
         public List<KeyframeContent>[] Channels { get; private set; }
 
-        public ClipContent(int boneCount, ushort rootBoneIndex)
+        public ClipContent(int boneCount, ushort rootBoneIndex, string[] boneNames)
         {
             RootBoneIndex = rootBoneIndex;
+            BoneNames = boneNames;
 
             Channels = new List<KeyframeContent>[boneCount];
         }
@@ -82,6 +84,11 @@ namespace Myre.Graphics.Pipeline.Animations
 
             //The root bone index
             output.Write(value.RootBoneIndex);
+
+            //Bone names (useful for debugging)
+            output.Write(value.BoneNames.Length);
+            foreach (string name in value.BoneNames)
+                output.Write(name);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

@@ -213,6 +213,11 @@
       <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
+    <Compile Include="gangnam.bvh">
+      <Name>gangnam</Name>
+      <Importer>BvhImporter</Importer>
+      <Processor>AnimationProcessor</Processor>
+    </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
       <Importer>EffectImporter</Importer>

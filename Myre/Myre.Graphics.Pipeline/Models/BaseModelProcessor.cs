@@ -81,6 +81,14 @@ namespace Myre.Graphics.Pipeline.Models
             set { _gbufferTechnique = value; }
         }
 
+        private string _restPose;
+        [DisplayName("Rest Pose")]
+        [DefaultValue(null)]
+        public string RestPose
+        {
+            get { return _restPose; }
+            set { _restPose = value; }
+        }
         #endregion
 
         protected ContentProcessorContext Context { get; private set; }
@@ -353,21 +361,23 @@ namespace Myre.Graphics.Pipeline.Models
         #endregion
 
         #region animation processing
-        protected static SkinningDataContent ProcessSkinningData(BoneContent skeleton, IList<BoneContent> bones, IEnumerable<List<Vector3>> verticesPerBone)
+        protected SkinningDataContent ProcessSkinningData(IList<BoneContent> bones, IEnumerable<List<Vector3>> verticesPerBone)
         {
-            if (skeleton == null)
+            if (bones.Count == 0)
                 return null;
 
-            List<Matrix> bindPose = new List<Matrix>();
-            List<Matrix> inverseBindPose = new List<Matrix>();
-            List<int> skeletonHierarchy = new List<int>();
-
-            foreach (BoneContent bone in bones)
+            //If a rest pose is defined modify the skeleton to match that rest pose instead
+            if (RestPose != null)
             {
-                bindPose.Add(bone.Transform);
-                inverseBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
-                skeletonHierarchy.Add(bones.IndexOf(bone.Parent as BoneContent));
+                var restPose = MeshHelper.FlattenSkeleton(MeshHelper.FindSkeleton(Context.BuildAndLoadAsset<NodeContent, NodeContent>(new ExternalReference<NodeContent>(RestPose), null)));
+                ModelHelpers.Retarget(restPose: restPose, skeleton: bones);
             }
+
+            //Read the skinning data from the model skeleton
+            List<Matrix> bindPose;
+            List<Matrix> inverseBindPose;
+            List<int> skeletonHierarchy;
+            ModelHelpers.ReadSkeletonSkinning(bones, out bindPose, out inverseBindPose, out skeletonHierarchy);
 
             return new SkinningDataContent(
                 bindPose,

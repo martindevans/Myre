@@ -12,7 +12,7 @@ namespace Myre.Graphics.Animation
 {
     [DefaultManager(typeof(Manager<AnimationQueue>))]
     public class AnimationQueue
-        : ParallelProcessBehaviour
+        : ProcessBehaviour// ParallelProcessBehaviour
     {
         public static readonly TypedName<ClipPlaybackParameters> DefaultClipName = new TypedName<ClipPlaybackParameters>("animation_default_clip");
         public static readonly TypedName<Transform> RootTransformName = new TypedName<Transform>("animation_root_transform");
@@ -179,10 +179,24 @@ namespace Myre.Graphics.Animation
         /// <param name="clearQueue">Whether to cancel the animation queue and add this to it</param>
         public void EnqueueClip(ClipPlaybackParameters parameters, bool clearQueue = false)
         {
+#if DEBUG
+            CheckSkeletonMatch(parameters.Clip as Clip);
+#endif
+
             if (clearQueue)
                 _animationQueue.Clear();
 
             _animationQueue.Enqueue(parameters);
+        }
+
+        private void CheckSkeletonMatch(Clip clip)
+        {
+            if (clip != null)
+            {
+                for (int i = 0; i < clip.BoneNames.Length; i++)
+                    if (clip.BoneNames[i] != _animation.SkinningData.Names[i])
+                        throw new InvalidOperationException("Skeletal Mismatch");
+            }
         }
 
         /// <summary>
@@ -198,6 +212,10 @@ namespace Myre.Graphics.Animation
             if (parameters.Clip == null)
                 parameters = DefaultClip;
 
+#if DEBUG
+            CheckSkeletonMatch(parameters.Clip as Clip);
+#endif
+
             parameters.Clip.Start();
 
             _fadingIn = PlayingClip.Create(parameters, _animation.BonesCount);
@@ -211,7 +229,8 @@ namespace Myre.Graphics.Animation
             _crossfadeElapsed = TimeSpan.Zero;
         }
 
-        protected override void ParallelUpdate(float elapsedTime)
+        //protected override void ParallelUpdate(float elapsedTime)
+        protected override void Update(float elapsedTime)
         {
             //Chose which animations are playing
             Transform oldRootFadingOut;
@@ -306,6 +325,8 @@ namespace Myre.Graphics.Animation
                     BuildRootBoneMatrix(ref transform, out _boneTransforms[boneIndex]);
                 else
                     transform.ToMatrix(out _boneTransforms[boneIndex]);
+
+                _boneTransforms[boneIndex] *= _animation.SkinningData.BindPose[boneIndex];
             }
         }
 

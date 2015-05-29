@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,6 +110,52 @@ namespace Myre.Graphics.Pipeline.Models
 
             foreach (NodeContent child in node.Children)
                 FlattenAllTransforms(child);
+        }
+
+        public static Matrix[] Retarget(IList<BoneContent> restPose, IList<BoneContent> skeleton)
+        {
+            //Read skinning data from the skeleton
+            List<Matrix> modelBindPose;
+            List<Matrix> modelInverseBindPose;
+            List<int> modelHierarchy;
+            ReadSkeletonSkinning(skeleton, out modelBindPose, out modelInverseBindPose, out modelHierarchy);
+
+            //Read skinning data from the rest pose
+            List<Matrix> restBindPose;
+            List<Matrix> restInverseBindPose;
+            List<int> restSkeletonHierarchy;
+            ReadSkeletonSkinning(restPose, out restBindPose, out restInverseBindPose, out restSkeletonHierarchy);
+
+            //Check that the rest pose is compatible with this model (hierarchy is exactly the same)
+            if (modelHierarchy.Count != restSkeletonHierarchy.Count)
+                throw new InvalidContentException("Rest pose has incompatible skeleton (different number of bones)");
+            if (modelHierarchy.Where((t, i) => t != restSkeletonHierarchy[i]).Any())
+                throw new InvalidContentException("Rest pose has incompatible skeleton (different bone hierarchy)");
+
+            Matrix[] retargetMatrices = new Matrix[skeleton.Count];
+
+            //Modify skeleton to use new bind pose
+            for (int i = 0; i < skeleton.Count; i++)
+            {
+                skeleton[i].Transform = Matrix.Invert(modelBindPose[i]) * restBindPose[i];
+                retargetMatrices[i] = Matrix.Invert(restBindPose[i]) * modelBindPose[i];
+            }
+
+            return retargetMatrices;
+        }
+
+        public static void ReadSkeletonSkinning(IList<BoneContent> bones, out List<Matrix> bindPose, out List<Matrix> inverseBindPose, out List<int> skeletonHierarchy)
+        {
+            bindPose = new List<Matrix>();
+            inverseBindPose = new List<Matrix>();
+            skeletonHierarchy = new List<int>();
+
+            foreach (BoneContent bone in bones)
+            {
+                bindPose.Add(bone.Transform);
+                inverseBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
+                skeletonHierarchy.Add(bones.IndexOf(bone.Parent as BoneContent));
+            }
         }
     }
 }

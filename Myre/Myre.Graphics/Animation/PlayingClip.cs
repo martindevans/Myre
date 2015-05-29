@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Myre.Collections;
 using Myre.Graphics.Animation.Clips;
 
@@ -61,6 +62,7 @@ namespace Myre.Graphics.Animation
 
                         var totalTime = ElapsedTime.TotalSeconds / (b.Time - a.Time).TotalSeconds;
 
+                        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
                         _transforms[i] = a.Transform.Interpolate(b.Transform, (float) totalTime);
                     }
                 }

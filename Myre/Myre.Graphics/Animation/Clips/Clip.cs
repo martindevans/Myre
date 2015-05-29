@@ -19,13 +19,16 @@ namespace Myre.Graphics.Animation.Clips
 
         public ushort RootBoneIndex { get; private set; }
 
+        internal string[] BoneNames { get; private set; }
+
         public void Start()
         {
         }
 
-        internal Clip(string name, TimeSpan duration, IEnumerable<Keyframe[]> channels, ushort rootBoneIndex)
+        internal Clip(string name, TimeSpan duration, IEnumerable<Keyframe[]> channels, ushort rootBoneIndex, string[] boneNames)
         {
             Name = name;
+            BoneNames = boneNames;
             _channels = channels.Select((a, i) => new Channel((ushort)i, a)).ToArray();
             Duration = duration;
             RootBoneIndex = rootBoneIndex;
@@ -60,7 +63,7 @@ namespace Myre.Graphics.Animation.Clips
             var index = startIndex;
 
             //Iterate up frames until we find the frame which is greater than the current time index for this channel
-            while (_frames[index].Time <= elapsedTime && index < _frames.Length)
+            while (_frames[index].Time <= elapsedTime && (index + 1) < _frames.Length)
                 index++;
 
             return index;
@@ -75,8 +78,18 @@ namespace Myre.Graphics.Animation.Clips
                 input.AssetName,
                 new TimeSpan(input.ReadInt64()),
                 ReadChannels(input),
-                input.ReadUInt16()
+                input.ReadUInt16(),
+                ReadBoneNames(input)
             );
+        }
+
+        private string[] ReadBoneNames(ContentReader input)
+        {
+            var length = input.ReadInt32();
+            string[] result = new string[length];
+            for (int i = 0; i < length; i++)
+                result[i] = input.ReadString();
+            return result;
         }
 
         private static IEnumerable<Keyframe[]> ReadChannels(ContentReader input)

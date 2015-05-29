@@ -57,7 +57,7 @@ namespace Myre.Graphics.Pipeline.Models
                     outputModel.AddMesh(geom);
 
             //Extract skeleton data from the input
-            outputModel.SkinningData = ProcessSkinningData(skeleton, _bones, _verticesPerBone);
+            outputModel.SkinningData = ProcessSkinningData(_bones, _verticesPerBone);
 
             return outputModel;
         }
