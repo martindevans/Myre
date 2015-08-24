@@ -121,22 +121,22 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Myre.Entities\%28x86%29 Myre.Entities.csproj">
-      <Project>{5CDABE8C-7C9C-4163-8C85-FEA731088239}</Project>
-      <Name>%28x86%29 Myre.Entities</Name>
+    <ProjectReference Include="..\..\Myre.Entities\Myre.Entities.csproj">
+      <Project>{f287de39-958b-4483-8823-2faa8b26ffe7}</Project>
+      <Name>Myre.Entities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Myre.Graphics.Content\Myre.Graphics.Content.contentproj">
       <Project>{EC58850F-3960-426A-BE7D-7DFB67CB00A8}</Project>
       <Name>Myre.Graphics.Content</Name>
       <XnaReferenceType>Content</XnaReferenceType>
     </ProjectReference>
-    <ProjectReference Include="..\..\Myre.Graphics\%28x86%29 Myre.Graphics.csproj">
-      <Project>{fc3d8e34-3333-42fb-9b47-3a273b1b50d8}</Project>
-      <Name>%28x86%29 Myre.Graphics</Name>
+    <ProjectReference Include="..\..\Myre.Graphics\Myre.Graphics.csproj">
+      <Project>{89d13fe0-8194-4535-b77d-083da938a1af}</Project>
+      <Name>Myre.Graphics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Myre\%28x86%29 Myre.csproj">
-      <Project>{FDB5A9D8-9266-4F7B-BDE7-D4E720F5B45F}</Project>
-      <Name>%28x86%29 Myre</Name>
+    <ProjectReference Include="..\..\Myre\Myre.csproj">
+      <Project>{150b5101-1046-43e9-9fd0-a2ddd33c352f}</Project>
+      <Name>Myre</Name>
     </ProjectReference>
     <ProjectReference Include="..\ContentBuilderGameContent\ContentBuilderGameContent.contentproj">
       <Name>ContentBuilderGameContent</Name>

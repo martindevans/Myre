@@ -19,7 +19,7 @@ namespace Myre.UI.Gestures
             this.BlockedInputs.Add((int)key);
         }
 
-        public override bool Test(KeyboardDevice device)
+        protected override bool Test(KeyboardDevice device)
         {
             return device.IsKeyDown(Key);
         }

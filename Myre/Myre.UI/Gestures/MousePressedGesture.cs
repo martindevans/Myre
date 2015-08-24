@@ -18,7 +18,7 @@ namespace Myre.UI.Gestures
             base.BlockedInputs.Add((int)Button);
         }
 
-        public override bool Test(MouseDevice device)
+        protected override bool Test(MouseDevice device)
         {
             return device.IsButtonNewlyDown(Button);
         }

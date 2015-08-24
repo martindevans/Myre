@@ -1,0 +1,211 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{89D13FE0-8194-4535-B77D-083DA938A1AF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Myre.Graphics</RootNamespace>
+    <AssemblyName>Myre.Graphics</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animation\Animated.cs" />
+    <Compile Include="Animation\AnimationHelpers.cs" />
+    <Compile Include="Animation\AnimationQueue.cs" />
+    <Compile Include="Animation\Clips\Clip.cs" />
+    <Compile Include="Animation\Clips\IClip.cs" />
+    <Compile Include="Animation\Clips\RandomClip.cs" />
+    <Compile Include="Animation\Clips\SequenceClip.cs" />
+    <Compile Include="Animation\Keyframe.cs" />
+    <Compile Include="Animation\PlayingClip.cs" />
+    <Compile Include="Animation\SkinningData.cs" />
+    <Compile Include="Animation\Transform.cs" />
+    <Compile Include="Camera.cs" />
+    <Compile Include="Content.cs" />
+    <Compile Include="ContentPipeline\BlendStateReader.cs" />
+    <Compile Include="CreateTargetComponent.cs" />
+    <Compile Include="Deferred\AntiAliasComponent.cs" />
+    <Compile Include="Deferred\Decals\Decal.cs" />
+    <Compile Include="Deferred\Decals\DecalComponent.cs" />
+    <Compile Include="Deferred\Decals\DecalMixComponent.cs" />
+    <Compile Include="Deferred\EdgeDetectComponent.cs" />
+    <Compile Include="Deferred\GammaCorrectionPhase.cs" />
+    <Compile Include="Deferred\GeometryBufferComponent.cs" />
+    <Compile Include="Deferred\ILightProvider.cs" />
+    <Compile Include="Deferred\LightingComponent.cs" />
+    <Compile Include="Deferred\LightManagers\DeferredAmbientLightManager.cs" />
+    <Compile Include="Deferred\LightManagers\DeferredPointLightManager.cs" />
+    <Compile Include="Deferred\LightManagers\DeferredSkyboxManager.cs" />
+    <Compile Include="Deferred\LightManagers\DeferredSpotLightManager.cs" />
+    <Compile Include="Deferred\LightManagers\DeferredSunLightManager.cs" />
+    <Compile Include="Deferred\RestoreDepthPhase.cs" />
+    <Compile Include="Deferred\Ssao.cs" />
+    <Compile Include="Deferred\ToneMapComponent.cs" />
+    <Compile Include="Extensions\MatrixExtensions.cs" />
+    <Compile Include="Extensions\RenderTarget2DExtensions.cs" />
+    <Compile Include="Geometry\BoundingVolume.cs" />
+    <Compile Include="Geometry\ICullable.cs" />
+    <Compile Include="Geometry\IGeometryProvider.cs" />
+    <Compile Include="Geometry\Mesh.cs" />
+    <Compile Include="Geometry\MeshPart.cs" />
+    <Compile Include="Geometry\ModelData.cs" />
+    <Compile Include="Geometry\ModelInstance.cs" />
+    <Compile Include="Geometry\OrientedBoundingBox.cs" />
+    <Compile Include="Geometry\Sprite.cs" />
+    <Compile Include="Geometry\Text\SpriteText2D.cs" />
+    <Compile Include="Geometry\Text\StringModelData.cs" />
+    <Compile Include="Geometry\Text\VertexCharacter.cs" />
+    <Compile Include="Geometry\Text\VertexFont.cs" />
+    <Compile Include="Geometry\VertexPosition.cs" />
+    <Compile Include="Geometry\VertexPositionTextureNormalBinormalTangent.cs" />
+    <Compile Include="IRenderable.cs" />
+    <Compile Include="Lighting\AmbientLight.cs" />
+    <Compile Include="Lighting\PointLight.cs" />
+    <Compile Include="Lighting\Skybox.cs" />
+    <Compile Include="Lighting\SpotLight.cs" />
+    <Compile Include="Lighting\SunLight.cs" />
+    <Compile Include="Materials\Material.cs" />
+    <Compile Include="Materials\MaterialParameter.cs" />
+    <Compile Include="Materials\MaterialReader.cs" />
+    <Compile Include="PlanView.cs" />
+    <Compile Include="PostProcessing\BasePostProcessComponent.cs" />
+    <Compile Include="PostProcessing\Gaussian.cs" />
+    <Compile Include="PostProcessing\Scale.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quad.cs" />
+    <Compile Include="Renderer.cs" />
+    <Compile Include="RendererComponent.cs" />
+    <Compile Include="RendererMetadata.cs" />
+    <Compile Include="RendererSettings.cs" />
+    <Compile Include="RenderPlan.cs" />
+    <Compile Include="RenderTargetManager.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\BaseParticleInitialiser.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Colour\RandomEndColour.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Colour\RandomStartColour.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Lifetime\RandomLifetime.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Position\Ellipsoid.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Position\InterpolatedEntityPosition.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Size\RandomSize.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Velocity\EntityVelocity.cs" />
+    <Compile Include="Translucency\Particles\Initialisers\Velocity\RandomVelocity.cs" />
+    <Compile Include="Translucency\Particles\ParticleEmitter.cs" />
+    <Compile Include="Translucency\Particles\ParticleEmitterDescription.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystem.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystemDescription.cs" />
+    <Compile Include="Translucency\Particles\ParticleSystemService.cs" />
+    <Compile Include="Translucency\Particles\ParticleVertex.cs" />
+    <Compile Include="Translucency\Particles\Triggers\Burst.cs" />
+    <Compile Include="Translucency\Particles\Triggers\Continuous.cs" />
+    <Compile Include="Translucency\Particles\Triggers\ITrigger.cs" />
+    <Compile Include="Translucency\TranslucentComponent.cs" />
+    <Compile Include="View.cs" />
+    <Compile Include="x86Resources.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="x86Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Resources\AmbientLight.xnb" />
+    <None Include="Resources\Bloom.xnb" />
+    <None Include="Resources\BlurSSAO.xnb" />
+    <None Include="Resources\CalculateLuminance.xnb" />
+    <None Include="Resources\ClearGBuffer.xnb" />
+    <None Include="Resources\CopyTexture.xnb" />
+    <None Include="Resources\Decal.xnb" />
+    <None Include="Resources\DecalBufferMix.xnb" />
+    <None Include="Resources\DirectionalLight.xnb" />
+    <None Include="Resources\Downsample.xnb" />
+    <None Include="Resources\EdgeBlur.xnb" />
+    <None Include="Resources\EdgeDetect.xnb" />
+    <None Include="Resources\FXAA.xnb" />
+    <None Include="Resources\Gamma.xnb" />
+    <None Include="Resources\Gaussian.xnb" />
+    <None Include="Resources\MarkGeometry.xnb" />
+    <None Include="Resources\Nothing.xnb" />
+    <None Include="Resources\ParticleSystem.xnb" />
+    <None Include="Resources\PointLight.xnb" />
+    <None Include="Resources\randomnormals.xnb" />
+    <None Include="Resources\RestoreDepth.xnb" />
+    <None Include="Resources\Skybox.xnb" />
+    <None Include="Resources\SkyboxModel.xnb" />
+    <None Include="Resources\sphere.xnb" />
+    <None Include="Resources\SpotLight.xnb" />
+    <None Include="Resources\SSAO.xnb" />
+    <None Include="Resources\ToneMap.xnb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Myre.Debugging\Myre.Debugging.csproj">
+      <Project>{830b5721-1e84-4f33-beac-4b4d12e795e1}</Project>
+      <Name>Myre.Debugging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Myre.Entities\Myre.Entities.csproj">
+      <Project>{f287de39-958b-4483-8823-2faa8b26ffe7}</Project>
+      <Name>Myre.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Myre\Myre.csproj">
+      <Project>{150b5101-1046-43e9-9fd0-a2ddd33c352f}</Project>
+      <Name>Myre</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

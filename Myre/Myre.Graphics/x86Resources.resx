@@ -119,64 +119,64 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Bloom" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\Bloom.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\Bloom.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="BlurSSAO" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\BlurSSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\BlurSSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="CalculateLuminance" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\CalculateLuminance.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\CalculateLuminance.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ClearGBuffer" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\ClearGBuffer.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\ClearGBuffer.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="CopyTexture" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\CopyTexture.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\CopyTexture.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Downsample" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\Downsample.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\Downsample.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="EdgeBlur" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\EdgeBlur.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\EdgeBlur.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="EdgeDetect" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\EdgeDetect.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\EdgeDetect.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Gamma" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\Gamma.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\Gamma.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Gaussian" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\Gaussian.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\Gaussian.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="MarkGeometry" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\MarkGeometry.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\MarkGeometry.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Nothing" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\Nothing.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\Nothing.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="PointLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\PointLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\PointLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="randomnormals" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\randomnormals.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\randomnormals.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="RestoreDepth" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\RestoreDepth.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\RestoreDepth.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Skybox" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\Skybox.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\Skybox.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="SkyboxModel" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\SkyboxModel.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\SkyboxModel.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="sphere" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\sphere.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\sphere.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="SSAO" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\SSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\SSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="ToneMap" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>bin\x86\Debug\Myre.Graphics.Content\ToneMap.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>Resources\ToneMap.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="AmbientLight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AmbientLight.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

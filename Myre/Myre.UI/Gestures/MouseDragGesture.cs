@@ -21,7 +21,7 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add((int)Button);
         }
 
-        public override bool Test(MouseDevice device)
+        protected override bool Test(MouseDevice device)
         {
             return device.IsButtonDown(Button) && device.PositionMovement != Vector2.Zero;
         }

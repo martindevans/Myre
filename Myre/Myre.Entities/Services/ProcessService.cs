@@ -27,7 +27,6 @@ namespace Myre.Entities.Services
         private readonly List<IProcess> _processes;
         private readonly List<IProcess> _buffer;
 
-#if WINDOWS
         readonly Stopwatch _timer = new Stopwatch();
         private readonly List<KeyValuePair<IProcess, TimeSpan>> _executionTimes;
         private readonly ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>> _readonlyExecutionTimes;
@@ -39,7 +38,6 @@ namespace Myre.Entities.Services
         {
             get { return _readonlyExecutionTimes; }
         }
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessService"/> class.
@@ -65,9 +63,7 @@ namespace Myre.Entities.Services
                 _buffer.Clear();
             }
 
-#if WINDOWS
             _executionTimes.Clear();
-#endif
 
             for (int i = _processes.Count - 1; i >= 0; i--)
             {
@@ -79,14 +75,12 @@ namespace Myre.Entities.Services
                     continue;
                 }
 
-#if WINDOWS
                 _timer.Restart();
-#endif
+
                 process.Update(elapsedTime);
-#if WINDOWS
+
                 _timer.Stop();
                 _executionTimes.Add(new KeyValuePair<IProcess, TimeSpan>(process, _timer.Elapsed));
-#endif
             }
         }
 

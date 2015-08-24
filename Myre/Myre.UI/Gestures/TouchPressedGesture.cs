@@ -20,7 +20,7 @@ namespace Myre.UI.Gestures
             base.BlockedInputs.Add(0);
         }
 
-        public override bool Test(TouchDevice device)
+        protected override bool Test(TouchDevice device)
         {
             return device.Current.State == State;
         }

@@ -20,7 +20,7 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add((int)Thumbstick + 25);//Enum.GetValues(typeof(Buttons)).Length);
         }
 
-        public override bool Test(GamepadDevice device)
+        protected override bool Test(GamepadDevice device)
         {
             if (Thumbstick == Side.Left)
                 return device.LeftThumbstickMovement != Vector2.Zero;

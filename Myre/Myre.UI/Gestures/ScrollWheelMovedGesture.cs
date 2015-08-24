@@ -16,7 +16,7 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add(1 + 5/*Enum.(typeof(MouseButtons)).Length*/);
         }
 
-        public override bool Test(MouseDevice device)
+        protected override bool Test(MouseDevice device)
         {
             return device.WheelMovement != 0;
         }

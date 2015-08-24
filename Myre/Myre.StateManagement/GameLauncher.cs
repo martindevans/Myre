@@ -16,11 +16,7 @@ namespace Myre.StateManagement
             Run(() => new GameWrapper(instance));
         }
 
-        public static void Run(Func<ILaunchable> createGame
-#if WINDOWS
-            , params Action<Exception>[] exceptionHandlers
-#endif
-            )
+        public static void Run(Func<ILaunchable> createGame, params Action<Exception>[] exceptionHandlers)
         {
             if (Debugger.IsAttached)
             {
@@ -42,15 +38,10 @@ namespace Myre.StateManagement
                 }
                 catch (Exception e)
                 {
-#if !WINDOWS
-                    using (var g = new ExceptionGame(e))
-                        g.Run();
-#else
                     foreach (Action<Exception> t in exceptionHandlers)
                     {
                         t(e);
                     }
-#endif
                 }
             }
         }

@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{56FA6D49-E949-4A90-A5EA-ED48805CBA92}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Myre.UI</RootNamespace>
+    <AssemblyName>Myre.UI</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Input.Touch, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Anchor.cs" />
+    <Compile Include="Clipboard.cs" />
+    <Compile Include="Control.cs" />
+    <Compile Include="ControlArea.cs" />
+    <Compile Include="ControlStrata.cs" />
+    <Compile Include="Controls\Button.cs" />
+    <Compile Include="Controls\ImageBox.cs" />
+    <Compile Include="Controls\Label.cs" />
+    <Compile Include="Controls\Menu.cs" />
+    <Compile Include="Controls\MultiButton.cs" />
+    <Compile Include="Controls\SimpleLabel.cs" />
+    <Compile Include="Controls\TextBox.cs" />
+    <Compile Include="Controls\TextButton.cs" />
+    <Compile Include="Controls\TextLog.cs" />
+    <Compile Include="Controls\TextMultiButton.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FocusChain.cs" />
+    <Compile Include="Frame.cs" />
+    <Compile Include="Gestures\ButtonPressed.cs" />
+    <Compile Include="Gestures\ButtonReleased.cs" />
+    <Compile Include="Gestures\CharacterEntered.cs" />
+    <Compile Include="Gestures\GestureGroup.cs" />
+    <Compile Include="Gestures\IGesture.cs" />
+    <Compile Include="Gestures\KeyCombinationPressed.cs" />
+    <Compile Include="Gestures\KeyCombinationReleased.cs" />
+    <Compile Include="Gestures\KeyDown.cs" />
+    <Compile Include="Gestures\KeyPressed.cs" />
+    <Compile Include="Gestures\KeyPressedGesture.cs" />
+    <Compile Include="Gestures\KeyReleased.cs" />
+    <Compile Include="Gestures\KeyReleasedGesture.cs" />
+    <Compile Include="Gestures\MouseDrag.cs" />
+    <Compile Include="Gestures\MouseDragGesture.cs" />
+    <Compile Include="Gestures\MouseMove.cs" />
+    <Compile Include="Gestures\MouseMoveGesture.cs" />
+    <Compile Include="Gestures\MousePressed.cs" />
+    <Compile Include="Gestures\MousePressedGesture.cs" />
+    <Compile Include="Gestures\MouseReleased.cs" />
+    <Compile Include="Gestures\MouseReleasedGesture.cs" />
+    <Compile Include="Gestures\ScrollWheelMoved.cs" />
+    <Compile Include="Gestures\ScrollWheelMovedGesture.cs" />
+    <Compile Include="Gestures\ThumbstickMoved.cs" />
+    <Compile Include="Gestures\ThumbstickMovedGesture.cs" />
+    <Compile Include="Gestures\TouchChangedState.cs" />
+    <Compile Include="Gestures\TouchPressedGesture.cs" />
+    <Compile Include="Gestures\TriggerMoved.cs" />
+    <Compile Include="Gestures\TriggerMovedGesture.cs" />
+    <Compile Include="InputActor.cs" />
+    <Compile Include="InputActorCollection.cs" />
+    <Compile Include="InputDevices\GamepadDevice.cs" />
+    <Compile Include="InputDevices\IInputDevice.cs" />
+    <Compile Include="InputDevices\KeyboardDevice.cs" />
+    <Compile Include="InputDevices\MouseButtons.cs" />
+    <Compile Include="InputDevices\MouseDevice.cs" />
+    <Compile Include="InputDevices\TouchDevice.cs" />
+    <Compile Include="InputDevices\WindowEventCapture.cs" />
+    <Compile Include="Int2D.cs" />
+    <Compile Include="Points.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Text\ColourParser.cs" />
+    <Compile Include="Text\ContentParser.cs" />
+    <Compile Include="Text\Justification.cs" />
+    <Compile Include="Text\StringPart.cs" />
+    <Compile Include="Text\TextFormatter.cs" />
+    <Compile Include="UserInterface.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Myre\Myre.csproj">
+      <Project>{150b5101-1046-43e9-9fd0-a2ddd33c352f}</Project>
+      <Name>Myre</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

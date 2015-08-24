@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E7DDF0E7-C694-48C2-B9E9-F84ED39EFD49}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GraphicsTests</RootNamespace>
+    <AssemblyName>GraphicsTests</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>GraphicsTests.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CameraScript.cs" />
+    <Compile Include="Fire.cs" />
+    <Compile Include="MainMenu.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestGame.cs" />
+    <Compile Include="TestScene.cs" />
+    <Compile Include="TestScreen.cs" />
+    <Compile Include="Tests\AnimatedDude.cs" />
+    <Compile Include="Tests\AntiAliasTest.cs" />
+    <Compile Include="Tests\DecalTest.cs" />
+    <Compile Include="Tests\Demo.cs" />
+    <Compile Include="Tests\EdgeDetectTest.cs" />
+    <Compile Include="Tests\GBufferTest.cs" />
+    <Compile Include="Tests\GBufferTest2.cs" />
+    <Compile Include="Tests\LightingTest.cs" />
+    <Compile Include="Tests\LuminanceTest.cs" />
+    <Compile Include="Tests\MaterialContentTest.cs" />
+    <Compile Include="Tests\MaterialParametersTest.cs" />
+    <Compile Include="Tests\ParticlesTest.cs" />
+    <Compile Include="Tests\RenderPhaseDependancyTest.cs" />
+    <Compile Include="Tests\RenderPhaseTest.cs" />
+    <Compile Include="Tests\SpriteTest.cs" />
+    <Compile Include="Tests\SsaoTest.cs" />
+    <Compile Include="Tests\TextTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Myre\Myre.Debugging.UI\Myre.Debugging.UI.csproj">
+      <Project>{68eb6894-b0ff-4ef9-86c4-b68a4b2f36ee}</Project>
+      <Name>Myre.Debugging.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\Myre.Debugging\Myre.Debugging.csproj">
+      <Project>{830b5721-1e84-4f33-beac-4b4d12e795e1}</Project>
+      <Name>Myre.Debugging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\Myre.Entities\Myre.Entities.csproj">
+      <Project>{f287de39-958b-4483-8823-2faa8b26ffe7}</Project>
+      <Name>Myre.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\Myre.Graphics\Myre.Graphics.csproj">
+      <Project>{89d13fe0-8194-4535-b77d-083da938a1af}</Project>
+      <Name>Myre.Graphics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\Myre.StateManagement\Myre.StateManagement.csproj">
+      <Project>{d5f5e582-23db-4a14-bab7-33faf6c45f8d}</Project>
+      <Name>Myre.StateManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\Myre.UI\Myre.UI.csproj">
+      <Project>{56fa6d49-e949-4a90-a5ea-ed48805cba92}</Project>
+      <Name>Myre.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Myre\Myre\Myre.csproj">
+      <Project>{150b5101-1046-43e9-9fd0-a2ddd33c352f}</Project>
+      <Name>Myre</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GraphicsTests.ContentShim\GraphicsTests.ContentShim.csproj">
+      <Project>{c8669b57-6a20-43f9-850c-b30f091c7f42}</Project>
+      <Name>GraphicsTests.ContentShim</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

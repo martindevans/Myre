@@ -34,10 +34,10 @@
 /Testing/Myre.Serialisation.Tests/obj
 /Testing/DebugContentPipeline/bin
 /Testing/DebugContentPipeline/obj
-/Testing/GraphicsTests/GraphicsTests/obj
-/Testing/GraphicsTests/GraphicsTests/bin
-/Testing/GraphicsTests/GraphicsTestsContent/obj
-/Testing/GraphicsTests/GraphicsTestsContent/bin
+/Testing/GraphicsTests/obj
+/Testing/GraphicsTests/bin
+/Testing/GraphicsTestsContent/obj
+/Testing/GraphicsTestsContent/bin
 /Testing/Myre.Entities.Tests/bin
 /Testing/Myre.Entities.Tests/obj
 /Testing/TestResults

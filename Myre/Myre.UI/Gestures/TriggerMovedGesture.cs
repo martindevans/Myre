@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
+﻿using Myre.UI.InputDevices;
+using System;
 
 namespace Myre.UI.Gestures
 {
@@ -19,12 +15,13 @@ namespace Myre.UI.Gestures
             BlockedInputs.Add((int)Trigger + 25); //Enum.GetValues(typeof(Buttons)).Length);
         }
 
-        public override bool Test(GamepadDevice device)
+        protected override bool Test(GamepadDevice device)
         {
+            const float EPSILON = 0.01f;
             if (Trigger == Side.Left)
-                return device.LeftTriggerMovement != 0;
+                return Math.Abs(device.LeftTriggerMovement) > EPSILON;
             else
-                return device.RightTriggerMovement != 0;
+                return Math.Abs(device.RightTriggerMovement) > EPSILON;
         }
     }
 }

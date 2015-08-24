@@ -1,27 +1,26 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Myre.UI")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Myre.UI")]
-[assembly: AssemblyDescription("A basic framework for in game UIs")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type. Only Windows
-// assemblies support COM.
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// On Windows, the following GUID is for the ID of the typelib if this
-// project is exposed to COM. On other platforms, it unique identifies the
-// title storage container when deploying this assembly to the device.
-[assembly: Guid("480039a4-0e2d-45dc-af73-0b05a3ebb4e4")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("3e7d72b4-ba42-4340-ae84-b9045bab5d37")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -30,4 +29,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.1.2")]
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("2.0.0")]

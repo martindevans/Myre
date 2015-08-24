@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
-using Myre.Collections;
+﻿using System.Collections.ObjectModel;
+using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
 

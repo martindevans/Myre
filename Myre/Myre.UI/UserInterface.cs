@@ -142,12 +142,7 @@ namespace Myre.UI
 
         public void Update(GameTime gameTime)
         {
-            if (EnableInput && Visible
-#if WINDOWS
-                )
-#else
-                && !Guide.IsVisible)
-#endif
+            if (EnableInput && Visible)
             {
                 foreach (var actor in _actors)
                     actor.Evaluate(gameTime, this);
