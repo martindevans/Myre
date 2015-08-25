@@ -33,6 +33,18 @@ namespace Myre
             XnaBox = box;
         }
 
+        public static BoundingBox CreateMerged(BoundingBox a, BoundingBox b)
+        {
+            return new BoundingBox(Microsoft.Xna.Framework.BoundingBox.CreateMerged(a.XnaBox, b.XnaBox));
+        }
+
+        public static void CreateMerged(ref BoundingBox a, ref BoundingBox b, out BoundingBox result)
+        {
+            result = new BoundingBox(Microsoft.Xna.Framework.BoundingBox.CreateMerged(a.XnaBox, b.XnaBox));
+        }
+
+
+        #region containment
         [Pure]
         public ContainmentType Contains(Vector3 point)
         {
@@ -41,6 +53,26 @@ namespace Myre
             return XnaBox.Contains(point.ToXNA());
         }
 
+        public ContainmentType Contains(BoundingSphere boundingSphere)
+        {
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+            return XnaBox.Contains(boundingSphere.XnaSphere);
+        }
+
+        public ContainmentType Contains(BoundingBox boundingBox)
+        {
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+            return XnaBox.Contains(boundingBox.XnaBox);
+        }
+
+        public ContainmentType Contains(BoundingFrustum boundingFrustum)
+        {
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+            return XnaBox.Contains(boundingFrustum.XnaFrustum);
+        }
+        #endregion
+
+        #region intersection
         [Pure]
         public bool Intersects(BoundingBox bounds)
         {
@@ -57,9 +89,15 @@ namespace Myre
             return XnaBox.Intersects(bounds.XnaSphere);
         }
 
+        public float? Intersects(Ray ray)
+        {
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+            return XnaBox.Intersects(ray.XnaRay);
+        }
+        #endregion
+
         private static SpinLock _cornersLock = new SpinLock();
         private static readonly Microsoft.Xna.Framework.Vector3[] _xnaCorners = new Microsoft.Xna.Framework.Vector3[8];
-
         public void GetCorners(Vector3[] corners)
         {
             bool lockTaken = false;
@@ -111,18 +149,6 @@ namespace Myre
         {
             var b = Microsoft.Xna.Framework.BoundingBox.CreateFromPoints(points.Select(a => a.ToXNA()));
             return new BoundingBox(b);
-        }
-
-        public float? Intersects(Ray ray)
-        {
-            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-            return XnaBox.Intersects(ray.XnaRay);
-        }
-
-        public ContainmentType Contains(BoundingSphere boundingSphere)
-        {
-            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-            return XnaBox.Contains(boundingSphere.XnaSphere);
         }
     }
 }
