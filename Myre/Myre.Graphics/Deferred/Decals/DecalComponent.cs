@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred.Decals
 {

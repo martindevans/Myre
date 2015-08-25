@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
 {
@@ -25,7 +26,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
         {
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new RandomStartColour(MinStartColour, MaxStartColour);
         }

@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
@@ -159,7 +159,7 @@ namespace Myre.Graphics.Geometry.Text
                 cache2.Add(m);
 
                 //Move mesh into position
-                m.MeshTransform = Matrix.CreateScale(1, _thickness.Value, 1) * Matrix.CreateTranslation(pen, 0, 0);
+                m.MeshTransform = Matrix4x4.CreateScale(1, _thickness.Value, 1) * Matrix4x4.CreateTranslation(pen, 0, 0);
                 _model.Value.Add(m);
 
                 //Update pen position
@@ -181,7 +181,7 @@ namespace Myre.Graphics.Geometry.Text
             CleanCache(_characterCache, false);
 
             //Move characters back by half string length to center the string
-            Matrix offset = Matrix.CreateTranslation(-pen / 2, 0, -height / 2);
+            Matrix4x4 offset = Matrix4x4.CreateTranslation(-pen / 2, 0, -height / 2);
             foreach (var mesh in _model.Value.Meshes)
                 mesh.MeshTransform *= offset;
         }

@@ -1,5 +1,5 @@
 using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Myre.Extensions;
 
@@ -37,7 +37,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             return Vector3.Lerp(min, max, (float)random.NextDouble());
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new Ellipsoid(Shape, MinEmitDistance);
         }
@@ -47,7 +47,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
     {
         protected override Ellipsoid Read(ContentReader input, Ellipsoid existingInstance)
         {
-            return new Ellipsoid(input.ReadVector3(), input.ReadSingle());
+            return new Ellipsoid(input.ReadVector3().FromXNA(), input.ReadSingle());
         }
     }
 }

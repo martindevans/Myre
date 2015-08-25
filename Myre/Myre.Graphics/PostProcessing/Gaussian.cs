@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 
 namespace Myre.Graphics.PostProcessing
 {

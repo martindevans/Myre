@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre;
-using Myre.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using Myre.Graphics.Translucency;
-using Ninject;
-using Myre.Entities;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework;
-using Myre.Graphics.Geometry;
-using System.IO;
-using Myre.Graphics.Lighting;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Myre.UI.Gestures;
+using Myre;
+using Myre.Entities;
+using Myre.Graphics;
 using Myre.Graphics.Deferred;
+using Myre.Graphics.Translucency;
+using Myre.UI.Gestures;
+using Ninject;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GraphicsTests.Tests
 {
@@ -25,16 +22,14 @@ namespace GraphicsTests.Tests
         class Phase
             : RendererComponent
         {
-            private SpriteBatch batch;
-            private bool drawScene = true;
-            private ToneMapComponent toneMap;
+            private readonly SpriteBatch _batch;
+            private bool _drawScene = true;
 
             public Phase(LuminanceTest test, GraphicsDevice device, ToneMapComponent toneMap)
             {
-                batch = new SpriteBatch(device);
-                this.toneMap = toneMap;
+                _batch = new SpriteBatch(device);
 
-                test.UI.Root.Gestures.Bind((g, t, d) => { drawScene = !drawScene; }, new KeyPressed(Keys.Space));
+                test.UI.Root.Gestures.Bind((g, t, d) => { _drawScene = !_drawScene; }, new KeyPressed(Keys.Space));
             }
 
             //protected override void SpecifyResources(IList<Input> inputs, IList<RendererComponent.Resource> outputs, out RenderTargetInfo? outputTarget)
@@ -79,35 +74,34 @@ namespace GraphicsTests.Tests
                 var width = (int)resolution.X;
                 var height = (int)resolution.Y;
 
-                batch.GraphicsDevice.Clear(Color.Black);
-                batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _batch.GraphicsDevice.Clear(Color.Black);
+                _batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
 
-                if (drawScene)
+                if (_drawScene)
                 {
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-                    batch.Draw(light, new Rectangle(0, 0, width, height), Color.White);
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+                    _batch.Draw(light, new Rectangle(0, 0, width, height), Color.White);
                     //batch.Draw(luminance, new Rectangle(50, height - (height / 5) - 50, height / 5, height / 5), Color.White);
                     //batch.Draw(toneMap.AdaptedLuminance, new Rectangle(50 + 20 + (height / 5), height - (height / 5) - 50, height / 5, height / 5), Color.White);
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
                 }
                 else
                 {
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-                    batch.Draw(luminance, new Rectangle(0, 0, width, height), Color.White);
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+                    _batch.Draw(luminance, new Rectangle(0, 0, width, height), Color.White);
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
                 }
 
-                batch.End();
+                _batch.End();
 
                 Output("scene", target);
             }
         }
 
 
-        private IKernel kernel;
-        private ContentManager content;
-        private GraphicsDevice device;
-        private TestScene scene;
+        private readonly IKernel _kernel;
+        private readonly GraphicsDevice _device;
+        private TestScene _scene;
         private Entity light;
 
         public LuminanceTest(
@@ -116,9 +110,8 @@ namespace GraphicsTests.Tests
             GraphicsDevice device)
             : base("Luminance", kernel)
         {
-            this.kernel = kernel;
-            this.content = content;
-            this.device = device;
+            _kernel = kernel;
+            _device = device;
 
             UI.Root.Gestures.Bind((g, t, d) => light.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(5),
                 new KeyPressed(Keys.L));
@@ -129,7 +122,7 @@ namespace GraphicsTests.Tests
 
         protected override void BeginTransitionOn()
         {
-            scene = kernel.Get<TestScene>();
+            _scene = _kernel.Get<TestScene>();
 
             //var sun = kernel.Get<EntityDescription>();
             //sun.AddProperty<Vector3>("direction", Vector3.Down);
@@ -139,15 +132,15 @@ namespace GraphicsTests.Tests
             //light = sun.Create();
             //scene.Scene.Add(light);
 
-            var toneMap = kernel.Get<ToneMapComponent>();
-            var renderer = scene.Scene.GetService<Renderer>();
+            var toneMap = _kernel.Get<ToneMapComponent>();
+            var renderer = _scene.Scene.GetService<Renderer>();
             renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 //.Then<EdgeDetectComponent>()
                 .Then<Ssao>()
                 .Then<LightingComponent>()
                 .Then(toneMap)
-                .Then(new Phase(this, device, toneMap))
+                .Then(new Phase(this, _device, toneMap))
                 .Then<RestoreDepthPhase>()
                 .Then<TranslucentComponent>()
                 //.Then<AntiAliasComponent>()
@@ -158,13 +151,13 @@ namespace GraphicsTests.Tests
 
         public override void Update(GameTime gameTime)
         {
-            scene.Update(gameTime);
+            _scene.Update(gameTime);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            scene.Draw(gameTime);
+            _scene.Draw(gameTime);
             base.Draw(gameTime);
         }
     }

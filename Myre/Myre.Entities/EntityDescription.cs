@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reflection;
 using Myre.Entities.Behaviours;
 using Ninject;
@@ -155,7 +154,8 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(BehaviourData behaviour)
         {
-            Assert.ArgumentNotNull("behaviour.TypeAndFactory", (object)behaviour.Type ?? behaviour.Factory);
+            if (((object)behaviour.Type ?? behaviour.Factory) == null)
+                throw new ArgumentException("behaviour.TypeAndFactory", "behaviour");
 
             if (_behaviours.Contains(behaviour))
                 return false;
@@ -245,14 +245,12 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddProperty(PropertyData property)
         {
-            Assert.ArgumentNotNull("property.Name", property.Name);
-            Assert.ArgumentNotNull("property.DataType", property.DataType);
-
-            if (property.InitialValue != null)
-            {
-                var initialType = property.InitialValue.GetType();
-                Assert.IsTrue(property.DataType.IsAssignableFrom(initialType), "Cannot cast initial value to type of property");
-            }
+            if (property.Name == null)
+                throw new ArgumentException("property.Name", "property");
+            if (property.DataType == null)
+                throw new ArgumentException("property.DataType", "property");
+            if (property.InitialValue != null && !property.DataType.IsAssignableFrom(property.InitialValue.GetType()))
+                throw new ArgumentException("property.InitialValue cannot be cast to property.DataType", "property");
 
             if (_properties.Contains(property))
                 return false;
@@ -388,14 +386,14 @@ namespace Myre.Entities
                 constructor = type.GetConstructor(new Type[] { typeof(string) });
                 _propertyConstructors.Add(property.DataType, constructor);
             }
+            if (constructor == null)
+                throw new InvalidOperationException(string.Format("Cannot find constructor(string) for {0}", property.DataType));
 
-            Assert.ArgumentNotNull("constructor", constructor);
-            Debug.Assert(constructor != null, "constructor != null");
             IProperty prop = constructor.Invoke(new object[] { property.Name }) as IProperty;
-            Assert.ArgumentNotNull("property", prop);
-            Debug.Assert(prop != null, "prop != null");
-            prop.Value = property.InitialValue;
+            if (prop == null)
+                throw new InvalidOperationException(string.Format("Constructor for Property<{0}> returned null", property.DataType));
 
+            prop.Value = property.InitialValue;
             return prop;
         }
 

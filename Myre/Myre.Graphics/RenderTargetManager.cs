@@ -1,9 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Microsoft.Xna.Framework.Graphics;
-using Myre.Debugging.Statistics;
-using Myre.Extensions;
 
 namespace Myre.Graphics
 {

@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline;
+﻿using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Pipeline.Particles.Initialisers.Colour
 {

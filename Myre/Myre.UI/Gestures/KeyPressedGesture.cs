@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework.Input;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
 
 namespace Myre.UI.Gestures
 {
@@ -15,8 +11,8 @@ namespace Myre.UI.Gestures
         public KeyPressedGesture(Keys key)
             : base(false)
         {
-            this.Key = key;
-            this.BlockedInputs.Add((int)key);
+            Key = key;
+            BlockedInputs.Add((int)key);
         }
 
         protected override bool Test(KeyboardDevice device)

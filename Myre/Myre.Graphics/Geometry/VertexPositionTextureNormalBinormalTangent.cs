@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 
 namespace Myre.Graphics.Geometry
 {
@@ -32,21 +33,21 @@ namespace Myre.Graphics.Geometry
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable NotAccessedField.Global
-        public Vector3 Position;
-        public Vector2 TextureCoordinate;
-        public Vector3 Normal;
-        public Vector3 Binormal;
-        public Vector3 Tangent;
+        public Microsoft.Xna.Framework.Vector3 Position;
+        public Microsoft.Xna.Framework.Vector2 TextureCoordinate;
+        public Microsoft.Xna.Framework.Vector3 Normal;
+        public Microsoft.Xna.Framework.Vector3 Binormal;
+        public Microsoft.Xna.Framework.Vector3 Tangent;
 // ReSharper restore NotAccessedField.Global
 // ReSharper restore MemberCanBePrivate.Global
 
         public VertexPositionTextureNormalBinormalTangent(Vector3 position, Vector2 textureCoordinate, Vector3 normal, Vector3 binormal, Vector3 tangent)
         {
-            Position = position;
-            TextureCoordinate = textureCoordinate;
-            Normal = normal;
-            Binormal = binormal;
-            Tangent = tangent;
+            Position = position.ToXNA();
+            TextureCoordinate = textureCoordinate.ToXNA();
+            Normal = normal.ToXNA();
+            Binormal = binormal.ToXNA();
+            Tangent = tangent.ToXNA();
         }
     }
 }

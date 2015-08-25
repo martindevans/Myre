@@ -1,7 +1,9 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Text;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI.Controls
 {
@@ -49,11 +51,11 @@ namespace Myre.UI.Controls
             if (text == null)
                 throw new ArgumentNullException("text");
 
-            this.Label = new Label(this, font);
-            this.Justification = Justification.Centre;
-            this.Label.Text = text;
-            this.Colour = Color.White;
-            this.Highlight = Color.CornflowerBlue;
+            Label = new Label(this, font);
+            Justification = Justification.Centre;
+            Label.Text = text;
+            Colour = Color.White;
+            Highlight = Color.CornflowerBlue;
 
             SetSize((int)Label.TextSize.X, (int)Label.TextSize.Y);
             Label.SetPoint(Points.TopLeft, Int2D.Zero);

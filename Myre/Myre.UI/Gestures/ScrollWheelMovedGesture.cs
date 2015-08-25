@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
 
 namespace Myre.UI.Gestures
 {
@@ -18,7 +14,7 @@ namespace Myre.UI.Gestures
 
         protected override bool Test(MouseDevice device)
         {
-            return device.WheelMovement != 0;
+            return Math.Abs(device.WheelMovement) > float.Epsilon;
         }
     }
 }

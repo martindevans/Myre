@@ -1,7 +1,8 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 
 namespace Myre.Graphics.Translucency.Particles
 {
@@ -67,7 +68,7 @@ namespace Myre.Graphics.Translucency.Particles
                 BlendState = input.ReadObject<BlendState>(),
                 EndLinearVelocity = input.ReadSingle(),
                 EndScale = input.ReadSingle(),
-                Gravity = input.ReadVector3(),
+                Gravity = input.ReadVector3().FromXNA(),
                 Lifetime = input.ReadSingle(),
                 Texture = input.ContentManager.Load<Texture2D>(input.ReadString()),
                 Capacity = input.ReadInt32(),

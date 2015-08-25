@@ -1,4 +1,5 @@
-﻿using Myre.UI.InputDevices;
+﻿using System;
+using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures
 {
@@ -13,7 +14,7 @@ namespace Myre.UI.Gestures
 
         protected override bool Test(MouseDevice device)
         {
-            return device.WheelMovement != 0;
+            return Math.Abs(device.WheelMovement) > float.Epsilon;
         }
     }
 }

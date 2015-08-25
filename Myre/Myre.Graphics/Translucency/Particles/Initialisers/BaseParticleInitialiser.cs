@@ -1,9 +1,11 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers
 {
-    public abstract class BaseParticleInitialiser : ICopyable
+    public abstract class BaseParticleInitialiser : ICloneable
     {
         public virtual void Attach(ParticleEmitter emitter)
         {
@@ -15,7 +17,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers
 
         public abstract void Initialise(Random random, ref Particle particle);
 
-        public abstract object Copy();
+        public abstract object Clone();
     }
 
     public struct Particle

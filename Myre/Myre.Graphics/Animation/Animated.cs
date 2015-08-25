@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Myre.Collections;
+﻿using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Graphics.Geometry;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace Myre.Graphics.Animation
 {
@@ -17,15 +17,15 @@ namespace Myre.Graphics.Animation
         private ModelInstance _model;
 
         // Current animation transform matrices
-        private Matrix[] _worldTransforms;
-        private Matrix[] _skinTransforms;
+        private Matrix4x4[] _worldTransforms;
+        private Matrix4x4[] _skinTransforms;
 
-        public Matrix[] WorldTransforms
+        public Matrix4x4[] WorldTransforms
         {
             get { return _worldTransforms; }
         }
 
-        public Matrix[] SkinTransforms
+        public Matrix4x4[] SkinTransforms
         {
             get { return _skinTransforms; }
         }
@@ -71,8 +71,8 @@ namespace Myre.Graphics.Animation
         {
             if (model != null && model.Model != null && model.Model.SkinningData != null)
             {
-                _worldTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
-                _skinTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
+                _worldTransforms = new Matrix4x4[_model.Model.SkinningData.BindPose.Length];
+                _skinTransforms = new Matrix4x4[_model.Model.SkinningData.BindPose.Length];
 
                 var skinning = _model.Model.SkinningData;
                 AnimationHelpers.CalculateWorldTransformsFromBoneTransforms(skinning.SkeletonHierarchy, skinning.BindPose, _worldTransforms);
@@ -93,12 +93,12 @@ namespace Myre.Graphics.Animation
         private void UpdateSkinTransforms()
         {
             for (int bone = 0; bone < _worldTransforms.Length; bone++)
-                Matrix.Multiply(ref SkinningData.InverseBindPose[bone], ref _worldTransforms[bone], out _skinTransforms[bone]);
+                _skinTransforms[bone] = Matrix4x4.Multiply(SkinningData.InverseBindPose[bone], _worldTransforms[bone]);
         }
 
         public void SetRenderData(NamedBoxCollection metadata)
         {
-            metadata.Set<Matrix[]>("bones", _skinTransforms);
+            metadata.Set<Matrix4x4[]>("bones", _skinTransforms);
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace Myre.Graphics.Animation
                 .Bounds
                 .Select((b, i) =>
                 {
-                    Matrix transform;
-                    Matrix.Invert(ref _worldTransforms[i], out transform);
+                    Matrix4x4 transform;
+                    Matrix4x4.Invert(_worldTransforms[i], out transform);
 
                     var start = Vector3.Transform(ray.Position, transform);             //Transform ray into bone space
                     var direction = Vector3.TransformNormal(ray.Direction, transform);
@@ -142,8 +142,8 @@ namespace Myre.Graphics.Animation
                 .Bounds
                 .Select((b, i) =>
                 {
-                    Matrix transform;
-                    Matrix.Invert(ref _worldTransforms[i], out transform);
+                    Matrix4x4 transform;
+                    Matrix4x4.Invert(_worldTransforms[i], out transform);
 
                     var center = Vector3.Transform(sphere.Center, transform);                   //Transform sphere center into bone space
 

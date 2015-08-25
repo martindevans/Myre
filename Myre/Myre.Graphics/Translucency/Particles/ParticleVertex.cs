@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Myre.Graphics.Translucency.Particles
@@ -7,10 +6,10 @@ namespace Myre.Graphics.Translucency.Particles
     struct ParticleVertex
     {
         public Short2 Corner;
-        public Vector3 Position;
-        public Vector4 Velocity;
-        public Color StartColour;
-        public Color EndColour;
+        public Microsoft.Xna.Framework.Vector3 Position;
+        public Microsoft.Xna.Framework.Vector4 Velocity;
+        public Microsoft.Xna.Framework.Color StartColour;
+        public Microsoft.Xna.Framework.Color EndColour;
         public HalfVector2 Scales;
         public float Time;
 

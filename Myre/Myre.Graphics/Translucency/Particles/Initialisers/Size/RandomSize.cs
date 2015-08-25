@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
 {
@@ -22,7 +23,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
             particle.Size += size;
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new RandomSize(MinSize, MaxSize);
         }

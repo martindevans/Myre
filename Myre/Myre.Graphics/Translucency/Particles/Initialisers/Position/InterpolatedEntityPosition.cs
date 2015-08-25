@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Myre.Entities;
 
@@ -22,7 +22,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             BatchSize = batchSize;
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new InterpolatedEntityPosition(BatchSize);
         }

@@ -11,8 +11,8 @@ namespace Myre.UI.Gestures
         public KeyPressed(Keys key)
             : base(false)
         {
-            this.Key = key;
-            this.BlockedInputs.Add((int)key);
+            Key = key;
+            BlockedInputs.Add((int)key);
         }
 
         protected override bool Test(KeyboardDevice device)

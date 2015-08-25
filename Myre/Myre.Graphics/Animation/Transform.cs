@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Myre.Extensions;
 
 namespace Myre.Graphics.Animation
@@ -14,7 +13,6 @@ namespace Myre.Graphics.Animation
         public Vector3 Scale;
         public Quaternion Rotation;
 
-        [Pure]
         public Transform Interpolate(Transform b, float amount)
         {
             Transform result;
@@ -24,9 +22,9 @@ namespace Myre.Graphics.Animation
 
         public void Interpolate(ref Transform b, float amount, out Transform result)
         {
-            Vector3.Lerp(ref Translation, ref b.Translation, amount, out result.Translation);
+            result.Translation = Vector3.Lerp(Translation, b.Translation, amount);
             Rotation.Nlerp(ref b.Rotation, amount, out result.Rotation);
-            Vector3.Lerp(ref Scale, ref b.Scale, amount, out result.Scale);
+            result.Scale = Vector3.Lerp(Scale, b.Scale, amount);
         }
 
         /// <summary>
@@ -45,24 +43,19 @@ namespace Myre.Graphics.Animation
             };
         }
 
-        public void ToMatrix(out Matrix matrix)
+        public void ToMatrix(out Matrix4x4 matrix)
         {
-            Matrix s;
-            Matrix.CreateScale(ref Scale, out s);
+            Matrix4x4 s = Matrix4x4.CreateScale(Scale);
+            Matrix4x4 r = Matrix4x4.CreateFromQuaternion(Rotation);
+            Matrix4x4 t = Matrix4x4.CreateTranslation(Translation);
 
-            Matrix r;
-            Matrix.CreateFromQuaternion(ref Rotation, out r);
-
-            Matrix t;
-            Matrix.CreateTranslation(ref Translation, out t);
-
-            Matrix.Multiply(ref s, ref r, out matrix);
-            Matrix.Multiply(ref matrix, ref t, out matrix);
+            matrix = Matrix4x4.Multiply(s, r);
+            matrix = Matrix4x4.Multiply(matrix, t);
         }
 
-        public Matrix ToMatrix()
+        public Matrix4x4 ToMatrix()
         {
-            Matrix m;
+            Matrix4x4 m;
             ToMatrix(out m);
             return m;
         }

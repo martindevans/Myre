@@ -11,7 +11,7 @@ namespace Myre.UI.Gestures
             : base(false)
         {
             Button = button;
-            base.BlockedInputs.Add((int)Button);
+            BlockedInputs.Add((int)Button);
         }
 
         protected override bool Test(MouseDevice device)

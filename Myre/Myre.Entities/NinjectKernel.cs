@@ -1,8 +1,11 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Ninject;
+
+using Game = Microsoft.Xna.Framework.Game;
+using GameServiceContainer = Microsoft.Xna.Framework.GameServiceContainer;
+using GameComponentCollection = Microsoft.Xna.Framework.GameComponentCollection;
 
 namespace Myre.Entities
 {
@@ -47,6 +50,7 @@ namespace Myre.Entities
         /// <param name="bindGraphicsDevice">if set to <c>true</c> binds game.GraphicsDevice.</param>
         /// <param name="bindContentManager">if set to <c>true</c> binds game.Content.</param>
         /// <param name="bindServiceContainer">if set to <c>true</c> binds game.Services.</param>
+        /// <param name="bindComponentCollection"></param>
         public static void BindGame(Game game, IKernel kernel, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true, bool bindComponentCollection = true)
         {
             // bind the game to a singleton instance

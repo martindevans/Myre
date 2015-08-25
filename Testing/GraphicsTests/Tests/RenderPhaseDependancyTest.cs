@@ -1,22 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre;
-using Myre.Graphics;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Ninject;
-using Microsoft.Xna.Framework.Content;
+using Myre;
 using Myre.Entities;
+using Myre.Extensions;
+using Myre.Graphics;
+using Ninject;
+using System.Numerics;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GraphicsTests.Tests
 {
     class RenderPhaseDependancyTest
         : TestScreen
     {
-        static SpriteBatch spriteBatch;
-        static SpriteFont font;
+        static SpriteBatch _spriteBatch;
+        static SpriteFont _font;
 
         class A
             : RendererComponent
@@ -46,9 +47,9 @@ namespace GraphicsTests.Tests
                 var target = RenderTargetManager.GetTarget(renderer.Device, new RenderTargetInfo(50, 50, default(SurfaceFormat), default(DepthFormat), default(int), default(bool), default(RenderTargetUsage)));
                 renderer.Device.SetRenderTarget(target);
                 renderer.Device.Clear(Color.White);
-                spriteBatch.Begin();
-                spriteBatch.DrawString(font, "A", Vector2.Zero, Color.Black);
-                spriteBatch.End();
+                _spriteBatch.Begin();
+                _spriteBatch.DrawString(_font, "A", Vector2.Zero.ToXNA(), Color.Black);
+                _spriteBatch.End();
 
                 Output("a", target);
             }
@@ -81,9 +82,9 @@ namespace GraphicsTests.Tests
             {
                 var target = RenderTargetManager.GetTarget(renderer.Device, new RenderTargetInfo(50, 50, default(SurfaceFormat), default(DepthFormat), default(int), default(bool), default(RenderTargetUsage)));
                 renderer.Device.SetRenderTarget(target);
-                spriteBatch.Begin();
-                spriteBatch.DrawString(font, "B", Vector2.Zero, Color.White);
-                spriteBatch.End();
+                _spriteBatch.Begin();
+                _spriteBatch.DrawString(_font, "B", Vector2.Zero.ToXNA(), Color.White);
+                _spriteBatch.End();
 
                 Output("b", target);
             }
@@ -127,10 +128,10 @@ namespace GraphicsTests.Tests
                 var a = metadata.Get<Texture2D>("a").Value;
                 var b = metadata.Get<Texture2D>("b").Value;
 
-                spriteBatch.Begin();
-                spriteBatch.Draw(a, new Rectangle(0, 0, 50, 50), Color.White);
-                spriteBatch.Draw(b, new Rectangle(50, 0, 50, 50), Color.White);
-                spriteBatch.End();
+                _spriteBatch.Begin();
+                _spriteBatch.Draw(a, new Rectangle(0, 0, 50, 50), Color.White);
+                _spriteBatch.Draw(b, new Rectangle(50, 0, 50, 50), Color.White);
+                _spriteBatch.End();
 
                 Output("c", target);
             }
@@ -171,19 +172,19 @@ namespace GraphicsTests.Tests
                 var metadata = renderer.Data;
                 var c = metadata.Get<Texture2D>("c").Value;
 
-                spriteBatch.Begin();
-                spriteBatch.Draw(c, new Rectangle(590, 335, 100, 50), Color.White);
-                spriteBatch.End();
+                _spriteBatch.Begin();
+                _spriteBatch.Draw(c, new Rectangle(590, 335, 100, 50), Color.White);
+                _spriteBatch.End();
 
                 Output("d", target);
             }
         }
 
 
-        private IKernel kernel;
-        private ContentManager content;
-        private GraphicsDevice device;
-        private Scene scene;
+        private readonly IKernel _kernel;
+        private readonly ContentManager _content;
+        private readonly GraphicsDevice _device;
+        private Scene _scene;
 
         public RenderPhaseDependancyTest(
             IKernel kernel,
@@ -191,28 +192,28 @@ namespace GraphicsTests.Tests
             GraphicsDevice device)
             : base("Render Phase Dependancies", kernel)
         {
-            this.kernel = kernel;
-            this.content = content;
-            this.device = device;
+            _kernel = kernel;
+            _content = content;
+            _device = device;
         }
 
         protected override void BeginTransitionOn()
         {
-            spriteBatch = new SpriteBatch(device);
-            font = content.Load<SpriteFont>("Consolas");
+            _spriteBatch = new SpriteBatch(_device);
+            _font = _content.Load<SpriteFont>("Consolas");
 
-            scene = new Scene(kernel);
+            _scene = new Scene(_kernel);
             
-            var camera = new EntityDescription(kernel);
+            var camera = new EntityDescription(_kernel);
             camera.AddProperty(new TypedName<Camera>("camera"));
             camera.AddProperty(new TypedName<Viewport>("viewport"));
             camera.AddBehaviour<View>();
             var cameraEntity = camera.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = new Camera();
             cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Height = 1920, Width = 1080 };
-            scene.Add(camera.Create());
+            _scene.Add(cameraEntity);
 
-            var renderer = scene.GetService<Renderer>();
+            var renderer = _scene.GetService<Renderer>();
             renderer.StartPlan()
                 .Then<A>()
                 .Then<B>()
@@ -225,13 +226,13 @@ namespace GraphicsTests.Tests
 
         public override void Update(GameTime gameTime)
         {
-            scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            scene.Draw();
+            _scene.Draw();
             base.Draw(gameTime);
         }
     }

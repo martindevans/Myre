@@ -13,7 +13,7 @@ namespace Myre.Graphics.Pipeline.Models
             return new MyreMeshContent
             {
                 Name = geometry.Parent.Name ?? "",
-                BoundingSphere = geometry.Vertices.Positions.Count == 0 ? new BoundingSphere(Vector3.Zero, 0) : BoundingSphere.CreateFromPoints(geometry.Vertices.Positions),
+                BoundingSphere = geometry.Vertices.Positions.Count == 0 ? new Microsoft.Xna.Framework.BoundingSphere(Vector3.Zero, 0) : Microsoft.Xna.Framework.BoundingSphere.CreateFromPoints(geometry.Vertices.Positions),
                 Materials = materials,
                 IndexBuffer = geometry.Indices,
                 VertexBuffer = geometry.Vertices.CreateVertexBuffer(),

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Myre.Extensions;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
 
 namespace Myre.UI.InputDevices
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Myre.Extensions;
 
@@ -21,7 +21,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
             particle.Velocity += randomVector;
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new RandomVelocity(VelocityVariance);
         }
@@ -31,7 +31,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
     {
         protected override RandomVelocity Read(ContentReader input, RandomVelocity existingInstance)
         {
-            return new RandomVelocity(input.ReadVector3());
+            return new RandomVelocity(input.ReadVector3().FromXNA());
         }
     }
 }

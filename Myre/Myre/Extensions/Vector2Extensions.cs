@@ -1,5 +1,6 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Myre.Extensions
 {
@@ -8,6 +9,19 @@ namespace Myre.Extensions
     /// </summary>
     public static class Vector2Extensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Microsoft.Xna.Framework.Vector2 ToXNA(this System.Numerics.Vector2 v)
+        {
+            return new Microsoft.Xna.Framework.Vector2(v.X, v.Y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Numerics.Vector2 FromXNA(this Microsoft.Xna.Framework.Vector2 v)
+        {
+            return new System.Numerics.Vector2(v.X, v.Y);
+        }
+
+
         /// <summary>
         /// Determines whether this Vector2 contains any components which are not a number.
         /// </summary>

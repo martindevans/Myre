@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Point = Microsoft.Xna.Framework.Point;
 
 namespace Myre.UI
 {

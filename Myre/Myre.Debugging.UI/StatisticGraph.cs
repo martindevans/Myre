@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Globalization;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Debugging.Statistics;
 using Myre.UI;
 using Myre.UI.Controls;
 using Myre.UI.Text;
+
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.Debugging.UI
 {
@@ -35,15 +38,17 @@ namespace Myre.Debugging.UI
             Strata = new ControlStrata() { Layer = Layer.Overlay };
             _tracker = new StatisticTracker(statistic, accessInterval);
             _graph = new Graph(Device, (int)(15f / (float)accessInterval.TotalSeconds)); //(byte)MathHelper.Clamp(15f / (float)accessInterval.TotalSeconds, 15, 15 * 60));
-            _label = new Label(this, font);
-            _label.Text = statistic.Name;
-            _label.Justification = Justification.Centre;
+            _label = new Label(this, font) {
+                Text = statistic.Name,
+                Justification = Justification.Centre
+            };
             _label.SetPoint(Points.TopLeft, 2, 2);
             _label.SetPoint(Points.TopRight, -2, 2);
 
-            _value = new Label(this, font);
-            _value.Text = "0";
-            _value.Justification = Justification.Centre;
+            _value = new Label(this, font) {
+                Text = "0",
+                Justification = Justification.Centre
+            };
             _value.SetPoint(Points.BottomLeft, 2, -2);
             _value.SetPoint(Points.BottomRight, -2, -2);
 

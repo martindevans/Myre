@@ -100,7 +100,6 @@ namespace Myre.UI.InputDevices
             private set;
         }
 
-#if WINDOWS
         delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
         static IntPtr _prevWndProc;
@@ -130,7 +129,6 @@ namespace Myre.UI.InputDevices
 
         [DllImport("user32.dll")]
         static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-#endif
 
         /// <summary>
         /// Initialize the TextInput with the given GameWindow.
@@ -141,17 +139,14 @@ namespace Myre.UI.InputDevices
             if (Initialized)
                 throw new InvalidOperationException("TextInput.Initialize can only be called once!");
 
-#if WINDOWS
             _hookProcDelegate = HookProc;
             _prevWndProc = (IntPtr)SetWindowLong(handle, GWL_WNDPROC,
                 (int)Marshal.GetFunctionPointerForDelegate(_hookProcDelegate));
 
             _hImc = ImmGetContext(handle);
-#endif
             Initialized = true;
         }
 
-#if WINDOWS
         static IntPtr HookProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
         {
             IntPtr returnCode = CallWindowProc(_prevWndProc, hWnd, msg, wParam, lParam);
@@ -190,6 +185,5 @@ namespace Myre.UI.InputDevices
 
             return returnCode;
         }
-#endif
     }
 }

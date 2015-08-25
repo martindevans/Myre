@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 
 namespace Myre.Extensions
 {
@@ -9,12 +9,12 @@ namespace Myre.Extensions
     public static class RectangleExtensions
     {
         /// <summary>
-        /// Transforms the <see cref="Rectangle"/> with a specified <see cref="Matrix"/>.
+        /// Transforms the <see cref=" Microsoft.Xna.Framework.Rectangle"/> with a specified <see cref="Matrix4x4"/>.
         /// </summary>
         /// <param name="rect">The rectangle to transform.</param>
         /// <param name="m">The matrix with which to do the transformation.</param>
         /// <returns>The transformed rectangle.</returns>
-        public static Rectangle Transform(this Rectangle rect, ref Matrix m)
+        public static Microsoft.Xna.Framework.Rectangle Transform(this  Microsoft.Xna.Framework.Rectangle rect, ref Matrix4x4 m)
         {
             // get corners
             Vector2 topLeft = new Vector2(rect.X, rect.Y);
@@ -23,11 +23,10 @@ namespace Myre.Extensions
             Vector2 bottomRight = new Vector2(rect.X + rect.Width, rect.Y + rect.Height);
 
             // transform corners
-            Vector2 newTopLeft, newTopRight, newBottomLeft, newBottomRight;
-            Vector2.Transform(ref topLeft, ref m, out newTopLeft);
-            Vector2.Transform(ref topRight, ref m, out newTopRight);
-            Vector2.Transform(ref bottomRight, ref m, out newBottomRight);
-            Vector2.Transform(ref bottomLeft, ref m, out newBottomLeft);
+            var newTopLeft = Vector2.Transform(topLeft, m);
+            var newTopRight = Vector2.Transform(topRight, m);
+            var newBottomRight = Vector2.Transform(bottomRight, m);
+            var newBottomLeft = Vector2.Transform(bottomLeft, m);
 
             // find new extents
             Vector2 min = new Vector2(
@@ -38,7 +37,7 @@ namespace Myre.Extensions
                 Math.Max(newTopLeft.Y, Math.Max(newTopRight.Y, Math.Max(newBottomLeft.Y, newBottomRight.Y))));
 
             // create and return rectangle
-            return new Rectangle(
+            return new Microsoft.Xna.Framework.Rectangle(
                 (int)min.X,
                 (int)min.Y,
                 (int)(max.X - min.X),

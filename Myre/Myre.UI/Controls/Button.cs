@@ -1,9 +1,10 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
 using Myre.UI.Text;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI.Controls
 {

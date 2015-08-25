@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
+using Myre.Extensions;
 using Myre.Graphics.Materials;
 using System;
 using System.Collections.Generic;
@@ -20,20 +21,20 @@ namespace Myre.Graphics.Geometry
         : Behaviour
     {
         public static readonly TypedName<ModelData> ModelName = new TypedName<ModelData>("model");
-        public static readonly TypedName<Matrix> TransformName = new TypedName<Matrix>("transform");
+        public static readonly TypedName<Matrix4x4> TransformName = new TypedName<Matrix4x4>("transform");
         public static readonly TypedName<bool> IsStaticName = new TypedName<bool>("is_static");
         public static readonly TypedName<bool> IsInvisibleName = new TypedName<bool>("is_invisible");
         public static readonly TypedName<float> OpacityName = new TypedName<float>("opacity");
-        public static readonly TypedName<Matrix?> CustomViewMatrixName = new TypedName<Matrix?>("custom_view_matrix");
-        public static readonly TypedName<Matrix?> CustomProjectionMatrixName = new TypedName<Matrix?>("custom_projection_matrix");
+        public static readonly TypedName<Matrix4x4?> CustomViewMatrixName = new TypedName<Matrix4x4?>("custom_view_matrix");
+        public static readonly TypedName<Matrix4x4?> CustomProjectionMatrixName = new TypedName<Matrix4x4?>("custom_projection_matrix");
 
         private Property<ModelData> _model;
-        private Property<Matrix> _transform;
+        private Property<Matrix4x4> _transform;
         private Property<bool> _isStatic;
         private Property<bool> _isInvisible;
         private Property<float> _opacity;
-        private Property<Matrix?> _customViewMatrix;
-        private Property<Matrix?> _customProjectionMatrix;
+        private Property<Matrix4x4?> _customViewMatrix;
+        private Property<Matrix4x4?> _customProjectionMatrix;
 
         private IRenderDataSupplier[] _renderDataSuppliers;
 
@@ -43,7 +44,7 @@ namespace Myre.Graphics.Geometry
             set { _model.Value = value; }
         }
 
-        public Matrix Transform
+        public Matrix4x4 Transform
         {
             get { return _transform.Value; }
             set { _transform.Value = value; }
@@ -162,7 +163,7 @@ namespace Myre.Graphics.Geometry
 
                 public BoundingSphere Bounds { get; private set; }
 
-                public Matrix WorldView;
+                public Matrix4x4 WorldView;
 
                 public void UpdateBounds()
                 {
@@ -289,7 +290,7 @@ namespace Myre.Graphics.Geometry
                 foreach (var item in _buffer)
                     item.IsVisible = !item.Instance.IsInvisible;
 
-                var view = metadata.GetValue(new TypedName<Matrix>("view"));
+                var view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
                 CalculateWorldViews(meshes, view);              //Calculate WorldView for all mesh instances
 
                 DepthSortMeshes(meshes);                        //Sort batches by first item in batch
@@ -338,7 +339,7 @@ namespace Myre.Graphics.Geometry
                 return a.Instances.Count.CompareTo(b.Instances.Count);
             }
 
-            private static void CalculateWorldViews(List<MeshRenderData> batches, Matrix cameraView)
+            private static void CalculateWorldViews(List<MeshRenderData> batches, Matrix4x4 cameraView)
             {
                 for (int b = 0; b < batches.Count; b++)
                 {
@@ -346,11 +347,11 @@ namespace Myre.Graphics.Geometry
                     for (int i = 0; i < meshInstances.Count; i++)
                     {
                         var instance = meshInstances[i];
-                        Matrix world = instance.Mesh.MeshTransform * instance.Instance.Transform;
+                        Matrix4x4 world = instance.Mesh.MeshTransform * instance.Instance.Transform;
                         if (instance.Instance._customViewMatrix.Value.HasValue)
                             instance.WorldView = world * instance.Instance._customViewMatrix.Value.Value;
                         else
-                            Matrix.Multiply(ref world, ref cameraView, out instance.WorldView);
+                            instance.WorldView = Matrix4x4.Multiply(world, cameraView);
                     }
                 }
             }
@@ -377,10 +378,10 @@ namespace Myre.Graphics.Geometry
                 _device.SetVertexBuffer(mesh.VertexBuffer);
                 _device.Indices = mesh.IndexBuffer;
 
-                var world = metadata.Get<Matrix>("world", default(Matrix), true);
-                var projection = metadata.Get<Matrix>("projection", default(Matrix), true);
-                var worldView = metadata.Get<Matrix>("worldview", default(Matrix), true);
-                var worldViewProjection = metadata.Get<Matrix>("worldviewprojection", default(Matrix), true);
+                var world = metadata.Get<Matrix4x4>("world", Matrix4x4.Identity);
+                var projection = metadata.Get<Matrix4x4>("projection", Matrix4x4.Identity);
+                var worldView = metadata.Get<Matrix4x4>("worldview", Matrix4x4.Identity);
+                var worldViewProjection = metadata.Get<Matrix4x4>("worldviewprojection", Matrix4x4.Identity);
 
                 DepthSortInstances(_visibleInstances);
 
@@ -444,7 +445,7 @@ namespace Myre.Graphics.Geometry
                 return CompareWorldViews(ref a.WorldView, ref b.WorldView);
             }
 
-            private static int CompareWorldViews(ref Matrix worldViewA, ref Matrix worldViewB)
+            private static int CompareWorldViews(ref Matrix4x4 worldViewA, ref Matrix4x4 worldViewB)
             {
                 //Negated, because XNA uses a negative Z space
                 return -worldViewA.Translation.Z.CompareTo(worldViewB.Translation.Z);

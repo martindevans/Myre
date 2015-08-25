@@ -1,5 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
+
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Myre.Debugging.UI
 {
@@ -42,9 +46,9 @@ namespace Myre.Debugging.UI
             {
                 LightingEnabled = false, 
                 VertexColorEnabled = true,
-                World = Matrix.Identity,
-                View = Matrix.Identity,
-                Projection = Matrix.Identity
+                World = Matrix4x4.Identity.ToXNA(),
+                View = Matrix4x4.Identity.ToXNA(),
+                Projection = Matrix4x4.Identity.ToXNA()
             };
 
             _dirty = true;
@@ -92,7 +96,7 @@ namespace Myre.Debugging.UI
                             x + (i / (float)(_data.Length - 1)) * width,
                             (y - height) + _data[i] * height,
                             0);
-                    _transformedData[i] = new VertexPositionColor(position, _colour);
+                    _transformedData[i] = new VertexPositionColor(position.ToXNA(), _colour);
                 }
 
                 _vertices.SetData<VertexPositionColor>(_transformedData);
@@ -101,18 +105,9 @@ namespace Myre.Debugging.UI
                 _previousArea = area;
             }
 
-#if XNA_3_1
-            effect.Begin();
-            effect.Techniques[0].Passes[0].Begin();
-            device.Vertices[0].SetSource(vertices, 0, VertexPositionColor.SizeInBytes);
-            device.DrawPrimitives(PrimitiveType.LineStrip, 0, data.Length - 1);
-            effect.Techniques[0].Passes[0].End();
-            effect.End();
-#else
             _effect.Techniques[0].Passes[0].Apply();
             device.SetVertexBuffer(_vertices);
             device.DrawPrimitives(PrimitiveType.LineStrip, 0, _data.Length - 1);
-#endif
         }
     }
 }

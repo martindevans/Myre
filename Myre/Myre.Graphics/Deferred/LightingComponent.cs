@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Deferred.LightManagers;
 using Myre.Graphics.Materials;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred
 {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures

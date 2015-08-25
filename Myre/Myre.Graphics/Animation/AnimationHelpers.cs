@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 
 namespace Myre.Graphics.Animation
 {
@@ -11,16 +11,16 @@ namespace Myre.Graphics.Animation
         /// <param name="hierarchy"></param>
         /// <param name="worldTransforms"></param>
         /// <param name="calculatedBoneTransforms"></param>
-        public static void CalculateBoneTransformsFromWorldTransforms(IList<int> hierarchy, Matrix[] worldTransforms, Matrix[] calculatedBoneTransforms)
+        public static void CalculateBoneTransformsFromWorldTransforms(IList<int> hierarchy, Matrix4x4[] worldTransforms, Matrix4x4[] calculatedBoneTransforms)
         {
             unsafe
             {
                 //Allocate a place to store the inverted transforms (on the stack to save allocations)
-                Matrix* inverseWorldTransforms = stackalloc Matrix[worldTransforms.Length];
+                Matrix4x4* inverseWorldTransforms = stackalloc Matrix4x4[worldTransforms.Length];
 
                 //Calculate inverse world transforms for each bone
                 for (int i = 0; i < calculatedBoneTransforms.Length; i++)
-                    Matrix.Invert(ref worldTransforms[i], out inverseWorldTransforms[i]);
+                    Matrix4x4.Invert(worldTransforms[i], out inverseWorldTransforms[i]);
 
                 //Calculate bone transforms for each bone
                 for (int bone = 0; bone < worldTransforms.Length; bone++)
@@ -29,7 +29,7 @@ namespace Myre.Graphics.Animation
                     if (parentBone == -1)
                         calculatedBoneTransforms[bone] = worldTransforms[bone];
                     else
-                        Matrix.Multiply(ref worldTransforms[bone], ref inverseWorldTransforms[parentBone], out calculatedBoneTransforms[bone]);
+                        calculatedBoneTransforms[bone] = Matrix4x4.Multiply(worldTransforms[bone], inverseWorldTransforms[parentBone]);
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace Myre.Graphics.Animation
         /// <param name="hierarchy"></param>
         /// <param name="boneTransforms"></param>
         /// <param name="calculateWorldTransforms"></param>
-        public static void CalculateWorldTransformsFromBoneTransforms(IList<int> hierarchy, Matrix[] boneTransforms, Matrix[] calculateWorldTransforms)
+        public static void CalculateWorldTransformsFromBoneTransforms(IList<int> hierarchy, Matrix4x4[] boneTransforms, Matrix4x4[] calculateWorldTransforms)
         {
             // Root bone.
             calculateWorldTransforms[0] = boneTransforms[0];
@@ -51,7 +51,7 @@ namespace Myre.Graphics.Animation
                 int parentBone = hierarchy[bone];
 
                 //Multiply by parent bone transform
-                Matrix.Multiply(ref boneTransforms[bone], ref calculateWorldTransforms[parentBone], out calculateWorldTransforms[bone]);
+                calculateWorldTransforms[bone] = Matrix4x4.Multiply(boneTransforms[bone], calculateWorldTransforms[parentBone]);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI.InputDevices
 {

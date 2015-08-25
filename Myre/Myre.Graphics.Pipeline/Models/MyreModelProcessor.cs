@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Myre.Collections;
 
 namespace Myre.Graphics.Pipeline.Models
 {

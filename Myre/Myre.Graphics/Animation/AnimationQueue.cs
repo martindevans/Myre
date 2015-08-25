@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
@@ -109,7 +109,7 @@ namespace Myre.Graphics.Animation
             get { return (_fadingIn ?? _fadingOut).Animation; }
         }
 
-        Matrix[] _boneTransforms;
+        Matrix4x4[] _boneTransforms;
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
@@ -162,7 +162,7 @@ namespace Myre.Graphics.Animation
         {
             if (model != null && model.Model != null && model.Model.SkinningData != null)
             {
-                _boneTransforms = new Matrix[_model.Model.SkinningData.BindPose.Length];
+                _boneTransforms = new Matrix4x4[_model.Model.SkinningData.BindPose.Length];
                 for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
                     _boneTransforms[i] = _model.Model.SkinningData.BindPose[i];
             }
@@ -309,13 +309,13 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        private void BuildRootBoneMatrix(ref Transform transform, out Matrix m)
+        private void BuildRootBoneMatrix(ref Transform transform, out Matrix4x4 m)
         {
             if (!EnableRootBoneTranslationX || !EnableRootBoneTranslationY || !EnableRootBoneTranslationZ || !EnableRootBoneScale || !EnableRootBoneRotation)
             {
-                m = (EnableRootBoneScale ? Matrix.CreateScale(transform.Scale) : Matrix.Identity) *
-                    (EnableRootBoneRotation ? Matrix.CreateFromQuaternion(transform.Rotation) : Matrix.Identity) *
-                    Matrix.CreateTranslation(new Vector3(
+                m = (EnableRootBoneScale ? Matrix4x4.CreateScale(transform.Scale) : Matrix4x4.Identity) *
+                    (EnableRootBoneRotation ? Matrix4x4.CreateFromQuaternion(transform.Rotation) : Matrix4x4.Identity) *
+                    Matrix4x4.CreateTranslation(new Vector3(
                         EnableRootBoneTranslationX ? transform.Translation.X : 0,
                         EnableRootBoneTranslationY ? transform.Translation.Y : 0,
                         EnableRootBoneTranslationZ ? transform.Translation.Z : 0

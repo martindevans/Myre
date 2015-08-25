@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,26 +11,27 @@ using Myre.Graphics.Translucency;
 using Myre.Graphics.Translucency.Particles;
 using Ninject;
 
+using GameTime = Microsoft.Xna.Framework.GameTime;
+
 namespace GraphicsTests.Tests
 {
     class Demo
         : TestScreen
     {
-        private IKernel kernel;
-        private ContentManager content;
-        private GraphicsDevice device;
-        private TestScene scene;
-        private TestGame game;
+        private readonly IKernel _kernel;
+        private readonly ContentManager _content;
+        private TestScene _scene;
+        private readonly TestGame _game;
 
-        private Box<float> ssaoIntensity;
-        private RenderPlan fullPlan;
-        private RenderPlan ssaoPlan;
-        private RenderPlan lightingPlan;
-        private RenderPlan edgeDetectPlan;
-        private RenderPlan normalPlan;
-        private RenderPlan depthPlan;
-        private RenderPlan diffusePlan;
-        private RenderPlan noAAPlan;
+        private Box<float> _ssaoIntensity;
+        private RenderPlan _fullPlan;
+        private RenderPlan _ssaoPlan;
+        private RenderPlan _lightingPlan;
+        private RenderPlan _edgeDetectPlan;
+        private RenderPlan _normalPlan;
+        private RenderPlan _depthPlan;
+        private RenderPlan _diffusePlan;
+        private RenderPlan _noAaPlan;
 
         public Demo(
             IKernel kernel,
@@ -39,10 +40,9 @@ namespace GraphicsTests.Tests
             GraphicsDevice device)
             : base("Demo", kernel)
         {
-            this.kernel = kernel;
-            this.content = content;
-            this.device = device;
-            this.game = game;
+            _kernel = kernel;
+            _content = content;
+            _game = game;
 
             //aviManager = new AviManager(@"demo.avi", false);
 
@@ -54,22 +54,22 @@ namespace GraphicsTests.Tests
 
         protected override void BeginTransitionOn()
         {
-            scene = kernel.Get<TestScene>();
+            _scene = _kernel.Get<TestScene>();
 
-            var particleEntityDesc = scene.Scene.Kernel.Get<EntityDescription>();
+            var particleEntityDesc = _scene.Scene.Kernel.Get<EntityDescription>();
             particleEntityDesc.AddProperty(new TypedName<Vector3>("position"));
             particleEntityDesc.AddBehaviour<ParticleEmitter>();
             var entity = particleEntityDesc.Create();
             entity.GetProperty(new TypedName<Vector3>("position")).Value = Vector3.Zero;
             NamedBoxCollection initData = new NamedBoxCollection();
-            initData.Set<ParticleEmitterDescription>("particlesystem", content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
-            scene.Scene.Add(entity, initData);
+            initData.Set<ParticleEmitterDescription>("particlesystem", _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
+            _scene.Scene.Add(entity, initData);
 
-            var renderer = scene.Scene.GetService<Renderer>();
+            var renderer = _scene.Scene.GetService<Renderer>();
 
-            ssaoIntensity = renderer.Data.Get<float>("ssao_intensity");
+            _ssaoIntensity = renderer.Data.Get<float>("ssao_intensity");
 
-            fullPlan = renderer.StartPlan()
+            _fullPlan = renderer.StartPlan()
                                .Then<GeometryBufferComponent>()
                                .Then<EdgeDetectComponent>()
                                .Then<Ssao>()
@@ -79,13 +79,13 @@ namespace GraphicsTests.Tests
                                .Then<ToneMapComponent>()
                                .Then<AntiAliasComponent>()
                                .Show("antialiased");
-            ssaoPlan = renderer.StartPlan()
+            _ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<EdgeDetectComponent>()
                 .Then<Ssao>()
                 .Show("ssao");
 
-            lightingPlan = renderer.StartPlan()
+            _lightingPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<Ssao>()
                 .Then<LightingComponent>()
@@ -93,25 +93,25 @@ namespace GraphicsTests.Tests
                 .Then<TranslucentComponent>();
                 //.Show("lightbuffer");
 
-            edgeDetectPlan = renderer.StartPlan()
+            _edgeDetectPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<EdgeDetectComponent>()
                 .Show("edges");
 
-            normalPlan = renderer.StartPlan()
+            _normalPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
-                .Then(new AntiAliasComponent(kernel.Get<GraphicsDevice>(), "gbuffer_normals"))
+                .Then(new AntiAliasComponent(_kernel.Get<GraphicsDevice>(), "gbuffer_normals"))
                 .Show("antialiased");
 
-            depthPlan = renderer.StartPlan()
+            _depthPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Show("gbuffer_depth");
 
-            diffusePlan = renderer.StartPlan()
+            _diffusePlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Show("gbuffer_diffuse");
 
-            noAAPlan = renderer.StartPlan()
+            _noAaPlan = renderer.StartPlan()
                                .Then<GeometryBufferComponent>()
                                .Then<EdgeDetectComponent>()
                                .Then<Ssao>()
@@ -121,12 +121,12 @@ namespace GraphicsTests.Tests
                                .Then<ToneMapComponent>()
                                .Show("tonemapped");
 
-            fullPlan.Apply();
+            _fullPlan.Apply();
 
             base.BeginTransitionOn();
 
             //var game = kernel.Get<TestGame>();
-            game.DisplayUI = true;
+            _game.DisplayUI = true;
             //game.IsFixedTimeStep = true;
         }
 
@@ -134,34 +134,34 @@ namespace GraphicsTests.Tests
         {
             var keyboard = Keyboard.GetState();
             if (keyboard.IsKeyDown(Keys.D1))
-                ssaoPlan.Apply();
+                _ssaoPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D3))
-                edgeDetectPlan.Apply();
+                _edgeDetectPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D4))
-                lightingPlan.Apply();
+                _lightingPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D5))
-                normalPlan.Apply();
+                _normalPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D6))
-                depthPlan.Apply();
+                _depthPlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D7))
-                diffusePlan.Apply();
+                _diffusePlan.Apply();
             else if (keyboard.IsKeyDown(Keys.D8))
-                noAAPlan.Apply();
+                _noAaPlan.Apply();
             else
-                fullPlan.Apply();
+                _fullPlan.Apply();
 
             if (keyboard.IsKeyDown(Keys.D2))
-                ssaoIntensity.Value = 0;
+                _ssaoIntensity.Value = 0;
             else
-                ssaoIntensity.Value = 20;
+                _ssaoIntensity.Value = 20;
 
-            scene.Update(gameTime);
+            _scene.Update(gameTime);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            scene.Draw(gameTime);
+            _scene.Draw(gameTime);
             base.Draw(gameTime);
         }
     }

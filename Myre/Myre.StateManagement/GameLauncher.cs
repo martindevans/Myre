@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Microsoft.Xna.Framework;
+
+using Game = Microsoft.Xna.Framework.Game;
 
 namespace Myre.StateManagement
 {

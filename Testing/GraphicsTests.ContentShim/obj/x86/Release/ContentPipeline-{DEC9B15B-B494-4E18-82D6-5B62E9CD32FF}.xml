@@ -356,7 +356,7 @@
       <Time>2011-09-01T03:43:11.1624841+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\Ground_0.xml</Key>
-        <Value>2015-08-24T15:43:48.6359254+01:00</Value>
+        <Value>2015-08-25T16:06:47.4145951+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -369,7 +369,7 @@
       <Time>2014-08-04T14:32:48.226297+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\sphere_0.xml</Key>
-        <Value>2015-08-24T15:43:48.7149233+01:00</Value>
+        <Value>2015-08-25T16:06:47.472585+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -382,7 +382,7 @@
       <Time>2011-09-01T03:43:12.0925373+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\SkyboxModel_0.xml</Key>
-        <Value>2015-08-24T15:43:48.7599235+01:00</Value>
+        <Value>2015-08-25T16:06:47.5015851+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -652,7 +652,7 @@
       <Time>2015-02-04T01:36:49.6542356+00:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Fonts\Cousine-Regular-Latin_0.xml</Key>
-        <Value>2015-08-24T15:44:57.4825177+01:00</Value>
+        <Value>2015-08-25T16:07:53.9632306+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -670,7 +670,7 @@
       <Time>2011-09-01T03:43:11.6025093+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\Hebe2_0.xml</Key>
-        <Value>2015-08-24T15:45:04.3331452+01:00</Value>
+        <Value>2015-08-25T16:08:00.7356041+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -688,7 +688,7 @@
       <Time>2014-01-15T22:23:10.3177089+00:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_0.xml</Key>
-        <Value>2015-08-24T15:45:37.6589716+01:00</Value>
+        <Value>2015-08-25T16:08:33.0469559+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -706,7 +706,7 @@
       <Time>2011-09-01T03:43:14.0406487+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Sponza_0.xml</Key>
-        <Value>2015-08-24T15:45:43.7139751+01:00</Value>
+        <Value>2015-08-25T16:08:38.86531+01:00</Value>
       </Dependency>
       <Request>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\spnza_bricks_a_diff_0.xnb</Request>
       <Request>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\spnza_bricks_a_ddn_0.xnb</Request>
@@ -770,7 +770,7 @@
       <Time>2014-10-01T17:53:20.2795678+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -783,7 +783,7 @@
       <Time>2014-10-01T17:53:20.2895682+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -796,7 +796,7 @@
       <Time>2014-10-01T17:53:20.3145695+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -809,7 +809,7 @@
       <Time>2014-10-02T20:49:41.9061929+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -822,7 +822,7 @@
       <Time>2014-10-01T17:53:22.1083973+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -835,7 +835,7 @@
       <Time>2014-10-01T17:53:20.2975687+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -848,7 +848,7 @@
       <Time>2014-10-01T17:53:20.306569+01:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_1.xml</Key>
-        <Value>2015-08-24T15:46:12.7987871+01:00</Value>
+        <Value>2015-08-25T16:09:07.3624384+01:00</Value>
       </Dependency>
     </Item>
     <Item>
@@ -910,7 +910,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\spnza_bricks_a_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2389719+01:00</Time>
+      <Time>2015-08-25T16:08:33.5249569+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\spnza_bricks_a_ddn.tga</Source>
@@ -922,7 +922,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\spnza_bricks_a_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2439725+01:00</Time>
+      <Time>2015-08-25T16:08:33.529957+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_arch_diff.tga</Source>
@@ -934,7 +934,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_arch_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2499735+01:00</Time>
+      <Time>2015-08-25T16:08:33.5349561+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_ceiling_a_diff.tga</Source>
@@ -946,7 +946,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_ceiling_a_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.254972+01:00</Time>
+      <Time>2015-08-25T16:08:33.5409574+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_column_a_diff.tga</Source>
@@ -958,7 +958,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_column_a_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2609724+01:00</Time>
+      <Time>2015-08-25T16:08:33.5449679+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_column_a_ddn.tga</Source>
@@ -970,7 +970,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_column_a_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2669731+01:00</Time>
+      <Time>2015-08-25T16:08:33.5519674+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_floor_a_diff.tga</Source>
@@ -982,7 +982,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_floor_a_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2729735+01:00</Time>
+      <Time>2015-08-25T16:08:33.5569596+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_column_c_diff.tga</Source>
@@ -994,7 +994,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_column_c_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2779735+01:00</Time>
+      <Time>2015-08-25T16:08:33.562957+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_column_c_ddn.tga</Source>
@@ -1006,7 +1006,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_column_c_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2849731+01:00</Time>
+      <Time>2015-08-25T16:08:33.5679582+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_details_diff.tga</Source>
@@ -1018,7 +1018,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_details_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2899743+01:00</Time>
+      <Time>2015-08-25T16:08:33.5729573+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_column_b_diff.tga</Source>
@@ -1030,7 +1030,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_column_b_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.2969733+01:00</Time>
+      <Time>2015-08-25T16:08:33.5779679+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_column_b_ddn.tga</Source>
@@ -1042,7 +1042,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_column_b_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3029733+01:00</Time>
+      <Time>2015-08-25T16:08:33.5829574+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_roof_diff.tga</Source>
@@ -1054,7 +1054,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_roof_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3079743+01:00</Time>
+      <Time>2015-08-25T16:08:33.5879565+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_thorn_diff.tga</Source>
@@ -1066,7 +1066,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_thorn_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3129737+01:00</Time>
+      <Time>2015-08-25T16:08:33.5919567+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_thorn_ddn.tga</Source>
@@ -1078,7 +1078,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_thorn_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3219731+01:00</Time>
+      <Time>2015-08-25T16:08:33.5999569+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\sponza_fabric_diff.tga</Source>
@@ -1090,7 +1090,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\sponza_fabric_diff_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3289738+01:00</Time>
+      <Time>2015-08-25T16:08:33.6059585+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\chain_texture.tga</Source>
@@ -1102,7 +1102,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\chain_texture_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3329726+01:00</Time>
+      <Time>2015-08-25T16:08:33.6089675+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\chain_texture_ddn.tga</Source>
@@ -1114,7 +1114,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\chain_texture_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3429744+01:00</Time>
+      <Time>2015-08-25T16:08:33.6169583+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\vase_hanging.tga</Source>
@@ -1126,7 +1126,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\vase_hanging_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3489739+01:00</Time>
+      <Time>2015-08-25T16:08:33.6239645+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\vase_plant.tga</Source>
@@ -1138,7 +1138,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\vase_plant_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3549734+01:00</Time>
+      <Time>2015-08-25T16:08:33.6299876+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\vase_round.tga</Source>
@@ -1150,7 +1150,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\vase_round_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3669732+01:00</Time>
+      <Time>2015-08-25T16:08:33.6419572+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\vase_round_ddn.tga</Source>
@@ -1162,7 +1162,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\vase_round_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3729745+01:00</Time>
+      <Time>2015-08-25T16:08:33.6479564+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\vase_dif.tga</Source>
@@ -1174,7 +1174,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\vase_dif_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3799732+01:00</Time>
+      <Time>2015-08-25T16:08:33.6539565+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\lion.tga</Source>
@@ -1186,7 +1186,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\lion_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.386973+01:00</Time>
+      <Time>2015-08-25T16:08:33.6589677+01:00</Time>
     </Item>
     <Item>
       <Source>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\FBX\B8732296\Sponza.fbm\lion_ddn.tga</Source>
@@ -1198,7 +1198,7 @@
       </Parameters>
       <Options>None</Options>
       <Output>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\bin\x86\Release\Content\lion_ddn_0.xnb</Output>
-      <Time>2015-08-24T15:45:38.3929743+01:00</Time>
+      <Time>2015-08-25T16:08:33.6639566+01:00</Time>
     </Item>
     <Item>
       <Source>Models\zoe.fbx</Source>
@@ -1208,7 +1208,7 @@
       <Time>2014-01-15T22:23:10.3177089+00:00</Time>
       <Dependency>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Testing\GraphicsTests.ContentShim\obj\x86\Release\Models\zoe_0.xml</Key>
-        <Value>2015-08-24T15:45:37.6589716+01:00</Value>
+        <Value>2015-08-25T16:08:33.0469559+01:00</Value>
       </Dependency>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
@@ -1226,15 +1226,15 @@
     <Assemblies>
       <Assembly>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Myre\Myre.Graphics.Pipeline\bin\x86\Debug\Myre.Graphics.Pipeline.dll</Key>
-        <Value>2015-08-24T14:56:33.1280574+01:00</Value>
+        <Value>2015-08-25T16:06:45.5349887+01:00</Value>
       </Assembly>
       <Assembly>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Myre\Myre.Graphics\bin\Release\Myre.Graphics.dll</Key>
-        <Value>2015-08-24T14:42:44.1904928+01:00</Value>
+        <Value>2015-08-25T16:06:44.9707207+01:00</Value>
       </Assembly>
       <Assembly>
         <Key>C:\Users\Martin\Documents\dotnet\Martin-Myre\Myre\Myre\bin\Release\Myre.dll</Key>
-        <Value>2015-08-24T14:27:30.1063823+01:00</Value>
+        <Value>2015-08-25T16:06:43.4494157+01:00</Value>
       </Assembly>
       <Assembly>
         <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>

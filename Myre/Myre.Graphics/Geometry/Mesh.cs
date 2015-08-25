@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Geometry
@@ -20,11 +21,11 @@ namespace Myre.Graphics.Geometry
         public int StartIndex { get; set; }
         public int BaseVertex { get; set; }
         public int MinVertexIndex { get; set; }
-        public Matrix MeshTransform { get; set; }
+        public Matrix4x4 MeshTransform { get; set; }
 
         public Mesh()
         {
-            MeshTransform = Matrix.Identity;
+            MeshTransform = Matrix4x4.Identity;
         }
 
         public void Dispose()
@@ -66,7 +67,7 @@ namespace Myre.Graphics.Geometry
         {
             var mesh = existingInstance ?? new Mesh();
 
-            mesh.MeshTransform = Matrix.Identity;
+            mesh.MeshTransform = Matrix4x4.Identity;
 
             mesh.Name = input.ReadString();
             mesh.VertexCount = input.ReadInt32();
@@ -93,7 +94,7 @@ namespace Myre.Graphics.Geometry
                 mesh.Materials.Add(key, material);
             }
 
-            mesh.BoundingSphere = input.ReadObject<BoundingSphere>();
+            mesh.BoundingSphere = input.ReadObject<Microsoft.Xna.Framework.BoundingSphere>().FromXNA();
 
             return mesh;
         }

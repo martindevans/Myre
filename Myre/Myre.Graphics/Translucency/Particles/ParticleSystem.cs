@@ -2,11 +2,14 @@
 // 
 
 using System.Diagnostics;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Myre.Collections;
+using Myre.Extensions;
 using Myre.Graphics.Materials;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Translucency.Particles
 {
@@ -42,7 +45,7 @@ namespace Myre.Graphics.Translucency.Particles
         /// <summary>
         /// Gets or sets the world transformation matrix to apply to this <see cref="ParticleSystem"/>s' particles.
         /// </summary>
-        public Matrix Transform { get; set; }
+        public Matrix4x4 Transform { get; set; }
 
         /// <summary>
         /// Gets the number of active particles.
@@ -66,7 +69,7 @@ namespace Myre.Graphics.Translucency.Particles
         {
             _device = device;
             _material = new Material(Content.Load<Effect>("ParticleSystem").Clone());
-            Transform = Matrix.Identity;
+            Transform = Matrix4x4.Identity;
         }
 
         /// <summary>
@@ -132,8 +135,8 @@ namespace Myre.Graphics.Translucency.Particles
             // write data into buffer
             for (int i = 0; i < 4; i++)
             {
-                _particles[_free * 4 + i].Position = position;
-                _particles[_free * 4 + i].Velocity = new Vector4(velocity, angularVelocity);
+                _particles[_free * 4 + i].Position = position.ToXNA();
+                _particles[_free * 4 + i].Velocity = new Vector4(velocity, angularVelocity).ToXNA();
                 _particles[_free * 4 + i].Scales = new HalfVector2(size, lifetimeScale > 0 ? 1f / lifetimeScale : 1);
                 _particles[_free * 4 + i].StartColour = startColour;
                 _particles[_free * 4 + i].EndColour = endColour;
@@ -191,7 +194,7 @@ namespace Myre.Graphics.Translucency.Particles
                 // shader particle animation is keyed off this value.
                 _currentTimeParameter.SetValue(_time);
 
-                data.Set<Matrix>("world", Transform);
+                data.Set<Matrix4x4>("world", Transform);
 
                 // Set the particle vertex and index buffer.
                 _device.SetVertexBuffer(_vertices);
@@ -368,30 +371,30 @@ namespace Myre.Graphics.Translucency.Particles
         // Modified from Particles3D sample
         void AddNewParticlesToVertexBuffer()
         {
-            const int stride = ParticleVertex.SIZE_IN_BYTES;
+            const int STRIDE = ParticleVertex.SIZE_IN_BYTES;
 
             if (_newlyCreated < _free)
             {
                 // If the new particles are all in one consecutive range,
                 // we can upload them all in a single call.
-                _vertices.SetData(_newlyCreated * stride * 4, _particles,
+                _vertices.SetData(_newlyCreated * STRIDE * 4, _particles,
                                  _newlyCreated * 4, (_free - _newlyCreated) * 4,
-                                 stride, SetDataOptions.NoOverwrite);
+                                 STRIDE, SetDataOptions.NoOverwrite);
             }
             else
             {
                 // If the new particle range wraps past the end of the queue
                 // back to the start, we must split them over two upload calls.
-                _vertices.SetData(_newlyCreated * stride * 4, _particles,
+                _vertices.SetData(_newlyCreated * STRIDE * 4, _particles,
                                  _newlyCreated * 4,
                                  (Description.Capacity - _newlyCreated) * 4,
-                                 stride, SetDataOptions.NoOverwrite);
+                                 STRIDE, SetDataOptions.NoOverwrite);
 
                 if (_free > 0)
                 {
                     _vertices.SetData(0, _particles,
                                      0, _free * 4,
-                                     stride, SetDataOptions.NoOverwrite);
+                                     STRIDE, SetDataOptions.NoOverwrite);
                 }
             }
 

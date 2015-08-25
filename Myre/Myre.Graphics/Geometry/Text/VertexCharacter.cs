@@ -1,8 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
+using Myre.Extensions;
 
 namespace Myre.Graphics.Geometry.Text
 {
@@ -67,7 +68,7 @@ namespace Myre.Graphics.Geometry.Text
             var model = input.ReadObject<Mesh>();
 
             //read width
-            var size = input.ReadVector2();
+            var size = input.ReadVector2().FromXNA();
 
             return new VertexCharacter(character, kerning, model, size);
         }

@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Graphics.Materials;
+
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Myre.Graphics
 {

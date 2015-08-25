@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
-using Myre.Collections;
 using Myre.Graphics.Pipeline.Animations;
 using Myre.Graphics.Pipeline.Materials;
 using System;
@@ -366,7 +365,10 @@ namespace Myre.Graphics.Pipeline.Models
             foreach (BoneContent bone in bones)
             {
                 bindPose.Add(bone.Transform);
-                inverseBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
+
+                Matrix inverted = Matrix.Invert(bone.AbsoluteTransform);
+                inverseBindPose.Add(inverted);
+
                 skeletonHierarchy.Add(bones.IndexOf(bone.Parent as BoneContent));
             }
 
@@ -380,16 +382,16 @@ namespace Myre.Graphics.Pipeline.Models
         }
 
         #region ABB fitting
-        private static BoundingBox CalculateBoundingBox(ICollection<Vector3> points, BoneContent bone)
+        private static Microsoft.Xna.Framework.BoundingBox CalculateBoundingBox(ICollection<Vector3> points, BoneContent bone)
         {
             if (points.Count == 0)
-                return new BoundingBox();
+                return new Microsoft.Xna.Framework.BoundingBox();
 
             Matrix m = Matrix.Invert(bone.AbsoluteTransform);
 
             //We could sample a load of rotations *around* the bone axis here, and establish a rotated bounding box to find a slightly smaller volume
 
-            return BoundingBox.CreateFromPoints(points.Select(p => Vector3.Transform(p, m)));
+            return Microsoft.Xna.Framework.BoundingBox.CreateFromPoints(points.Select(p => Vector3.Transform(p, m)));
         }
         #endregion
         #endregion
@@ -405,7 +407,7 @@ namespace Myre.Graphics.Pipeline.Models
             foreach (var item in mesh.Geometry)
             {
                 if (!item.Vertices.Channels.Contains(texCoord0))
-                    item.Vertices.Channels.Add<Vector2>(texCoord0, null);
+                    item.Vertices.Channels.Add<Microsoft.Xna.Framework.Vector2>(texCoord0, null);
             }
 
             // calculate tangent frames for normal mapping

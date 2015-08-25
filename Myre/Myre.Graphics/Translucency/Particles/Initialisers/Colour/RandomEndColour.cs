@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
 {
@@ -21,7 +22,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Colour
             particle.EndColour = new Color(particle.StartColour.ToVector4() + Color.Lerp(MinEndColour, MaxEndColour, (float)random.NextDouble()).ToVector4());
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new RandomEndColour(MinEndColour, MaxEndColour);
         }

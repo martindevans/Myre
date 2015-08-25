@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Myre.UI.InputDevices;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI.Gestures
 {

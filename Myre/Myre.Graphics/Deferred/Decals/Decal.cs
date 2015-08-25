@@ -1,13 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
+using Myre.Extensions;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using Ninject;
 
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
+using ContainmentType = Microsoft.Xna.Framework.ContainmentType;
 
 #if PROFILE
 using Myre.Debugging.Statistics;
@@ -19,7 +22,7 @@ namespace Myre.Graphics.Deferred.Decals
     public class Decal
         : Behaviour
     {
-        public static readonly TypedName<Matrix> TransformName = ModelInstance.TransformName;
+        public static readonly TypedName<Matrix4x4> TransformName = ModelInstance.TransformName;
         public static readonly TypedName<Texture2D> DiffuseName = new TypedName<Texture2D>("diffuse_texture");
         public static readonly TypedName<Texture2D> NormalName = new TypedName<Texture2D>("normal_texture");
         public static readonly TypedName<float> AngleCutoffName = new TypedName<float>("angle_cutoff");
@@ -28,10 +31,10 @@ namespace Myre.Graphics.Deferred.Decals
 
         private Vector3 _decalDirection;
 
-        private Matrix _inverseTransform;
+        private Matrix4x4 _inverseTransform;
 
-        private Property<Matrix> _transform;
-        public Matrix Transform
+        private Property<Matrix4x4> _transform;
+        public Matrix4x4 Transform
         {
             get
             {
@@ -105,8 +108,8 @@ namespace Myre.Graphics.Deferred.Decals
         {
             _transform = context.CreateProperty(TransformName);
             _transform.PropertySet += (p, o, n) => {
-                _inverseTransform = Matrix.Invert(n);
-                _decalDirection = Vector3.Normalize(Vector3.TransformNormal(Vector3.Down, n));
+                Matrix4x4.Invert(n, out _inverseTransform);
+                _decalDirection = Vector3.Normalize(Vector3.TransformNormal(-Vector3.UnitY, n));
             };
 
             _diffuse = context.CreateProperty(DiffuseName);
@@ -234,10 +237,10 @@ namespace Myre.Graphics.Deferred.Decals
                 device.Indices = _unitCubeIndices;
 
                 //Get data from the renderer
-                var worldBox = renderer.Data.Get<Matrix>("world");
-                var inverseWorldBox = renderer.Data.Get<Matrix>("inverseworld");
-                var cameraViewBox = renderer.Data.Get<Matrix>("view");
-                var worldViewBox = renderer.Data.Get<Matrix>("worldview");
+                var worldBox = renderer.Data.Get<Matrix4x4>("world");
+                var inverseWorldBox = renderer.Data.Get<Matrix4x4>("inverseworld");
+                var cameraViewBox = renderer.Data.Get<Matrix4x4>("view");
+                var worldViewBox = renderer.Data.Get<Matrix4x4>("worldview");
 
                 var cameraPosition = renderer.Data.Get<Vector3>("cameraposition");
                 var cameraNearClip = renderer.Data.Get<float>("nearclip");
@@ -256,7 +259,7 @@ namespace Myre.Graphics.Deferred.Decals
                     worldViewBox.Value = behaviour.Transform * cameraViewBox.Value;
 
                     //Transform the camera position into object space and test to see if it intersects the decal
-                    var cameraSphere = new BoundingSphere(cameraPosition.Value, cameraNearClip.Value).Transform(behaviour._inverseTransform);
+                    var cameraSphere = new BoundingSphere(cameraPosition.Value, cameraNearClip.Value).Transform(ref behaviour._inverseTransform);
                     var cameraIntersectsDecal = new BoundingBox(new Vector3(-0.5f), new Vector3(0.5f)).Contains(cameraSphere) != ContainmentType.Disjoint;
 
                     //Select appropriate material

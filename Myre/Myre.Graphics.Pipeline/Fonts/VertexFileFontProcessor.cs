@@ -18,6 +18,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
+
 namespace Myre.Graphics.Pipeline.Fonts
 {
     [ContentProcessor(DisplayName = "Myre Vertex File Font Processor")]
@@ -328,12 +330,12 @@ namespace Myre.Graphics.Pipeline.Fonts
 
         private Vector2[] CreateTextureData(List<Vector3> vertexPositions)
         {
-            Vector2 min = vertexPositions.Select(a => a.XZ()).Aggregate(new Vector2(float.MaxValue), (a, b) => new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y)));
-            Vector2 max = vertexPositions.Select(a => a.XZ()).Aggregate(new Vector2(float.MinValue), (a, b) => new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y)));
+            Vector2 min = vertexPositions.Select(a => a.FromXNA().XZ()).Aggregate(new Vector2(float.MaxValue), (a, b) => new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y)));
+            Vector2 max = vertexPositions.Select(a => a.FromXNA().XZ()).Aggregate(new Vector2(float.MinValue), (a, b) => new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y)));
             var range = max - min;
 
             return vertexPositions.Select(a => {
-                var uv = (a.XZ() - min) / range;
+                var uv = (a.FromXNA().XZ().ToXNA() - min) / range;
                 if (a.Y < 0)
                     uv = Vector2.One - uv;
                 return uv;
@@ -368,7 +370,7 @@ namespace Myre.Graphics.Pipeline.Fonts
                 }
 
                 //eliminate triangle with small enough area
-                var triangleArea = Math.Abs(ab.Cross(cb) / 2);
+                var triangleArea = Math.Abs(ab.FromXNA().Cross(cb.FromXNA()) / 2);
                 if (triangleArea < FontSize * AreaPrecision)
                 {
                     points.RemoveAt((i + 1) % points.Count);

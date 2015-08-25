@@ -1,6 +1,9 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.UI.Controls
 {
@@ -27,7 +30,7 @@ namespace Myre.UI.Controls
                 if (!_text.Equals(value))
                 {
                     _text = value;
-                    SetSize((Int2D)_font.MeasureString(_text));
+                    SetSize((Int2D)_font.MeasureString(_text).FromXNA());
                 }
             }
         }
@@ -65,7 +68,7 @@ namespace Myre.UI.Controls
 
             _text = "";
             Font = font;
-            SetSize((Int2D)font.MeasureString(_text));
+            SetSize((Int2D)font.MeasureString(_text).FromXNA());
 
             Action<Frame> recalculateSize = c => SetSize(new Int2D(Area.Width, Font.LineSpacing));
 
@@ -78,7 +81,7 @@ namespace Myre.UI.Controls
         /// <param name="batch">An spritebactch already started for alpha blending with deferred sort mode.</param>
         public override void Draw(SpriteBatch batch)
         {
-            batch.DrawString(Font, Text, new Vector2(Area.X, Area.Y), Colour);
+            batch.DrawString(Font, Text, new Vector2(Area.X, Area.Y).ToXNA(), Colour);
         }
     }
 }

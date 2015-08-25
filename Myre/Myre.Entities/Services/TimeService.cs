@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.Xna.Framework;
 using Ninject;
+
+using Game = Microsoft.Xna.Framework.Game;
 
 namespace Myre.Entities.Services
 {

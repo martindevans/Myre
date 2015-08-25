@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Myre.UI.InputDevices;
+using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Myre.UI.InputDevices;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using IGameComponent = Microsoft.Xna.Framework.IGameComponent;
+using IUpdateable = Microsoft.Xna.Framework.IUpdateable;
 
 namespace Myre.UI
 {

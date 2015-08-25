@@ -4,7 +4,8 @@ using Microsoft.Xna.Framework.Content;
 using Myre.Graphics;
 using Myre.Collections;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace GraphicsTests.Tests
 {

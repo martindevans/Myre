@@ -1,8 +1,11 @@
-using Microsoft.Xna.Framework;
 using System;
 using System.IO;
 using System.Windows.Forms;
 
+using Color = Microsoft.Xna.Framework.Color;
+using Game = Microsoft.Xna.Framework.Game;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using GraphicsDeviceManager = Microsoft.Xna.Framework.GraphicsDeviceManager;
 
 namespace ContentBuilderGame
 {

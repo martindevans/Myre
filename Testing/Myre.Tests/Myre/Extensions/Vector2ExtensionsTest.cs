@@ -1,7 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Xna.Framework;
+﻿using System.Numerics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Myre.Extensions;
-using MsAssert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
 namespace Myre.Tests.Myre.Extensions
 {
@@ -13,7 +12,7 @@ namespace Myre.Tests.Myre.Extensions
         {
             var shape = new[] {new Vector2(0, 0), new Vector2(10, 0), new Vector2(10, 10), new Vector2(0, 10)};
             var area = shape.Area();
-            MsAssert.AreEqual(-100f, area);
+            Assert.AreEqual(-100f, area);
         }
 
         [TestMethod]
@@ -21,7 +20,7 @@ namespace Myre.Tests.Myre.Extensions
         {
             var shape = new[] { new Vector2(0, 0), new Vector2(0, 10), new Vector2(10, 10), new Vector2(10, 0) };
             var area = shape.Area();
-            MsAssert.AreEqual(100f, area);
+            Assert.AreEqual(100f, area);
         }
     }
 }

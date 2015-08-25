@@ -1,8 +1,9 @@
 ﻿
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
+using Myre.Extensions;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI.InputDevices
 {
@@ -42,7 +43,7 @@ namespace Myre.UI.InputDevices
                 var t = _touches[i];
                 Current = t;
 
-                ui.FindControls(t.Position, _buffer);
+                ui.FindControls(t.Position.FromXNA(), _buffer);
                 _current.AddRange(_buffer);
 
                 for (int j = 0; j < _buffer.Count; j++)

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
+using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.Xna.Framework;
 using Myre.Collections;
 
 namespace Myre.Tests.Myre.Collections
@@ -11,7 +11,8 @@ namespace Myre.Tests.Myre.Collections
         [TestMethod]
         public void Construct()
         {
-            ProximityOctreeDatabase<object> db = new ProximityOctreeDatabase<object>(100, 100, 100, 10);
+            // ReSharper disable once ObjectCreationAsStatement
+            new ProximityOctreeDatabase<object>(100, 100, 100, 10);
         }
 
         [TestMethod]
@@ -22,9 +23,9 @@ namespace Myre.Tests.Myre.Collections
             var o = new object();
             var token = db.Insert(new Vector3(0), o);
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(token);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(o, token.Item);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(new Vector3(0), token.Position);
+            Assert.IsNotNull(token);
+            Assert.AreEqual(o, token.Item);
+            Assert.AreEqual(new Vector3(0), token.Position);
         }
 
         [TestMethod]
@@ -35,16 +36,16 @@ namespace Myre.Tests.Myre.Collections
             var o = new object();
             var token = db.Insert(new Vector3(20, 20, 20), o);
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(token);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(o, token.Item);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(new Vector3(20), token.Position);
+            Assert.IsNotNull(token);
+            Assert.AreEqual(o, token.Item);
+            Assert.AreEqual(new Vector3(20), token.Position);
 
             var o2 = new object();
             var token2 = db.Insert(new Vector3(10, 10, 10), o2);
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(token2);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(o2, token2.Item);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(new Vector3(10), token2.Position);
+            Assert.IsNotNull(token2);
+            Assert.AreEqual(o2, token2.Item);
+            Assert.AreEqual(new Vector3(10), token2.Position);
         }
 
         [TestMethod]
@@ -52,12 +53,12 @@ namespace Myre.Tests.Myre.Collections
         {
             ProximityOctreeDatabase<object> db = new ProximityOctreeDatabase<object>(100, 100, 100, 1);
 
-            var o = "a";
-            var token = db.Insert(new Vector3(20, 20, 20), o);
+            const string O = "a";
+            var token = db.Insert(new Vector3(20, 20, 20), O);
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(token);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual("a", token.Item);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(new Vector3(20), token.Position);
+            Assert.IsNotNull(token);
+            Assert.AreEqual("a", token.Item);
+            Assert.AreEqual(new Vector3(20), token.Position);
 
             token.Dispose();
         }
@@ -89,15 +90,15 @@ namespace Myre.Tests.Myre.Collections
             var o = new object();
             var token = db.Insert(new Vector3(5), o);
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(token);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(o, token.Item);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(new Vector3(5), token.Position);
+            Assert.IsNotNull(token);
+            Assert.AreEqual(o, token.Item);
+            Assert.AreEqual(new Vector3(5), token.Position);
 
             token.Position = new Vector3(10);
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.IsNotNull(token);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(o, token.Item);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(new Vector3(10), token.Position);
+            Assert.IsNotNull(token);
+            Assert.AreEqual(o, token.Item);
+            Assert.AreEqual(new Vector3(10), token.Position);
         }
 
         [TestMethod]
@@ -105,6 +106,7 @@ namespace Myre.Tests.Myre.Collections
         {
             ProximityOctreeDatabase<object> db = new ProximityOctreeDatabase<object>(5, 5, 5, 1);
 
+            // ReSharper disable once UnusedVariable
             var token = new[]
             {
                 db.Insert(new Vector3(1), "a"),
@@ -118,11 +120,11 @@ namespace Myre.Tests.Myre.Collections
 
             var inBounds = db.ItemsInBounds(new BoundingBox(new Vector3(0), new Vector3(12))).ToArray();
 
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(4, inBounds.Length);
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "a"));
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "b"));
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "c"));
-            Microsoft.VisualStudio.TestTools.UnitTesting.Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "d"));
+            Assert.AreEqual(4, inBounds.Length);
+            Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "a"));
+            Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "b"));
+            Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "c"));
+            Assert.AreEqual(1, inBounds.Count(a => (string)a.Value == "d"));
         }
     }
 }

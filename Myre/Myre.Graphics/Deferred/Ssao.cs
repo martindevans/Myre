@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 using Myre.Graphics.Materials;
+
+using Color = Microsoft.Xna.Framework.Color;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Deferred
 {
@@ -34,7 +38,7 @@ namespace Myre.Graphics.Deferred
                     (float)rand.NextDouble(),
                     (float)rand.NextDouble());
 
-                Vector2.Normalize(ref vector, out vector);
+                vector = Vector2.Normalize(vector);
 
                 colours[i] = new Color(vector.X, vector.Y, 0);
             }
@@ -45,9 +49,9 @@ namespace Myre.Graphics.Deferred
             return texture;
         }
 
-        private Vector2[] GenerateRandomSamplePositions(int numSamples, Random rand)
+        private Microsoft.Xna.Framework.Vector2[] GenerateRandomSamplePositions(int numSamples, Random rand)
         {
-            Vector2[] samples = new Vector2[numSamples];
+            Microsoft.Xna.Framework.Vector2[] samples = new Microsoft.Xna.Framework.Vector2[numSamples];
 
             for (int i = 0; i < numSamples; i++)
             {
@@ -56,7 +60,7 @@ namespace Myre.Graphics.Deferred
 
                 var length = i / (float)numSamples;
                 length = MathHelper.Lerp(0.1f, 1.0f, length * length);
-                samples[i] = vector * length;
+                samples[i] = (vector * length).ToXNA();
             }
 
             return samples;

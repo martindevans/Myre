@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using System.Collections.Generic;
 
 namespace Myre.Graphics.Pipeline.Animations
 {
@@ -13,9 +13,9 @@ namespace Myre.Graphics.Pipeline.Animations
         public List<Matrix> InverseBindPose { get; private set; }
         public List<int> Hierarchy { get; private set; }
         public List<string> BoneNames { get; private set; }
-        public List<BoundingBox> Bounds { get; private set; }
+        public List<Microsoft.Xna.Framework.BoundingBox> Bounds { get; private set; }
 
-        public SkinningDataContent(List<Matrix> bindPose, List<Matrix> inverseBindPose, List<int> hierarchy, List<string> names, List<BoundingBox> bounds)
+        public SkinningDataContent(List<Matrix> bindPose, List<Matrix> inverseBindPose, List<int> hierarchy, List<string> names, List<Microsoft.Xna.Framework.BoundingBox> bounds)
         {
             BindPose = bindPose;
             InverseBindPose = inverseBindPose;
@@ -61,7 +61,7 @@ namespace Myre.Graphics.Pipeline.Animations
             //Write bounds
             output.Write(value.Bounds.Count);
             foreach (var bound in value.Bounds)
-                output.WriteObject<BoundingBox>(bound);
+                output.WriteObject<Microsoft.Xna.Framework.BoundingBox>(bound);
         }
 
         public override string GetRuntimeReader(TargetPlatform targetPlatform)

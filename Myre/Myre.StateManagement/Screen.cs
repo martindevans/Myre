@@ -1,5 +1,6 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.StateManagement
 {

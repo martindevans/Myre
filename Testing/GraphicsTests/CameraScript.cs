@@ -1,61 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Myre.Graphics;
+using System;
+
+using Curve = Microsoft.Xna.Framework.Curve;
+using CurveLoopType = Microsoft.Xna.Framework.CurveLoopType;
+using CurveKey = Microsoft.Xna.Framework.CurveKey;
 
 namespace GraphicsTests
 {
     class Curve3D
     {
-        public Curve curveX = new Curve();
-        public Curve curveY = new Curve();
-        public Curve curveZ = new Curve();
+        public readonly Curve CurveX = new Curve();
+        public readonly Curve CurveY = new Curve();
+        public readonly Curve CurveZ = new Curve();
 
         public Curve3D()
         {
-            curveX.PostLoop = CurveLoopType.Oscillate;
-            curveY.PostLoop = CurveLoopType.Oscillate;
-            curveZ.PostLoop = CurveLoopType.Oscillate;
+            CurveX.PostLoop = CurveLoopType.Oscillate;
+            CurveY.PostLoop = CurveLoopType.Oscillate;
+            CurveZ.PostLoop = CurveLoopType.Oscillate;
 
-            curveX.PreLoop = CurveLoopType.Oscillate;
-            curveY.PreLoop = CurveLoopType.Oscillate;
-            curveZ.PreLoop = CurveLoopType.Oscillate;
+            CurveX.PreLoop = CurveLoopType.Oscillate;
+            CurveY.PreLoop = CurveLoopType.Oscillate;
+            CurveZ.PreLoop = CurveLoopType.Oscillate;
         }
 
         public void SetTangents()
         {
-            CurveKey prev;
-            CurveKey current;
-            CurveKey next;
-            int prevIndex;
-            int nextIndex;
-            for (int i = 0; i < curveX.Keys.Count; i++)
+            for (int i = 0; i < CurveX.Keys.Count; i++)
             {
-                prevIndex = i - 1;
+                int prevIndex = i - 1;
                 if (prevIndex < 0) prevIndex = i;
 
-                nextIndex = i + 1;
-                if (nextIndex == curveX.Keys.Count) nextIndex = i;
+                int nextIndex = i + 1;
+                if (nextIndex == CurveX.Keys.Count) nextIndex = i;
 
-                prev = curveX.Keys[prevIndex];
-                next = curveX.Keys[nextIndex];
-                current = curveX.Keys[i];
+                CurveKey prev = CurveX.Keys[prevIndex];
+                CurveKey next = CurveX.Keys[nextIndex];
+                CurveKey current = CurveX.Keys[i];
                 SetCurveKeyTangent(ref prev, ref current, ref next);
-                curveX.Keys[i] = current;
+                CurveX.Keys[i] = current;
 
-                prev = curveY.Keys[prevIndex];
-                next = curveY.Keys[nextIndex];
-                current = curveY.Keys[i];
+                prev = CurveY.Keys[prevIndex];
+                next = CurveY.Keys[nextIndex];
+                current = CurveY.Keys[i];
                 SetCurveKeyTangent(ref prev, ref current, ref next);
-                curveY.Keys[i] = current;
+                CurveY.Keys[i] = current;
 
-                prev = curveZ.Keys[prevIndex];
-                next = curveZ.Keys[nextIndex];
-                current = curveZ.Keys[i];
+                prev = CurveZ.Keys[prevIndex];
+                next = CurveZ.Keys[nextIndex];
+                current = CurveZ.Keys[i];
                 SetCurveKeyTangent(ref prev, ref current, ref next);
-                curveZ.Keys[i] = current;
+                CurveZ.Keys[i] = current;
             }
         }
 
@@ -78,27 +74,28 @@ namespace GraphicsTests
 
         public void AddPoint(Vector3 point, float time)
         {
-            curveX.Keys.Add(new CurveKey(time, point.X));
-            curveY.Keys.Add(new CurveKey(time, point.Y));
-            curveZ.Keys.Add(new CurveKey(time, point.Z));
+            CurveX.Keys.Add(new CurveKey(time, point.X));
+            CurveY.Keys.Add(new CurveKey(time, point.Y));
+            CurveZ.Keys.Add(new CurveKey(time, point.Z));
         }
 
         public Vector3 GetPointOnCurve(float time)
         {
-            Vector3 point = new Vector3();
-            point.X = curveX.Evaluate(time);
-            point.Y = curveY.Evaluate(time);
-            point.Z = curveZ.Evaluate(time);
+            Vector3 point = new Vector3 {
+                X = CurveX.Evaluate(time),
+                Y = CurveY.Evaluate(time),
+                Z = CurveZ.Evaluate(time)
+            };
             return point;
         }
     }
 
     class CameraScript
     {
-        private Camera camera;
-        private Curve3D positionCurve;
-        private Curve3D lookatCurve;
-        private float time;
+        private readonly Camera _camera;
+        private readonly Curve3D _positionCurve;
+        private readonly Curve3D _lookatCurve;
+        private float _time;
 
         public Vector3 Position
         {
@@ -114,31 +111,31 @@ namespace GraphicsTests
 
         public CameraScript(Camera camera)
         {
-            this.camera = camera;
-            this.positionCurve = new Curve3D();
-            this.lookatCurve = new Curve3D();
+            _camera = camera;
+            _positionCurve = new Curve3D();
+            _lookatCurve = new Curve3D();
         }
 
         public void AddWaypoint(float time, Vector3 position, Vector3 lookat)
         {
-            positionCurve.AddPoint(position, time);
-            lookatCurve.AddPoint(lookat, time);
+            _positionCurve.AddPoint(position, time);
+            _lookatCurve.AddPoint(lookat, time);
         }
 
         public void Initialise()
         {
-            positionCurve.SetTangents();
-            lookatCurve.SetTangents();
+            _positionCurve.SetTangents();
+            _lookatCurve.SetTangents();
         }
 
         public void Update(float dt)
         {
-            time += dt;
+            _time += dt;
 
-            Position = positionCurve.GetPointOnCurve(time);
-            LookAt = lookatCurve.GetPointOnCurve(time);
+            Position = _positionCurve.GetPointOnCurve(_time);
+            LookAt = _lookatCurve.GetPointOnCurve(_time);
 
-            camera.View = Matrix.CreateLookAt(Position, LookAt, Vector3.Up);
+            _camera.View = Matrix4x4.CreateLookAt(Position, LookAt, Vector3.UnitY);
         }
     }
 }

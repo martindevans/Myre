@@ -1,10 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
+using Myre.Extensions;
 using Myre.Graphics.Geometry.Text;
+
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Myre.Graphics.Geometry
 {
@@ -217,7 +221,7 @@ namespace Myre.Graphics.Geometry
 
         private void Draw(SpriteBatch batch)
         {
-            batch.Draw(Texture, Position, SourceRectangle, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
+            batch.Draw(Texture, Position.ToXNA(), SourceRectangle, Color, Rotation, Origin.ToXNA(), Scale.ToXNA(), SpriteEffects, LayerDepth);
         }
 
         private bool IsInView(View view)

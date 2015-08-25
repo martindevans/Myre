@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -105,7 +104,7 @@ namespace Myre.Graphics.Pipeline.Animations
                     transform.Up = Vector3.Normalize(transform.Up);
                     transform.Backward = Vector3.Normalize(transform.Backward);
 
-                    keyframe.Transform.Decompose(out scale, out orientation, out pos);
+                    transform.Decompose(out scale, out orientation, out pos);
                 }
                 else
                 {
@@ -180,7 +179,7 @@ namespace Myre.Graphics.Pipeline.Animations
                 //Estimate where B *should* be using purely LERP
                 Vector3 translation = Vector3.Lerp(a.Translation, c.Translation, t);
                 Vector3 scale = Vector3.Lerp(a.Scale, c.Scale, t);
-                Quaternion rotation = a.Rotation.Nlerp(c.Rotation, t);
+                Quaternion rotation = a.Rotation.FromXNA().Nlerp(c.Rotation.FromXNA(), t).ToXNA();
 
                 //If it's a close enough guess, run with it and drop B
                 if ((translation - b.Translation).LengthSquared() < EPSILON_LENGTH && Quaternion.Dot(rotation, b.Rotation) > EPSILON_COS_ANGLE && (scale - b.Scale).LengthSquared() < EPSILON_SCALE)

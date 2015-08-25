@@ -1,17 +1,16 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Numerics;
 using Myre.Collections;
 
 namespace Myre.Graphics
 {
     public sealed class Camera
     {
-        private Matrix _view;
-        private Matrix _projection;
-        private Matrix _viewProjection;
-        private Matrix _inverseView;
-        private Matrix _inverseProjection;
-        private Matrix _inverseViewProjection;
+        private Matrix4x4 _view;
+        private Matrix4x4 _projection;
+        private Matrix4x4 _viewProjection;
+        private Matrix4x4 _inverseView;
+        private Matrix4x4 _inverseProjection;
+        private Matrix4x4 _inverseViewProjection;
         private float _nearClip;
         private float _farClip;
         private BoundingFrustum _bounds;
@@ -20,7 +19,7 @@ namespace Myre.Graphics
         private readonly Vector3[] _frustumCorners = new Vector3[8];
         private readonly Vector3[] _farFrustumCorners = new Vector3[4];
 
-        public Matrix View
+        public Matrix4x4 View
         {
             get { return _view; }
             set
@@ -33,7 +32,7 @@ namespace Myre.Graphics
             }
         }
 
-        public Matrix Projection
+        public Matrix4x4 Projection
         {
             get { return _projection; }
             set 
@@ -42,7 +41,7 @@ namespace Myre.Graphics
             }
         }
 
-        public Matrix ViewProjection
+        public Matrix4x4 ViewProjection
         {
             get 
             {
@@ -100,10 +99,10 @@ namespace Myre.Graphics
 
         private void Update()
         {
-            Matrix.Multiply(ref _view, ref _projection, out _viewProjection);
-            Matrix.Invert(ref _view, out _inverseView);
-            Matrix.Invert(ref _projection, out _inverseProjection);
-            Matrix.Invert(ref _viewProjection, out _inverseViewProjection);
+            _viewProjection = Matrix4x4.Multiply(_view, _projection);
+            Matrix4x4.Invert(_view, out _inverseView);
+            Matrix4x4.Invert(_projection, out _inverseProjection);
+            Matrix4x4.Invert(_viewProjection, out _inverseViewProjection);
             _bounds = new BoundingFrustum(_viewProjection);
             _isDirty = false;
         }
@@ -125,7 +124,10 @@ namespace Myre.Graphics
             _bounds.GetCorners(_frustumCorners);
             for (int i = 0; i < 4; i++)
                 _farFrustumCorners[i] = _frustumCorners[i + 4];
-            Vector3.Transform(_farFrustumCorners, ref _view, _farFrustumCorners);
+
+            for (int i = 0; i < _farFrustumCorners.Length; i++)
+                _farFrustumCorners[i] = Vector3.Transform(_farFrustumCorners[i], _view);
+
             metadata.Set("farfrustumcorners", _farFrustumCorners);
         }
     }

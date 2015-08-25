@@ -1,8 +1,9 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI.Controls
 {
@@ -39,7 +40,6 @@ namespace Myre.UI.Controls
             get { return _selectedOption; }
             set
             {
-                System.Diagnostics.Debug.WriteLine(DateTime.Now);
                 while (value < 0)
                     value += _count;
                 value %= _count;

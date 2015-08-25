@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Debugging.Statistics;
 using Myre.Entities;
 using Myre.Entities.Services;
 using Myre.Extensions;
 using Ninject;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics
 {

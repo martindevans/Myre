@@ -17,11 +17,10 @@ namespace Myre.UI.Gestures
 
         protected override bool Test(GamepadDevice device)
         {
-            const float EPSILON = 0.01f;
             if (Trigger == Side.Left)
-                return Math.Abs(device.LeftTriggerMovement) > EPSILON;
+                return Math.Abs(device.LeftTriggerMovement) > float.Epsilon;
             else
-                return Math.Abs(device.RightTriggerMovement) > EPSILON;
+                return Math.Abs(device.RightTriggerMovement) > float.Epsilon;
         }
     }
 }

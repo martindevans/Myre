@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 
 namespace Myre.Collections
 {
@@ -130,7 +130,7 @@ namespace Myre.Collections
             /// <returns></returns>
             public bool Contains(Vector3 point)
             {
-                return Bounds.Contains(point) != ContainmentType.Disjoint;
+                return Bounds.Contains(point) != Microsoft.Xna.Framework.ContainmentType.Disjoint;
             }
 
             /// <summary>

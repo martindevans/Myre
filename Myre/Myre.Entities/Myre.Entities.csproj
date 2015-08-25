@@ -42,6 +42,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -71,7 +73,6 @@
     <Compile Include="Services\ProcessService.cs" />
     <Compile Include="Services\ServiceContainer.cs" />
     <Compile Include="Services\TimeService.cs" />
-    <Compile Include="SpinLock.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Myre\Myre.csproj">

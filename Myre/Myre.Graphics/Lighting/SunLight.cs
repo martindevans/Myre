@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
+using Myre.Extensions;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Lighting
 {
@@ -44,8 +46,8 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(ColourName, Color.LightBlue.ToVector3());
-            _direction = context.CreateProperty(DirectionName, Vector3.Down);
+            _colour = context.CreateProperty(ColourName, Color.LightBlue.ToVector3().FromXNA());
+            _direction = context.CreateProperty(DirectionName, -Vector3.UnitY);
             _shadowResolution = context.CreateProperty(ShadowResolutionName);
             _active = context.CreateProperty(ActiveName, true);
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Extensions
 {
@@ -72,6 +73,8 @@ namespace Myre.Extensions
         {
             switch (format)
             {
+                case DepthFormat.None:
+                    return 0;
                 case DepthFormat.Depth16:
                     return 2;
                 case DepthFormat.Depth24:
@@ -79,7 +82,7 @@ namespace Myre.Extensions
                 case DepthFormat.Depth24Stencil8:
                     return 4;
                 default:
-                    return 0;
+                    throw new ArgumentException("format");
             }
         }
     }

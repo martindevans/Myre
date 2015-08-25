@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre;
@@ -10,6 +8,11 @@ using Myre.Graphics;
 using Myre.Graphics.Translucency;
 using Myre.Graphics.Translucency.Particles;
 using Ninject;
+using System;
+using System.Numerics;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace GraphicsTests.Tests
 {
@@ -53,10 +56,10 @@ namespace GraphicsTests.Tests
             {
                 NearClip = 1,
                 FarClip = 3000,
-                View = Matrix.CreateLookAt(cameraPosition, new Vector3(0, 25, 0),
-                Vector3.Up)
+                View = Matrix4x4.CreateLookAt(cameraPosition, new Vector3(0, 25, 0),
+                Vector3.UnitY)
             };
-            _camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
+            _camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
 
             var cameraDescription = _kernel.Get<EntityDescription>();
             cameraDescription.AddProperty(new TypedName<Viewport>("viewport"));
@@ -86,7 +89,7 @@ namespace GraphicsTests.Tests
 
             if (_spin)
                 _rotation += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            _camera.View = Matrix.CreateLookAt(new Vector3((float)Math.Sin(_rotation) * 300, 0, (float)Math.Cos(_rotation) * 300), new Vector3(0, 0, 0), Vector3.Up);
+            _camera.View = Matrix4x4.CreateLookAt(new Vector3((float)Math.Sin(_rotation) * 300, 0, (float)Math.Cos(_rotation) * 300), new Vector3(0, 0, 0), Vector3.UnitY);
 
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);

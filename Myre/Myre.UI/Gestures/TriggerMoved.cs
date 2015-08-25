@@ -1,4 +1,5 @@
-﻿using Myre.UI.InputDevices;
+﻿using System;
+using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures
 {
@@ -17,9 +18,9 @@ namespace Myre.UI.Gestures
         protected override bool Test(GamepadDevice device)
         {
             if (Trigger == Side.Left)
-                return device.LeftTriggerMovement != 0;
+                return Math.Abs(device.LeftTriggerMovement) > float.Epsilon;
             else
-                return device.RightTriggerMovement != 0;
+                return Math.Abs(device.RightTriggerMovement) > float.Epsilon;
         }
     }
 }

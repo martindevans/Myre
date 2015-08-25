@@ -1,7 +1,8 @@
 using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 
 namespace Myre.Graphics.Materials
 {
@@ -62,15 +63,15 @@ namespace Myre.Graphics.Materials
                     else if (t == typeof(int[]))
                         p.SetValue((int[])data);
                     
-                    else if (t == typeof(Matrix))
-                        p.SetValue((Matrix) data);
-                    else if (t == typeof(Matrix[]))
-                        p.SetValue((Matrix[]) data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Matrix))
+                        p.SetValue((Microsoft.Xna.Framework.Matrix)data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Matrix[]))
+                        p.SetValue((Microsoft.Xna.Framework.Matrix[])data);
 
                     else if (t == typeof(Quaternion))
-                        p.SetValue((Quaternion) data);
-                    else if (t == typeof(Quaternion[]))
-                        p.SetValue((Quaternion[]) data);
+                        p.SetValue((Quaternion)data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Quaternion[]))
+                        p.SetValue((Microsoft.Xna.Framework.Quaternion[])data);
 
                     else if (t == typeof(string))
                         p.SetValue((string)data);
@@ -80,20 +81,20 @@ namespace Myre.Graphics.Materials
                     else if (t == typeof(Texture))
                         p.SetValue((Texture)data);
 
-                    else if (t == typeof(Vector2))
-                        p.SetValue((Vector2)data);
-                    else if (t == typeof(Vector2[]))
-                        p.SetValue((Vector2[])data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Vector2))
+                        p.SetValue((Microsoft.Xna.Framework.Vector2)data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Vector2[]))
+                        p.SetValue((Microsoft.Xna.Framework.Vector2[])data);
 
-                    else if (t == typeof(Vector3))
-                        p.SetValue((Vector3)data);
-                    else if (t == typeof(Vector3[]))
-                        p.SetValue((Vector3[])data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Vector3))
+                        p.SetValue((Microsoft.Xna.Framework.Vector3)data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Vector3[]))
+                        p.SetValue((Microsoft.Xna.Framework.Vector3[])data);
 
-                    else if (t == typeof(Vector4))
-                        p.SetValue((Vector4)data);
-                    else if (t == typeof(Vector4[]))
-                        p.SetValue((Vector4[])data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Vector4))
+                        p.SetValue((Microsoft.Xna.Framework.Vector4)data);
+                    else if (t == typeof(Microsoft.Xna.Framework.Vector4[]))
+                        p.SetValue((Microsoft.Xna.Framework.Vector4[])data);
 
                     else
                         throw new InvalidOperationException(string.Format("Unknown effect parameter type {0}", t.Name));

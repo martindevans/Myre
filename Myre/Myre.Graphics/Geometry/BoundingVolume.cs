@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
+
+using ContainmentType = Microsoft.Xna.Framework.ContainmentType;
 
 namespace Myre.Graphics.Geometry
 {
@@ -34,12 +36,12 @@ namespace Myre.Graphics.Geometry
 
         public void Add(BoundingBox box)
         {
-            Add(new Plane(Vector3.Up, box.Min.Y));
-            Add(new Plane(Vector3.Down, -box.Max.Y));
-            Add(new Plane(Vector3.Left, -box.Max.X));
-            Add(new Plane(Vector3.Right, box.Min.X));
-            Add(new Plane(Vector3.Forward, -box.Max.Z));
-            Add(new Plane(Vector3.Backward, box.Min.Z));
+            Add(new Plane(Vector3.UnitY, box.Min.Y));
+            Add(new Plane(-Vector3.UnitY, -box.Max.Y));
+            Add(new Plane(-Vector3.UnitX, -box.Max.X));
+            Add(new Plane(Vector3.UnitX, box.Min.X));
+            Add(new Plane(-Vector3.UnitZ, -box.Max.Z));
+            Add(new Plane(Vector3.UnitZ, box.Min.Z));
         }
 
         public bool Intersects(Vector3 point)
@@ -47,8 +49,7 @@ namespace Myre.Graphics.Geometry
             for (int i = 0; i < Count; i++)
             {
                 var plane = this[i];
-                float distance;
-                plane.DotCoordinate(ref point, out distance);
+                float distance = Plane.DotCoordinate(plane, point);
 
                 if (distance < 0)
                     return false;
@@ -62,8 +63,7 @@ namespace Myre.Graphics.Geometry
             for (int i = 0; i < Count; i++)
             {
                 var plane = this[i];
-                float distance;
-                Vector3.Dot(ref plane.Normal, ref sphere.Center, out distance);
+                float distance = Vector3.Dot(plane.Normal, sphere.Center);
 
                 if (-plane.D - distance > sphere.Radius)
                     return false;
@@ -98,9 +98,7 @@ namespace Myre.Graphics.Geometry
 
             for (int i = 0; i < Count; i++)
             {
-                var plane = this[i];
-                float distance;
-                plane.DotCoordinate(ref sphere.Center, out distance);
+                float distance = Plane.DotCoordinate(this[i], sphere.Center);
 
                 if (distance < sphere.Radius)
                 {

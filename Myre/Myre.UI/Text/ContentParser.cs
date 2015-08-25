@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+
+using Game = Microsoft.Xna.Framework.Game;
 
 namespace Myre.UI.Text
 {

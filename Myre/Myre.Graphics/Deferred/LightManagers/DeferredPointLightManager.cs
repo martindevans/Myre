@@ -1,9 +1,12 @@
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities.Behaviours;
+using Myre.Extensions;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
+
+using PlaneIntersectionType = Microsoft.Xna.Framework.PlaneIntersectionType;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -143,22 +146,22 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             if (material != null)
             {
-                Vector3 position = Vector3.Transform(light.Position, metadata.GetValue(new TypedName<Matrix>("view")));
+                Vector3 position = Vector3.Transform(light.Position, metadata.GetValue(new TypedName<Matrix4x4>("view")));
                 material.Parameters["LightPosition"].SetValue(position);
                 material.Parameters["Colour"].SetValue(light.Colour);
                 material.Parameters["Range"].SetValue(light.Range);
             }
 
-            var view = metadata.GetValue(new TypedName<Matrix>("view"));
-            var projection = metadata.GetValue<Matrix>(new TypedName<Matrix>("projection"));
+            var view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
+            var projection = metadata.GetValue<Matrix4x4>(new TypedName<Matrix4x4>("projection"));
 
-            var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius) * Matrix.CreateTranslation(light.Position);
-            metadata.Set<Matrix>("world", world);
+            var world = Matrix4x4.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius) * Matrix4x4.CreateTranslation(light.Position);
+            metadata.Set<Matrix4x4>("world", world);
 
             var worldview = world * view;
-            metadata.Set(new TypedName<Matrix>("worldview"), worldview);
+            metadata.Set(new TypedName<Matrix4x4>("worldview"), worldview);
 
-            metadata.Set(new TypedName<Matrix>("worldviewprojection"), worldview * projection);
+            metadata.Set(new TypedName<Matrix4x4>("worldviewprojection"), worldview * projection);
         }
     }
 }

@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Graphics;
 using Myre.Graphics.Materials;
 using Ninject;
+using System;
+using System.Collections.Generic;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace GraphicsTests.Tests
 {

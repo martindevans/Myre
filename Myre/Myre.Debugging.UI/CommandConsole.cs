@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre.UI;
@@ -14,6 +13,12 @@ using Myre.UI.Controls;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
 using Myre.UI.Text;
+
+using Game = Microsoft.Xna.Framework.Game;
+using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Myre.Debugging.UI
 {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -13,7 +12,7 @@ namespace Myre.Graphics.Pipeline.Models
     public class MyreMeshContent
     {
         public string Name { get; set; }
-        public BoundingSphere BoundingSphere { get; set; }
+        public Microsoft.Xna.Framework.BoundingSphere BoundingSphere { get; set; }
 
         public Dictionary<string, MyreMaterialContent> Materials { get; set; }
         public int TriangleCount { get; set; }

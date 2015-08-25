@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Extensions;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
 using Ninject;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -20,8 +23,8 @@ namespace Myre.Graphics.Deferred.LightManagers
             public RenderTarget2D ShadowMap;
             public Vector4 NearClip;
             public float FarClip;
-            public Matrix View;
-            public Matrix Projection;
+            public Matrix4x4 View;
+            public Matrix4x4 Projection;
         }
 
         private readonly Material _material;
@@ -95,9 +98,8 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             if (_material != null)
             {
-                Matrix view = metadata.GetValue(new TypedName<Matrix>("view"));
-                Vector3 direction = light.Direction;
-                Vector3.TransformNormal(ref direction, ref view, out direction);
+                Matrix4x4 view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
+                Vector3 direction = Vector3.TransformNormal(light.Direction, view);
 
                 var shadowsEnabled = light.ShadowResolution > 0;
 
@@ -107,7 +109,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
                 if (shadowsEnabled)
                 {
-                    _material.Parameters["ShadowProjection"].SetValue(metadata.GetValue(new TypedName<Matrix>("inverseview")) * data.View * data.Projection);
+                    _material.Parameters["ShadowProjection"].SetValue(metadata.GetValue(new TypedName<Matrix4x4>("inverseview")) * data.View * data.Projection);
                     _material.Parameters["ShadowMapSize"].SetValue(new Vector2(light.ShadowResolution, light.ShadowResolution));
                     _material.Parameters["ShadowMap"].SetValue(data.ShadowMap);
                     _material.Parameters["LightFarClip"].SetValue(data.FarClip);
@@ -162,25 +164,25 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             var depthOffset = -min;
             var lightPosition = -light.Direction * depthOffset;
-            var lightIsVertical = light.Direction == Vector3.Up || light.Direction == Vector3.Down;
-            var viewMatrix = Matrix.CreateLookAt(lightPosition, Vector3.Zero, lightIsVertical ? Vector3.Forward : Vector3.Up);
+            var lightIsVertical = light.Direction == Vector3.UnitY || light.Direction == -Vector3.UnitY;
+            var viewMatrix = Matrix4x4.CreateLookAt(lightPosition, Vector3.Zero, lightIsVertical ? -Vector3.UnitZ : Vector3.UnitY);
 
-            Vector3.Transform(_frustumCornersWs, ref viewMatrix, _frustumCornersVs);
+            for (int i = 0; i < _frustumCornersWs.Length; i++)
+                _frustumCornersVs[i] = Vector3.Transform(_frustumCornersWs[i], viewMatrix);
 
             var bounds = BoundingSphere.CreateFromPoints(_frustumCornersVs);
 
             var farClip = max - min;
-            var projectionMatrix = Matrix.CreateOrthographicOffCenter(-bounds.Radius, bounds.Radius, -bounds.Radius, bounds.Radius, 0, farClip);
+            var projectionMatrix = Matrix4x4.CreateOrthographicOffCenter(-bounds.Radius, bounds.Radius, -bounds.Radius, bounds.Radius, 0, farClip);
 
             data.View = viewMatrix;
             data.Projection = projectionMatrix;
             data.FarClip = farClip;
 
             var nearPlane = new Plane(light.Direction, depthOffset);
-            nearPlane.Normalize();
-            Plane transformedNearPlane;
-            var view = renderer.Data.GetValue(new TypedName<Matrix>("view"));
-            Plane.Transform(ref nearPlane, ref view, out transformedNearPlane);
+            nearPlane = Plane.Normalize(nearPlane);
+            var view = renderer.Data.GetValue(new TypedName<Matrix4x4>("view"));
+            Plane transformedNearPlane = Plane.Transform(nearPlane, view);
             data.NearClip = new Vector4(transformedNearPlane.Normal, transformedNearPlane.D);
         }
 

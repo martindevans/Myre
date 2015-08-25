@@ -1,9 +1,12 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
 using Myre.UI.Text;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.UI.Controls
 {
@@ -14,7 +17,6 @@ namespace Myre.UI.Controls
         : MultiButton
     {
         private readonly string[] _options;
-        private int _arrowSize;
         private readonly Label _leftArrow;
         private readonly Label _rightArrow;
         private readonly Label _centreText;
@@ -86,8 +88,7 @@ namespace Myre.UI.Controls
             _centreText.SetPoint(Points.TopRight, -_rightArrow.Area.Width, 0);
             _centreText.Text = options[0];
 
-            ControlEventHandler recalcSize = delegate
-            {
+            ControlEventHandler recalcSize = sender => {
                 Vector2 maxSize = Vector2.Zero;
                 for (int i = 0; i < options.Length; i++)
                 {
@@ -95,17 +96,14 @@ namespace Myre.UI.Controls
                     maxSize.X = Math.Max(maxSize.X, size.X);
                     maxSize.Y = Math.Max(maxSize.Y, size.Y);
                 }
-                _arrowSize = (int)font.MeasureString("<").X;
-                maxSize.X += _arrowSize * 2;
+                int arrowSize = (int)font.MeasureString("<").X;
+                maxSize.X += arrowSize * 2;
                 SetSize((int)maxSize.X, (int)maxSize.Y);
-                _leftArrow.SetSize(_arrowSize, font.LineSpacing);
-                _rightArrow.SetSize(_arrowSize, font.LineSpacing);
+                _leftArrow.SetSize(arrowSize, font.LineSpacing);
+                _rightArrow.SetSize(arrowSize, font.LineSpacing);
             };
 
-            ControlEventHandler highlight = delegate(Control c)
-            {
-                ((Label)c).Colour = (c.IsFocused || c.IsWarm) ? Highlight : Colour;
-            };
+            ControlEventHandler highlight = c => ((Label)c).Colour = (c.IsFocused || c.IsWarm) ? Highlight : Colour;
 
             _leftArrow.WarmChanged += highlight;
             _rightArrow.WarmChanged += highlight;

@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
+using Myre.Extensions;
 
 namespace Myre.Graphics.Animation
 {
@@ -34,7 +35,7 @@ namespace Myre.Graphics.Animation
     {
         protected override Keyframe Read(ContentReader input, Keyframe existingInstance)
         {
-            return new Keyframe(input.ReadUInt16(), new TimeSpan(input.ReadInt64()), input.ReadVector3(), input.ReadVector3(), input.ReadQuaternion());
+            return new Keyframe(input.ReadUInt16(), new TimeSpan(input.ReadInt64()), input.ReadVector3().FromXNA(), input.ReadVector3().FromXNA(), input.ReadQuaternion().FromXNA());
         }
     }
 }

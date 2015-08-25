@@ -1,6 +1,7 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
 {
@@ -26,7 +27,7 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
         {
         }
 
-        public override object Copy()
+        public override object Clone()
         {
             return new RandomAngularVelocity(MinAngularVelocity, MaxAngularVelocity);
         }

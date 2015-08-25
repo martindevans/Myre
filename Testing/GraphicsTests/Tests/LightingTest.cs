@@ -1,10 +1,14 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre.Graphics;
 using Myre.Graphics.Deferred;
 using Ninject;
+using System.Numerics;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GraphicsTests.Tests
 {
@@ -14,13 +18,13 @@ namespace GraphicsTests.Tests
         class Phase
             : RendererComponent
         {
-            private SpriteBatch batch;
-            private bool drawGBuffer;
-            private KeyboardState previousKeyboard;
+            private readonly SpriteBatch _batch;
+            private bool _drawGBuffer;
+            private KeyboardState _previousKeyboard;
 
             public Phase(GraphicsDevice device)
             {
-                batch = new SpriteBatch(device);
+                _batch = new SpriteBatch(device);
             }
 
             //protected override void SpecifyResources(IList<Input> inputs, IList<RendererComponent.Resource> outputs, out RenderTargetInfo? outputTarget)
@@ -56,9 +60,9 @@ namespace GraphicsTests.Tests
             public override void Draw(Renderer renderer)
             {
                 KeyboardState keyboard = Keyboard.GetState();
-                if (keyboard.IsKeyDown(Keys.Space) && previousKeyboard.IsKeyUp(Keys.Space))
-                    drawGBuffer = !drawGBuffer;
-                previousKeyboard = keyboard;
+                if (keyboard.IsKeyDown(Keys.Space) && _previousKeyboard.IsKeyUp(Keys.Space))
+                    _drawGBuffer = !_drawGBuffer;
+                _previousKeyboard = keyboard;
 
                 var metadata = renderer.Data;
                 var resolution = renderer.Data.Get<Vector2>("resolution").Value;
@@ -77,37 +81,35 @@ namespace GraphicsTests.Tests
                 var halfWidth = (int)(resolution.X / 2);
                 var halfHeight = (int)(resolution.Y / 2);
 
-                batch.GraphicsDevice.Clear(Color.Black);
-                batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
+                _batch.GraphicsDevice.Clear(Color.Black);
+                _batch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
 
-                if (drawGBuffer)
+                if (_drawGBuffer)
                 {
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-                    batch.Draw(depth, new Rectangle(0, 0, halfWidth, halfHeight), Color.White);
-                    batch.Draw(light, new Rectangle(halfWidth, halfHeight, halfWidth, halfHeight), Color.White);
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+                    _batch.Draw(depth, new Rectangle(0, 0, halfWidth, halfHeight), Color.White);
+                    _batch.Draw(light, new Rectangle(halfWidth, halfHeight, halfWidth, halfHeight), Color.White);
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
 
-                    batch.Draw(normals, new Rectangle(halfWidth, 0, halfWidth, halfHeight), Color.White);
-                    batch.Draw(diffuse, new Rectangle(0, halfHeight, halfWidth, halfHeight), Color.White);
+                    _batch.Draw(normals, new Rectangle(halfWidth, 0, halfWidth, halfHeight), Color.White);
+                    _batch.Draw(diffuse, new Rectangle(0, halfHeight, halfWidth, halfHeight), Color.White);
                 }
                 else
                 {
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-                    batch.Draw(light, new Rectangle(0, 0, (int)resolution.X, (int)resolution.Y), Color.White);
-                    batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
+                    _batch.Draw(light, new Rectangle(0, 0, (int)resolution.X, (int)resolution.Y), Color.White);
+                    _batch.GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
                 }
 
-                batch.End();
+                _batch.End();
 
                 Output("scene", target);
             }
         }
 
 
-        private IKernel kernel;
-        private ContentManager content;
-        private GraphicsDevice device;
-        private TestScene scene;
+        private readonly IKernel _kernel;
+        private TestScene _scene;
 
         public LightingTest(
             IKernel kernel,
@@ -115,16 +117,14 @@ namespace GraphicsTests.Tests
             GraphicsDevice device)
             : base("Lighting", kernel)
         {
-            this.kernel = kernel;
-            this.content = content;
-            this.device = device;
+            _kernel = kernel;
         }
 
         protected override void BeginTransitionOn()
         {
-            scene = kernel.Get<TestScene>();
+            _scene = _kernel.Get<TestScene>();
 
-            var renderer = scene.Scene.GetService<Renderer>();
+            var renderer = _scene.Scene.GetService<Renderer>();
             renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<EdgeDetectComponent>()
@@ -139,13 +139,13 @@ namespace GraphicsTests.Tests
 
         public override void Update(GameTime gameTime)
         {
-            scene.Update(gameTime);
+            _scene.Update(gameTime);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            scene.Draw(gameTime);
+            _scene.Draw(gameTime);
             base.Draw(gameTime);
         }
     }

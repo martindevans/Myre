@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre;
@@ -8,6 +7,11 @@ using Myre.Entities;
 using Myre.Graphics;
 using Myre.Graphics.Geometry;
 using Ninject;
+using System;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace GraphicsTests.Tests
 {
@@ -39,11 +43,12 @@ namespace GraphicsTests.Tests
                   .Show("name")
                   .Apply();
 
-            var camera = new Camera();
-            camera.NearClip = 1;
-            camera.FarClip = 700;
-            camera.View = Matrix.CreateLookAt(new Vector3(100, 50, 0), new Vector3(0, 50, 0), Vector3.Up);
-            camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
+            var camera = new Camera {
+                NearClip = 1,
+                FarClip = 700,
+                View = Matrix4x4.CreateLookAt(new Vector3(100, 50, 0), new Vector3(0, 50, 0), Vector3.UnitY)
+            };
+            camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
 
             var cameraDesc = _kernel.Get<EntityDescription>();
             cameraDesc.AddProperty(new TypedName<Camera>("camera"));

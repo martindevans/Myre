@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.UI.Text
 {
@@ -116,7 +119,7 @@ namespace Myre.UI.Text
                     if (drawingEnabled)
                         DrawBuffer(spriteBatch, ref position, rotation, ref origin, ref scale, currentPositionOffset + justificationOffset);
 
-                    size = CurrentFont().MeasureString(_buffer);
+                    size = CurrentFont().MeasureString(_buffer).FromXNA();
                     currentPositionOffset.X += size.X;
                     lineSpacing = Math.Max(lineSpacing, (int)size.Y);
                     width = Math.Max(width, currentPositionOffset.X);
@@ -138,7 +141,7 @@ namespace Myre.UI.Text
                     if (drawingEnabled)
                         DrawBuffer(spriteBatch, ref position, rotation, ref origin, ref scale, currentPositionOffset + justificationOffset);
 
-                    size = CurrentFont().MeasureString(_buffer);
+                    size = CurrentFont().MeasureString(_buffer).FromXNA();
                     currentPositionOffset.X += size.X;
                     lineSpacing = Math.Max(lineSpacing, (int)size.Y);
                     width = Math.Max(width, currentPositionOffset.X);
@@ -154,7 +157,7 @@ namespace Myre.UI.Text
                 if (drawingEnabled)
                     DrawBuffer(spriteBatch, ref position, rotation, ref origin, ref scale, currentPositionOffset + justificationOffset);
 
-                size = CurrentFont().MeasureString(_buffer);
+                size = CurrentFont().MeasureString(_buffer).FromXNA();
                 currentPositionOffset.X += size.X;
                 lineSpacing = Math.Max(lineSpacing, (int)size.Y);
                 width = Math.Max(width, currentPositionOffset.X);
@@ -174,11 +177,11 @@ namespace Myre.UI.Text
             spriteBatch.DrawString(
                 CurrentFont(),
                 _buffer,
-                position,
+                position.ToXNA(),
                 CurrentColour(),
                 rotation,
-                origin - currentPositionOffset,
-                scale,
+                (origin - currentPositionOffset).ToXNA(),
+                scale.ToXNA(),
                 SpriteEffects.None,
                 0);
         }
@@ -268,7 +271,7 @@ namespace Myre.UI.Text
 
                 _buffer.Clear();
                 _buffer.AppendPart(new StringPart(input, i, 1));
-                var size = font.MeasureString(_buffer) * scale;
+                var size = font.MeasureString(_buffer).FromXNA() * scale;
                 wordWidth += size.X;
 
                 if (wordWidth > allowedWidth)

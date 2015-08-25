@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Gestures;
 using System.Collections.ObjectModel;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.UI
 {

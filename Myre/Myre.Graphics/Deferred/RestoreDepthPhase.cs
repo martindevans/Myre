@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Materials;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred
 {

@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Diagnostics.Contracts;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 
 namespace Myre
 {

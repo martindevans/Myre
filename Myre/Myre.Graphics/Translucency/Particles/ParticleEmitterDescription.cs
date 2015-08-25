@@ -21,10 +21,10 @@ namespace Myre.Graphics.Translucency.Particles
         public void Setup(ParticleEmitter emitter)
         {
             foreach (var trigger in _triggers)
-                emitter.AddTrigger((ITrigger)trigger.Copy());
+                emitter.AddTrigger((ITrigger)trigger.Clone());
 
             foreach (var initialiser in _initialisers)
-                emitter.AddInitialiser((BaseParticleInitialiser)initialiser.Copy());
+                emitter.AddInitialiser((BaseParticleInitialiser)initialiser.Clone());
         }
     }
 

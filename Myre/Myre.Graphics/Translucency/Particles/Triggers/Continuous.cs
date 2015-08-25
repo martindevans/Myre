@@ -43,7 +43,7 @@ namespace Myre.Graphics.Translucency.Particles.Triggers
             _unspentTime = timeToSpend;
         }
 
-        public object Copy()
+        public object Clone()
         {
             return new Continuous(EmitsPerSecond);
         }

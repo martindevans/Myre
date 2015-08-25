@@ -68,6 +68,7 @@ namespace Myre
     /// <typeparam name="T"></typeparam>
     [Serializable]
     public struct NameWithType
+        : IEquatable<NameWithType>
     {
         /// <summary>
         /// The name
@@ -88,6 +89,27 @@ namespace Myre
         {
             Name = name;
             Type = type;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is NameWithType))
+                return false;
+
+            return Equals((NameWithType)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Name != null ? Name.GetHashCode() : 0) * 397) ^ (Type != null ? Type.GetHashCode() : 0);
+            }
+        }
+
+        public bool Equals(NameWithType other)
+        {
+            return other.Type == Type && other.Name == Name;
         }
     }
 }

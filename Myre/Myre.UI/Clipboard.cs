@@ -3,14 +3,10 @@ namespace Myre.UI
 {
     static class Clipboard
     {
-#if !WINDOWS
-        public static string Text { get; set; }
-#else
         public static string Text
         {
-            get { return System.Windows.Clipboard.GetText(); }
-            set { System.Windows.Clipboard.SetText(value); }
+            get { return System.Windows.Forms.Clipboard.GetText(); }
+            set { System.Windows.Forms.Clipboard.SetText(value); }
         }
-#endif
     }
 }

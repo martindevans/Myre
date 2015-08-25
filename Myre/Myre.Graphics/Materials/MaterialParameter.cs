@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Myre.Collections;
+using Myre.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Myre.Collections;
-using System.Diagnostics;
-using Myre.Extensions;
-using Microsoft.Xna.Framework;
 
 namespace Myre.Graphics.Materials
 {
@@ -25,7 +24,18 @@ namespace Myre.Graphics.Materials
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            return obj is ParameterType && Equals((ParameterType)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = (int)Type;
+                hashCode = (hashCode * 397) ^ Rows;
+                hashCode = (hashCode * 397) ^ Columns;
+                return hashCode;
+            }
         }
 
         public bool Equals(ParameterType obj)
@@ -33,11 +43,6 @@ namespace Myre.Graphics.Materials
             return Type == obj.Type
                 && Rows == obj.Rows
                 && Columns == obj.Columns;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode() ^ Type.GetHashCode() ^ Rows.GetHashCode() ^ Columns.GetHashCode();
         }
     }
 
@@ -54,7 +59,7 @@ namespace Myre.Graphics.Materials
             { typeof(Vector2).Name,   typeof(Vector2MaterialParameterSetter)      },
             { typeof(Vector3).Name,   typeof(Vector3MaterialParameterSetter)      },
             { typeof(Vector4).Name,   typeof(Vector4MaterialParameterSetter)      },
-            { typeof(Matrix).Name,    typeof(Matrix4X4MaterialParameterSetter)    },
+            { typeof(Matrix4x4).Name, typeof(Matrix4X4MaterialParameterSetter)    },
             { typeof(String).Name,    typeof(StringMaterialParameterSetter)       },
             { typeof(Boolean[]).Name, typeof(BooleanArrayMaterialParameterSetter) },
             { typeof(Int32[]).Name,   typeof(Int32ArrayMaterialParameterSetter)   },
@@ -62,7 +67,7 @@ namespace Myre.Graphics.Materials
             { typeof(Vector2[]).Name, typeof(Vector2ArrayMaterialParameterSetter) },
             { typeof(Vector3[]).Name, typeof(Vector3ArrayMaterialParameterSetter) },
             { typeof(Vector4[]).Name, typeof(Vector4ArrayMaterialParameterSetter) },
-            { typeof(Matrix[]).Name,  typeof(Matrix4X4ArrayMaterialParameterSetter)  },
+            { typeof(Matrix4x4[]).Name,  typeof(Matrix4X4ArrayMaterialParameterSetter)  },
         };
 
         internal static readonly Dictionary<ParameterType, Type> ParameterTypeMappings = new Dictionary<ParameterType, Type>()
@@ -74,7 +79,7 @@ namespace Myre.Graphics.Materials
             { new ParameterType(EffectParameterType.Single, 2, 1), typeof(Vector2)   },
             { new ParameterType(EffectParameterType.Single, 3, 1), typeof(Vector3)   },
             { new ParameterType(EffectParameterType.Single, 4, 1), typeof(Vector4)   },
-            { new ParameterType(EffectParameterType.Single, 4, 4), typeof(Matrix)    },
+            { new ParameterType(EffectParameterType.Single, 4, 4), typeof(Matrix4x4)    },
             { new ParameterType(EffectParameterType.String, 0, 0), typeof(String)    }
         };
         #endregion
@@ -109,13 +114,8 @@ namespace Myre.Graphics.Materials
             var parameterType = new ParameterType(parameter.ParameterType, parameter.ColumnCount, parameter.RowCount);
             Type type;
             if (!ParameterTypeMappings.TryGetValue(parameterType, out type))
-            {
-#if WINDOWS
-                Trace.TraceWarning("An automatic setter could not be created for the Material parameter \"{0}\", with semantic \"{1}\".", parameter.Name, parameter.Semantic);
-#endif
-            }
+                throw new InvalidOperationException(string.Format("An automatic setter could not be created for the Material parameter \"{0}\", with semantic \"{1}\".", parameter.Name, parameter.Semantic));
 
-            Debug.Assert(type != null, "type != null");
             var typeName = type.Name;
 
             if (parameter.Elements.Count > 0)
@@ -384,7 +384,7 @@ namespace Myre.Graphics.Materials
     class Matrix4X4MaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Matrix> _value;
+        private Box<Matrix4x4> _value;
         private BoxedValueStore<string> _previousGlobals;
 
         public Matrix4X4MaterialParameterSetter(EffectParameter parameter)
@@ -507,6 +507,8 @@ namespace Myre.Graphics.Materials
         private Box<Vector2[]> _value;
         private BoxedValueStore<string> _previousGlobals;
 
+        private Microsoft.Xna.Framework.Vector2[] _conversion;
+
         public Vector2ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
@@ -521,7 +523,17 @@ namespace Myre.Graphics.Materials
             }
 
             if (_value != null)
-                Parameter.SetValue(_value.Value);
+            {
+                //Create an array to convert into (or reuse existing one)
+                if (_conversion == null || _conversion.Length != _value.Value.Length)
+                    _conversion = new Microsoft.Xna.Framework.Vector2[_value.Value.Length];
+
+                //Convert to XNA types
+                for (int i = 0; i < _value.Value.Length; i++)
+                    _conversion[i] = _value.Value[i].ToXNA();
+
+                Parameter.SetValue(_conversion);
+            }
         }
     }
 
@@ -530,6 +542,8 @@ namespace Myre.Graphics.Materials
     {
         private Box<Vector3[]> _value;
         private BoxedValueStore<string> _previousGlobals;
+
+        private Microsoft.Xna.Framework.Vector3[] _conversion;
 
         public Vector3ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -545,7 +559,17 @@ namespace Myre.Graphics.Materials
             }
 
             if (_value != null)
-                Parameter.SetValue(_value.Value);
+            {
+                //Create an array to convert into (or reuse existing one)
+                if (_conversion == null || _conversion.Length != _value.Value.Length)
+                    _conversion = new Microsoft.Xna.Framework.Vector3[_value.Value.Length];
+
+                //Convert to XNA types
+                for (int i = 0; i < _value.Value.Length; i++)
+                    _conversion[i] = _value.Value[i].ToXNA();
+
+                Parameter.SetValue(_conversion);
+            }
         }
     }
 
@@ -554,6 +578,8 @@ namespace Myre.Graphics.Materials
     {
         private Box<Vector4[]> _value;
         private BoxedValueStore<string> _previousGlobals;
+
+        private Microsoft.Xna.Framework.Vector4[] _conversion;
 
         public Vector4ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -569,15 +595,27 @@ namespace Myre.Graphics.Materials
             }
 
             if (_value != null)
-                Parameter.SetValue(_value.Value);
+            {
+                //Create an array to convert into (or reuse existing one)
+                if (_conversion == null || _conversion.Length != _value.Value.Length)
+                    _conversion = new Microsoft.Xna.Framework.Vector4[_value.Value.Length];
+
+                //Convert to XNA types
+                for (int i = 0; i < _value.Value.Length; i++)
+                    _conversion[i] = _value.Value[i].ToXNA();
+
+                Parameter.SetValue(_conversion);
+            }
         }
     }
 
     class Matrix4X4ArrayMaterialParameterSetter
         : MaterialParameterSetter
     {
-        private Box<Matrix[]> _value;
+        private Box<Matrix4x4[]> _value;
         private BoxedValueStore<string> _previousGlobals;
+
+        private Microsoft.Xna.Framework.Matrix[] _conversion;
 
         public Matrix4X4ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
@@ -593,7 +631,17 @@ namespace Myre.Graphics.Materials
             }
 
             if (_value != null)
-                Parameter.SetValue(_value.Value);
+            {
+                //Create an array to convert into (or reuse existing one)
+                if (_conversion == null || _conversion.Length != _value.Value.Length)
+                    _conversion = new Microsoft.Xna.Framework.Matrix[_value.Value.Length];
+
+                //Convert to XNA types
+                for (int i = 0; i < _value.Value.Length; i++)
+                    _conversion[i] = _value.Value[i].ToXNA();
+
+                Parameter.SetValue(_conversion);
+            }
         }
     }
 #endregion

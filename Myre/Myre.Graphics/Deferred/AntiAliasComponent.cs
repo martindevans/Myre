@@ -1,7 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 using Myre.Graphics.Materials;
 using Ninject;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred
 {

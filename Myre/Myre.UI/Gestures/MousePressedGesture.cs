@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Myre.UI.InputDevices;
+﻿using Myre.UI.InputDevices;
 
 namespace Myre.UI.Gestures
 {
@@ -15,7 +11,7 @@ namespace Myre.UI.Gestures
             : base(false)
         {
             Button = button;
-            base.BlockedInputs.Add((int)Button);
+            BlockedInputs.Add((int)Button);
         }
 
         protected override bool Test(MouseDevice device)

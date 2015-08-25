@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Numerics;
 using Myre.UI.InputDevices;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework;
 
 namespace Myre.UI.Gestures
 {

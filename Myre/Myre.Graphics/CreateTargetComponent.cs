@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics
 {

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre;
 using Myre.Collections;
@@ -9,14 +8,15 @@ using Myre.Graphics.Deferred;
 using Myre.Graphics.Translucency;
 using Ninject;
 
+using Game = Microsoft.Xna.Framework.Game;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+
 namespace GraphicsTests.Tests
 {
     class GBufferTest2
         : TestScreen
     {
         private readonly IKernel _kernel;
-        private ContentManager _content;
-        private GraphicsDevice _device;
         private TestScene _scene;
         private Renderer _renderer;
 
@@ -24,8 +24,6 @@ namespace GraphicsTests.Tests
             : base("Geometry Buffer 2", kernel)
         {
             _kernel = kernel;
-            _content = content;
-            _device = device;
         }
 
         protected override void BeginTransitionOn()

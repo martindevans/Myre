@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre;
@@ -14,6 +12,10 @@ using Myre.Graphics.Geometry.Text;
 using Myre.Graphics.Lighting;
 using Myre.UI.InputDevices;
 using Ninject;
+using System.Numerics;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace GraphicsTests.Tests
 {
@@ -56,8 +58,8 @@ namespace GraphicsTests.Tests
             _resolution = renderer.Data.Get<Vector2>("resolution");
 
             //Create camera
-            _camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateLookAt(new Vector3(-100, 300, 10), new Vector3(300, 0, 0), Vector3.Forward) };
-            _camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
+            _camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix4x4.CreateLookAt(new Vector3(-100, 300, 10), new Vector3(300, 0, 0), -Vector3.UnitZ) };
+            _camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
             var cameraDesc = _kernel.Get<EntityDescription>();
             cameraDesc.AddProperty(new TypedName<Camera>("camera"));
             cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
@@ -76,13 +78,13 @@ namespace GraphicsTests.Tests
             var ambientLightEntity = ambientLight.Create();
             ambientLightEntity.GetProperty(new TypedName<Vector3>("sky_colour")).Value = new Vector3(0.08f);
             ambientLightEntity.GetProperty(new TypedName<Vector3>("ground_colour")).Value = new Vector3(0.04f, 0.05f, 0.04f);
-            ambientLightEntity.GetProperty(new TypedName<Vector3>("up")).Value = Vector3.Up;
+            ambientLightEntity.GetProperty(new TypedName<Vector3>("up")).Value = Vector3.UnitY;
             _scene.Add(ambientLightEntity);
 
             //Create text
             var textDesc = _kernel.Get<EntityDescription>();
             textDesc.AddBehaviour<ModelInstance>();
-            textDesc.AddProperty(ModelInstance.TransformName, Matrix.Identity);
+            textDesc.AddProperty(ModelInstance.TransformName, Matrix4x4.Identity);
             textDesc.AddBehaviour<StringModelData>();
             var textEnt = textDesc.Create();
             var init = new NamedBoxCollection {
@@ -116,12 +118,9 @@ namespace GraphicsTests.Tests
                 _cameraRotation.Y -= mouseDelta.X * gameTime.Seconds() * 0.1f;
                 _cameraRotation.X -= mouseDelta.Y * gameTime.Seconds() * 0.1f;
 
-                var rotation = Matrix.CreateFromYawPitchRoll(_cameraRotation.Y, _cameraRotation.X, _cameraRotation.Z);
-                var forward = Vector3.TransformNormal(Vector3.Forward, rotation);
-                var right = Vector3.TransformNormal(Vector3.Right, rotation);
-
-                forward.Normalize();
-                right.Normalize();
+                var rotation = Matrix4x4.CreateFromYawPitchRoll(_cameraRotation.Y, _cameraRotation.X, _cameraRotation.Z);
+                var forward = Vector3.TransformNormal(-Vector3.UnitZ, rotation);
+                var right = Vector3.TransformNormal(Vector3.UnitX, rotation);
 
                 if (keyboard.IsKeyDown(Keys.W))
                     _cameraPosition += forward * gameTime.Seconds() * 50;
@@ -132,7 +131,9 @@ namespace GraphicsTests.Tests
                 if (keyboard.IsKeyDown(Keys.D))
                     _cameraPosition += right * gameTime.Seconds() * 50f;
 
-                _camera.View = Matrix.Invert(rotation * Matrix.CreateTranslation(_cameraPosition));
+                Matrix4x4 invView;
+                Matrix4x4.Invert(rotation * Matrix4x4.CreateTranslation(_cameraPosition), out invView);
+                _camera.View = invView;
 
                 Mouse.SetPosition((int)_resolution.Value.X / 2, (int)_resolution.Value.Y / 2);
                 //camera.View = Matrix.CreateLookAt(new Vector3(0, 60, -7), new Vector3(50, 30, -50), Vector3.Up);

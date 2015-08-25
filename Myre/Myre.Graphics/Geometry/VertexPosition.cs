@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
 
 namespace Myre.Graphics.Geometry
 {
@@ -25,18 +26,18 @@ namespace Myre.Graphics.Geometry
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable NotAccessedField.Global
-        public Vector3 Position;
+        public Microsoft.Xna.Framework.Vector3 Position;
 // ReSharper restore NotAccessedField.Global
 // ReSharper restore MemberCanBePrivate.Global
 
         public VertexPosition(Vector3 position)
         {
-            Position = position;
+            Position = position.ToXNA();
         }
 
         public VertexPosition(float x, float y, float z)
         {
-            Position = new Vector3(x, y, z);
+            Position = new Vector3(x, y, z).ToXNA();
         }
     }
 }

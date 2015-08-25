@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre;
@@ -16,6 +13,11 @@ using Myre.Graphics.Lighting;
 using Myre.Graphics.Translucency;
 using Myre.UI.InputDevices;
 using Ninject;
+using System.Linq;
+using System.Numerics;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace GraphicsTests.Tests
 {
@@ -27,8 +29,6 @@ namespace GraphicsTests.Tests
         Vector3 _cameraPosition;
         Vector3 _cameraRotation;
         private readonly Camera _camera;
-
-        private Random _random = new Random();
 
         public DecalTest(IKernel kernel, ContentManager content, GraphicsDevice device)
             : base("Decal Test", kernel)
@@ -47,8 +47,8 @@ namespace GraphicsTests.Tests
                   //.Show("gbuffer_normals")
                   .Apply();
 
-            _camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix.CreateLookAt(new Vector3(100, 50, -200), new Vector3(0, 0, 0), Vector3.Up) };
-            _camera.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
+            _camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix4x4.CreateLookAt(new Vector3(100, 50, -200), new Vector3(0, 0, 0), Vector3.UnitY) };
+            _camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
             var cameraDesc = kernel.Get<EntityDescription>();
             cameraDesc.AddProperty(new TypedName<Camera>("camera"));
             cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
@@ -61,13 +61,13 @@ namespace GraphicsTests.Tests
             var ambientLight = kernel.Get<EntityDescription>();
             ambientLight.AddProperty(new TypedName<Vector3>("sky_colour"), new Vector3(0.44f, 0.44f, 0.74f));
             ambientLight.AddProperty(new TypedName<Vector3>("ground_colour"), new Vector3(0.24f, 0.35f, 0.24f));
-            ambientLight.AddProperty(new TypedName<Vector3>("up"), Vector3.Up);
+            ambientLight.AddProperty(new TypedName<Vector3>("up"), Vector3.UnitY);
             ambientLight.AddBehaviour<AmbientLight>();
             _scene.Add(ambientLight.Create());
 
             var sponza = kernel.Get<EntityDescription>();
             sponza.AddProperty(new TypedName<ModelData>("model"), content.Load<ModelData>(@"Sponza"));
-            sponza.AddProperty(new TypedName<Matrix>("transform"), Matrix.CreateScale(0.5f) * Matrix.CreateTranslation(-350, 0, 0));
+            sponza.AddProperty(new TypedName<Matrix4x4>("transform"), Matrix4x4.CreateScale(0.5f) * Matrix4x4.CreateTranslation(-350, 0, 0));
             sponza.AddProperty(new TypedName<bool>("is_static"), true);
             sponza.AddBehaviour<ModelInstance>();
             _scene.Add(sponza.Create());
@@ -100,28 +100,28 @@ namespace GraphicsTests.Tests
             _scene.Add(decal.Create(), new NamedBoxCollection {
                 { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
                 { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 0) },
+                { Decal.TransformName, Matrix4x4.CreateScale(30, 30, 30) * Matrix4x4.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix4x4.CreateRotationY(MathHelper.PiOver2) * Matrix4x4.CreateTranslation(-135, -10, 0) },
                 { Decal.AngleCutoffName, MathHelper.Pi / 3.65f }
             });
 
             _scene.Add(decal.Create(), new NamedBoxCollection {
                 { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
                 { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 40) },
+                { Decal.TransformName, Matrix4x4.CreateScale(30, 30, 30) * Matrix4x4.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix4x4.CreateRotationY(MathHelper.PiOver2) * Matrix4x4.CreateTranslation(-135, -10, 40) },
                 { Decal.AngleCutoffName, MathHelper.Pi / 3 }
             });
 
             _scene.Add(decal.Create(), new NamedBoxCollection {
                 { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
                 { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 80) },
+                { Decal.TransformName, Matrix4x4.CreateScale(30, 30, 30) * Matrix4x4.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix4x4.CreateRotationY(MathHelper.PiOver2) * Matrix4x4.CreateTranslation(-135, -10, 80) },
                 { Decal.AngleCutoffName, MathHelper.Pi / 2 }
             });
 
             _scene.Add(decal.Create(), new NamedBoxCollection {
                 { Decal.NormalName, content.Load<Texture2D>("randomnormals") },
                 { Decal.DiffuseName, content.Load<Texture2D>("Splatter") },
-                { Decal.TransformName, Matrix.CreateScale(30, 30, 30) * Matrix.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix.CreateRotationY(MathHelper.PiOver2) * Matrix.CreateTranslation(-135, -10, 120) },
+                { Decal.TransformName, Matrix4x4.CreateScale(30, 30, 30) * Matrix4x4.CreateRotationX(MathHelper.PiOver2 + MathHelper.PiOver4) * Matrix4x4.CreateRotationY(MathHelper.PiOver2) * Matrix4x4.CreateTranslation(-135, -10, 120) },
                 { Decal.AngleCutoffName, MathHelper.Pi }
             });
         }
@@ -151,12 +151,9 @@ namespace GraphicsTests.Tests
                 _cameraRotation.Y -= mouseDelta.X * deltaTime * 0.1f;
                 _cameraRotation.X -= mouseDelta.Y * deltaTime * 0.1f;
 
-                var rotation = Matrix.CreateFromYawPitchRoll(_cameraRotation.Y, _cameraRotation.X, _cameraRotation.Z);
-                var forward = Vector3.TransformNormal(Vector3.Forward, rotation);
-                var right = Vector3.TransformNormal(Vector3.Right, rotation);
-
-                forward.Normalize();
-                right.Normalize();
+                var rotation = Matrix4x4.CreateFromYawPitchRoll(_cameraRotation.Y, _cameraRotation.X, _cameraRotation.Z);
+                var forward = Vector3.TransformNormal(-Vector3.UnitZ, rotation);
+                var right = Vector3.TransformNormal(Vector3.UnitX, rotation);
 
                 if (keyboard.IsKeyDown(Keys.W))
                     _cameraPosition += forward * deltaTime * 50;
@@ -167,7 +164,7 @@ namespace GraphicsTests.Tests
                 if (keyboard.IsKeyDown(Keys.D))
                     _cameraPosition += right * deltaTime * 50f;
 
-                _camera.View = Matrix.CreateLookAt(_cameraPosition, _cameraPosition + forward, Vector3.Cross(right, forward));
+                _camera.View = Matrix4x4.CreateLookAt(_cameraPosition, _cameraPosition + forward, Vector3.Cross(right, forward));
 
                 Mouse.SetPosition((int)resolution.X / 2, (int)resolution.Y / 2);
             }

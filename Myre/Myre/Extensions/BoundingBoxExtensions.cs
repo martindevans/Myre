@@ -1,5 +1,6 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Myre.Extensions
 {
@@ -8,13 +9,25 @@ namespace Myre.Extensions
     /// </summary>
     public static class BoundingBoxExtensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Microsoft.Xna.Framework.BoundingBox ToXNA(this BoundingBox box)
+        {
+            return box.XnaBox;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BoundingBox FromXNA(this Microsoft.Xna.Framework.BoundingBox box)
+        {
+            return new BoundingBox(box);
+        }
+
         /// <summary>
-        /// Transformes the <see cref="BoundingBox"/> with a specified <see cref="Matrix"/>.
+        /// Transformes the <see cref="BoundingBox"/> with a specified <see cref="Matrix4x4"/>.
         /// </summary>
         /// <param name="box">The rectangle to transform.</param>
         /// <param name="m">The matrix with which to do the transformation.</param>
         /// <returns>The transformed <see cref="BoundingBox"/>.</returns>
-        public static BoundingBox Transform(this BoundingBox box, ref Matrix m)
+        public static BoundingBox Transform(this BoundingBox box, ref Matrix4x4 m)
         {
             // get corners
             Vector3 v1 = new Vector3(box.Min.X, box.Min.Y, box.Min.Z);
@@ -27,15 +40,14 @@ namespace Myre.Extensions
             Vector3 v8 = new Vector3(box.Min.X, box.Max.Y, box.Max.Z);
 
             // tranfrom corners
-            Vector3 n1, n2, n3, n4, n5, n6, n7, n8;
-            Vector3.Transform(ref v1, ref m, out n1);
-            Vector3.Transform(ref v2, ref m, out n2);
-            Vector3.Transform(ref v3, ref m, out n3);
-            Vector3.Transform(ref v4, ref m, out n4);
-            Vector3.Transform(ref v5, ref m, out n5);
-            Vector3.Transform(ref v6, ref m, out n6);
-            Vector3.Transform(ref v7, ref m, out n7);
-            Vector3.Transform(ref v8, ref m, out n8);
+            var n1 = Vector3.Transform(v1, m);
+            var n2 = Vector3.Transform(v2, m);
+            var n3 = Vector3.Transform(v3, m);
+            var n4 = Vector3.Transform(v4, m);
+            var n5 = Vector3.Transform(v5, m);
+            var n6 = Vector3.Transform(v6, m);
+            var n7 = Vector3.Transform(v7, m);
+            var n8 = Vector3.Transform(v8, m);
 
             // find new extents
             Vector3 min = new Vector3(

@@ -10,8 +10,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Extensions;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Debugging
 {
@@ -94,8 +99,8 @@ namespace Myre.Debugging
             {
                 VertexColorEnabled = true,
                 TextureEnabled = false,
-                DiffuseColor = Vector3.One,
-                World = Matrix.Identity
+                DiffuseColor = Vector3.One.ToXNA(),
+                World = Matrix4x4.Identity.ToXNA()
             };
 
             // Create our unit sphere vertices
@@ -116,8 +121,8 @@ namespace Myre.Debugging
 			DebugShape shape = GetShapeForLines(1, life);
 
             // Add the two vertices to the shape
-			shape.Vertices[0] = new VertexPositionColor(a, color);
-			shape.Vertices[1] = new VertexPositionColor(b, color);
+			shape.Vertices[0] = new VertexPositionColor(a.ToXNA(), color);
+            shape.Vertices[1] = new VertexPositionColor(b.ToXNA(), color);
 		}
 
         /// <summary>
@@ -135,12 +140,12 @@ namespace Myre.Debugging
             DebugShape shape = GetShapeForLines(3, life);
 
             // Add the vertices to the shape
-			shape.Vertices[0] = new VertexPositionColor(a, color);
-			shape.Vertices[1] = new VertexPositionColor(b, color);
-			shape.Vertices[2] = new VertexPositionColor(b, color);
-			shape.Vertices[3] = new VertexPositionColor(c, color);
-			shape.Vertices[4] = new VertexPositionColor(c, color);
-			shape.Vertices[5] = new VertexPositionColor(a, color);
+            shape.Vertices[0] = new VertexPositionColor(a.ToXNA(), color);
+            shape.Vertices[1] = new VertexPositionColor(b.ToXNA(), color);
+            shape.Vertices[2] = new VertexPositionColor(b.ToXNA(), color);
+            shape.Vertices[3] = new VertexPositionColor(c.ToXNA(), color);
+            shape.Vertices[4] = new VertexPositionColor(c.ToXNA(), color);
+            shape.Vertices[5] = new VertexPositionColor(a.ToXNA(), color);
 		}
 
         /// <summary>
@@ -159,34 +164,34 @@ namespace Myre.Debugging
 			frustum.GetCorners(_corners);
 
             // Fill in the vertices for the bottom of the frustum
-			shape.Vertices[0] = new VertexPositionColor(_corners[0], color);
-			shape.Vertices[1] = new VertexPositionColor(_corners[1], color);
-			shape.Vertices[2] = new VertexPositionColor(_corners[1], color);
-			shape.Vertices[3] = new VertexPositionColor(_corners[2], color);
-			shape.Vertices[4] = new VertexPositionColor(_corners[2], color);
-			shape.Vertices[5] = new VertexPositionColor(_corners[3], color);
-			shape.Vertices[6] = new VertexPositionColor(_corners[3], color);
-			shape.Vertices[7] = new VertexPositionColor(_corners[0], color);
+            shape.Vertices[0] = new VertexPositionColor(_corners[0].ToXNA(), color);
+            shape.Vertices[1] = new VertexPositionColor(_corners[1].ToXNA(), color);
+            shape.Vertices[2] = new VertexPositionColor(_corners[1].ToXNA(), color);
+            shape.Vertices[3] = new VertexPositionColor(_corners[2].ToXNA(), color);
+            shape.Vertices[4] = new VertexPositionColor(_corners[2].ToXNA(), color);
+            shape.Vertices[5] = new VertexPositionColor(_corners[3].ToXNA(), color);
+            shape.Vertices[6] = new VertexPositionColor(_corners[3].ToXNA(), color);
+            shape.Vertices[7] = new VertexPositionColor(_corners[0].ToXNA(), color);
 
             // Fill in the vertices for the top of the frustum
-			shape.Vertices[8] = new VertexPositionColor(_corners[4], color);
-			shape.Vertices[9] = new VertexPositionColor(_corners[5], color);
-			shape.Vertices[10] = new VertexPositionColor(_corners[5], color);
-			shape.Vertices[11] = new VertexPositionColor(_corners[6], color);
-			shape.Vertices[12] = new VertexPositionColor(_corners[6], color);
-			shape.Vertices[13] = new VertexPositionColor(_corners[7], color);
-			shape.Vertices[14] = new VertexPositionColor(_corners[7], color);
-			shape.Vertices[15] = new VertexPositionColor(_corners[4], color);
+            shape.Vertices[8] = new VertexPositionColor(_corners[4].ToXNA(), color);
+            shape.Vertices[9] = new VertexPositionColor(_corners[5].ToXNA(), color);
+            shape.Vertices[10] = new VertexPositionColor(_corners[5].ToXNA(), color);
+            shape.Vertices[11] = new VertexPositionColor(_corners[6].ToXNA(), color);
+            shape.Vertices[12] = new VertexPositionColor(_corners[6].ToXNA(), color);
+            shape.Vertices[13] = new VertexPositionColor(_corners[7].ToXNA(), color);
+            shape.Vertices[14] = new VertexPositionColor(_corners[7].ToXNA(), color);
+            shape.Vertices[15] = new VertexPositionColor(_corners[4].ToXNA(), color);
 
             // Fill in the vertices for the vertical sides of the frustum
-			shape.Vertices[16] = new VertexPositionColor(_corners[0], color);
-			shape.Vertices[17] = new VertexPositionColor(_corners[4], color);
-			shape.Vertices[18] = new VertexPositionColor(_corners[1], color);
-			shape.Vertices[19] = new VertexPositionColor(_corners[5], color);
-			shape.Vertices[20] = new VertexPositionColor(_corners[2], color);
-			shape.Vertices[21] = new VertexPositionColor(_corners[6], color);
-			shape.Vertices[22] = new VertexPositionColor(_corners[3], color);
-			shape.Vertices[23] = new VertexPositionColor(_corners[7], color);
+            shape.Vertices[16] = new VertexPositionColor(_corners[0].ToXNA(), color);
+            shape.Vertices[17] = new VertexPositionColor(_corners[4].ToXNA(), color);
+            shape.Vertices[18] = new VertexPositionColor(_corners[1].ToXNA(), color);
+            shape.Vertices[19] = new VertexPositionColor(_corners[5].ToXNA(), color);
+            shape.Vertices[20] = new VertexPositionColor(_corners[2].ToXNA(), color);
+            shape.Vertices[21] = new VertexPositionColor(_corners[6].ToXNA(), color);
+            shape.Vertices[22] = new VertexPositionColor(_corners[3].ToXNA(), color);
+            shape.Vertices[23] = new VertexPositionColor(_corners[7].ToXNA(), color);
 		}
 
         /// <summary>
@@ -205,34 +210,34 @@ namespace Myre.Debugging
 			box.GetCorners(_corners);
 
 			// Fill in the vertices for the bottom of the box
-			shape.Vertices[0] = new VertexPositionColor(_corners[0], color);
-			shape.Vertices[1] = new VertexPositionColor(_corners[1], color);
-			shape.Vertices[2] = new VertexPositionColor(_corners[1], color);
-			shape.Vertices[3] = new VertexPositionColor(_corners[2], color);
-			shape.Vertices[4] = new VertexPositionColor(_corners[2], color);
-			shape.Vertices[5] = new VertexPositionColor(_corners[3], color);
-			shape.Vertices[6] = new VertexPositionColor(_corners[3], color);
-			shape.Vertices[7] = new VertexPositionColor(_corners[0], color);
+            shape.Vertices[0] = new VertexPositionColor(_corners[0].ToXNA(), color);
+            shape.Vertices[1] = new VertexPositionColor(_corners[1].ToXNA(), color);
+            shape.Vertices[2] = new VertexPositionColor(_corners[1].ToXNA(), color);
+            shape.Vertices[3] = new VertexPositionColor(_corners[2].ToXNA(), color);
+            shape.Vertices[4] = new VertexPositionColor(_corners[2].ToXNA(), color);
+            shape.Vertices[5] = new VertexPositionColor(_corners[3].ToXNA(), color);
+            shape.Vertices[6] = new VertexPositionColor(_corners[3].ToXNA(), color);
+            shape.Vertices[7] = new VertexPositionColor(_corners[0].ToXNA(), color);
 
 			// Fill in the vertices for the top of the box
-			shape.Vertices[8] = new VertexPositionColor(_corners[4], color);
-			shape.Vertices[9] = new VertexPositionColor(_corners[5], color);
-			shape.Vertices[10] = new VertexPositionColor(_corners[5], color);
-			shape.Vertices[11] = new VertexPositionColor(_corners[6], color);
-			shape.Vertices[12] = new VertexPositionColor(_corners[6], color);
-			shape.Vertices[13] = new VertexPositionColor(_corners[7], color);
-			shape.Vertices[14] = new VertexPositionColor(_corners[7], color);
-			shape.Vertices[15] = new VertexPositionColor(_corners[4], color);
+            shape.Vertices[8] = new VertexPositionColor(_corners[4].ToXNA(), color);
+            shape.Vertices[9] = new VertexPositionColor(_corners[5].ToXNA(), color);
+            shape.Vertices[10] = new VertexPositionColor(_corners[5].ToXNA(), color);
+            shape.Vertices[11] = new VertexPositionColor(_corners[6].ToXNA(), color);
+            shape.Vertices[12] = new VertexPositionColor(_corners[6].ToXNA(), color);
+            shape.Vertices[13] = new VertexPositionColor(_corners[7].ToXNA(), color);
+            shape.Vertices[14] = new VertexPositionColor(_corners[7].ToXNA(), color);
+            shape.Vertices[15] = new VertexPositionColor(_corners[4].ToXNA(), color);
 
 			// Fill in the vertices for the vertical sides of the box
-			shape.Vertices[16] = new VertexPositionColor(_corners[0], color);
-			shape.Vertices[17] = new VertexPositionColor(_corners[4], color);
-			shape.Vertices[18] = new VertexPositionColor(_corners[1], color);
-			shape.Vertices[19] = new VertexPositionColor(_corners[5], color);
-			shape.Vertices[20] = new VertexPositionColor(_corners[2], color);
-			shape.Vertices[21] = new VertexPositionColor(_corners[6], color);
-			shape.Vertices[22] = new VertexPositionColor(_corners[3], color);
-			shape.Vertices[23] = new VertexPositionColor(_corners[7], color);
+            shape.Vertices[16] = new VertexPositionColor(_corners[0].ToXNA(), color);
+            shape.Vertices[17] = new VertexPositionColor(_corners[4].ToXNA(), color);
+            shape.Vertices[18] = new VertexPositionColor(_corners[1].ToXNA(), color);
+            shape.Vertices[19] = new VertexPositionColor(_corners[5].ToXNA(), color);
+            shape.Vertices[20] = new VertexPositionColor(_corners[2].ToXNA(), color);
+            shape.Vertices[21] = new VertexPositionColor(_corners[6].ToXNA(), color);
+            shape.Vertices[22] = new VertexPositionColor(_corners[3].ToXNA(), color);
+            shape.Vertices[23] = new VertexPositionColor(_corners[7].ToXNA(), color);
 		}
 
         /// <summary>
@@ -254,7 +259,7 @@ namespace Myre.Debugging
                 Vector3 vertPos = _unitSphere[i] * sphere.Radius + sphere.Center;
 
                 // Add the vertex to the shape
-                shape.Vertices[i] = new VertexPositionColor(vertPos, color);
+                shape.Vertices[i] = new VertexPositionColor(vertPos.ToXNA(), color);
             }
         }
 
@@ -265,11 +270,11 @@ namespace Myre.Debugging
         /// <param name="view">The view matrix to use when rendering the shapes.</param>
         /// <param name="projection">The projection matrix to use when rendering the shapes.</param>
         [Conditional("DEBUG")]
-		public static void Draw(GameTime gameTime, Matrix view, Matrix projection)
+		public static void Draw(GameTime gameTime, Matrix4x4 view, Matrix4x4 projection)
 		{
             // Update our effect with the matrices.
-			_effect.View = view;
-			_effect.Projection = projection;
+            _effect.View = view.ToXNA();
+            _effect.Projection = projection.ToXNA();
 
             // Calculate the total number of vertices we're going to be rendering.
             int vertexCount = 0;
@@ -353,30 +358,30 @@ namespace Myre.Debugging
             _unitSphere = new Vector3[SPHERE_LINE_COUNT * 2];
 
             // Compute our step around each circle
-            const float step = MathHelper.TwoPi / SPHERE_RESOLUTION;
+            const float STEP = MathHelper.TwoPi / SPHERE_RESOLUTION;
 
             // Used to track the index into our vertex array
             int index = 0;
 
             // Create the loop on the XY plane first
-            for (float a = 0f; a < MathHelper.TwoPi; a += step)
+            for (float a = 0f; a < MathHelper.TwoPi; a += STEP)
             {
                 _unitSphere[index++] = new Vector3((float)Math.Cos(a), (float)Math.Sin(a), 0f);
-                _unitSphere[index++] = new Vector3((float)Math.Cos(a + step), (float)Math.Sin(a + step), 0f);
+                _unitSphere[index++] = new Vector3((float)Math.Cos(a + STEP), (float)Math.Sin(a + STEP), 0f);
             }
 
             // Next on the XZ plane
-            for (float a = 0f; a < MathHelper.TwoPi; a += step)
+            for (float a = 0f; a < MathHelper.TwoPi; a += STEP)
             {
                 _unitSphere[index++] = new Vector3((float)Math.Cos(a), 0f, (float)Math.Sin(a));
-                _unitSphere[index++] = new Vector3((float)Math.Cos(a + step), 0f, (float)Math.Sin(a + step));
+                _unitSphere[index++] = new Vector3((float)Math.Cos(a + STEP), 0f, (float)Math.Sin(a + STEP));
             }
 
             // Finally on the YZ plane
-            for (float a = 0f; a < MathHelper.TwoPi; a += step)
+            for (float a = 0f; a < MathHelper.TwoPi; a += STEP)
             {
                 _unitSphere[index++] = new Vector3(0f, (float)Math.Cos(a), (float)Math.Sin(a));
-                _unitSphere[index++] = new Vector3(0f, (float)Math.Cos(a + step), (float)Math.Sin(a + step));
+                _unitSphere[index++] = new Vector3(0f, (float)Math.Cos(a + STEP), (float)Math.Sin(a + STEP));
             }
         }
 

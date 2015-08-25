@@ -1,28 +1,20 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre;
 using Myre.Entities;
+using Myre.Extensions;
 using Myre.Graphics;
 using Ninject;
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
-namespace GraphicsTests
+namespace GraphicsTests.Tests
 {
     class ClearPhase
         : RendererComponent
     {
         public Color Colour;
-
-        //protected override void SpecifyResources(IList<Input> inputs, IList<RendererComponent.Resource> outputs, out RenderTargetInfo? outputTarget)
-        //{
-        //    outputs.Add(new Resource() { Name = "scene", IsLeftSet = true });
-        //    outputTarget = new RenderTargetInfo();
-        //}
-
-        //protected override bool ValidateInput(RenderTargetInfo? previousRenderTarget)
-        //{
-        //    return true;
-        //}
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
@@ -54,24 +46,13 @@ namespace GraphicsTests
         class Phase
             : RendererComponent
         {
-            private SpriteBatch batch;
+            private readonly SpriteBatch _batch;
             public SpriteFont Font;
 
             public Phase(GraphicsDevice device)
             {
-                batch = new SpriteBatch(device);
+                _batch = new SpriteBatch(device);
             }
-
-            //protected override void SpecifyResources(IList<Input> inputs, IList<RendererComponent.Resource> outputs, out RenderTargetInfo? outputTarget)
-            //{
-            //    outputs.Add(new Resource() { Name = "scene", IsLeftSet = true });
-            //    outputTarget = new RenderTargetInfo();
-            //}
-
-            //protected override bool ValidateInput(RenderTargetInfo? previousRenderTarget)
-            //{
-            //    return true;
-            //}
 
             public override void Initialise(Renderer renderer, ResourceContext context)
             {
@@ -88,19 +69,19 @@ namespace GraphicsTests
                 var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
                 renderer.Device.SetRenderTarget(target);
 
-                batch.Begin();
-                batch.DrawString(Font, "This is being drawn by a RenderPhase!", new Vector2(640, 360), Color.White);
-                batch.End();
+                _batch.Begin();
+                _batch.DrawString(Font, "This is being drawn by a RenderPhase!", new Vector2(640, 360).ToXNA(), Color.White);
+                _batch.End();
 
                 Output("scene", target);
             }
         }
 
 
-        private IKernel kernel;
-        private ContentManager content;
-        private GraphicsDevice device;
-        private Scene scene;
+        private readonly IKernel _kernel;
+        private readonly ContentManager _content;
+        private readonly GraphicsDevice _device;
+        private Scene _scene;
 
         public RenderPhaseTest(
             IKernel kernel,
@@ -108,28 +89,28 @@ namespace GraphicsTests
             GraphicsDevice device)
             : base("Render Phase", kernel)
         {
-            this.kernel = kernel;
-            this.content = content;
-            this.device = device;
+            _kernel = kernel;
+            _content = content;
+            _device = device;
         }
 
         protected override void BeginTransitionOn()
         {
-            scene = new Scene(kernel);
+            _scene = new Scene(_kernel);
             
-            var camera = new EntityDescription(kernel);
+            var camera = new EntityDescription(_kernel);
             camera.AddProperty(new TypedName<Camera>("camera"));
             camera.AddProperty(new TypedName<Viewport>("viewport"));
             camera.AddBehaviour<View>();
             var cameraEntity = camera.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = new Camera();
             cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = 1280, Height = 720 };
-            scene.Add(camera.Create());
+            _scene.Add(cameraEntity);
 
-            var renderer = scene.GetService<Renderer>();
+            var renderer = _scene.GetService<Renderer>();
             renderer.StartPlan()
+                .Then(new Phase(_device) { Font = _content.Load<SpriteFont>("Consolas") })
                 .Then(new ClearPhase() { Colour = Color.Black })
-                .Then(new Phase(device) { Font = content.Load<SpriteFont>("Consolas") })
                 .Apply();
 
             base.OnShown();
@@ -137,13 +118,13 @@ namespace GraphicsTests
 
         public override void Update(GameTime gameTime)
         {
-            scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            scene.Draw();
+            _scene.Draw();
             base.Draw(gameTime);
         }
     }

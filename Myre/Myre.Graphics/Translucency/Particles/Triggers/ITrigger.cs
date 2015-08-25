@@ -1,7 +1,9 @@
 ﻿
+using System;
+
 namespace Myre.Graphics.Translucency.Particles.Triggers
 {
-    public interface ITrigger : ICopyable
+    public interface ITrigger : ICloneable
     {
         /// <summary>
         /// Attach this trigger to an emitter

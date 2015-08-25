@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+using System.Numerics;
+
+using Point = Microsoft.Xna.Framework.Point;
 
 namespace Myre.UI
 {

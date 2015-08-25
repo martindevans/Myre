@@ -2,14 +2,18 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
+using Myre.Extensions;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
 using Ninject;
+using System.Numerics;
+
+using Color = Microsoft.Xna.Framework.Color;
+using PlaneIntersectionType = Microsoft.Xna.Framework.PlaneIntersectionType;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -20,8 +24,8 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             public SpotLight Light;
             public RenderTarget2D ShadowMap;
-            public Matrix View;
-            public Matrix Projection;
+            public Matrix4x4 View;
+            public Matrix4x4 Projection;
         }
 
         private readonly Material _geometryLightingMaterial;
@@ -170,11 +174,11 @@ namespace Myre.Graphics.Deferred.LightManagers
                     light.ShadowMap = null;
                 }
 
-                light.View = Matrix.CreateLookAt(
+                light.View = Matrix4x4.CreateLookAt(
                     light.Light.Position,
                     light.Light.Position + light.Light.Direction,
-                    light.Light.Direction == Vector3.Up || light.Light.Direction == Vector3.Down ? Vector3.Right : Vector3.Up);
-                light.Projection = Matrix.CreatePerspectiveFieldOfView(light.Light.Angle, 1, 1, light.Light.Range);
+                    light.Light.Direction == Vector3.UnitY || light.Light.Direction == -Vector3.UnitY ? Vector3.UnitX : Vector3.UnitY);
+                light.Projection = Matrix4x4.CreatePerspectiveFieldOfView(light.Light.Angle, 1, 1, light.Light.Range);
 
                 if (light.Light.ShadowResolution > 0)
                     DrawShadowMap(renderer, light);
@@ -285,19 +289,19 @@ namespace Myre.Graphics.Deferred.LightManagers
         private void SetupLight(RendererMetadata metadata, Material material, LightData data)
         {
             var light = data.Light;
-            Matrix view = metadata.GetValue(new TypedName<Matrix>("view"));
+            Matrix4x4 view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
 
             if (material != null)
             {
                 Vector3 position = light.Position;
                 Vector3 direction = light.Direction;
-                Vector3.Transform(ref position, ref view, out position);
-                Vector3.TransformNormal(ref direction, ref view, out direction);
+                position = Vector3.Transform(position, view);
+                direction = Vector3.TransformNormal(direction, view);
                 float angle = (float)Math.Cos(light.Angle / 2);
 
                 if (light.Mask != null || light.ShadowResolution > 0)
                 {
-                    var inverseView = metadata.GetValue(new TypedName<Matrix>("inverseview"));
+                    var inverseView = metadata.GetValue(new TypedName<Matrix4x4>("inverseview"));
                     var cameraToLightProjection = inverseView * data.View * data.Projection;
                     material.Parameters["CameraViewToLightProjection"].SetValue(cameraToLightProjection);
                 }
@@ -316,20 +320,20 @@ namespace Myre.Graphics.Deferred.LightManagers
                 material.Parameters["LightFarClip"].SetValue(light.Range);
 
                 var nearPlane = new Plane(light.Direction, Vector3.Dot(light.Direction, light.Position));
-                nearPlane.Normalize();
+                nearPlane = Plane.Normalize(nearPlane);
                 nearPlane = Plane.Transform(nearPlane, view);
                 material.Parameters["LightNearPlane"].SetValue(new Vector4(nearPlane.Normal, nearPlane.D));
             }
 
-            var world = Matrix.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
-                        * Matrix.CreateTranslation(light.Position);
-            metadata.Set<Matrix>("world", world);
+            var world = Matrix4x4.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
+                        * Matrix4x4.CreateTranslation(light.Position);
+            metadata.Set<Matrix4x4>("world", world);
 
-            var projection = metadata.GetValue(new TypedName<Matrix>("projection"));
+            var projection = metadata.GetValue(new TypedName<Matrix4x4>("projection"));
 
             var worldview = world * view;
-            metadata.Set(new TypedName<Matrix>("worldview"), worldview);
-            metadata.Set(new TypedName<Matrix>("worldviewprojection"), worldview * projection);
+            metadata.Set(new TypedName<Matrix4x4>("worldview"), worldview);
+            metadata.Set(new TypedName<Matrix4x4>("worldviewprojection"), worldview * projection);
         }
     }
 }

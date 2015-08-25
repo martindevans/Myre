@@ -1,10 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
 using System;
+using System.Numerics;
+using Myre.Extensions;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Geometry.Text
 {
@@ -191,7 +193,7 @@ namespace Myre.Graphics.Geometry.Text
         private Vector2 _stringBounds;
         private void RecalculateBounds()
         {
-            _stringBounds = _font.Value.MeasureString(_string.Value);
+            _stringBounds = _font.Value.MeasureString(_string.Value).FromXNA();
         }
 
         private bool Prepare(View view)
@@ -206,7 +208,7 @@ namespace Myre.Graphics.Geometry.Text
 
         private void Draw(SpriteBatch batch)
         {
-            batch.DrawString(Font, String, Position, Color, Rotation, Origin, Scale, SpriteEffects, LayerDepth);
+            batch.DrawString(Font, String, Position.ToXNA(), Color, Rotation, Origin.ToXNA(), Scale.ToXNA(), SpriteEffects, LayerDepth);
         }
 
         internal class Manager

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Text;
+using System.Numerics;
+
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.UI.Controls
 {

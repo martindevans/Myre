@@ -1,5 +1,6 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Myre.Extensions
 {
@@ -8,6 +9,18 @@ namespace Myre.Extensions
     /// </summary>
     public static class Vector3Extensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Microsoft.Xna.Framework.Vector3 ToXNA(this System.Numerics.Vector3 v)
+        {
+            return new Microsoft.Xna.Framework.Vector3(v.X, v.Y, v.Z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Numerics.Vector3 FromXNA(this Microsoft.Xna.Framework.Vector3 v)
+        {
+            return new System.Numerics.Vector3(v.X, v.Y, v.Z);
+        }
+
         /// <summary>
         /// Determines whether this Vector3 contains any components which are not a number.
         /// </summary>
@@ -61,9 +74,9 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static Vector3 CatmullRom(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t)
         {
-            var x = MathHelper.CatmullRom(a.X, b.X, c.X, d.X, t);
-            var y = MathHelper.CatmullRom(a.Y, b.Y, c.Y, d.Y, t);
-            var z = MathHelper.CatmullRom(a.Z, b.Z, c.Z, d.Z, t);
+            var x = Microsoft.Xna.Framework.MathHelper.CatmullRom(a.X, b.X, c.X, d.X, t);
+            var y = Microsoft.Xna.Framework.MathHelper.CatmullRom(a.Y, b.Y, c.Y, d.Y, t);
+            var z = Microsoft.Xna.Framework.MathHelper.CatmullRom(a.Z, b.Z, c.Z, d.Z, t);
 
             return new Vector3(x, y, z);
         }
@@ -78,13 +91,13 @@ namespace Myre.Extensions
         public static Vector3 Clamp(this Vector3 point, Vector3 min, Vector3 max)
         {
             return new Vector3(
-                MathHelper.Clamp(point.X, min.X, max.X),
-                MathHelper.Clamp(point.Y, min.Y, max.Y),
-                MathHelper.Clamp(point.Z, min.Z, max.Z)
+                Microsoft.Xna.Framework.MathHelper.Clamp(point.X, min.X, max.X),
+                Microsoft.Xna.Framework.MathHelper.Clamp(point.Y, min.Y, max.Y),
+                Microsoft.Xna.Framework.MathHelper.Clamp(point.Z, min.Z, max.Z)
             );
         }
 
-        #region conver to v2
+        #region convert to v2
         /// <summary>
         /// Get a vector 2 with the specified elements
         /// </summary>

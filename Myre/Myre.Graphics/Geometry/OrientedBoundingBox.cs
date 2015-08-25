@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Myre.Extensions;
 
 namespace Myre.Graphics.Geometry
@@ -6,7 +6,7 @@ namespace Myre.Graphics.Geometry
     public class OrientedBoundingBox
     {
         private BoundingBox _bounds;
-        private Matrix _transform;
+        private Matrix4x4 _transform;
         private BoundingBox _axisAligned;
         private bool _dirty;
 
@@ -23,7 +23,7 @@ namespace Myre.Graphics.Geometry
             }
         }
 
-        public Matrix Transform
+        public Matrix4x4 Transform
         {
             get { return _transform; }
             set

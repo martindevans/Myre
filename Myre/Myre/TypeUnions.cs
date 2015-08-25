@@ -13,12 +13,14 @@ namespace Myre
         /// The value of this union, interpreted as a single
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public float SingleValue;
 
         /// <summary>
         /// The value of this union, interpreted as a uint
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public uint UIntValue;
     }
 
@@ -32,12 +34,14 @@ namespace Myre
         /// The value of this union, interpreted as a single
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public float SingleValue;
 
         /// <summary>
         /// The value of this union, interpreted as a uint
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public int IntValue;
     }
 
@@ -51,12 +55,14 @@ namespace Myre
         /// The value of this union, interpreted as a double
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public double DoubleValue;
 
         /// <summary>
         /// The value of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public ulong ULongValue;
     }
 
@@ -70,12 +76,14 @@ namespace Myre
         /// The value of this union, interpreted as a long
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public long LongValue;
 
         /// <summary>
         /// The value of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public ulong ULongValue;
     }
 
@@ -89,12 +97,14 @@ namespace Myre
         /// The value of this union, interpreted as a int
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public int IntValue;
 
         /// <summary>
         /// The value of this union, interpreted as a uint
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public uint UIntValue;
     }
 
@@ -108,12 +118,14 @@ namespace Myre
         /// The value of this union, interpreted as a sbyte
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public sbyte SbyteValue;
 
         /// <summary>
         /// The value of this union, interpreted as a byte
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public byte ByteValue;
     }
 
@@ -127,18 +139,21 @@ namespace Myre
         /// The value of this union, interpreted as a decimal
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public decimal DecimalValue;
 
         /// <summary>
         /// The value of the first 64 bits of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public ulong UlongValue1;
 
         /// <summary>
         /// The value of the last 64 bits of this union, interpreted as a ulong
         /// </summary>
         [FieldOffset(sizeof(ulong))]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public ulong UlongValue2;
     }
 
@@ -152,18 +167,21 @@ namespace Myre
         /// The value of this union, interpreted as a int
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public int IntValue;
 
         /// <summary>
         /// The value of the first 16 bits of this union, interpreted as a short
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public short ShortValue1;
 
         /// <summary>
         /// The value of the last 16 bits of this union, interpreted as a short
         /// </summary>
         [FieldOffset(sizeof(ushort))]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public short ShortValue2;
     }
 
@@ -177,30 +195,35 @@ namespace Myre
         /// The value of this union, interpreted as a int
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public int IntValue;
 
         /// <summary>
         /// The first 8 bits of this union
         /// </summary>
         [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public byte ByteValue1;
 
         /// <summary>
         /// The second 8 bits of this union
         /// </summary>
         [FieldOffset(1)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public byte ByteValue2;
 
         /// <summary>
         /// The third 8 bits of this union
         /// </summary>
         [FieldOffset(2)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public byte ByteValue3;
 
         /// <summary>
         /// The fourth 8 bits of this union
         /// </summary>
         [FieldOffset(3)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public byte ByteValue4;
     }
 }

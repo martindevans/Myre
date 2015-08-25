@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Input;
+using Myre.Extensions;
+using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+using System.Numerics;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
+using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
 
 namespace Myre.UI.InputDevices
 {
@@ -34,22 +39,22 @@ namespace Myre.UI.InputDevices
 
         public Vector2 LeftThumbstick
         {
-            get { return _currentState.ThumbSticks.Left; }
+            get { return _currentState.ThumbSticks.Left.FromXNA(); }
         }
 
         public Vector2 LeftThumbstickMovement
         {
-            get { return _currentState.ThumbSticks.Left - _previousState.ThumbSticks.Left; }
+            get { return _currentState.ThumbSticks.Left.FromXNA() - _previousState.ThumbSticks.Left.FromXNA(); }
         }
 
         public Vector2 RightThumbstick
         {
-            get { return _currentState.ThumbSticks.Right; }
+            get { return _currentState.ThumbSticks.Right.FromXNA(); }
         }
 
         public Vector2 RightThumbstickMovement
         {
-            get { return _currentState.ThumbSticks.Right - _previousState.ThumbSticks.Right; }
+            get { return _currentState.ThumbSticks.Right.FromXNA() - _previousState.ThumbSticks.Right.FromXNA(); }
         }
 
         public float LeftTrigger

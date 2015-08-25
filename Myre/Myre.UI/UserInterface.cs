@@ -1,10 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Extensions;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using IDrawable = Microsoft.Xna.Framework.IDrawable;
+using IGameComponent = Microsoft.Xna.Framework.IGameComponent;
+using IUpdateable = Microsoft.Xna.Framework.IUpdateable;
 
 namespace Myre.UI
 {

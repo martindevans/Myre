@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using System.Text;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre.Extensions;
 using Myre.UI.Gestures;
 using Myre.UI.InputDevices;
+
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using Color = Microsoft.Xna.Framework.Color;
+using Game = Microsoft.Xna.Framework.Game;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
 
 namespace Myre.UI.Controls
 {
@@ -220,7 +227,7 @@ namespace Myre.UI.Controls
             if (!IsVisible)
                 return;
 
-            spriteBatch.DrawString(_font, _drawBuffer, new Vector2(Area.X, Area.Y), _colour);
+            spriteBatch.DrawString(_font, _drawBuffer, new Vector2(Area.X, Area.Y).ToXNA(), _colour);
 
             if (_typing)
             {
@@ -289,7 +296,7 @@ namespace Myre.UI.Controls
         {
             _measurementBuffer.Clear();
             _measurementBuffer.Append(sb, startIndex, length);
-            return _font.MeasureString(_measurementBuffer);
+            return _font.MeasureString(_measurementBuffer).FromXNA();
         }
 
         private void Write(string characters)

@@ -1,4 +1,3 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre.Debugging.Statistics;
@@ -10,6 +9,13 @@ using Myre.UI.InputDevices;
 using Ninject;
 using System;
 using System.IO;
+
+using Color = Microsoft.Xna.Framework.Color;
+using Game = Microsoft.Xna.Framework.Game;
+using GameTime = Microsoft.Xna.Framework.GameTime;
+using GraphicsDeviceManager = Microsoft.Xna.Framework.GraphicsDeviceManager;
+using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
+using PreparingDeviceSettingsEventArgs = Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs;
 
 namespace GraphicsTests
 {
@@ -55,7 +61,7 @@ namespace GraphicsTests
             _previousKeyboard = Keyboard.GetState();
 
             _framerate = new StreamWriter(File.OpenWrite("framerate.csv"));
-            Exiting += new EventHandler<EventArgs>(TestGame_Exiting);
+            Exiting += TestGame_Exiting;
         }
 
         void TestGame_Exiting(object sender, EventArgs e)
@@ -84,7 +90,6 @@ namespace GraphicsTests
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             _ui = new UserInterface(GraphicsDevice);
 
             Player = new InputActor(1, new MouseDevice(), new KeyboardDevice(PlayerIndex.One, Window.Handle));
@@ -108,27 +113,6 @@ namespace GraphicsTests
         }
 
         /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-        protected override void LoadContent()
-        {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here          
-        }
-
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-        }
-
-        /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
@@ -137,14 +121,13 @@ namespace GraphicsTests
         {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+                Exit();
 
             _fps.Pulse();
             _frameTime.Set((float)gameTime.ElapsedGameTime.TotalMilliseconds);
 
             //framerate.Write(gameTime.ElapsedGameTime.TotalMilliseconds.ToString() + ",");
 
-            //// TODO: Add your update logic here
             _screens.Update(gameTime);
             _ui.Update(gameTime);
 
@@ -159,7 +142,6 @@ namespace GraphicsTests
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            //// TODO: Add your drawing code here
             _screens.PrepareDraw();
             _screens.Draw(gameTime);
 

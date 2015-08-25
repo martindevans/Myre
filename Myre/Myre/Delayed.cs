@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 
 namespace Myre
 {
@@ -48,7 +47,7 @@ namespace Myre
         /// Updates all transitions. This is called by MyreGame.Update(gameTime).
         /// </summary>
         /// <param name="gameTime"></param>
-        public static void Update(GameTime gameTime)
+        public static void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
             var now = DateTime.Now;
 
@@ -58,7 +57,7 @@ namespace Myre
             for (int i = _events.Count - 1; i >= 0; i--)
             {
                 var e = _events[i];
-                e.Progress = MathHelper.Clamp((float)(now - e.Start).TotalSeconds / e.Duration, 0, 1);
+                e.Progress = Microsoft.Xna.Framework.MathHelper.Clamp((float)(now - e.Start).TotalSeconds / e.Duration, 0, 1);
 
                 if (e.Transition != null)
                     e.Transition(e.Progress);

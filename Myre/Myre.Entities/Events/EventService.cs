@@ -1,4 +1,5 @@
-﻿using Myre.Entities.Services;
+﻿using System.Threading;
+using Myre.Entities.Services;
 using System;
 using System.Collections.Generic;
 
@@ -102,14 +103,16 @@ namespace Myre.Entities.Events
 
         internal void Queue(IEventInvocation eventInvocation)
         {
+            bool taken = false;
             try
             {
-                _spinLock.Lock();
+                _spinLock.Enter(ref taken);
                 _waitingEvents.Enqueue(eventInvocation);
             }
             finally
             {
-                _spinLock.Unlock();
+                if (taken)
+                    _spinLock.Exit();
             }
         }
 
@@ -125,16 +128,18 @@ namespace Myre.Entities.Events
 
         private void FlipBuffers()
         {
+            bool taken = false;
             try
             {
-                _spinLock.Lock();
+                _spinLock.Enter(ref taken);
                 var tmp = _waitingEvents;
                 _waitingEvents = _executingEvents;
                 _executingEvents = tmp;
             }
             finally
             {
-                _spinLock.Unlock();
+                if (taken)
+                    _spinLock.Exit();
             }
         }
     }

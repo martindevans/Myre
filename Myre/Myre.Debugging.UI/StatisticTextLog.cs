@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using Myre.Debugging.Statistics;
 using Myre.UI;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Controls;
+
+using Color = Microsoft.Xna.Framework.Color;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace Myre.Debugging.UI
 {

@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
+
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace Myre.UI
 {

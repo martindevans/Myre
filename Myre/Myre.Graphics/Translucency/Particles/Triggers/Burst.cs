@@ -37,7 +37,7 @@ namespace Myre.Graphics.Translucency.Particles.Triggers
             }
         }
 
-        public object Copy()
+        public object Clone()
         {
             return new Burst(BurstLength, BurstParticles, BurstDelay);
         }

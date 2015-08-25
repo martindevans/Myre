@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Extensions
@@ -35,7 +35,7 @@ namespace Myre.Extensions
         /// <param name="depth">The depth to clear the depth buffer to.</param>
         public static void ClearDepth(this GraphicsDevice device, int depth)
         {
-            device.Clear(ClearOptions.DepthBuffer, Color.White, depth, 0);
+            device.Clear(ClearOptions.DepthBuffer, Microsoft.Xna.Framework.Color.White, depth, 0);
         }
     }
 }

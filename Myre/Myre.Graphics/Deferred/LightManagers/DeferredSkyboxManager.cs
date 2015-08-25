@@ -1,6 +1,7 @@
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities.Behaviours;
+using Myre.Extensions;
 using Myre.Graphics.Lighting;
 
 namespace Myre.Graphics.Deferred.LightManagers
@@ -10,7 +11,6 @@ namespace Myre.Graphics.Deferred.LightManagers
     {
         readonly Model _model;
         readonly Effect _skyboxEffect;
-        readonly Quad _quad;
 
         private readonly DepthStencilState _depthState = new DepthStencilState
         {
@@ -23,8 +23,6 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             _skyboxEffect = Content.Load<Effect>("Skybox");
             _model = Content.Load<Model>("SkyboxModel");
-            _quad = new Quad(device);
-            _quad.SetPosition(depth: 1);
         }
 
         public void Prepare(Renderer renderer)
@@ -45,10 +43,10 @@ namespace Myre.Graphics.Deferred.LightManagers
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
 
-            var view = renderer.Data.GetValue(new TypedName<Matrix>("view"));
+            var view = renderer.Data.GetValue(new TypedName<Matrix4x4>("view"));
             view.Translation = Vector3.Zero;
             _skyboxEffect.Parameters["View"].SetValue(view);
-            _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.GetValue(new TypedName<Matrix>("projection")));
+            _skyboxEffect.Parameters["Projection"].SetValue(renderer.Data.GetValue(new TypedName<Matrix4x4>("projection")));
 
             for (int i = 0; i < Behaviours.Count; i++)
             {
