@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Myre.Extensions;
+using SwizzleMyVectors;
 
 namespace Myre.Tests.Myre.Extensions
 {

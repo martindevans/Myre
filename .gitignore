@@ -36,6 +36,8 @@
 /Testing/DebugContentPipeline/obj
 /Testing/GraphicsTests/obj
 /Testing/GraphicsTests/bin
+/Testing/GraphicsTests.ContentShim/obj
+/Testing/GraphicsTests.ContentShim/bin
 /Testing/GraphicsTestsContent/obj
 /Testing/GraphicsTestsContent/bin
 /Testing/Myre.Entities.Tests/bin

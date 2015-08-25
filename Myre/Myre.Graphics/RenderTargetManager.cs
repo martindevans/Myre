@@ -1,4 +1,8 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿#if DEBUG
+using System;
+#endif
+
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Myre.Graphics
