@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Myre.Extensions;
+using SwizzleMyVectors;
 
 namespace Myre.Graphics.Pipeline.Animations
 {

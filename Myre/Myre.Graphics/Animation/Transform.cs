@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using Myre.Extensions;
+using SwizzleMyVectors;
 
 namespace Myre.Graphics.Animation
 {

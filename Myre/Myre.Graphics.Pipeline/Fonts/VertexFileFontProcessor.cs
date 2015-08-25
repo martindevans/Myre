@@ -17,7 +17,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-
+using SwizzleMyVectors;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Pipeline.Fonts

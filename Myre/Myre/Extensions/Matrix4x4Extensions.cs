@@ -111,18 +111,5 @@ namespace Myre.Extensions
         {
             return Forward(matrix, -value);
         }
-
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3 Scale(this Matrix4x4 matrix)
-        {
-            return new Vector3(matrix.M11, matrix.M22, matrix.M33);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3 Translation(this Matrix4x4 matrix)
-        {
-            return new Vector3(matrix.M41, matrix.M42, matrix.M43);
-        }
     }
 }
