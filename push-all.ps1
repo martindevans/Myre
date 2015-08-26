@@ -1,7 +1,7 @@
 function Push-Nuget($path, $csproj) {
     $fullPathToCsprog = Join-Path -Path $path -ChildPath $csproj -resolve;
     
-    nuget pack $fullPathToCsprog -Prop Configuration=Release -IncludeReferencedProjects -Symbols
+    nuget pack $fullPathToCsprog -Prop Configuration=Release -IncludeReferencedProjects
     
     get-childitem -Filter *.nupkg -name | foreach ($_) {
         Write-Host "Pushing " $_ -backgroundcolor darkgreen -foregroundcolor white;
@@ -29,5 +29,5 @@ Push-Nuget "Myre/Myre.Debugging.UI" "Myre.Debugging.UI.csproj"
 Push-Nuget "Myre/Myre.Graphics" "Myre.Graphics.csproj"
 
 # Dependent upon Myre.Graphics
-# Note no (x86) for pipeline. This is a pipeline project not a deploy project so target platform doesn't matter
+# Note no for pipeline. This is a pipeline project not a deploy project so target platform doesn't matter
 Push-Nuget "Myre/Myre.Graphics.Pipeline" "Myre.Graphics.Pipeline.csproj"
