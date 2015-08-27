@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
-
-using ContainmentType = Microsoft.Xna.Framework.ContainmentType;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Geometry
 {

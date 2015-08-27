@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Collections
 {
@@ -111,7 +112,7 @@ namespace Myre.Collections
             /// <exception cref="InvalidOperationException"></exception>
             public TokenNode Insert(Vector3 position, T item)
             {
-                if (Bounds.Contains(position) == Microsoft.Xna.Framework.ContainmentType.Disjoint)
+                if (Bounds.Contains(position) == ContainmentType.Disjoint)
                     return null;
 
                 if (IsSubdivided)
@@ -146,7 +147,7 @@ namespace Myre.Collections
             /// <returns></returns>
             public bool Remove(Vector3 position, T item)
             {
-                if (Bounds.Contains(position) == Microsoft.Xna.Framework.ContainmentType.Disjoint)
+                if (Bounds.Contains(position) == ContainmentType.Disjoint)
                     return false;
 
                 if (IsSubdivided)
@@ -179,7 +180,7 @@ namespace Myre.Collections
                 return NodesOverlappingBounds(bounds)
                     .Cast<TokenNode>()
                     .SelectMany(a => a._tokens
-                        .Where(t => bounds.Contains(t.Key) != Microsoft.Xna.Framework.ContainmentType.Disjoint));
+                        .Where(t => bounds.Contains(t.Key) != ContainmentType.Disjoint));
             }
         }
     }

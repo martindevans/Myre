@@ -5,8 +5,7 @@ using Myre.Entities.Behaviours;
 using Myre.Extensions;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
-
-using PlaneIntersectionType = Microsoft.Xna.Framework.PlaneIntersectionType;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -65,7 +64,10 @@ namespace Myre.Graphics.Deferred.LightManagers
             foreach (var light in Behaviours)
             {
                 var bounds = new BoundingSphere(light.Position, light.Range);
-                if (!bounds.Intersects(frustum))
+
+                bool intersects;
+                bounds.Intersects(ref frustum, out intersects);
+                if (!intersects)
                     continue;
 
                 var near = bounds.Intersects(frustum.Near) == PlaneIntersectionType.Intersecting;

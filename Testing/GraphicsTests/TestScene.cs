@@ -98,20 +98,6 @@ namespace GraphicsTests
                 _scene.Add(skybox);
             }
 
-            var sunEntity = kernel.Get<EntityDescription>();
-            sunEntity.AddProperty(SunLight.DirectionName, Vector3.Normalize(new Vector3(-.2f, -1f, .3f)));
-            sunEntity.AddProperty(SunLight.ColourName, new Vector3(1, 0.3f, 0.01f) * 5);
-            sunEntity.AddProperty(SunLight.ShadowResolutionName, 4096);
-            sunEntity.AddProperty(SunLight.ActiveName, true);
-            sunEntity.AddBehaviour<SunLight>();
-            Entity sun = sunEntity.Create();
-            _scene.Add(sun);
-
-            //var sun2 = sunEntity.Create();
-            //sun2.GetProperty<Vector3>("direction").Value = Vector3.Normalize(new Vector3(1, -1, 0));
-            //sun2.GetProperty<Vector3>("colour").Value = new Vector3(1, 0, 0);
-            //scene.Add(sun2);
-
             var pointLight = kernel.Get<EntityDescription>();
             pointLight.AddProperty(new TypedName<Vector3>("position"));
             pointLight.AddProperty(new TypedName<Vector3>("colour"));
@@ -181,6 +167,20 @@ namespace GraphicsTests
                 sunlightEntity.GetProperty(new TypedName<Vector3>("direction")).Value = -Vector3.UnitY;
                 sunlightEntity.GetProperty(new TypedName<int>("shadow_resolution")).Value = 1024;
                 _scene.Add(sunlightEntity);
+
+                //var sunEntity = kernel.Get<EntityDescription>();
+                //sunEntity.AddProperty(SunLight.DirectionName, Vector3.Normalize(new Vector3(-.2f, -1f, .3f)));
+                //sunEntity.AddProperty(SunLight.ColourName, new Vector3(1, 0.3f, 0.01f) * 5);
+                //sunEntity.AddProperty(SunLight.ShadowResolutionName, 4096);
+                //sunEntity.AddProperty(SunLight.ActiveName, true);
+                //sunEntity.AddBehaviour<SunLight>();
+                //Entity sun = sunEntity.Create();
+                //_scene.Add(sun);
+
+                //var sun2 = sunEntity.Create();
+                //sun2.GetProperty<Vector3>("direction").Value = Vector3.Normalize(new Vector3(1, -1, 0));
+                //sun2.GetProperty<Vector3>("colour").Value = new Vector3(1, 0, 0);
+                //scene.Add(sun2);
             }
 
             //var floor = content.Load<ModelData>(@"Models\Ground");

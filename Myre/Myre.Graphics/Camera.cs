@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Myre.Collections;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics
 {
@@ -103,7 +104,7 @@ namespace Myre.Graphics
             Matrix4x4.Invert(_view, out _inverseView);
             Matrix4x4.Invert(_projection, out _inverseProjection);
             Matrix4x4.Invert(_viewProjection, out _inverseViewProjection);
-            _bounds = new BoundingFrustum(_viewProjection);
+            _bounds.Matrix = _viewProjection;
             _isDirty = false;
         }
 

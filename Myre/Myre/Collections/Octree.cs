@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Collections
 {
@@ -130,7 +131,7 @@ namespace Myre.Collections
             /// <returns></returns>
             public bool Contains(Vector3 point)
             {
-                return Bounds.Contains(point) != Microsoft.Xna.Framework.ContainmentType.Disjoint;
+                return Bounds.Contains(point) != ContainmentType.Disjoint;
             }
 
             /// <summary>

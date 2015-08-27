@@ -1,5 +1,6 @@
 ﻿
 using System.Numerics;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre
 {

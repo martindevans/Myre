@@ -2,6 +2,7 @@
 using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Myre.Extensions;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Animation
 {

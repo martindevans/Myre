@@ -9,7 +9,7 @@ using Myre.Graphics.Geometry;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
 using Ninject;
-
+using SwizzleMyVectors.Geometry;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred.LightManagers

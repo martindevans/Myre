@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Extensions
 {
@@ -12,13 +13,19 @@ namespace Myre.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Microsoft.Xna.Framework.BoundingBox ToXNA(this BoundingBox box)
         {
-            return box.XnaBox;
+            return new Microsoft.Xna.Framework.BoundingBox(
+                box.Min.ToXNA(),
+                box.Max.ToXNA()
+            );
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BoundingBox FromXNA(this Microsoft.Xna.Framework.BoundingBox box)
         {
-            return new BoundingBox(box);
+            return new BoundingBox(
+                box.Min.FromXNA(),
+                box.Max.FromXNA()
+            );
         }
 
         /// <summary>

@@ -9,10 +9,10 @@ using Myre.Graphics.Materials;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 #if PROFILE
 using Myre.Debugging.Statistics;
 #endif
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Geometry
 {

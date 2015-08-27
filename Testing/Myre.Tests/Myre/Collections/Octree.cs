@@ -2,6 +2,7 @@
 using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Myre.Collections;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Tests.Myre.Collections
 {

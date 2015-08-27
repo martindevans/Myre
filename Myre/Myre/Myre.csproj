@@ -37,8 +37,8 @@
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
-    <Reference Include="SwizzleMyVectors, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SwizzleMyVectors.1.0.0.0\lib\net46\SwizzleMyVectors.dll</HintPath>
+    <Reference Include="SwizzleMyVectors, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SwizzleMyVectors.1.2.1.0\lib\net46\SwizzleMyVectors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -53,9 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionDisposable.cs" />
-    <Compile Include="BoundingBox.cs" />
-    <Compile Include="BoundingFrustum.cs" />
-    <Compile Include="BoundingSphere.cs" />
     <Compile Include="Collections\Box.cs" />
     <Compile Include="Collections\CascadingBoxCollection.cs" />
     <Compile Include="Collections\INamedDataCollection.cs" />
@@ -102,7 +99,6 @@
     <Compile Include="IRecycleable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pulser.cs" />
-    <Compile Include="Ray.cs" />
     <Compile Include="RotatedBoundingBox.cs" />
     <Compile Include="StaticRandom.cs" />
     <Compile Include="TypedName.cs" />

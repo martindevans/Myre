@@ -8,9 +8,9 @@ using Myre.Extensions;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using Ninject;
-
+using SwizzleMyVectors.Geometry;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
-using ContainmentType = Microsoft.Xna.Framework.ContainmentType;
+
 
 #if PROFILE
 using Myre.Debugging.Statistics;
@@ -259,7 +259,8 @@ namespace Myre.Graphics.Deferred.Decals
                     worldViewBox.Value = behaviour.Transform * cameraViewBox.Value;
 
                     //Transform the camera position into object space and test to see if it intersects the decal
-                    var cameraSphere = new BoundingSphere(cameraPosition.Value, cameraNearClip.Value).Transform(ref behaviour._inverseTransform);
+                    BoundingSphere cameraSphere;
+                    new BoundingSphere(cameraPosition.Value, cameraNearClip.Value).Transform(ref behaviour._inverseTransform, out cameraSphere);
                     var cameraIntersectsDecal = new BoundingBox(new Vector3(-0.5f), new Vector3(0.5f)).Contains(cameraSphere) != ContainmentType.Disjoint;
 
                     //Select appropriate material

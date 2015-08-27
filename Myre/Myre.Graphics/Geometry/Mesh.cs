@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Extensions;
 using Myre.Graphics.Materials;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Geometry
 {

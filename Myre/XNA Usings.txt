@@ -8,11 +8,10 @@ using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 using Game = Microsoft.Xna.Framework.Game;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Ray = Microsoft.Xna.Framework.Ray;
-using ContainmentType = Microsoft.Xna.Framework.ContainmentType;
-using PlaneIntersectionType = Microsoft.Xna.Framework.PlaneIntersectionType;
 using GraphicsDeviceManager = Microsoft.Xna.Framework.GraphicsDeviceManager;
 using PreparingDeviceSettingsEventArgs = Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs;
 using Curve = Microsoft.Xna.Framework.Curve;
 using CurveLoopType = Microsoft.Xna.Framework.CurveLoopType;
 using CurveKey = Microsoft.Xna.Framework.CurveKey;
+
+

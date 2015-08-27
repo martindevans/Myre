@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Myre.Extensions;
+using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Geometry
 {

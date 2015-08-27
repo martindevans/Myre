@@ -11,9 +11,9 @@ using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
 using Ninject;
 using System.Numerics;
-
+using SwizzleMyVectors.Geometry;
 using Color = Microsoft.Xna.Framework.Color;
-using PlaneIntersectionType = Microsoft.Xna.Framework.PlaneIntersectionType;
+
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
