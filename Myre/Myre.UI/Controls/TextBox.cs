@@ -47,11 +47,6 @@ namespace Myre.UI.Controls
         private bool _dirty;
         private readonly Texture2D _blank;
 
-#if WINDOWS
-        private KeyboardState currentState;
-        private KeyboardState previousState;
-#endif
-
         public string Text
         {
             get { return _textString; }
@@ -330,7 +325,6 @@ namespace Myre.UI.Controls
             _dirty = true;
         }
 
-#if WINDOWS
         private void Delete()
         {
             if (_selectionEndIndex != _selectionStartIndex)
@@ -387,6 +381,5 @@ namespace Myre.UI.Controls
                 _selectionStartIndex = _selectionEndIndex;
             Dirty();
         }
-#endif
     }
 }

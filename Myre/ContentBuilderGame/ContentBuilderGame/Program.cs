@@ -2,7 +2,6 @@ using System;
 
 namespace ContentBuilderGame
 {
-#if WINDOWS
     static class Program
     {
         /// <summary>
@@ -16,6 +15,5 @@ namespace ContentBuilderGame
             }
         }
     }
-#endif
 }
 

@@ -47,7 +47,6 @@ namespace Myre.UI.InputDevices
             _characters = new List<char>();
             Characters = new ReadOnlyCollection<char>(_characters);
 
-#if WINDOWS
             if (player == PlayerIndex.One)
             {
                 if (windowHandle != IntPtr.Zero)
@@ -62,7 +61,6 @@ namespace Myre.UI.InputDevices
                             _newCharacters.Add(e.Character);
                     };
             }
-#endif
         }
 
         public void Update(GameTime gameTime)

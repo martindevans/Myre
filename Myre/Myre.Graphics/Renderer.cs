@@ -87,9 +87,7 @@ namespace Myre.Graphics
 
         public override void Draw()
         {
-#if WINDOWS
             var targets = _device.GetRenderTargets();
-#endif
 
 #if PROFILE
             Statistic.Create("Graphics.Primitives").Set(0);
@@ -108,14 +106,10 @@ namespace Myre.Graphics
                 view.End(this);
             }
 
-#if WINDOWS
             if (targets.Length != 0)
                 _device.SetRenderTargets(targets);
             else
                 _device.SetRenderTarget(null);
-#else
-            _device.SetRenderTarget(null);
-#endif
 
 
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);

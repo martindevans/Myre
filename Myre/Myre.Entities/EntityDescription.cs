@@ -189,7 +189,6 @@ namespace Myre.Entities
             return AddBehaviour(typeof(T), name.Name);
         }
 
-#if WINDOWS
         /// <summary>
         /// Adds the behaviour, provided that such a behaviour does not already exist.
         /// </summary>
@@ -201,7 +200,6 @@ namespace Myre.Entities
         {
             return AddBehaviour(new BehaviourData(name, typeof(T), create));
         }
-#endif
 
         /// <summary>
         /// Removes the behaviour.

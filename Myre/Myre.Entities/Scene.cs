@@ -42,7 +42,6 @@ namespace Myre.Entities
             get { return _services; }
         }
 
-#if WINDOWS
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
@@ -50,7 +49,6 @@ namespace Myre.Entities
         {
             get { return _services.ExecutionTimes; }
         }
-#endif
 
         /// <summary>
         /// Gets the managers.
