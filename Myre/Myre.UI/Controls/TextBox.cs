@@ -36,6 +36,9 @@ namespace Myre.UI.Controls
         private int _drawStartIndex;
         private int _drawEndIndex;
 
+        private KeyboardState _previousState;
+        private KeyboardState _currentState;
+
         private readonly Pulser _blink;
         private readonly Pulser _keyRepeat;
         private int _selectionStartIndex;
@@ -180,11 +183,10 @@ namespace Myre.UI.Controls
 
         private void ReadNavigationKeys()
         {
-#if WINDOWS
-            previousState = currentState;
-            currentState = Keyboard.GetState();
+            _previousState = _currentState;
+            _currentState = Keyboard.GetState();
 
-            bool shift = currentState.IsKeyDown(Keys.LeftShift) || currentState.IsKeyDown(Keys.RightShift);
+            bool shift = _currentState.IsKeyDown(Keys.LeftShift) || _currentState.IsKeyDown(Keys.RightShift);
 
             if (NewOrRepeat(Keys.Left))
                 Left(shift);
@@ -198,16 +200,14 @@ namespace Myre.UI.Controls
                 Delete();
             if (NewOrRepeat(Keys.Back))
                 Backspace();
-#endif
         }
 
-#if WINDOWS
         private bool NewOrRepeat(Keys key)
         {
-            if (!currentState.IsKeyDown(key))
+            if (!_currentState.IsKeyDown(key))
                 return false;
 
-            if (!previousState.IsKeyDown(key))
+            if (!_previousState.IsKeyDown(key))
             {
                 _keyRepeat.Restart(false, true);
                 return true;
@@ -215,7 +215,6 @@ namespace Myre.UI.Controls
 
             return _keyRepeat.IsSignalled;
         }
-#endif
 
         public override void Draw(SpriteBatch spriteBatch)
         {

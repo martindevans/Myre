@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-
+using System.Threading;
 using Game = Microsoft.Xna.Framework.Game;
 
 namespace Myre.StateManagement
@@ -19,6 +19,9 @@ namespace Myre.StateManagement
 
         public static void Run(Func<ILaunchable> createGame, params Action<Exception>[] exceptionHandlers)
         {
+            if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+                throw new InvalidOperationException("Current thread is not STA - Add [STAThread] to main method");
+
             if (Debugger.IsAttached)
             {
                 Trace.TraceInformation("Debugger is attached, running with no global exception handler");

@@ -88,7 +88,8 @@ namespace Myre.UI.Controls
             _centreText.SetPoint(Points.TopRight, -_rightArrow.Area.Width, 0);
             _centreText.Text = options[0];
 
-            ControlEventHandler recalcSize = sender => {
+            ControlEventHandler recalcSize = delegate
+            {
                 Vector2 maxSize = Vector2.Zero;
                 for (int i = 0; i < options.Length; i++)
                 {
@@ -103,7 +104,10 @@ namespace Myre.UI.Controls
                 _rightArrow.SetSize(arrowSize, font.LineSpacing);
             };
 
-            ControlEventHandler highlight = c => ((Label)c).Colour = (c.IsFocused || c.IsWarm) ? Highlight : Colour;
+            ControlEventHandler highlight = delegate(Control c)
+            {
+                ((Label)c).Colour = (c.IsFocused || c.IsWarm) ? Highlight : Colour;
+            };
 
             _leftArrow.WarmChanged += highlight;
             _rightArrow.WarmChanged += highlight;

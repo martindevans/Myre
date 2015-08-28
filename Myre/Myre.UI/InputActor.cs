@@ -61,13 +61,8 @@ namespace Myre.UI
             }
         }
 
-#if XNA_3_1
-        public event EventHandler UpdateOrderChanged;
-        public event EventHandler EnabledChanged;
-#else
         public event EventHandler<EventArgs> UpdateOrderChanged;
         public event EventHandler<EventArgs> EnabledChanged;
-#endif
 
         protected virtual void OnEnabledChanged()
         {

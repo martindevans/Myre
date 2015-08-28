@@ -77,13 +77,8 @@ namespace Myre.UI
             }
         }
 
-#if XNA_3_1
-        public event EventHandler UpdateOrderChanged;
-        public event EventHandler EnabledChanged;
-#else
         public event EventHandler<EventArgs> UpdateOrderChanged;
         public event EventHandler<EventArgs> EnabledChanged;
-#endif
 
         #endregion
 
@@ -114,13 +109,8 @@ namespace Myre.UI
             }
         }
 
-#if XNA_3_1
-        public event EventHandler DrawOrderChanged;
-        public event EventHandler VisibleChanged;
-#else
         public event EventHandler<EventArgs> DrawOrderChanged;
         public event EventHandler<EventArgs> VisibleChanged;
-#endif
         #endregion
 
         public UserInterface(GraphicsDevice graphics)
@@ -163,11 +153,7 @@ namespace Myre.UI
 
         public void Draw(GameTime gameTime)
         {
-#if XNA_3_1
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
-#else
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-#endif
             for (int i = 0; i < _buffer.Count; i++)
             {
                 if (_buffer[i].IsVisible)
