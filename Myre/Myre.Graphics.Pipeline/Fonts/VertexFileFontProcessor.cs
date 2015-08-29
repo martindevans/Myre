@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Myre.Extensions;
 using Myre.Graphics.Pipeline.Models;
 using Poly2Tri;
 using Poly2Tri.Triangulation.Delaunay;
@@ -17,8 +16,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using SwizzleMyVectors;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Pipeline.Fonts
 {
@@ -314,10 +311,12 @@ namespace Myre.Graphics.Pipeline.Fonts
             List<int> outputIndices = new List<int>();
 
             //generate triangle mesh (upper face)
-            polys.SelectMany(a => a.Triangles).ForEach(t => CreateTriangle(t, 0.5f, true, outputVertices, outputIndices));
+            foreach (var t in polys.SelectMany(a => a.Triangles))
+                CreateTriangle(t, 0.5f, true, outputVertices, outputIndices);
 
             //generate triangle mesh (lower face, all triangles reversed in order)
-            polys.SelectMany(a => a.Triangles).ForEach(t => CreateTriangle(t, -0.5f, false, outputVertices, outputIndices));
+            foreach (var t in polys.SelectMany(a => a.Triangles))
+                CreateTriangle(t, -0.5f, false, outputVertices, outputIndices);
 
             //generate connecting triangles
             foreach (var polygon in polygons)
@@ -330,12 +329,12 @@ namespace Myre.Graphics.Pipeline.Fonts
 
         private Vector2[] CreateTextureData(List<Vector3> vertexPositions)
         {
-            Vector2 min = vertexPositions.Select(a => a.FromXNA().XZ()).Aggregate(new Vector2(float.MaxValue), (a, b) => new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y)));
-            Vector2 max = vertexPositions.Select(a => a.FromXNA().XZ()).Aggregate(new Vector2(float.MinValue), (a, b) => new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y)));
+            Vector2 min = vertexPositions.Select(a => new Vector2(a.X, a.Z)).Aggregate(new Vector2(float.MaxValue), (a, b) => new Vector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y)));
+            Vector2 max = vertexPositions.Select(a => new Vector2(a.X, a.Z)).Aggregate(new Vector2(float.MinValue), (a, b) => new Vector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y)));
             var range = max - min;
 
             return vertexPositions.Select(a => {
-                var uv = (a.FromXNA().XZ().ToXNA() - min) / range;
+                var uv = (new Vector2(a.X, a.Z) - min) / range;
                 if (a.Y < 0)
                     uv = Vector2.One - uv;
                 return uv;
@@ -370,7 +369,7 @@ namespace Myre.Graphics.Pipeline.Fonts
                 }
 
                 //eliminate triangle with small enough area
-                var triangleArea = Math.Abs(ab.FromXNA().Cross(cb.FromXNA()) / 2);
+                var triangleArea = Math.Abs(Cross(ab, cb) / 2);
                 if (triangleArea < FontSize * AreaPrecision)
                 {
                     points.RemoveAt((i + 1) % points.Count);
@@ -380,6 +379,11 @@ namespace Myre.Graphics.Pipeline.Fonts
             }
 
             return new Polygon(points);
+        }
+
+        private static float Cross(Vector2 a, Vector2 b)
+        {
+            return a.X * b.Y - a.Y * b.X;
         }
 
         private static void CreateTriangle(DelaunayTriangle triangle, float yOffset, bool flip, ICollection<Vector3> vertices, List<int> indices)

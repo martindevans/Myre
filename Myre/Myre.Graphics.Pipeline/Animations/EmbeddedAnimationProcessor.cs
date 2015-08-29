@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Myre.Extensions;
-using SwizzleMyVectors;
 
 namespace Myre.Graphics.Pipeline.Animations
 {
@@ -180,7 +178,7 @@ namespace Myre.Graphics.Pipeline.Animations
                 //Estimate where B *should* be using purely LERP
                 Vector3 translation = Vector3.Lerp(a.Translation, c.Translation, t);
                 Vector3 scale = Vector3.Lerp(a.Scale, c.Scale, t);
-                Quaternion rotation = a.Rotation.FromXNA().Nlerp(c.Rotation.FromXNA(), t).ToXNA();
+                Quaternion rotation = NLerp(a.Rotation, c.Rotation, t);
 
                 //If it's a close enough guess, run with it and drop B
                 if ((translation - b.Translation).LengthSquared() < EPSILON_LENGTH && Quaternion.Dot(rotation, b.Rotation) > EPSILON_COS_ANGLE && (scale - b.Scale).LengthSquared() < EPSILON_SCALE)
@@ -190,6 +188,11 @@ namespace Myre.Graphics.Pipeline.Animations
                     node = n;
                 }
             }
+        }
+
+        private static Quaternion NLerp(Quaternion a, Quaternion b, float t)
+        {
+            return Quaternion.Normalize(Quaternion.Lerp(a, b, t));
         }
 
         /// <summary>
