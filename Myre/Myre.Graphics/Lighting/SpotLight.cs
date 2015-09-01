@@ -12,6 +12,7 @@ namespace Myre.Graphics.Lighting
         private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
         private static readonly TypedName<Vector3> _positionName = new TypedName<Vector3>("position");
         private static readonly TypedName<Vector3> _directionName = new TypedName<Vector3>("direction");
+        private static readonly TypedName<Vector3> _upName = new TypedName<Vector3>("up");
         private static readonly TypedName<float> _angleName = new TypedName<float>("angle");
         private static readonly TypedName<float> _rangeName = new TypedName<float>("range");
         private static readonly TypedName<Texture2D> _maskName = new TypedName<Texture2D>("mask");
@@ -22,6 +23,7 @@ namespace Myre.Graphics.Lighting
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
         private Property<Vector3> _direction;
+        private Property<Vector3> _up;
         private Property<float> _angle;
         private Property<float> _range;
         private Property<Texture2D> _mask;
@@ -51,6 +53,12 @@ namespace Myre.Graphics.Lighting
         {
             get { return _direction.Value; }
             set { _direction.Value = Vector3.Normalize(value); }
+        }
+
+        public Vector3 Up
+        {
+            get { return _up.Value; }
+            set { _up.Value = value; }
         }
 
         public float Angle
@@ -88,6 +96,7 @@ namespace Myre.Graphics.Lighting
             _colour = context.CreateProperty(_colourName);
             _position = context.CreateProperty(_positionName);
             _direction = context.CreateProperty(_directionName);
+            _up = context.CreateProperty(_upName, Vector3.UnitY);
             _angle = context.CreateProperty(_angleName);
             _range = context.CreateProperty(_rangeName);
             _mask = context.CreateProperty(_maskName);
@@ -105,6 +114,7 @@ namespace Myre.Graphics.Lighting
             initialisationData.TryCopyValue(this, _colourName, _colour);
             initialisationData.TryCopyValue(this, _positionName, _position);
             initialisationData.TryCopyValue(this, _directionName, _direction);
+            initialisationData.TryCopyValue(this, _upName, _up);
             initialisationData.TryCopyValue(this, _angleName, _angle);
             initialisationData.TryCopyValue(this, _rangeName, _range);
             initialisationData.TryCopyValue(this, _maskName, _mask);

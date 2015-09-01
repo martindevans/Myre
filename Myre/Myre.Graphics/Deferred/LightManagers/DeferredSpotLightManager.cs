@@ -177,7 +177,7 @@ namespace Myre.Graphics.Deferred.LightManagers
                 light.View = Matrix4x4.CreateLookAt(
                     light.Light.Position,
                     light.Light.Position + light.Light.Direction,
-                    light.Light.Direction == Vector3.UnitY || light.Light.Direction == -Vector3.UnitY ? Vector3.UnitX : Vector3.UnitY);
+                    light.Light.Up); //  Vector3.UnitY || light.Light.Direction == -Vector3.UnitY ? Vector3.UnitX : Vector3.UnitY);
                 light.Projection = Matrix4x4.CreatePerspectiveFieldOfView(light.Light.Angle, 1, 1, light.Light.Range);
 
                 if (light.Light.ShadowResolution > 0)
@@ -293,10 +293,9 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             if (material != null)
             {
-                Vector3 position = light.Position;
-                Vector3 direction = light.Direction;
-                position = Vector3.Transform(position, view);
-                direction = Vector3.TransformNormal(direction, view);
+                var position = Vector3.Transform(light.Position, view);
+                var direction = Vector3.TransformNormal(light.Direction, view);
+                var up = Vector3.TransformNormal(light.Up, view);
                 float angle = (float)Math.Cos(light.Angle / 2);
 
                 if (light.Mask != null || light.ShadowResolution > 0)

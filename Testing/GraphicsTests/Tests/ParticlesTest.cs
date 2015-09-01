@@ -5,6 +5,7 @@ using Myre;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Graphics;
+using Myre.Graphics.Deferred;
 using Myre.Graphics.Translucency;
 using Myre.Graphics.Translucency.Particles;
 using Ninject;
@@ -46,7 +47,7 @@ namespace GraphicsTests.Tests
 
             var renderer = _scene.GetService<Renderer>();
             renderer.StartPlan()
-                    .Then(new CreateTargetComponent(new RenderTargetInfo(0, 0, default(SurfaceFormat), DepthFormat.Depth24Stencil8, default(int), default(bool), default(RenderTargetUsage))))
+                    .Then(new CreateTargetComponent(new RenderTargetInfo(0, 0, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 1, false, default(RenderTargetUsage))))
                     .Then<TranslucentComponent>()
                     .Apply();
 
@@ -56,8 +57,7 @@ namespace GraphicsTests.Tests
             {
                 NearClip = 1,
                 FarClip = 3000,
-                View = Matrix4x4.CreateLookAt(cameraPosition, new Vector3(0, 25, 0),
-                Vector3.UnitY)
+                View = Matrix4x4.CreateLookAt(cameraPosition, new Vector3(0, 0, 0), Vector3.UnitY)
             };
             _camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
 

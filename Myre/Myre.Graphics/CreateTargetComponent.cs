@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-
+using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics
@@ -50,7 +50,7 @@ namespace Myre.Graphics
 
             var target = RenderTargetManager.GetTarget(renderer.Device, info);
             renderer.Device.SetRenderTarget(target);
-            renderer.Device.Clear(Color.Black);
+            renderer.Device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1, 0);
 
             Output(_name, target);
         }
