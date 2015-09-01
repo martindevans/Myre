@@ -9,6 +9,17 @@ namespace Myre
     {
         private const float EPSILON = float.Epsilon;
 
+        #region Derivative
+        public static Func<float, float> Derivative(this Func<float, float> interpolation, float dt)
+        {
+            return t => {
+                var a = interpolation(t);
+                var b = interpolation(t + dt);
+                return b - a;
+            };
+        }
+        #endregion
+
         #region Linear
         /// <summary>
         /// Easing equation function for a simple linear tweening, with no easing.
