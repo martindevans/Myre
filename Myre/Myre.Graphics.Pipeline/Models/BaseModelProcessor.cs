@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
@@ -397,7 +396,7 @@ namespace Myre.Graphics.Pipeline.Models
         #endregion
 
         #region geometry processing
-        protected IEnumerable<MyreMeshContent> ProcessMesh(MeshContent mesh, List<Vector3>[] verticesPerBoneIndex = null, ReadOnlyDictionary<string, int> boneIndices = null)
+        protected IEnumerable<MyreMeshContent> ProcessMesh(MeshContent mesh, List<Vector3>[] verticesPerBoneIndex = null, IDictionary<string, int> boneIndices = null)
         {
             MeshHelper.MergeDuplicateVertices(mesh);
             MeshHelper.OptimizeForCache(mesh);
@@ -424,7 +423,7 @@ namespace Myre.Graphics.Pipeline.Models
             return mesh.Geometry.Select(geometry => ProcessGeometry(geometry, verticesPerBoneIndex, boneIndices)).ToArray();
         }
 
-        protected MyreMeshContent ProcessGeometry(GeometryContent geometry, List<Vector3>[] verticesPerBoneIndex = null, ReadOnlyDictionary<string, int> boneIndices = null)
+        protected MyreMeshContent ProcessGeometry(GeometryContent geometry, List<Vector3>[] verticesPerBoneIndex = null, IDictionary<string, int> boneIndices = null)
         {
             //save which vertices are assigned to which bone
             if (geometry.Vertices.Channels.Contains(VertexChannelNames.Weights(0)) && verticesPerBoneIndex != null && boneIndices != null)

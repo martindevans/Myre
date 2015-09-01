@@ -19,10 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2CFE20
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentBuilderGame", "ContentBuilderGame\ContentBuilderGame\ContentBuilderGame.csproj", "{9530DD68-4817-49FB-A2C0-47BE640B7054}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentBuilderGameContent", "ContentBuilderGame\ContentBuilderGameContent\ContentBuilderGameContent.contentproj", "{7C3C31EF-4DE9-4E55-9CE4-0062694CDAEC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre", "Myre\Myre.csproj", "{150B5101-1046-43E9-9FD0-A2DDD33C352F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Debugging", "Myre.Debugging\Myre.Debugging.csproj", "{830B5721-1E84-4F33-BEAC-4B4D12E795E1}"
@@ -36,6 +32,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Entities", "Myre.Entities\Myre.Entities.csproj", "{F287DE39-958B-4483-8823-2FAA8B26FFE7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myre.Graphics", "Myre.Graphics\Myre.Graphics.csproj", "{89D13FE0-8194-4535-B77D-083DA938A1AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentBuilder", "ContentBuilder\ContentBuilder.csproj", "{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentBuilder.ContentShim", "ContentBuilder.ContentShim\ContentBuilder.ContentShim.csproj", "{E8C46A74-E665-4ADD-A58F-C079A4DBB908}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,15 +53,6 @@ Global
 		{EC58850F-3960-426A-BE7D-7DFB67CB00A8}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{EC58850F-3960-426A-BE7D-7DFB67CB00A8}.Profile|x86.ActiveCfg = Debug|Any CPU
 		{EC58850F-3960-426A-BE7D-7DFB67CB00A8}.Release|x86.ActiveCfg = Debug|Any CPU
-		{9530DD68-4817-49FB-A2C0-47BE640B7054}.Debug|x86.ActiveCfg = Debug|x86
-		{9530DD68-4817-49FB-A2C0-47BE640B7054}.Debug|x86.Build.0 = Debug|x86
-		{9530DD68-4817-49FB-A2C0-47BE640B7054}.Profile|x86.ActiveCfg = Release|x86
-		{9530DD68-4817-49FB-A2C0-47BE640B7054}.Profile|x86.Build.0 = Release|x86
-		{9530DD68-4817-49FB-A2C0-47BE640B7054}.Release|x86.ActiveCfg = Release|x86
-		{9530DD68-4817-49FB-A2C0-47BE640B7054}.Release|x86.Build.0 = Release|x86
-		{7C3C31EF-4DE9-4E55-9CE4-0062694CDAEC}.Debug|x86.ActiveCfg = Debug|x86
-		{7C3C31EF-4DE9-4E55-9CE4-0062694CDAEC}.Profile|x86.ActiveCfg = Release|x86
-		{7C3C31EF-4DE9-4E55-9CE4-0062694CDAEC}.Release|x86.ActiveCfg = Release|x86
 		{150B5101-1046-43E9-9FD0-A2DDD33C352F}.Debug|x86.ActiveCfg = Debug|x86
 		{150B5101-1046-43E9-9FD0-A2DDD33C352F}.Debug|x86.Build.0 = Debug|x86
 		{150B5101-1046-43E9-9FD0-A2DDD33C352F}.Profile|x86.ActiveCfg = Release|x86
@@ -104,6 +95,18 @@ Global
 		{89D13FE0-8194-4535-B77D-083DA938A1AF}.Profile|x86.Build.0 = Release|x86
 		{89D13FE0-8194-4535-B77D-083DA938A1AF}.Release|x86.ActiveCfg = Release|x86
 		{89D13FE0-8194-4535-B77D-083DA938A1AF}.Release|x86.Build.0 = Release|x86
+		{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}.Debug|x86.ActiveCfg = Debug|x86
+		{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}.Debug|x86.Build.0 = Debug|x86
+		{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}.Profile|x86.ActiveCfg = Release|x86
+		{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}.Profile|x86.Build.0 = Release|x86
+		{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}.Release|x86.ActiveCfg = Release|x86
+		{9444A7D7-A7C1-4FF3-BC2B-E3A6C11B7EED}.Release|x86.Build.0 = Release|x86
+		{E8C46A74-E665-4ADD-A58F-C079A4DBB908}.Debug|x86.ActiveCfg = Debug|x86
+		{E8C46A74-E665-4ADD-A58F-C079A4DBB908}.Debug|x86.Build.0 = Debug|x86
+		{E8C46A74-E665-4ADD-A58F-C079A4DBB908}.Profile|x86.ActiveCfg = Release|x86
+		{E8C46A74-E665-4ADD-A58F-C079A4DBB908}.Profile|x86.Build.0 = Release|x86
+		{E8C46A74-E665-4ADD-A58F-C079A4DBB908}.Release|x86.ActiveCfg = Release|x86
+		{E8C46A74-E665-4ADD-A58F-C079A4DBB908}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

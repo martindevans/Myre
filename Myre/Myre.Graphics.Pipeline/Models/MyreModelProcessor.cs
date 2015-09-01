@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -51,7 +50,7 @@ namespace Myre.Graphics.Pipeline.Models
             List<MeshContent> meshes = new List<MeshContent>();
             ModelHelpers.FindMeshes(input, meshes);
 
-            var bi = _boneIndices == null ? null : new ReadOnlyDictionary<string, int>(_boneIndices);
+            var bi = _boneIndices == null ? null : new Dictionary<string, int>(_boneIndices);
             foreach (var mesh in meshes)
                 foreach (var geom in ProcessMesh(mesh, _verticesPerBone, bi))
                     outputModel.AddMesh(geom);
