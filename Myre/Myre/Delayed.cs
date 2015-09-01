@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
+
 namespace Myre
 {
     /// <summary>
@@ -18,12 +20,13 @@ namespace Myre
         /// <param name="delay">The delay before the action is executed.</param>
         public static void Action(Action action, float delay)
         {
-            _buffer.Add(new Event
+            lock (_buffer)
             {
-                Start = DateTime.Now,
-                Duration = delay,
-                Completed = action
-            });
+                _buffer.Add(new Event {
+                    Duration = delay,
+                    Completed = action
+                });
+            }
         }
 
         /// <summary>
@@ -32,39 +35,52 @@ namespace Myre
         /// <param name="step">The method to call each frame. This method takes on float parameter which is the progress from 0 to 1.</param>
         /// <param name="completionCallback">The method to call on completion of the transition.</param>
         /// <param name="duration">The number of seconds to call the delegate for.</param>
-        public static void Transition(Action<float> step, float duration, Action completionCallback = null)
+        public static void Transition(Action<float> step, TimeSpan duration, Action completionCallback = null)
         {
-            _buffer.Add(new Event()
+            lock (_buffer)
             {
-                Start = DateTime.Now,
-                Duration = duration,
-                Completed = completionCallback,
-                Transition = step
-            });
+                _buffer.Add(new Event() {
+                    Duration = (float)duration.TotalSeconds,
+                    Completed = completionCallback,
+                    Transition = step
+                });
+            }
         }
 
         /// <summary>
-        /// Updates all transitions. This is called by MyreGame.Update(gameTime).
+        /// Updates all transitions.
         /// </summary>
         /// <param name="gameTime"></param>
         public static void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
-            var now = DateTime.Now;
+            //Move items from add buffer to events, keep lock as small as possible
+            lock (_buffer)
+            {
+                //Copy events from buffer to event collection, initialise the start time
+                for (int i = 0; i < _buffer.Count; i++)
+                {
+                    var e = _buffer[i];
+                    e.Start = gameTime.TotalGameTime.TotalSeconds;
 
-            _events.AddRange(_buffer);
-            _buffer.Clear();
+                    _events.Add(e);
+                }
 
+                _buffer.Clear();
+            }
+
+            //Step all event
             for (int i = _events.Count - 1; i >= 0; i--)
             {
+                //Update progress
                 var e = _events[i];
-                e.Progress = Microsoft.Xna.Framework.MathHelper.Clamp((float)(now - e.Start).TotalSeconds / e.Duration, 0, 1);
+                e.Progress = MathHelper.Clamp((float)(gameTime.TotalGameTime.TotalSeconds - e.Start) / e.Duration, 0, 1);
 
+                //Call per tick update (if applicable)
                 if (e.Transition != null)
                     e.Transition(e.Progress);
 
-// ReSharper disable CompareOfFloatsByEqualityOperator
-                if (e.Progress == 1)
-// ReSharper restore CompareOfFloatsByEqualityOperator
+                //Remove finished events
+                if (e.Progress >= 1)
                 {
                     if (e.Completed != null)
                         e.Completed();
@@ -72,14 +88,17 @@ namespace Myre
                     _events.RemoveAt(i);
                 }
                 else
+                {
+                    //We've been mutating a local copy
                     _events[i] = e;
+                }
             }
         }
     }
 
     struct Event
     {
-        public DateTime Start;
+        public double Start;
         public float Duration;
         public float Progress;
         public Action Completed;

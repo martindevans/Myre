@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Myre.Entities.Services
 {
@@ -92,6 +93,29 @@ namespace Myre.Entities.Services
         {
             lock (_buffer)
                 _buffer.Add(process);
+        }
+
+        public void Add(Func<float, bool> update)
+        {
+            Add(new ActionProcess(update));
+        }
+
+        private class ActionProcess : IProcess
+        {
+            private readonly Func<float, bool> _update;
+
+            public ActionProcess(Func<float, bool> update)
+            {
+                _update = update;
+            }
+
+            public bool IsComplete { get; private set; }
+
+            public void Update(float elapsedTime)
+            {
+                if (!IsComplete)
+                    IsComplete = _update(elapsedTime);
+            }
         }
     }
 }
