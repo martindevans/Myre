@@ -9,16 +9,16 @@ namespace Myre.Graphics.Lighting
     public class SpotLight
         : Behaviour
     {
-        private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
-        private static readonly TypedName<Vector3> _positionName = new TypedName<Vector3>("position");
-        private static readonly TypedName<Vector3> _directionName = new TypedName<Vector3>("direction");
-        private static readonly TypedName<Vector3> _upName = new TypedName<Vector3>("up");
-        private static readonly TypedName<float> _angleName = new TypedName<float>("angle");
-        private static readonly TypedName<float> _rangeName = new TypedName<float>("range");
-        private static readonly TypedName<Texture2D> _maskName = new TypedName<Texture2D>("mask");
-        private static readonly TypedName<int> _shadowResolutionName = new TypedName<int>("shadow_resolution");
-        private static readonly TypedName<bool> _activeName = new TypedName<bool>("spotlight_active");
-        private static readonly TypedName<float> _falloffName = new TypedName<float>("falloff");
+        public static readonly TypedName<Vector3> ColourName = new TypedName<Vector3>("colour");
+        public static readonly TypedName<Vector3> PositionName = new TypedName<Vector3>("position");
+        public static readonly TypedName<Vector3> DirectionName = new TypedName<Vector3>("direction");
+        public static readonly TypedName<Vector3> UpName = new TypedName<Vector3>("up");
+        public static readonly TypedName<float> AngleName = new TypedName<float>("angle");
+        public static readonly TypedName<float> RangeName = new TypedName<float>("range");
+        public static readonly TypedName<Texture2D> MaskName = new TypedName<Texture2D>("mask");
+        public static readonly TypedName<int> ShadowResolutionName = new TypedName<int>("shadow_resolution");
+        public static readonly TypedName<bool> ActiveName = new TypedName<bool>("spotlight_active");
+        public static readonly TypedName<float> FalloffName = new TypedName<float>("falloff");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
@@ -93,16 +93,16 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(_colourName);
-            _position = context.CreateProperty(_positionName);
-            _direction = context.CreateProperty(_directionName);
-            _up = context.CreateProperty(_upName, Vector3.UnitY);
-            _angle = context.CreateProperty(_angleName);
-            _range = context.CreateProperty(_rangeName);
-            _mask = context.CreateProperty(_maskName);
-            _shadowResolution = context.CreateProperty(_shadowResolutionName);
-            _active = context.CreateProperty(_activeName, true);
-            _falloff = context.CreateProperty(_falloffName, 1);
+            _colour = context.CreateProperty(ColourName);
+            _position = context.CreateProperty(PositionName);
+            _direction = context.CreateProperty(DirectionName);
+            _up = context.CreateProperty(UpName, Vector3.UnitY);
+            _angle = context.CreateProperty(AngleName);
+            _range = context.CreateProperty(RangeName);
+            _mask = context.CreateProperty(MaskName);
+            _shadowResolution = context.CreateProperty(ShadowResolutionName);
+            _active = context.CreateProperty(ActiveName, true);
+            _falloff = context.CreateProperty(FalloffName, 1);
 
             base.CreateProperties(context);
         }
@@ -111,16 +111,16 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(this, _colourName, _colour);
-            initialisationData.TryCopyValue(this, _positionName, _position);
-            initialisationData.TryCopyValue(this, _directionName, _direction);
-            initialisationData.TryCopyValue(this, _upName, _up);
-            initialisationData.TryCopyValue(this, _angleName, _angle);
-            initialisationData.TryCopyValue(this, _rangeName, _range);
-            initialisationData.TryCopyValue(this, _maskName, _mask);
-            initialisationData.TryCopyValue(this, _shadowResolutionName, _shadowResolution);
-            initialisationData.TryCopyValue(this, _activeName, _active);
-            initialisationData.TryCopyValue(this, _falloffName, _falloff);
+            initialisationData.TryCopyValue(this, ColourName, _colour);
+            initialisationData.TryCopyValue(this, PositionName, _position);
+            initialisationData.TryCopyValue(this, DirectionName, _direction);
+            initialisationData.TryCopyValue(this, UpName, _up);
+            initialisationData.TryCopyValue(this, AngleName, _angle);
+            initialisationData.TryCopyValue(this, RangeName, _range);
+            initialisationData.TryCopyValue(this, MaskName, _mask);
+            initialisationData.TryCopyValue(this, ShadowResolutionName, _shadowResolution);
+            initialisationData.TryCopyValue(this, ActiveName, _active);
+            initialisationData.TryCopyValue(this, FalloffName, _falloff);
         }
     }
 }

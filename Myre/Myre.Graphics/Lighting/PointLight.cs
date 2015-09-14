@@ -8,10 +8,10 @@ namespace Myre.Graphics.Lighting
     public class PointLight
         : Behaviour
     {
-        private static readonly TypedName<Vector3> _colourName = new TypedName<Vector3>("colour");
-        private static readonly TypedName<Vector3> _positionName = new TypedName<Vector3>("position");
-        private static readonly TypedName<float> _rangeName = new TypedName<float>("range");
-        private static readonly TypedName<bool> _activeName = new TypedName<bool>("pointlight_active");
+        public static readonly TypedName<Vector3> ColourName = new TypedName<Vector3>("colour");
+        public static readonly TypedName<Vector3> PositionName = new TypedName<Vector3>("position");
+        public static readonly TypedName<float> RangeName = new TypedName<float>("range");
+        public static readonly TypedName<bool> ActiveName = new TypedName<bool>("pointlight_active");
 
         private Property<Vector3> _colour;
         private Property<Vector3> _position;
@@ -44,10 +44,10 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _colour = context.CreateProperty(_colourName);
-            _position = context.CreateProperty(_positionName);
-            _range = context.CreateProperty(_rangeName);
-            _active = context.CreateProperty(_activeName, true);
+            _colour = context.CreateProperty(ColourName);
+            _position = context.CreateProperty(PositionName);
+            _range = context.CreateProperty(RangeName);
+            _active = context.CreateProperty(ActiveName, true);
             
             base.CreateProperties(context);
         }
@@ -56,10 +56,10 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(this, _colourName, _colour);
-            initialisationData.TryCopyValue(this, _positionName, _position);
-            initialisationData.TryCopyValue(this, _rangeName, _range);
-            initialisationData.TryCopyValue(this, _activeName, _active);
+            initialisationData.TryCopyValue(this, ColourName, _colour);
+            initialisationData.TryCopyValue(this, PositionName, _position);
+            initialisationData.TryCopyValue(this, RangeName, _range);
+            initialisationData.TryCopyValue(this, ActiveName, _active);
         }
     }
 }

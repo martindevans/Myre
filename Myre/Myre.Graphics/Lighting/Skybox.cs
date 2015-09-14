@@ -8,9 +8,9 @@ namespace Myre.Graphics.Lighting
     public class Skybox
         : Behaviour
     {
-        private static readonly TypedName<TextureCube> _textureName = new TypedName<TextureCube>("texture");
-        private static readonly TypedName<float> _brightnessName = new TypedName<float>("brightness");
-        private static readonly TypedName<bool> _gammaCorrectName = new TypedName<bool>("gamma_correct");
+        public static readonly TypedName<TextureCube> TextureName = new TypedName<TextureCube>("texture");
+        public static readonly TypedName<float> BrightnessName = new TypedName<float>("brightness");
+        public static readonly TypedName<bool> GammaCorrectName = new TypedName<bool>("gamma_correct");
 
         private Property<TextureCube> _texture;
         private Property<float> _brightness;
@@ -36,9 +36,9 @@ namespace Myre.Graphics.Lighting
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _texture = context.CreateProperty(_textureName);
-            _brightness = context.CreateProperty(_brightnessName);
-            _gammaCorrect = context.CreateProperty(_gammaCorrectName);
+            _texture = context.CreateProperty(TextureName);
+            _brightness = context.CreateProperty(BrightnessName);
+            _gammaCorrect = context.CreateProperty(GammaCorrectName);
 
             base.CreateProperties(context);
         }
@@ -47,9 +47,9 @@ namespace Myre.Graphics.Lighting
         {
             base.Initialise(initialisationData);
 
-            initialisationData.TryCopyValue(this, _textureName, _texture);
-            initialisationData.TryCopyValue(this, _brightnessName, _brightness);
-            initialisationData.TryCopyValue(this, _gammaCorrectName, _gammaCorrect);
+            initialisationData.TryCopyValue(this, TextureName, _texture);
+            initialisationData.TryCopyValue(this, BrightnessName, _brightness);
+            initialisationData.TryCopyValue(this, GammaCorrectName, _gammaCorrect);
         }
     }
 }
