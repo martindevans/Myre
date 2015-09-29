@@ -89,9 +89,7 @@ namespace GraphicsTests.Tests
                 .Then<GeometryBufferComponent>()
                 .Then<Ssao>()
                 .Then<LightingComponent>()
-                .Then<RestoreDepthPhase>()
-                .Then<TranslucentComponent>();
-                //.Show("lightbuffer");
+                .Show("directlighting");
 
             _edgeDetectPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()

@@ -67,6 +67,11 @@ sampler maskSampler = sampler_state
 
 float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 {
+	//Sample normals and use alpha channel as a kind of stencil (alpha will be zero where no geometry was drawn)
+	float4 sampledNormals = tex2D(normalSampler, texCoord);
+	if (sampledNormals.a == 0)
+		clip(-1);
+
 	float3 surfaceToLight = LightPosition - viewPosition;
 	float distance = length(surfaceToLight);	
 	float3 L = surfaceToLight / distance;
@@ -74,7 +79,6 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 
 	if (LdD > Angle)
 	{
-		float4 sampledNormals = tex2D(normalSampler, texCoord);
 		float3 normal = DecodeNormal(sampledNormals.xy);
 		float specularIntensity = sampledNormals.z;
 

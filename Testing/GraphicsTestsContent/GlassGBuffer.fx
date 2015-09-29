@@ -36,9 +36,24 @@ sampler specularSampler = sampler_state
 	MagFilter = Linear;
 };
 
-float4 DefaultPixelShaderFunction(in DefaultVertexShaderOutput input) : COLOR0
+void DefaultPixelShaderFunction(
+	in DefaultVertexShaderOutput input,
+	out float4 out_depth : COLOR0,
+	out float4 out_normal : COLOR1,
+	out float4 out_diffuse : COLOR2)
 {
-	return float4(1, 0, 0, 1);
+	float4 diffuseSample = tex2D(diffuseSampler, input.TexCoord);
+
+	float4 normalSample = tex2D(normalSampler, input.TexCoord);
+	float4 specularSample = tex2D(specularSampler, input.TexCoord);
+
+	float3 normal = normalSample.xyz * 2 - 1;
+	normal = mul(normal, input.TangentToView);
+	normal = normalize(normal);
+
+	out_depth = float4(input.Depth, 0, 0, 1);
+	out_normal = float4(EncodeNormal(normal), specularSample.r, 1);
+	out_diffuse = float4(diffuseSample.rgb, specularSample.a);
 }
 
 technique Default

@@ -50,23 +50,10 @@ sampler ssaoSampler = sampler_state
 
 float ReadSsao(float2 texCoord)
 {
-	//return tex2D(ssaoSampler, texCoord).a;
-    
-	float ao = 0;
-
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	for (int j = 0; j < 4; j++)
-	//	{
-	//		float2 coord = texCoord + float2(i / Resolution.x, j / Resolution.y);
-	//		ao += tex2D(ssaoSampler, coord);
-	//	}
-	//}
-	//return ao.a / 16;
-
 	float2 halfTexel = 0.5 / Resolution;
 
-	ao = tex2D(ssaoSampler, texCoord + halfTexel * float2(-1, -1)).a
+	float ao =
+		 tex2D(ssaoSampler, texCoord + halfTexel * float2(-1, -1)).a
 	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(1, -1)).a
 	   + tex2D(ssaoSampler, texCoord + halfTexel * float2(3, -1)).a
 
@@ -87,6 +74,9 @@ void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
 						 uniform bool enableSsao)
 {
 	float4 sampledNormals = tex2D(normalSampler, in_TexCoord);
+	if (sampledNormals.a == 0)
+		clip(-1);
+
 	float3 normal = DecodeNormal(sampledNormals.xy);
 
 	float alpha = dot(Up, normal) / 2 + 0.5;

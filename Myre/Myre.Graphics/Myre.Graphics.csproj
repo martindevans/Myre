@@ -157,6 +157,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Deferred\GBuffer.md" />
     <None Include="packages.config" />
     <None Include="Resources\AmbientLight.xnb" />
     <None Include="Resources\Bloom.xnb" />

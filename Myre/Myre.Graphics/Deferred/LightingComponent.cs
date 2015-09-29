@@ -36,7 +36,6 @@ namespace Myre.Graphics.Deferred
             context.DefineInput("gbuffer_depth");
             context.DefineInput("gbuffer_normals");
             context.DefineInput("gbuffer_diffuse");
-            //context.DefineInput("gbuffer_depth_downsample");
 
             if (context.AvailableResources.Any(r => r.Name == "ssao"))
                 context.DefineInput("ssao");

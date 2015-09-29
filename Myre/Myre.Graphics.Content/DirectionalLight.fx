@@ -56,10 +56,14 @@ void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
 						 in float3 in_FrustumRay : TEXCOORD1,
 						 out float4 out_Colour : COLOR0)
 {
+	//Sample normals and use alpha channel as a kind of stencil (alpha will be zero where no geometry was drawn)
+	float4 sampledNormals = tex2D(normalSampler, in_TexCoord);
+	if (sampledNormals.a == 0)
+		clip(-1);
+
 	float4 sampledDepth = tex2D(depthSampler, in_TexCoord);
 	float3 viewPosition = in_FrustumRay * sampledDepth.x;
 
-	float4 sampledNormals = tex2D(normalSampler, in_TexCoord);
 	float3 normal = DecodeNormal(sampledNormals.xy);
 	float specularIntensity = sampledNormals.z;
 
