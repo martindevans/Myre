@@ -1,3 +1,6 @@
+#ifndef FullScreenQuadFxh
+#define FullScreenQuadFxh
+
 float2 Resolution : RESOLUTION;
 float3 FrustumCorners[4] : FARFRUSTUMCORNERS;
 
@@ -30,3 +33,5 @@ void FullScreenQuadVS(in float3 in_Position : POSITION0,
 
 	out_TexCoord = in_TexCoord;// + (0.5 / Resolution);
 }
+
+#endif

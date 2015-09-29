@@ -201,9 +201,9 @@
       <Name>Hebe2</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
-      <ProcessorParameters_TranslucentEffectName>DefaultGBuffer.fx</ProcessorParameters_TranslucentEffectName>
-      <ProcessorParameters_TranslucentEffectTechnique>Translucent</ProcessorParameters_TranslucentEffectTechnique>
+      <ProcessorParameters_TranslucentEffectTechnique>Default</ProcessorParameters_TranslucentEffectTechnique>
       <ProcessorParameters_DiffuseTexture>White Dot</ProcessorParameters_DiffuseTexture>
+      <ProcessorParameters_TranslucentEffectName>GlassGBuffer</ProcessorParameters_TranslucentEffectName>
     </Compile>
     <Compile Include="Models\zoe.fbx">
       <Name>zoe</Name>
@@ -213,6 +213,16 @@
       <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
+    <Compile Include="GlassGBuffer.fx">
+      <Name>GlassGBuffer</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <None Include="GBufferHeader.fxh">
+      <Name>GBufferHeader</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </None>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
       <Importer>EffectImporter</Importer>
@@ -485,11 +495,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Myre.Graphics\Decal.fx">
-      <Name>Decal</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
+    <Folder Include="Myre.Graphics\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,3 +1,6 @@
+#ifndef EncodeNormalsFxh
+#define EncodeNormalsFxh
+
 // Lambert Azimuthal Equal-Area projection
 // http://aras-p.info/texts/CompactNormalStorage.html
 
@@ -18,3 +21,5 @@ float3 DecodeNormal(float2 enc)
     n.z = 1-f/2;
     return n;
 }
+
+#endif

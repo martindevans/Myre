@@ -1,3 +1,6 @@
+#ifndef DepthHeaderFxh
+#define DepthHeaderFxh
+
 float CalculateDepth(float4 viewPosition, float farClip) {
 	return -viewPosition.z / farClip;
 }
@@ -12,3 +15,5 @@ float3 ReconstructWorldPosition(float3 viewRay, float depth, float4x4 InverseVie
 	//Calculate world position of this pixel
 	return mul(float4(viewPosition, 1), InverseView).xyz;
 }
+
+#endif

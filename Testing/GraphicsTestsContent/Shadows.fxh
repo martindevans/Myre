@@ -1,3 +1,6 @@
+#ifndef ShadowsFxh
+#define ShadowsFxh
+
 #define BIAS 0//0.001
 
 float2 ShadowMapSize;
@@ -94,3 +97,5 @@ float CalculateShadow(float fLightDepth, float2 vTexCoord, int iSqrtSamples)
     return fShadowTerm;
 }
 */
+
+#endif

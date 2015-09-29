@@ -211,7 +211,7 @@ namespace GraphicsTests
                                                                     * Matrix4x4.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix4x4.CreateTranslation(-150, 20, 0);
             hebeEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
-            hebeEntity.GetProperty(ModelInstance.OpacityName).Value = 0.05f;
+            hebeEntity.GetProperty(ModelInstance.OpacityName).Value = 0.5f;
             _scene.Add(hebeEntity);
 
             //var dudeModel = content.Load<ModelData>(@"dude");

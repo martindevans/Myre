@@ -1,3 +1,6 @@
+#ifndef ToneMapFunctionsFxh
+#define ToneMapFunctionsFxh
+
 // Functions from http://mynameismjp.wordpress.com/2010/04/30/a-closer-look-at-tone-mapping
 
 float MinExposure : HDR_MINEXPOSURE;
@@ -27,3 +30,5 @@ float3 CalcExposedColor(float3 color, float avgLuminance, float threshold)
 	exposure -= threshold;
     return exp2(exposure) * color;
 }
+
+#endif

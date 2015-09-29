@@ -1,3 +1,6 @@
+#ifndef SkinningHeaderFxh
+#define SkinningHeaderFxh
+
 uniform int WeightsPerVertex : WEIGHTS_PER_VERTEX = 4;
 
 #define SKINNED_EFFECT_MAX_BONES   60
@@ -25,3 +28,5 @@ float3 SkinTransformNormal(float3 normal, float4x3 skinTransform)
 {
 	return mul(normal, (float3x3)skinTransform);
 }
+
+#endif

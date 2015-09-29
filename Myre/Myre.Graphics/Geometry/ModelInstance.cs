@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
@@ -12,7 +13,8 @@ using System.Linq;
 #if PROFILE
 using Myre.Debugging.Statistics;
 #endif
-using SwizzleMyVectors.Geometry;
+using BoundingFrustum = SwizzleMyVectors.Geometry.BoundingFrustum;
+using BoundingSphere = SwizzleMyVectors.Geometry.BoundingSphere;
 
 namespace Myre.Graphics.Geometry
 {
@@ -306,7 +308,7 @@ namespace Myre.Graphics.Geometry
                     if (phase == "translucent")
                     {
                         //TODO: Use something other than additive blending for transparent meshes (multiplicative?)
-                        _device.BlendState = BlendState.Additive;
+                        _device.BlendState = BlendState.NonPremultiplied;
                         _device.DepthStencilState = DepthStencilState.DepthRead;
                     }
                     else
@@ -327,7 +329,7 @@ namespace Myre.Graphics.Geometry
                 _buffer.Clear();
             }
 
-            private void DepthSortMeshes(List<MeshRenderData> meshes)
+            private static void DepthSortMeshes(List<MeshRenderData> meshes)
             {
                 meshes.Sort(RenderDataComparator);
             }
@@ -339,7 +341,7 @@ namespace Myre.Graphics.Geometry
                 return a.Instances.Count.CompareTo(b.Instances.Count);
             }
 
-            private static void CalculateWorldViews(List<MeshRenderData> batches, Matrix4x4 cameraView)
+            private static void CalculateWorldViews(IReadOnlyList<MeshRenderData> batches, Matrix4x4 cameraView)
             {
                 for (int b = 0; b < batches.Count; b++)
                 {
