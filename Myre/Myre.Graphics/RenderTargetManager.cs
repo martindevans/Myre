@@ -2,6 +2,11 @@
 using System;
 #endif
 
+#if PROFILE
+using Myre.Extensions;
+using Myre.Debugging.Statistics;
+#endif
+
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 

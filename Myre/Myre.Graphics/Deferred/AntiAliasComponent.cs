@@ -1,9 +1,8 @@
-﻿using System.Numerics;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Extensions;
 using Myre.Graphics.Materials;
+using System.Numerics;
 using Ninject;
-
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred
@@ -12,30 +11,27 @@ namespace Myre.Graphics.Deferred
         : RendererComponent
     {
         private readonly Material _fxaa;
-        private readonly Quad _quad;
+
+        private Quad _quad;
         private string _inputResource;
-        private readonly GraphicsDevice _device;
 
         [Inject]
-// This method is needed for dependency injection
-// ReSharper disable RedundantOverload.Global
-        public AntiAliasComponent(GraphicsDevice device)
-// ReSharper restore RedundantOverload.Global
-            : this(device, null)
+        public AntiAliasComponent()
+            : this(null)
         {
         }
 
-        public AntiAliasComponent(GraphicsDevice device, string inputResource = null)
+        public AntiAliasComponent(string inputResource = null)
         {
-            _device = device;
-
             _fxaa = new Material(Content.Load<Effect>("FXAA"), "FXAA");
-            _quad = new Quad(device);
+
             _inputResource = inputResource;
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
+            _quad = new Quad(renderer.Device);
+
             // define inputs
             if (_inputResource == null)
                 _inputResource = context.SetRenderTargets[0].Name;
@@ -91,7 +87,7 @@ namespace Myre.Graphics.Deferred
             device.BlendState = BlendState.Opaque;
             device.Clear(Color.Black);
 
-            Viewport viewport = _device.Viewport;
+            Viewport viewport = renderer.Device.Viewport;
 
             _fxaa.Parameters["InverseViewportSize"].SetValue(new Vector2(1f / viewport.Width, 1f / viewport.Height));
             _fxaa.Parameters["Texture"].SetValue(GetResource(_inputResource));

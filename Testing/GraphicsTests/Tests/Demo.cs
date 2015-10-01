@@ -43,13 +43,6 @@ namespace GraphicsTests.Tests
             _kernel = kernel;
             _content = content;
             _game = game;
-
-            //aviManager = new AviManager(@"demo.avi", false);
-
-            //timeline = new DefaultTimeline(framesPerSecond);
-            //timeline.AddAudioGroup("main");
-            //videoGroup = timeline.AddVideoGroup("main", framesPerSecond, 32, width, height);
-            //videoTrack = videoGroup.AddTrack();
         }
 
         protected override void BeginTransitionOn()
@@ -75,7 +68,7 @@ namespace GraphicsTests.Tests
                                .Then<Ssao>()
                                .Then<LightingComponent>()
                                .Then<RestoreDepthPhase>()
-                               .Then<TranslucentComponent>()
+                               //.Then<TranslucentComponent>()
                                .Then<ToneMapComponent>()
                                .Then<AntiAliasComponent>()
                                .Show("antialiased");
@@ -98,7 +91,7 @@ namespace GraphicsTests.Tests
 
             _normalPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
-                .Then(new AntiAliasComponent(_kernel.Get<GraphicsDevice>(), "gbuffer_normals"))
+                .Then(new AntiAliasComponent("gbuffer_normals"))
                 .Show("antialiased");
 
             _depthPlan = renderer.StartPlan()

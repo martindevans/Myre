@@ -1,11 +1,9 @@
 ﻿using System.Numerics;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Extensions;
-using Myre.Extensions;
 using Myre.Graphics.Materials;
 using System;
 using System.Collections.Generic;
@@ -157,27 +155,88 @@ namespace Myre.Graphics.Geometry
             : BehaviourManager<ModelInstance>, IGeometryProvider
         {
             class MeshInstance
-                : ICullable
+                : IGeometry
             {
                 public Mesh Mesh;
                 public ModelInstance Instance;
-                public bool IsVisible;
 
-                public BoundingSphere Bounds { get; private set; }
+                public BoundingSphere BoundingSphere { get; private set; }
 
-                public Matrix4x4 WorldView;
+                public Matrix4x4 WorldView { get; set; }
 
                 public void UpdateBounds()
                 {
-                    Bounds = Mesh.BoundingSphere.Transform(Mesh.MeshTransform * Instance.Transform);
+                    BoundingSphere = Mesh.BoundingSphere.Transform(Mesh.MeshTransform * Instance.Transform);
                 }
-            }
 
-            class MeshRenderData
-            {
-                public Mesh Mesh;
-                public Material Material;
-                public List<MeshInstance> Instances;
+                public void Draw(string phase, Renderer renderer)
+                {
+                    Material material;
+                    if (!Mesh.Materials.TryGetValue(phase, out material))
+                        return;
+
+                    Draw(material, renderer);
+                }
+
+                public void Draw(Material material, Renderer renderer)
+                {
+                    //Early exit for null meshes
+                    if (Mesh.VertexBuffer == null || Mesh.IndexBuffer == null)
+                        return;
+                    if (Mesh.TriangleCount == 0 || Mesh.VertexCount == 0)
+                        return;
+
+                    //Set the buffers onto the device
+                    renderer.Device.SetVertexBuffer(Mesh.VertexBuffer);
+                    renderer.Device.Indices = Mesh.IndexBuffer;
+
+                    //Extract useful data boxes
+                    var world = renderer.Data.Get<Matrix4x4>("world", Matrix4x4.Identity);
+                    var projection = renderer.Data.Get<Matrix4x4>("projection", Matrix4x4.Identity);
+                    var worldView = renderer.Data.Get<Matrix4x4>("worldview", Matrix4x4.Identity);
+                    var worldViewProjection = renderer.Data.Get<Matrix4x4>("worldviewprojection", Matrix4x4.Identity);
+
+                    //We are limited in per call primitives, depending on profile. These are the max possible values for each profile
+                    int maxPrimitives = renderer.Device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
+
+                    //Allow the instance to apply any old data that it likes into the renderer
+                    Instance.ApplyRendererData(renderer.Data);
+                    renderer.Data.Set("opacity", Instance.Opacity);
+
+                    //Calculate transform matrices
+                    world.Value = Instance.Transform;
+                    worldView.Value = WorldView;
+                    if (Instance._customProjectionMatrix.Value.HasValue)
+                        worldViewProjection.Value = worldView.Value * Instance._customProjectionMatrix.Value.Value;
+                    else
+                        worldViewProjection.Value = worldView.Value * projection.Value;
+
+                    foreach (var pass in material.Begin(renderer.Data))
+                    {
+                        pass.Apply();
+
+                        //Loop through mesh, drawing as many primitives as possible per batch
+                        int primitives = Mesh.TriangleCount;
+                        int offset = 0;
+                        while (primitives > 0)
+                        {
+                            int primitiveCount = Math.Min(primitives, maxPrimitives);
+                            primitives -= primitiveCount;
+
+                            renderer.Device.DrawIndexedPrimitives(PrimitiveType.TriangleList, Mesh.BaseVertex, Mesh.MinVertexIndex, Mesh.VertexCount, Mesh.StartIndex + offset * 3, primitiveCount);
+
+                            offset += primitiveCount;
+
+#if PROFILE
+                            _drawsStat.Add(1);
+#endif
+                        }
+
+#if PROFILE
+                        _polysDrawnStat.Add(Mesh.TriangleCount);
+#endif
+                    }
+                }
             }
 
 #if PROFILE
@@ -186,26 +245,18 @@ namespace Myre.Graphics.Geometry
 #endif
 
             #region fields
-            private readonly GraphicsDevice _device;
             private readonly Pool<MeshInstance> _meshInstancePool;
-            private readonly Dictionary<Mesh, List<MeshInstance>> _instances;
-            private readonly Dictionary<string, List<MeshRenderData>> _phases;
-            private readonly List<MeshInstance> _dynamicMeshInstances;
+            private readonly Dictionary<string, List<MeshInstance>> _phases;
             private readonly List<MeshInstance> _buffer;
-            private readonly List<MeshInstance> _visibleInstances;
             private readonly BoundingVolume _bounds;
             #endregion
 
-            public Manager(
-                GraphicsDevice device)
+            public Manager()
             {
-                _device = device;
                 _meshInstancePool = new Pool<MeshInstance>();
-                _instances = new Dictionary<Mesh, List<MeshInstance>>();
-                _phases = new Dictionary<string, List<MeshRenderData>>();
-                _dynamicMeshInstances = new List<MeshInstance>();
+
+                _phases = new Dictionary<string, List<MeshInstance>>();
                 _buffer = new List<MeshInstance>();
-                _visibleInstances = new List<MeshInstance>();
                 _bounds = new BoundingVolume();
             }
 
@@ -233,10 +284,18 @@ namespace Myre.Graphics.Geometry
                 var instance = _meshInstancePool.Get();
                 instance.Mesh = mesh;
                 instance.Instance = behaviour;
-                instance.IsVisible = false;
 
-                GetInstanceList(mesh).Add(instance);
-                _dynamicMeshInstances.Add(instance);
+                foreach (var material in mesh.Materials)
+                {
+                    List<MeshInstance> phaseList;
+                    if (!_phases.TryGetValue(material.Key, out phaseList))
+                    {
+                        phaseList = new List<MeshInstance>();
+                        _phases.Add(material.Key, phaseList);
+                    }
+
+                    phaseList.Add(instance);
+                }
             }
 
             private void MeshesAdded(ModelInstance modelInstance, IEnumerable<Mesh> added)
@@ -247,16 +306,15 @@ namespace Myre.Graphics.Geometry
 
             private void RemoveMesh(ModelInstance behaviour, Mesh mesh)
             {
-                var meshInstances = GetInstanceList(mesh);
-                for (int i = 0; i < meshInstances.Count; i++)
+                foreach (var phase in mesh.Materials.Keys)
                 {
-                    if (meshInstances[i].Instance == behaviour)
-                    {
-                        _dynamicMeshInstances.Remove(meshInstances[i]);
-                        _meshInstancePool.Return(meshInstances[i]);
-                        meshInstances.RemoveAt(i);
-                        break;
-                    }
+                    //Get the phase list which contains this mesh
+                    List<MeshInstance> phaseList;
+                    if (!_phases.TryGetValue(phase, out phaseList))
+                        continue;
+
+                    //Remove all instances of this behaviour+mesh
+                    phaseList.RemoveAll(a => a.Mesh == mesh && a.Instance == behaviour);
                 }
             }
 
@@ -278,215 +336,55 @@ namespace Myre.Graphics.Geometry
             }
             #endregion
 
-            public void Draw(string phase, NamedBoxCollection metadata)
+            public void Query(string phase, NamedBoxCollection metadata, ICollection<IGeometry> result)
             {
-                List<MeshRenderData> meshes;
+                //Get all meshes which want to be drawn in this phase (early exit if there are none)
+                List<MeshInstance> meshes;
                 if (!_phases.TryGetValue(phase, out meshes))
                     return;
 
+                //Find all items which are in the view bounds
                 var viewFrustum = metadata.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
                 _bounds.Clear();
                 _bounds.Add(viewFrustum);
-                QueryVisible(_bounds, _buffer);
+                QueryVisible(meshes, _bounds, _buffer);
 
+                //Copy visible instances into the result set
                 foreach (var item in _buffer)
-                    item.IsVisible = !item.Instance.IsInvisible;
+                    if (!item.Instance.IsInvisible)
+                        result.Add(item);
 
+                //Calculate world view matrices for each mesh
                 var view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
-                CalculateWorldViews(meshes, view);              //Calculate WorldView for all mesh instances
 
-                DepthSortMeshes(meshes);                        //Sort batches by first item in batch
+                //Calculate WorldView for all mesh instances
+                CalculateWorldViews(_buffer, view);
 
-                foreach (var mesh in meshes)
-                {
-                    foreach (var instance in mesh.Instances)
-                    {
-                        if (instance.IsVisible)
-                            _visibleInstances.Add(instance);
-                    }
-
-                    if (phase == "translucent")
-                    {
-                        //TODO: Use something other than additive blending for transparent meshes (multiplicative?)
-                        _device.BlendState = BlendState.NonPremultiplied;
-                        _device.DepthStencilState = DepthStencilState.DepthRead;
-                    }
-                    else
-                    {
-                        _device.BlendState = BlendState.Opaque;
-                        _device.DepthStencilState = DepthStencilState.Default;
-                    }
-
-                    if (_visibleInstances.Count > 0)
-                    {
-                        DrawMesh(mesh, metadata);
-                        _visibleInstances.Clear();
-                    }
-                }
-
-                foreach (var item in _buffer)
-                    item.IsVisible = false;
+                //Clear the temp query buffer
                 _buffer.Clear();
             }
 
-            private static void DepthSortMeshes(List<MeshRenderData> meshes)
+            private static void CalculateWorldViews(IEnumerable<MeshInstance> instances, Matrix4x4 cameraView)
             {
-                meshes.Sort(RenderDataComparator);
-            }
-
-            private static int RenderDataComparator(MeshRenderData a, MeshRenderData b)
-            {
-                if (a.Instances.Count > 0 && b.Instances.Count > 0)
-                    return CompareWorldViews(ref a.Instances[0].WorldView, ref b.Instances[0].WorldView);
-                return a.Instances.Count.CompareTo(b.Instances.Count);
-            }
-
-            private static void CalculateWorldViews(IReadOnlyList<MeshRenderData> batches, Matrix4x4 cameraView)
-            {
-                for (int b = 0; b < batches.Count; b++)
+                foreach (var instance in instances)
                 {
-                    var meshInstances = batches[b].Instances;
-                    for (int i = 0; i < meshInstances.Count; i++)
-                    {
-                        var instance = meshInstances[i];
-                        Matrix4x4 world = instance.Mesh.MeshTransform * instance.Instance.Transform;
-                        if (instance.Instance._customViewMatrix.Value.HasValue)
-                            instance.WorldView = world * instance.Instance._customViewMatrix.Value.Value;
-                        else
-                            instance.WorldView = Matrix4x4.Multiply(world, cameraView);
-                    }
-                }
-            }
-
-            private void QueryVisible(BoundingVolume volume, List<MeshInstance> meshInstances)
-            {
-                foreach (var item in _dynamicMeshInstances)
-                {
-                    item.UpdateBounds();
-                    //If this item ignores the view and projection matrices all bets are off. Just pass it and let the graphics device deal with it
-                    if (item.Instance._customViewMatrix.Value.HasValue || item.Instance._customProjectionMatrix.Value.HasValue || volume.Intersects(item.Bounds))
-                        meshInstances.Add(item);
-                }
-            }
-
-            private void DrawMesh(MeshRenderData data, NamedBoxCollection metadata)
-            {
-                var mesh = data.Mesh;
-
-                //Early exit for null meshes
-                if (mesh.VertexBuffer == null || mesh.IndexBuffer == null)
-                    return;
-
-                _device.SetVertexBuffer(mesh.VertexBuffer);
-                _device.Indices = mesh.IndexBuffer;
-
-                var world = metadata.Get<Matrix4x4>("world", Matrix4x4.Identity);
-                var projection = metadata.Get<Matrix4x4>("projection", Matrix4x4.Identity);
-                var worldView = metadata.Get<Matrix4x4>("worldview", Matrix4x4.Identity);
-                var worldViewProjection = metadata.Get<Matrix4x4>("worldviewprojection", Matrix4x4.Identity);
-
-                DepthSortInstances(_visibleInstances);
-
-                int maxPrimitives = _device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
-
-                for (int i = 0; i < _visibleInstances.Count; i++)
-                {
-                    var instance = _visibleInstances[i];
-
-                    instance.Instance.ApplyRendererData(metadata);
-
-                    world.Value = instance.Instance.Transform;
-                    worldView.Value = instance.WorldView;
-                    if (instance.Instance._customProjectionMatrix.Value.HasValue)
-                        worldViewProjection.Value = worldView.Value * instance.Instance._customProjectionMatrix.Value.Value;
+                    Matrix4x4 world = instance.Mesh.MeshTransform * instance.Instance.Transform;
+                    if (instance.Instance._customViewMatrix.Value.HasValue)
+                        instance.WorldView = world * instance.Instance._customViewMatrix.Value.Value;
                     else
-                        worldViewProjection.Value = worldView.Value * projection.Value;
-
-                    metadata.Set("opacity", instance.Instance.Opacity);
-
-                    foreach (var pass in data.Material.Begin(metadata))
-                    {
-                        //Skip this if it has no vertices or triangles
-                        if (mesh.TriangleCount == 0 || mesh.VertexCount == 0)
-                            continue;
-
-                        pass.Apply();
-
-                        //Loop through mesh, drawing as many primitives as possible per batch
-                        int primitives = mesh.TriangleCount;
-                        int offset = 0;
-                        while (primitives > 0)
-                        {
-                            int primitiveCount = Math.Min(primitives, maxPrimitives);
-                            primitives -= primitiveCount;
-
-                            _device.DrawIndexedPrimitives(PrimitiveType.TriangleList, mesh.BaseVertex, mesh.MinVertexIndex, mesh.VertexCount, mesh.StartIndex + offset * 3, primitiveCount);
-
-                            offset += primitiveCount;
-
-#if PROFILE
-                            _drawsStat.Add(1);
-#endif
-                        }
-
-#if PROFILE
-                        _polysDrawnStat.Add(mesh.TriangleCount);
-#endif
-                    }
+                        instance.WorldView = Matrix4x4.Multiply(world, cameraView);
                 }
             }
 
-            private void DepthSortInstances(List<MeshInstance> meshInstances)
+            private static void QueryVisible(IEnumerable<MeshInstance> instances, BoundingVolume volume, ICollection<MeshInstance> meshInstances)
             {
-                if (meshInstances.Count > 1)
-                    meshInstances.Sort(InstanceComparator);
-            }
-
-            private static int InstanceComparator(MeshInstance a, MeshInstance b)
-            {
-                return CompareWorldViews(ref a.WorldView, ref b.WorldView);
-            }
-
-            private static int CompareWorldViews(ref Matrix4x4 worldViewA, ref Matrix4x4 worldViewB)
-            {
-                //Negated, because XNA uses a negative Z space
-                return -worldViewA.Translation.Z.CompareTo(worldViewB.Translation.Z);
-            }
-
-            private List<MeshInstance> GetInstanceList(Mesh mesh)
-            {
-                List<MeshInstance> value;
-                if (!_instances.TryGetValue(mesh, out value))
+                foreach (var instance in instances)
                 {
-                    value = new List<MeshInstance>();
-                    _instances[mesh] = value;
+                    instance.UpdateBounds();
 
-                    RegisterMeshParts(mesh, value);
-                }
-
-                return value;
-            }
-
-            private void RegisterMeshParts(Mesh mesh, List<MeshInstance> meshInstances)
-            {
-                if (mesh.Materials == null)
-                    return;
-
-                foreach (var material in mesh.Materials)
-                {
-                    List<MeshRenderData> data;
-                    if (!_phases.TryGetValue(material.Key, out data))
-                    {
-                        data = new List<MeshRenderData>();
-                        _phases[material.Key] = data;
-                    }
-
-                    data.Add(new MeshRenderData()
-                    {
-                        Mesh = mesh,
-                        Material = material.Value,
-                        Instances = meshInstances
-                    });
+                    //If this item ignores the view and projection matrices all bets are off. Just pass it and let the graphics device deal with it
+                    if (instance.Instance._customViewMatrix.Value.HasValue || instance.Instance._customProjectionMatrix.Value.HasValue || volume.Intersects(instance.BoundingSphere))
+                        meshInstances.Add(instance);
                 }
             }
         }

@@ -18,7 +18,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PROFILE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -93,7 +93,7 @@
     <Compile Include="Extensions\MatrixExtensions.cs" />
     <Compile Include="Extensions\RenderTarget2DExtensions.cs" />
     <Compile Include="Geometry\BoundingVolume.cs" />
-    <Compile Include="Geometry\ICullable.cs" />
+    <Compile Include="Geometry\IGeometry.cs" />
     <Compile Include="Geometry\IGeometryProvider.cs" />
     <Compile Include="Geometry\Mesh.cs" />
     <Compile Include="Geometry\MeshPart.cs" />
@@ -147,6 +147,7 @@
     <Compile Include="Translucency\Particles\Triggers\Burst.cs" />
     <Compile Include="Translucency\Particles\Triggers\Continuous.cs" />
     <Compile Include="Translucency\Particles\Triggers\ITrigger.cs" />
+    <Compile Include="Translucency\TranslucencyTypes.cs" />
     <Compile Include="Translucency\TranslucentComponent.cs" />
     <Compile Include="View.cs" />
     <Compile Include="x86Resources.Designer.cs" />
@@ -186,6 +187,7 @@
     <None Include="Resources\SpotLight.xnb" />
     <None Include="Resources\SSAO.xnb" />
     <None Include="Resources\ToneMap.xnb" />
+    <None Include="Translucency\Transparencies.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Myre.Debugging\Myre.Debugging.csproj">

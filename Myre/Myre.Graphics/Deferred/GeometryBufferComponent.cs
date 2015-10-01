@@ -14,6 +14,7 @@ namespace Myre.Graphics.Deferred
         private readonly Resample _scale;
         private readonly Material _clear;
         private readonly Quad _quad;
+        private GeometryRenderer _geometry;
 
         public GeometryBufferComponent(GraphicsDevice device)
         {
@@ -24,6 +25,8 @@ namespace Myre.Graphics.Deferred
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
+            _geometry = new GeometryRenderer(renderer.Scene.FindManagers<IGeometryProvider>());
+
             // define outputs
             context.DefineOutput("gbuffer_depth", isLeftSet: false, surfaceFormat: SurfaceFormat.Single, depthFormat: DepthFormat.Depth24Stencil8);
             context.DefineOutput("gbuffer_normals", isLeftSet: false, surfaceFormat: SurfaceFormat.Rgba1010102);
@@ -56,8 +59,7 @@ namespace Myre.Graphics.Deferred
 
             device.BlendState = BlendState.Opaque;
 
-            foreach (var geometryProvider in renderer.Scene.FindManagers<IGeometryProvider>())
-                geometryProvider.Draw("gbuffer", metadata);
+            _geometry.Draw("gbuffer", renderer);
 
             Output("gbuffer_depth", depth);
             Output("gbuffer_normals", normals);

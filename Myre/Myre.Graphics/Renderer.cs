@@ -8,6 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#if PROFILE
+using Myre.Debugging.Statistics;
+#endif
+
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics

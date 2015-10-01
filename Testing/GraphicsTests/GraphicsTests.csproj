@@ -103,6 +103,7 @@
     <Compile Include="Tests\SpriteTest.cs" />
     <Compile Include="Tests\SsaoTest.cs" />
     <Compile Include="Tests\TextTest.cs" />
+    <Compile Include="Tests\TransparencyTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Myre\Myre.Debugging.UI\Myre.Debugging.UI.csproj">

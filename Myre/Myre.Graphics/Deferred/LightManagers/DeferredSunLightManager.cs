@@ -36,6 +36,8 @@ namespace Myre.Graphics.Deferred.LightManagers
         private readonly Vector3[] _frustumCornersVs;
         private readonly View _shadowView;
 
+        private GeometryRenderer _geometryRenderer;
+
         public DeferredSunLightManager(IKernel kernel, GraphicsDevice device)
         {
             var effect = Content.Load<Effect>("DirectionalLight");
@@ -52,6 +54,13 @@ namespace Myre.Graphics.Deferred.LightManagers
             shadowCameraEntity.AddBehaviour<View>();
             _shadowView = shadowCameraEntity.Create().GetBehaviour<View>(null);
             _shadowView.Camera = new Camera();
+        }
+
+        public override void Initialise(Scene scene)
+        {
+            _geometryRenderer = new GeometryRenderer(scene.FindManagers<IGeometryProvider>());
+
+            base.Initialise(scene);
         }
 
         public override void Add(SunLight behaviour)
@@ -213,8 +222,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _shadowView.Viewport = new Viewport(0, 0, light.ShadowResolution, light.ShadowResolution);
             _shadowView.SetMetadata(renderer.Data);
 
-            foreach (var item in renderer.Scene.FindManagers<IGeometryProvider>())
-                item.Draw("shadows_viewz", renderer.Data);
+            _geometryRenderer.Draw("shadows_viewz", renderer);
 
             data.ShadowMap = target;
             resolution.Value = previousResolution;

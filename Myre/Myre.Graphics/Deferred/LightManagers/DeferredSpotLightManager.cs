@@ -46,6 +46,8 @@ namespace Myre.Graphics.Deferred.LightManagers
 
         private readonly DepthStencilState _depthGreater;
 
+        private GeometryRenderer _geometryRenderer;
+
         public DeferredSpotLightManager(IKernel kernel, GraphicsDevice device)
         {
             var effect = Content.Load<Effect>("SpotLight");
@@ -92,6 +94,13 @@ namespace Myre.Graphics.Deferred.LightManagers
                 DepthBufferWriteEnable = false,
                 DepthBufferFunction = CompareFunction.GreaterEqual
             };
+        }
+
+        public override void Initialise(Scene scene)
+        {
+            _geometryRenderer = new GeometryRenderer(scene.FindManagers<IGeometryProvider>());
+
+            base.Initialise(scene);
         }
 
         public override void Add(SpotLight behaviour)
@@ -212,8 +221,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _shadowView.Viewport = new Viewport(0, 0, light.ShadowResolution, light.ShadowResolution);
             _shadowView.SetMetadata(renderer.Data);
 
-            foreach (var item in renderer.Scene.FindManagers<IGeometryProvider>())
-                item.Draw("shadows_viewlength", renderer.Data);
+            _geometryRenderer.Draw("shadows_viewlength", renderer);
 
             data.ShadowMap = target;
             resolution.Value = previousResolution;
