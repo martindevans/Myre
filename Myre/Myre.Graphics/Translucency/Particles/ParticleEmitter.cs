@@ -9,7 +9,7 @@ using Myre.Graphics.Translucency.Particles.Triggers;
 
 namespace Myre.Graphics.Translucency.Particles
 {
-    //[DefaultManager(typeof(Manager))]
+    [DefaultManager(typeof(Manager))]
     public class ParticleEmitter
         : ProcessBehaviour
     {
@@ -81,22 +81,25 @@ namespace Myre.Graphics.Translucency.Particles
             System.Spawn(particle.Position, particle.Velocity, particle.AngularVelocity, particle.Size, particle.LifetimeScale, particle.StartColour, particle.EndColour);
         }
 
-        //public class Manager
-        //    : Manager<ParticleEmitter>, IGeometryProvider
-        //{
-        //    private ParticleSystemService _systems;
+        public class Manager
+            : Manager<ParticleEmitter>, IGeometryProvider
+        {
+            private ParticleSystemService _systems;
 
-        //    public override void Initialise(Scene scene)
-        //    {
-        //        _systems = scene.GetService<ParticleSystemService>();
+            public override void Initialise(Scene scene)
+            {
+                _systems = scene.GetService<ParticleSystemService>();
 
-        //        base.Initialise(scene);
-        //    }
+                base.Initialise(scene);
+            }
 
-        //    public void Draw(string phase, NamedBoxCollection metadata)
-        //    {
-        //        _systems.Draw(phase, metadata);
-        //    }
-        //}
+            public void Query(string phase, NamedBoxCollection metadata, ICollection<IGeometry> result)
+            {
+                if (phase != "translucent")
+                    return;
+
+                _systems.Query(phase, metadata, result);
+            }
+        }
     }
 }

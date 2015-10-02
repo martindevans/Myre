@@ -3,13 +3,18 @@
 
 using System.Diagnostics;
 using System.Numerics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Myre.Collections;
 using Myre.Extensions;
+using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
-
+using BoundingSphere = SwizzleMyVectors.Geometry.BoundingSphere;
 using Color = Microsoft.Xna.Framework.Color;
+using Vector2 = System.Numerics.Vector2;
+using Vector3 = System.Numerics.Vector3;
+using Vector4 = System.Numerics.Vector4;
 
 namespace Myre.Graphics.Translucency.Particles
 {
@@ -17,6 +22,7 @@ namespace Myre.Graphics.Translucency.Particles
     /// A class which manages and updating and rendering of particles.
     /// </summary>
     public class ParticleSystem
+        : IGeometry
     {
         private readonly GraphicsDevice _device;
         private readonly Material _material;
@@ -336,7 +342,6 @@ namespace Myre.Graphics.Translucency.Particles
             }
         }
 
-
         /// <summary>
         /// Helper for checking when retired particles have been kept around long
         /// enough that we can be sure the GPU is no longer using them. It moves
@@ -400,6 +405,32 @@ namespace Myre.Graphics.Translucency.Particles
 
             // Move the particles we just uploaded from the new to the active queue.
             _newlyCreated = _free;
+        }
+
+        internal void CalculateWorldView(ref Matrix4x4 view)
+        {
+            _worldView = Transform * view;
+        }
+
+        private Matrix4x4 _worldView;
+        Matrix4x4 IGeometry.WorldView
+        {
+            get { return _worldView; }
+        }
+
+        BoundingSphere IGeometry.BoundingSphere
+        {
+            get { return new BoundingSphere(Transform.Translation, Description.Lifetime * Description.EndLinearVelocity); }
+        }
+
+        void IGeometry.Draw(Material material, Renderer renderer)
+        {
+            Draw(renderer.Data);
+        }
+
+        void IGeometry.Draw(string phase, Renderer renderer)
+        {
+            Draw(renderer.Data);
         }
     }
 }

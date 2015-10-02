@@ -187,7 +187,6 @@
     <None Include="Resources\SpotLight.xnb" />
     <None Include="Resources\SSAO.xnb" />
     <None Include="Resources\ToneMap.xnb" />
-    <None Include="Translucency\Transparencies.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Myre.Debugging\Myre.Debugging.csproj">

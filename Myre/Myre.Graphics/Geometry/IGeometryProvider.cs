@@ -1,5 +1,4 @@
-﻿using System;
-using Myre.Collections;
+﻿using Myre.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 

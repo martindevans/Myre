@@ -68,7 +68,7 @@ namespace GraphicsTests.Tests
                                .Then<Ssao>()
                                .Then<LightingComponent>()
                                .Then<RestoreDepthPhase>()
-                               //.Then<TranslucentComponent>()
+                               .Then<TranslucentComponent>()
                                .Then<ToneMapComponent>()
                                .Then<AntiAliasComponent>()
                                .Show("antialiased");

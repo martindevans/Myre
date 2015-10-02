@@ -1,7 +1,9 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Numerics;
+using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities.Services;
 using System.Collections.Generic;
+using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Translucency.Particles
 {
@@ -30,11 +32,23 @@ namespace Myre.Graphics.Translucency.Particles
             return system;
         }
 
-        internal void Draw(string phase, NamedBoxCollection metadata)
+        internal void Query(string phase, NamedBoxCollection metadata, ICollection<IGeometry> result)
         {
-            if (phase == "translucent")
-                foreach (var particleEmitter in _particleSystems.Values)
-                    particleEmitter.Draw(metadata);
+            //Early exit
+            if (phase != "translucent")
+                return;
+
+            //Get the view matrix from the renderer
+            var view = metadata.Get<Matrix4x4>("view").Value;
+
+            //Add all particle systems to the output buffer
+            foreach (var particleSystem in _particleSystems.Values)
+            {
+                //Calculate the world view of this system for depth sorting
+                particleSystem.CalculateWorldView(ref view);
+
+                result.Add(particleSystem);
+            }
         }
     }
 }
