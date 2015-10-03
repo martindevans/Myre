@@ -96,7 +96,7 @@ namespace Myre.Graphics.Deferred
             _current = tmp;
 
             // calculate luminance map
-            var luminanceMap = RenderTargetManager.GetTarget(device, 1024, 1024, SurfaceFormat.Single, mipMap: true, name:"luminance map");
+            var luminanceMap = RenderTargetManager.GetTarget(device, 1024, 1024, SurfaceFormat.Single, mipMap: true, name: "luminance map", usage: RenderTargetUsage.DiscardContents);
             device.SetRenderTarget(luminanceMap);
             device.BlendState = BlendState.Opaque;
             device.Clear(Color.Transparent);
@@ -105,7 +105,7 @@ namespace Myre.Graphics.Deferred
             Output("luminance", luminanceMap);
 
             // read bottom mipmap to find average luminance
-            _averageLuminance = RenderTargetManager.GetTarget(device, 1, 1, SurfaceFormat.Single, name: "average luminance");
+            _averageLuminance = RenderTargetManager.GetTarget(device, 1, 1, SurfaceFormat.Single, name: "average luminance", usage: RenderTargetUsage.DiscardContents);
             device.SetRenderTarget(_averageLuminance);
             _readLuminance.Parameters["Texture"].SetValue(luminanceMap);
             _quad.Draw(_readLuminance, renderer.Data);
@@ -126,7 +126,7 @@ namespace Myre.Graphics.Deferred
             var quarterResolution = halfResolution / 2;
 
             // downsample the light buffer to half resolution, and threshold at the same time
-            var thresholded = RenderTargetManager.GetTarget(device, (int)halfResolution.X, (int)halfResolution.Y, SurfaceFormat.Rgba64, name:"bloom thresholded");
+            var thresholded = RenderTargetManager.GetTarget(device, (int)halfResolution.X, (int)halfResolution.Y, SurfaceFormat.Rgba64, name: "bloom thresholded", usage: RenderTargetUsage.DiscardContents);
             device.SetRenderTarget(thresholded);
             _bloom.Parameters["Resolution"].SetValue(halfResolution);
             _bloom.Parameters["Threshold"].SetValue(renderer.Data.GetValue(new TypedName<float>("hdr_bloomthreshold")));
@@ -138,7 +138,7 @@ namespace Myre.Graphics.Deferred
             _quad.Draw(_bloom);
 
             // downsample again to quarter resolution
-            var downsample = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom downsampled");
+            var downsample = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom downsampled", usage: RenderTargetUsage.DiscardContents);
             device.SetRenderTarget(downsample);
             _bloom.Parameters["Resolution"].SetValue(quarterResolution);
             _bloom.Parameters["Texture"].SetValue(thresholded);
@@ -146,7 +146,7 @@ namespace Myre.Graphics.Deferred
             _quad.Draw(_bloom);
 
             // blur the target
-            var blurred = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom blurred");
+            var blurred = RenderTargetManager.GetTarget(device, (int)quarterResolution.X, (int)quarterResolution.Y, SurfaceFormat.Rgba64, name: "bloom blurred", usage: RenderTargetUsage.DiscardContents);
             _gaussian.Blur(downsample, blurred, renderer.Data.GetValue(new TypedName<float>("hdr_bloomblurammount")));
 
             // upscale back to half resolution
@@ -165,7 +165,7 @@ namespace Myre.Graphics.Deferred
 
         private void ToneMap(Renderer renderer, Vector2 resolution, GraphicsDevice device, Texture2D lightBuffer)
         {
-            var toneMapped = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.Color, depthFormat: DepthFormat.Depth24Stencil8, name:"tone mapped");
+            var toneMapped = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.Color, depthFormat: DepthFormat.Depth24Stencil8, name: "tone mapped", usage: RenderTargetUsage.DiscardContents);
             device.SetRenderTarget(toneMapped);
             device.Clear(Color.Transparent);
             device.DepthStencilState = DepthStencilState.None;

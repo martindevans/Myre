@@ -1,11 +1,10 @@
-using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Entities.Behaviours;
 using Myre.Extensions;
 using Myre.Graphics.Lighting;
 using Myre.Graphics.Materials;
+using System.Numerics;
 
-using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred.LightManagers
 {
@@ -28,10 +27,13 @@ namespace Myre.Graphics.Deferred.LightManagers
         public void Draw(Renderer renderer)
         {
             var metadata = renderer.Data;
+
+            bool enableSsao = metadata.GetMaybeValue<bool>(new TypedName<bool>("ssao")) ?? true;
+
             var view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
             var ssao = metadata.GetValue(new TypedName<Texture2D>("ssao"));
 
-            _lightingMaterial.CurrentTechnique = ssao != null ? _lightingMaterial.Techniques["AmbientSSAO"] : _lightingMaterial.Techniques["Ambient"];
+            _lightingMaterial.CurrentTechnique = (enableSsao && ssao != null) ? _lightingMaterial.Techniques["AmbientSSAO"] : _lightingMaterial.Techniques["Ambient"];
 
             foreach (var light in Behaviours)
             {

@@ -45,9 +45,9 @@ namespace Myre.Graphics.Deferred
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 
-            var depth = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Single, DepthFormat.Depth24Stencil8, name:"depth", usage: RenderTargetUsage.PreserveContents);
-            var normals = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Rgba1010102, name: "normals", usage: RenderTargetUsage.PreserveContents);
-            var diffuse = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Color, name: "diffuse", usage: RenderTargetUsage.PreserveContents);
+            var depth = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Single, DepthFormat.Depth24Stencil8, name:"depth");
+            var normals = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Rgba1010102, name: "normals");
+            var diffuse = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Color, name: "diffuse");
 
             device.SetRenderTargets(depth, normals, diffuse);
             device.BlendState = BlendState.Opaque;
@@ -70,7 +70,7 @@ namespace Myre.Graphics.Deferred
 
         private void DownsampleDepth(Renderer renderer, RenderTarget2D depth)
         {
-            var downsampled = RenderTargetManager.GetTarget(renderer.Device, depth.Width / 2, depth.Height / 2, SurfaceFormat.Single, name:"downsample depth");
+            var downsampled = RenderTargetManager.GetTarget(renderer.Device, depth.Width / 2, depth.Height / 2, SurfaceFormat.Single, name: "downsample depth", usage: RenderTargetUsage.DiscardContents);
             _scale.Scale(depth, downsampled);
             Output("gbuffer_depth_downsample", downsampled);
         }

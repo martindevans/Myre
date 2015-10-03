@@ -81,7 +81,7 @@ namespace Myre.Graphics.Deferred
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 
-            var target = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Color, DepthFormat.None, name: "antialiased");
+            var target = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.Color, DepthFormat.None, name: "antialiased", usage: RenderTargetUsage.DiscardContents);
 
             device.SetRenderTarget(target);
             device.BlendState = BlendState.Opaque;

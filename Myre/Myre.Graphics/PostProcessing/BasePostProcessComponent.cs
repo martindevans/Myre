@@ -52,7 +52,7 @@ namespace Myre.Graphics.PostProcessing
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 
-            var outputTarget = RenderTargetManager.GetTarget(device, width, height, _format, DepthFormat.None, name: _output);
+            var outputTarget = RenderTargetManager.GetTarget(device, width, height, _format, DepthFormat.None, name: _output, usage: RenderTargetUsage.DiscardContents);
             device.SetRenderTarget(outputTarget);
 
             device.Clear(Color.Black);

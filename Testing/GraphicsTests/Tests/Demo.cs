@@ -67,11 +67,12 @@ namespace GraphicsTests.Tests
                                .Then<EdgeDetectComponent>()
                                .Then<Ssao>()
                                .Then<LightingComponent>()
-                               .Then<RestoreDepthPhase>()
-                               .Then<TranslucentComponent>()
+                               //.Then<RestoreDepthPhase>()
+                               .Then<DeferredTransparency>()
+                               //.Then<TranslucentComponent>()
                                .Then<ToneMapComponent>()
                                .Then<AntiAliasComponent>()
-                               .Show("antialiased");
+                               .Show("demo");
             _ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<EdgeDetectComponent>()

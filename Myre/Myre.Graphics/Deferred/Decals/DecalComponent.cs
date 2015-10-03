@@ -31,8 +31,8 @@ namespace Myre.Graphics.Deferred.Decals
             var resolution = renderer.Data.Get<Vector2>("resolution").Value;
 
             //Create targets to write our changes into
-            var decalNormals = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.Rgba1010102);
-            var decalDiffuse = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y);
+            var decalNormals = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.Rgba1010102, usage: RenderTargetUsage.DiscardContents);
+            var decalDiffuse = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, usage: RenderTargetUsage.DiscardContents);
 
             //Set targets and clear to transparent
             device.SetRenderTargets(decalNormals, decalDiffuse);

@@ -430,6 +430,9 @@ namespace Myre.Graphics.Translucency.Particles
 
         void IGeometry.Draw(string phase, Renderer renderer)
         {
+            if (phase != "translucent")
+                return;
+
             Draw(renderer.Data);
         }
     }

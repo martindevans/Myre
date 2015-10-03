@@ -107,13 +107,13 @@ namespace Myre.Graphics.Deferred
                 _ssaoMaterial.CurrentTechnique = renderer.Data.GetValue<bool>(new TypedName<bool>("ssao_highquality")) ? _ssaoMaterial.Techniques["HQ_SSAO"] : _ssaoMaterial.Techniques["LQ_SSAO"];
             //}
 
-            var unblured = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, surfaceFormat: SurfaceFormat.HalfVector4, name: "ssao unblurred");//, SurfaceFormat.HalfVector4);
+                var unblured = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, surfaceFormat: SurfaceFormat.HalfVector4, name: "ssao unblurred", usage: RenderTargetUsage.DiscardContents);
             renderer.Device.SetRenderTarget(unblured);
             renderer.Device.Clear(Color.Transparent);
             renderer.Device.BlendState = BlendState.Opaque;
             _quad.Draw(_ssaoMaterial, renderer.Data);
 
-            _ssao = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.HalfVector4, name: "ssao");
+            _ssao = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.HalfVector4, name: "ssao", usage: RenderTargetUsage.DiscardContents);
             renderer.Device.SetRenderTarget(_ssao);
             renderer.Device.Clear(Color.Transparent);
             _ssaoBlurMaterial.Parameters["SSAO"].SetValue(unblured);

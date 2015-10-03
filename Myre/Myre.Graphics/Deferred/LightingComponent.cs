@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
+using Myre.Entities;
 using Myre.Graphics.Deferred.LightManagers;
 using Myre.Graphics.Materials;
 
@@ -18,9 +19,6 @@ namespace Myre.Graphics.Deferred
         ReadOnlyCollection<IDirectLight> _directLights;
         ReadOnlyCollection<IIndirectLight> _indirectLights;
 
-        RenderTarget2D _directLightBuffer;
-        RenderTarget2D _indirectLightBuffer;
-
         public LightingComponent(GraphicsDevice device)
         {
             _quad = new Quad(device);
@@ -28,6 +26,22 @@ namespace Myre.Graphics.Deferred
 
             _restoreDepth = new Material(Content.Load<Effect>("RestoreDepth"));
             _copyTexture = new Material(Content.Load<Effect>("CopyTexture"));
+        }
+
+        internal static void SetupScene(Scene scene, out ReadOnlyCollection<IDirectLight> directLights, out ReadOnlyCollection<IIndirectLight> indirectLights)
+        {
+            // define deferred light managers
+            // - This is slightly odd, why do we need to define these here when we could just put [DefaultManager(DeferredAmbientLightManager)] on AmbientLight
+            // - This is so that AmientLights (a generic light class) have no connection to *deferred rendering*.
+            scene.GetManager<DeferredAmbientLightManager>();
+            scene.GetManager<DeferredPointLightManager>();
+            scene.GetManager<DeferredSkyboxManager>();
+            scene.GetManager<DeferredSpotLightManager>();
+            scene.GetManager<DeferredSunLightManager>();
+
+            // get lights
+            directLights = scene.FindManagers<IDirectLight>();
+            indirectLights = scene.FindManagers<IIndirectLight>();
         }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
@@ -44,37 +58,40 @@ namespace Myre.Graphics.Deferred
             context.DefineOutput("lightbuffer", isLeftSet:true, surfaceFormat:SurfaceFormat.HdrBlendable, depthFormat:DepthFormat.Depth24Stencil8);
             context.DefineOutput("directlighting", isLeftSet:false, surfaceFormat: SurfaceFormat.HdrBlendable, depthFormat: DepthFormat.Depth24Stencil8);
 
-            // define default light managers
-            var scene = renderer.Scene;
-            scene.GetManager<DeferredAmbientLightManager>();
-            scene.GetManager<DeferredPointLightManager>();
-            scene.GetManager<DeferredSkyboxManager>();
-            scene.GetManager<DeferredSpotLightManager>();
-            scene.GetManager<DeferredSunLightManager>();
-
-            // get lights
-            _directLights = scene.FindManagers<IDirectLight>();
-            _indirectLights = scene.FindManagers<IIndirectLight>();
+            // Setup light managers and find lists of all lights
+            SetupScene(renderer.Scene, out _directLights, out _indirectLights);
 
             base.Initialise(renderer, context);
         }
 
         public override void Draw(Renderer renderer)
         {
-            var metadata = renderer.Data;
-            var device = renderer.Device;
+            RenderTarget2D directLightBuffer;
+            RenderTarget2D indirectLightBuffer;
+            PerformLightingPass(renderer, true, _quad, _restoreDepth, _copyTexture, _directLights, _indirectLights, out directLightBuffer, out indirectLightBuffer);
 
-            var resolution = metadata.GetValue(new TypedName<Vector2>("resolution"));
+            Output("directlighting", directLightBuffer);
+            Output("lightbuffer", indirectLightBuffer);
+        }
+
+        internal static void PerformLightingPass(Renderer renderer, bool ssao, Quad quad, Material restoreDepth, Material copyTexture, ReadOnlyCollection<IDirectLight> directLights, ReadOnlyCollection<IIndirectLight> indirectLights, out RenderTarget2D directLightBuffer, out RenderTarget2D indirectLightBuffer)
+        {
+            //Get some handy objects
+            var device = renderer.Device;
+            var resolution = renderer.Data.GetValue(new TypedName<Vector2>("resolution"));
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 
+            //Enable or disbale SSAO
+            renderer.Data.Set("ssao", ssao);
+
             // prepare direct lights
-            for (int i = 0; i < _directLights.Count; i++)
-                _directLights[i].Prepare(renderer);
+            for (int i = 0; i < directLights.Count; i++)
+                directLights[i].Prepare(renderer);
 
             // set and clear direct light buffer
-            _directLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
-            device.SetRenderTarget(_directLightBuffer);
+            directLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
+            device.SetRenderTarget(directLightBuffer);
             device.Clear(Color.Transparent);
 
             // work around for a bug in xna 4.0
@@ -86,37 +103,31 @@ namespace Myre.Graphics.Deferred
             device.DepthStencilState = DepthStencilState.Default;
 
             // restore depth
-            _quad.Draw(_restoreDepth, metadata);
-            
+            quad.Draw(restoreDepth, renderer.Data);
+
             // set render states to additive blend
             device.BlendState = BlendState.Additive;
 
             // draw direct lights
-            for (int i = 0; i < _directLights.Count; i++)
-                _directLights[i].Draw(renderer);
-
-            // output direct lighting
-            Output("directlighting", _directLightBuffer);
+            foreach (IDirectLight light in directLights)
+                light.Draw(renderer);
 
             // prepare indirect lights
-            for (int i = 0; i < _indirectLights.Count; i++)
-                _indirectLights[i].Prepare(renderer);
+            for (int i = 0; i < indirectLights.Count; i++)
+                indirectLights[i].Prepare(renderer);
 
             // set and clear indirect light buffer
-            _indirectLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
-            device.SetRenderTarget(_indirectLightBuffer);
+            indirectLightBuffer = RenderTargetManager.GetTarget(device, width, height, SurfaceFormat.HdrBlendable, DepthFormat.Depth24Stencil8);
+            device.SetRenderTarget(indirectLightBuffer);
             device.Clear(Color.Transparent);
 
             //draw indirect lights
-            for (int i = 0; i < _indirectLights.Count; i++)
-                _indirectLights[i].Draw(renderer);
+            foreach (IIndirectLight light in indirectLights)
+                light.Draw(renderer);
 
             // blend direct lighting into the indirect light buffer
-            _copyTexture.Parameters["Texture"].SetValue(_directLightBuffer);
-            _quad.Draw(_copyTexture, metadata);
-
-            // output resulting light buffer
-            Output("lightbuffer", _indirectLightBuffer);
+            copyTexture.Parameters["Texture"].SetValue(directLightBuffer);
+            quad.Draw(copyTexture, renderer.Data);
         }
     }
 }

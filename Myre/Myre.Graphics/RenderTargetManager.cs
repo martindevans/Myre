@@ -81,7 +81,7 @@ namespace Myre.Graphics
         private static readonly List<string> _active = new List<string>();
 #endif
 
-        public static RenderTarget2D GetTarget(GraphicsDevice device, int width, int height, SurfaceFormat surfaceFormat = SurfaceFormat.Color, DepthFormat depthFormat = DepthFormat.None, int multiSampleCount = 0, bool mipMap = false, RenderTargetUsage usage = RenderTargetUsage.DiscardContents, string name = null)
+        public static RenderTarget2D GetTarget(GraphicsDevice device, int width, int height, SurfaceFormat surfaceFormat = SurfaceFormat.Color, DepthFormat depthFormat = DepthFormat.None, int multiSampleCount = 0, bool mipMap = false, RenderTargetUsage usage = RenderTargetUsage.PreserveContents, string name = null)
         {
             var info = new RenderTargetInfo(width, height, surfaceFormat, depthFormat, multiSampleCount, mipMap, usage);
 

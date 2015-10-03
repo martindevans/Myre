@@ -128,6 +128,7 @@
     <Compile Include="RendererSettings.cs" />
     <Compile Include="RenderPlan.cs" />
     <Compile Include="RenderTargetManager.cs" />
+    <Compile Include="Translucency\DepthPeel.cs" />
     <Compile Include="Translucency\Particles\Initialisers\AngularVelocity\RandomAngularVelocity.cs" />
     <Compile Include="Translucency\Particles\Initialisers\BaseParticleInitialiser.cs" />
     <Compile Include="Translucency\Particles\Initialisers\Colour\RandomEndColour.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Translucency\Particles\Triggers\Continuous.cs" />
     <Compile Include="Translucency\Particles\Triggers\ITrigger.cs" />
     <Compile Include="Translucency\TranslucencyTypes.cs" />
+    <Compile Include="Translucency\DeferredTransparency.cs" />
     <Compile Include="Translucency\TranslucentComponent.cs" />
     <Compile Include="View.cs" />
     <Compile Include="x86Resources.Designer.cs" />

@@ -5,6 +5,9 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Deferred
 {
+    /// <summary>
+    /// Copy depth data from the gbuffer_depth, into the actual depth buffer
+    /// </summary>
     public class RestoreDepthPhase
         : RendererComponent
     {

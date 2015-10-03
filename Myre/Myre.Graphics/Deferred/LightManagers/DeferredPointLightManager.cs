@@ -88,7 +88,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             var metadata = renderer.Data;
             var device = renderer.Device;
 
-            // set deice for drawing sphere mesh
+            // set device for drawing sphere mesh
             var part = _geometry.Meshes[0].MeshParts[0];
             device.SetVertexBuffer(part.VertexBuffer);
             device.Indices = part.IndexBuffer;
@@ -128,11 +128,11 @@ namespace Myre.Graphics.Deferred.LightManagers
                     continue;
 
                 SetupLight(metadata, _geometryLightingMaterial, light);
-                DrawGeomery(_geometryLightingMaterial, metadata, device);
+                DrawGeometry(_geometryLightingMaterial, metadata, device);
             }
         }
 
-        private void DrawGeomery(Material material, RendererMetadata metadata, GraphicsDevice device)
+        private void DrawGeometry(Material material, RendererMetadata metadata, GraphicsDevice device)
         {
             var part = _geometry.Meshes[0].MeshParts[0];
             foreach (var pass in material.Begin(metadata))

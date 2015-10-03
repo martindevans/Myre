@@ -199,7 +199,7 @@ namespace Myre.Graphics.Deferred.LightManagers
         {
             var light = data.Light;
 
-            var target = RenderTargetManager.GetTarget(renderer.Device, light.ShadowResolution, light.ShadowResolution, SurfaceFormat.Single, DepthFormat.Depth24Stencil8, name: "sun light shadow map");
+            var target = RenderTargetManager.GetTarget(renderer.Device, light.ShadowResolution, light.ShadowResolution, SurfaceFormat.Single, DepthFormat.Depth24Stencil8, name: "sun light shadow map", usage: RenderTargetUsage.DiscardContents);
             renderer.Device.SetRenderTarget(target);
             renderer.Device.Clear(Color.Black);
 

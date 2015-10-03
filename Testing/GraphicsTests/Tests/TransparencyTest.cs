@@ -1,12 +1,9 @@
-﻿using System.Linq;
-using System.Numerics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre;
 using Myre.Entities;
-using Myre.Extensions;
 using Myre.Graphics;
 using Myre.Graphics.Deferred;
 using Myre.Graphics.Geometry;
@@ -14,6 +11,8 @@ using Myre.Graphics.Lighting;
 using Myre.Graphics.Translucency;
 using Myre.UI.InputDevices;
 using Ninject;
+using System.Linq;
+using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 
