@@ -46,11 +46,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClearGBuffer.fx">
-      <Name>ClearGBuffer</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="Bloom.fx">
       <Name>Bloom</Name>
       <Importer>EffectImporter</Importer>
@@ -81,8 +76,8 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="CopyTexture.fx">
-      <Name>CopyTexture</Name>
+    <Compile Include="DefaultGBuffer.fx">
+      <Name>DefaultGBuffer</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
@@ -98,11 +93,6 @@
       <ProcessorParameters_DiffuseTexture>ground_diffuse.jpg</ProcessorParameters_DiffuseTexture>
       <ProcessorParameters_NormalTexture>ground_normal.jpg</ProcessorParameters_NormalTexture>
       <ProcessorParameters_SpecularTexture>ground_specular.jpg</ProcessorParameters_SpecularTexture>
-    </Compile>
-    <Compile Include="RestoreDepth.fx">
-      <Name>RestoreDepth</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
     </Compile>
     <Compile Include="Gamma.fx">
       <Name>Gamma</Name>
@@ -191,9 +181,11 @@
       <Name>Hebe2</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
-      <ProcessorParameters_TranslucentEffectTechnique>Default</ProcessorParameters_TranslucentEffectTechnique>
-      <ProcessorParameters_DiffuseTexture>White Dot</ProcessorParameters_DiffuseTexture>
-      <ProcessorParameters_TranslucentEffectName>GlassGBuffer</ProcessorParameters_TranslucentEffectName>
+      <ProcessorParameters_DiffuseTexture>Models/rock_diff</ProcessorParameters_DiffuseTexture>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_GBufferTechnique>Default</ProcessorParameters_GBufferTechnique>
+      <ProcessorParameters_SpecularTexture>White Dot</ProcessorParameters_SpecularTexture>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
     <Compile Include="Models\zoe.fbx">
       <Name>zoe</Name>
@@ -203,8 +195,8 @@
       <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
-    <Compile Include="GlassGBuffer.fx">
-      <Name>GlassGBuffer</Name>
+    <Compile Include="GlassBlend.fx">
+      <Name>GlassBlend</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
@@ -213,6 +205,17 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </None>
+    <Compile Include="Models\sphere.x">
+      <Name>sphere</Name>
+      <Importer>XImporter</Importer>
+      <Processor>MyreModelProcessor</Processor>
+      <ProcessorParameters_DiffuseTexture>Models/rock_diff</ProcessorParameters_DiffuseTexture>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_GBufferTechnique>Default</ProcessorParameters_GBufferTechnique>
+      <ProcessorParameters_SpecularTexture>White Dot</ProcessorParameters_SpecularTexture>
+      <ProcessorParameters_TranslucentEffectName>GlassBlend</ProcessorParameters_TranslucentEffectName>
+      <ProcessorParameters_TranslucentEffectTechnique>FoggyGlass</ProcessorParameters_TranslucentEffectTechnique>
+    </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
       <Importer>EffectImporter</Importer>
@@ -349,13 +352,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultGBuffer.fx">
-      <Name>DefaultGBuffer</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Models\zoe_01.jpg">
       <Name>zoe_01</Name>
       <Importer>TextureImporter</Importer>
@@ -483,6 +479,13 @@
       <Project>{150b5101-1046-43e9-9fd0-a2ddd33c352f}</Project>
       <Name>Myre</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\rock_diff.tga">
+      <Name>rock_diff</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Myre.Graphics\" />

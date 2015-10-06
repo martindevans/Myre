@@ -61,20 +61,21 @@ void DefaultPixelShaderFunction(uniform bool ClipAlpha,
 	out_diffuse = float4(diffuseSample.rgb, specularSample.a);
 }
 
-float4 DefaultTranslucentPixelShaderFunction(in DefaultVertexShaderOutput input) : COLOR0
-{
-    float4 diffuseSample = tex2D(diffuseSampler, input.TexCoord);
-
-	diffuseSample.a *= Opacity;
-	return float4(diffuseSample.rgb, diffuseSample.a);
-}
-
 technique Default
 {
 	pass Pass1
 	{
 		VertexShader = compile vs_3_0 DefaultVertexShaderFunction();
 		PixelShader = compile ps_3_0 DefaultPixelShaderFunction(true);
+	}
+}
+
+technique DefaultNoAlphaCutout
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_3_0 DefaultVertexShaderFunction();
+		PixelShader = compile ps_3_0 DefaultPixelShaderFunction(false);
 	}
 }
 
@@ -87,20 +88,11 @@ technique Animated
 	}
 }
 
-technique Translucent
-{
-	pass Pass1
-	{
-		VertexShader = compile vs_3_0 DefaultVertexShaderFunction();
-		PixelShader = compile ps_3_0 DefaultTranslucentPixelShaderFunction();
-	}
-}
-
-technique AnimatedTranslucent
+technique AnimatedNoAlphaCutout
 {
 	pass Pass1
 	{
 		VertexShader = compile vs_3_0 AnimatedVertexShaderFunction();
-		PixelShader = compile ps_3_0 DefaultTranslucentPixelShaderFunction();
+		PixelShader = compile ps_3_0 DefaultPixelShaderFunction(false);
 	}
 }

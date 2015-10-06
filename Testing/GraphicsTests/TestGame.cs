@@ -97,6 +97,7 @@ namespace GraphicsTests
             Components.Add(Player);
             _ui.Actors.Add(Player);
 
+            
             var statLog = new StatisticTextLog(_ui.Root, Content.Load<SpriteFont>("Consolas"), true);
             statLog.SetPoint(Points.TopLeft, 10, 10);
 

@@ -63,16 +63,16 @@ namespace GraphicsTests.Tests
             _ssaoIntensity = renderer.Data.Get<float>("ssao_intensity");
 
             _fullPlan = renderer.StartPlan()
-                               .Then<GeometryBufferComponent>()
-                               .Then<EdgeDetectComponent>()
-                               .Then<Ssao>()
-                               .Then<LightingComponent>()
-                               //.Then<RestoreDepthPhase>()
-                               .Then<DeferredTransparency>()
-                               //.Then<TranslucentComponent>()
-                               .Then<ToneMapComponent>()
-                               .Then<AntiAliasComponent>()
-                               .Show("demo");
+                                .Then<GeometryBufferComponent>()
+                                .Then<EdgeDetectComponent>()
+                                .Then<Ssao>()
+                                .Then<LightingComponent>()
+                                .Then<DeferredTransparency>()
+                                //.Then<RestoreDepthPhase>()
+                                //.Then<TranslucentComponent>()
+                                .Then<ToneMapComponent>()
+                                .Then<AntiAliasComponent>();
+
             _ssaoPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
                 .Then<EdgeDetectComponent>()
@@ -92,15 +92,21 @@ namespace GraphicsTests.Tests
 
             _normalPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
+                .Then<LightingComponent>()
+                .Then<DeferredTransparency>()
                 .Then(new AntiAliasComponent("gbuffer_normals"))
                 .Show("antialiased");
 
             _depthPlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
+                .Then<LightingComponent>()
+                .Then<DeferredTransparency>()
                 .Show("gbuffer_depth");
 
             _diffusePlan = renderer.StartPlan()
                 .Then<GeometryBufferComponent>()
+                .Then<LightingComponent>()
+                .Then<DeferredTransparency>()
                 .Show("gbuffer_diffuse");
 
             _noAaPlan = renderer.StartPlan()
@@ -108,8 +114,6 @@ namespace GraphicsTests.Tests
                                .Then<EdgeDetectComponent>()
                                .Then<Ssao>()
                                .Then<LightingComponent>()
-                               .Then<RestoreDepthPhase>()
-                               .Then<TranslucentComponent>()
                                .Then<ToneMapComponent>()
                                .Show("tonemapped");
 

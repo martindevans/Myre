@@ -19,7 +19,7 @@ namespace Myre.Graphics.Deferred
         public RestoreDepthPhase(GraphicsDevice device)
         {
             _quad = new Quad(device);
-            _restoreDepth = new Material(Content.Load<Effect>("RestoreDepth").Clone());
+            _restoreDepth = new Material(Content.Load<Effect>("RestoreDepth"));
             ClearDepth = true;
         }
 
@@ -33,16 +33,21 @@ namespace Myre.Graphics.Deferred
 
         public override void Draw(Renderer renderer)
         {
+            RestoreDepth(renderer, _quad, _restoreDepth, ClearDepth);
+        }
+
+        public static void RestoreDepth(Renderer renderer, Quad quad, Material restoreDepth, bool clearDepth = true)
+        {
             // work arround for a bug in xna 4.0
             renderer.Device.SamplerStates[0] = SamplerState.LinearClamp;
             renderer.Device.SamplerStates[0] = SamplerState.PointClamp;
 
-            if (ClearDepth)
+            if (clearDepth)
                 renderer.Device.Clear(ClearOptions.DepthBuffer, Color.Transparent, 1, 0);
 
             renderer.Device.DepthStencilState = DepthStencilState.Default;
             renderer.Device.BlendState = BlendState.Additive;
-            _quad.Draw(_restoreDepth, renderer.Data);
+            quad.Draw(restoreDepth, renderer.Data);
         }
     }
 }

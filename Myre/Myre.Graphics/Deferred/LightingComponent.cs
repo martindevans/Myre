@@ -82,7 +82,7 @@ namespace Myre.Graphics.Deferred
             var width = (int)resolution.X;
             var height = (int)resolution.Y;
 
-            //Enable or disbale SSAO
+            //Enable or disable SSAO
             renderer.Data.Set("ssao", ssao);
 
             // prepare direct lights

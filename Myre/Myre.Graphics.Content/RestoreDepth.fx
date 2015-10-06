@@ -24,7 +24,7 @@ void PixelShaderFunction(in float2 in_TexCoord : TEXCOORD0,
 
 	float4 projectedPosition = mul(float4(viewPosition, 1), Projection);
 	
-	out_Colour = float4(0, 0, 0, 1);
+	out_Colour = float4(0, 0, 0, 0);
 	out_Depth = projectedPosition.z / projectedPosition.w;
 	//projectedPosition /= projectedPosition.w;
 	//out_Colour = float4(projectedPosition.xy / 2 + 0.5, projectedPosition.z, 1); //float4(viewPosition.xy, -viewPosition.z / farClip, 1);
@@ -36,7 +36,7 @@ technique Technique1
     {
         // TODO: set renderstates here.
 
-        VertexShader = compile vs_2_0 FullScreenQuadFrustumCornerVS();//VertexShaderFunction();
+        VertexShader = compile vs_2_0 FullScreenQuadFrustumCornerVS();
         PixelShader = compile ps_2_0 PixelShaderFunction();
     }
 }

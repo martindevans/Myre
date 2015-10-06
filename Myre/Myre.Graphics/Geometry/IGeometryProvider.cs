@@ -1,6 +1,8 @@
-﻿using Myre.Collections;
+﻿using System;
+using Myre.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Geometry
 {
@@ -22,32 +24,46 @@ namespace Myre.Graphics.Geometry
             _geometryProviders = geometryProviders;
         }
 
-        public void Draw(string phase, Renderer renderer)
+        public List<IGeometry> Query(string phase, Renderer renderer)
         {
             //Find geometry to draw in this phase
             _geometry.Clear();
             foreach (var geometryProvider in _geometryProviders)
                 geometryProvider.Query(phase, renderer.Data, _geometry);
 
-            //Draw the geometry
-            Draw(_geometry, BackToFront, phase, renderer);
+            //Return the raw list. Risky, as it could be externally mutated, but we don't want to incur a copy
+            return _geometry;
         }
 
-        public static void Draw(List<IGeometry> geometry, bool backToFront, string phase, Renderer renderer)
+        public void Draw(string phase, Renderer renderer)
         {
-            //Depth sort geometry
-            DepthSortGeometry(geometry);
+            //Draw the geometry
+            Draw(Query(phase, renderer), DepthSort.FrontToBack, phase, renderer);
+        }
+
+        public static void Draw(List<IGeometry> geometry, DepthSort sort, string phase, Renderer renderer)
+        {
+            //Depth sort geometry (always sort front-to-back, we'll render in reverse order for back-to-front)
+            if (sort != DepthSort.None)
+                DepthSortGeometry(geometry);
 
             //Draw geometry
-            if (backToFront)
+            switch (sort)
             {
-                for (int i = geometry.Count - 1; i >= 0; i--)
-                    geometry[i].Draw(phase, renderer);
-            }
-            else
-            {
-                foreach (IGeometry g in geometry)
-                    g.Draw(phase, renderer);
+                case DepthSort.BackToFront: {
+                    for (int i = geometry.Count - 1; i >= 0; i--)
+                        geometry[i].Draw(phase, renderer);
+                    break;
+                }
+                case DepthSort.None:
+                case DepthSort.FrontToBack: {
+                    foreach (IGeometry g in geometry)
+                        g.Draw(phase, renderer);
+
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException("sort");
             }
         }
 

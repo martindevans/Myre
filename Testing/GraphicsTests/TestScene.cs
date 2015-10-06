@@ -199,20 +199,39 @@ namespace GraphicsTests
             //ship1Entity.AddBehaviour<ModelInstance>();
             //scene.Add(ship1Entity.Create());
 
-            var hebeModel = content.Load<ModelData>(@"Models\Hebe2");
-            var hebe = kernel.Get<EntityDescription>();
-            hebe.AddProperty(new TypedName<ModelData>("model"));
-            hebe.AddProperty(new TypedName<Matrix4x4>("transform"));
-            hebe.AddProperty(new TypedName<bool>("is_static"));
-            hebe.AddBehaviour<ModelInstance>();
-            var hebeEntity = hebe.Create();
-            hebeEntity.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
-            hebeEntity.GetProperty(new TypedName<Matrix4x4>("transform")).Value = Matrix4x4.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
+            //var hebeModel = content.Load<ModelData>(@"Models\Hebe2");
+            //var hebe = kernel.Get<EntityDescription>();
+            //hebe.AddProperty(new TypedName<ModelData>("model"));
+            //hebe.AddProperty(new TypedName<Matrix4x4>("transform"));
+            //hebe.AddProperty(new TypedName<bool>("is_static"));
+            //hebe.AddBehaviour<ModelInstance>();
+            //var hebeEntity = hebe.Create();
+            //hebeEntity.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
+            //hebeEntity.GetProperty(new TypedName<Matrix4x4>("transform")).Value = Matrix4x4.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
+            //                                                        * Matrix4x4.CreateRotationY(MathHelper.PiOver2)
+            //                                                        * Matrix4x4.CreateTranslation(-150, 20, 0);
+            //hebeEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
+            //hebeEntity.GetProperty(ModelInstance.OpacityName).Value = 0.5f;
+            //_scene.Add(hebeEntity);
+
+            var sphereModel = content.Load<ModelData>(@"Models\sphere");
+            var sphere = kernel.Get<EntityDescription>();
+            sphere.AddProperty(new TypedName<ModelData>("model"));
+            sphere.AddProperty(new TypedName<Matrix4x4>("transform"));
+            sphere.AddProperty(new TypedName<bool>("is_static"));
+            sphere.AddBehaviour<ModelInstance>();
+            var sphereEntity = sphere.Create();
+            sphereEntity.GetProperty(new TypedName<ModelData>("model")).Value = sphereModel;
+            sphereEntity.GetProperty(new TypedName<Matrix4x4>("transform")).Value = Matrix4x4.CreateScale(5 / sphereModel.Meshes.First().BoundingSphere.Radius)
                                                                     * Matrix4x4.CreateRotationY(MathHelper.PiOver2)
                                                                     * Matrix4x4.CreateTranslation(-150, 20, 0);
-            hebeEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
-            hebeEntity.GetProperty(ModelInstance.OpacityName).Value = 0.5f;
-            _scene.Add(hebeEntity);
+            sphereEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
+            _scene.Add(sphereEntity);
+
+            var smodel = sphereEntity.GetBehaviour<ModelInstance>(null);
+            smodel.Opacity = 0.5f;
+            smodel.SubSurfaceScattering = 0.5f;
+            smodel.Attenuation = 0.3f;
 
             //var dudeModel = content.Load<ModelData>(@"dude");
             //var dude = kernel.Get<EntityDescription>();

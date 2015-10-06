@@ -92,6 +92,7 @@
     <Compile Include="Deferred\ToneMapComponent.cs" />
     <Compile Include="Extensions\MatrixExtensions.cs" />
     <Compile Include="Extensions\RenderTarget2DExtensions.cs" />
+    <Compile Include="Geometry\DepthSort.cs" />
     <Compile Include="Geometry\BoundingVolume.cs" />
     <Compile Include="Geometry\IGeometry.cs" />
     <Compile Include="Geometry\IGeometryProvider.cs" />

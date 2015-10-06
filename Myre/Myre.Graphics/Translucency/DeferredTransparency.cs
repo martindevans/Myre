@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Deferred;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-using Vector2 = System.Numerics.Vector2;
 using Color = Microsoft.Xna.Framework.Color;
+using Vector2 = System.Numerics.Vector2;
 
 namespace Myre.Graphics.Translucency
 {
@@ -21,6 +20,7 @@ namespace Myre.Graphics.Translucency
         private DepthPeel _depthPeeler;
 
         private readonly Material _copyTexture;
+        private Material _copyTextureWithStencil;
         private readonly Material _clearGBuffer;
         private readonly Material _restoreDepth;
         private Quad _quad;
@@ -28,10 +28,17 @@ namespace Myre.Graphics.Translucency
         private ReadOnlyCollection<IDirectLight> _directLights;
         private ReadOnlyCollection<IIndirectLight> _indirectLights;
 
+        private readonly DepthStencilState _depthReadGreaterThan = new DepthStencilState {
+            DepthBufferEnable = true,
+            DepthBufferFunction = CompareFunction.GreaterEqual,
+            DepthBufferWriteEnable = false
+        };
+
         public DeferredTransparency()
         {
-            _copyTexture = new Material(Content.Load<Effect>("CopyTexture"));
-            _clearGBuffer = new Material(Content.Load<Effect>("ClearGBuffer"));
+            _copyTexture = new Material(Content.Load<Effect>("CopyTexture").Clone(), "Copy");
+            _copyTextureWithStencil = new Material(Content.Load<Effect>("CopyTexture").Clone(), "CopyWithStencil");
+            _clearGBuffer = new Material(Content.Load<Effect>("ClearGBuffer").Clone(), "Clear_NormalsDiffuse");
             _restoreDepth = new Material(Content.Load<Effect>("RestoreDepth"));
         }
 
@@ -62,7 +69,6 @@ namespace Myre.Graphics.Translucency
             //define outputs
             context.DefineOutput("gbuffer_depth");
             context.DefineOutput("lightbuffer", isLeftSet: true, surfaceFormat: SurfaceFormat.HdrBlendable, depthFormat: DepthFormat.Depth24Stencil8);
-            context.DefineOutput("demo", surfaceFormat: SurfaceFormat.HdrBlendable, depthFormat: DepthFormat.Depth24Stencil8);
 
             base.Initialise(renderer, context);
         }
@@ -94,48 +100,94 @@ namespace Myre.Graphics.Translucency
             var normals = GetResource("gbuffer_normals");
             var diffuse = GetResource("gbuffer_diffuse");
 
+            renderer.Data.Set<bool>("render_translucent", true);
+
             //Render each peeled depth layer
             for (int i = 0; i < _layers.Length; i++)
             {
                 //Clear the transparent gbuffer
-                ClearGBuffer(renderer, depth, normals, diffuse);
+                ClearGBuffer(renderer, normals, diffuse);
 
                 //Render the layer gbuffer
-                GeometryRenderer.Draw(_layers[i], false, "translucent", renderer);
+                renderer.Device.SetRenderTargets(depth, normals, diffuse);
+                renderer.Device.DepthStencilState = DepthStencilState.Default;
+                renderer.Device.BlendState = BlendState.Opaque;
+                GeometryRenderer.Draw(_layers[i], DepthSort.FrontToBack, "gbuffer", renderer);
 
                 //Do a lighting pass for this gbuffer
                 //This leaves the lightbuffer set as the target
                 var tempLightbuffer = PerformLightingPass(renderer, depth, normals, diffuse);
 
                 //Render the layer (alpha blended particles into the lightbuffer)
-                GeometryRenderer.Draw(_layers[i], false, "translucent_alpha", renderer);
+                GeometryRenderer.Draw(_layers[i], DepthSort.BackToFront, "translucent_alpha", renderer);
 
                 //Blend tempLightbuffer into lightbuffer
-                renderer.Device.SetRenderTarget(lightbuffer);
-                //blend!
+                BlendTransparencies(renderer, _layers[i], normals, tempLightbuffer, lightbuffer);
 
                 //Recycle the temp lightbuffer
-                //RenderTargetManager.RecycleTarget(tempLightbuffer);
-                Output("demo", tempLightbuffer);
+                RenderTargetManager.RecycleTarget(tempLightbuffer);
             }
+
+            renderer.Data.Set<bool>("render_translucent", false);
 
             //Now output the modified lightbuffer
             Output("lightbuffer", lightbuffer);
         }
 
-        private void ClearGBuffer(Renderer renderer, RenderTarget2D depth, RenderTarget2D normals, RenderTarget2D diffuse)
+        /// <summary>
+        /// Blend the lightbuffer resulting from transparency into the primary scene lightbuffer
+        /// </summary>
+        /// <param name="renderer"></param>
+        /// <param name="geometry"></param>
+        /// <param name="gbufferNormals">The normal gbuffer component for the transparencies (used as a stencil buffer)</param>
+        /// <param name="transparencyLightbuffer"></param>
+        /// <param name="lightbuffer"></param>
+        private void BlendTransparencies(Renderer renderer, List<IGeometry> geometry, Texture gbufferNormals, RenderTarget2D transparencyLightbuffer, RenderTarget2D lightbuffer)
         {
-            //Clear GBuffer to black (this clears associated stencil and depth buffers)
-            renderer.Device.SetRenderTargets(depth, normals, diffuse);
+            //Write the new pixels into the temp light buffers
+            var tempLightBuffer = RenderTargetManager.GetTarget(renderer.Device, lightbuffer.Width, lightbuffer.Height, lightbuffer.Format, lightbuffer.DepthStencilFormat);
+
+            //Restore depth from gbuffer_depth into the lightbuffer depth buffer
+            renderer.Device.SetRenderTargets(tempLightBuffer);
+            RestoreDepthPhase.RestoreDepth(renderer, _quad, _restoreDepth, false);
+
+            //Put the transparency lightbuffer into the metadata so pixel shader semantics can access it
+            renderer.Data.Set<Texture2D>("transparency_lightbuffer", transparencyLightbuffer);
+
+            //Draw the transparent geometry again, but this time draw the back side and set depth read to greaterequal
+            //The material applied here has the distance to the front (read from gbuffer_depth) and the distance to the back (calculate from geometry being rendered)
+            //This means we can apply transmittance fx based on material thickness
+            renderer.Device.DepthStencilState = _depthReadGreaterThan;
+            renderer.Device.BlendState = BlendState.Opaque;
+            renderer.Device.RasterizerState = RasterizerState.CullClockwise;
+            GeometryRenderer.Draw(geometry, DepthSort.None, "translucent", renderer);
+            renderer.Device.RasterizerState = RasterizerState.CullCounterClockwise;
+
+            //Remove transparency lightbuffer from the metadata
+            renderer.Data.Set<Texture2D>("transparency_lightbuffer", null);
+
+            //Blend the temp lightbuffer into the real lightbuffer
+            renderer.Device.SetRenderTarget(lightbuffer);
+            renderer.Device.BlendState = BlendState.Opaque;
+            renderer.Device.DepthStencilState = DepthStencilState.None;
+            _copyTextureWithStencil.Parameters["Texture"].SetValue(tempLightBuffer);
+            _copyTextureWithStencil.Parameters["Stencil"].SetValue(gbufferNormals);
+            _quad.Draw(_copyTextureWithStencil, renderer.Data);
+
+            //Discard the temp light buffer
+            RenderTargetManager.RecycleTarget(tempLightBuffer);
+        }
+
+        private void ClearGBuffer(Renderer renderer, RenderTarget2D normals, RenderTarget2D diffuse)
+        {
+            //Clear GBuffer to black but *keep* the depth buffer set
+            renderer.Device.SetRenderTargets(normals, diffuse);
             renderer.Device.BlendState = BlendState.Opaque;
             renderer.Device.Clear(Color.Black);
 
             //Perform GBuffer specific clearing (clears different buffers to different initial values)
             renderer.Device.DepthStencilState = DepthStencilState.None;
             _quad.Draw(_clearGBuffer, renderer.Data);
-
-            renderer.Device.DepthStencilState = DepthStencilState.Default;
-            renderer.Device.BlendState = BlendState.Opaque;
         }
 
         private RenderTarget2D PerformLightingPass(Renderer renderer, RenderTarget2D depth, RenderTarget2D normals, RenderTarget2D diffuse)
@@ -146,21 +198,6 @@ namespace Myre.Graphics.Translucency
 
             RenderTargetManager.RecycleTarget(directLightBuffer);
             return indirectLightBuffer;
-        }
-
-        private void OverwriteModifiedPixels(Renderer renderer, RenderTarget2D source, RenderTarget2D target)
-        {
-            //This could be made more efficient by using the stencil buffer:
-            // - When rendering the source, write into the stencil buffer
-            // - When performing the copy, read the stencil buffer to reject unchanged pixels
-            //Unfortunately XNA4 makes stencil buffers impossible to use in this way :unimpressed:
-
-            renderer.Device.SetRenderTarget(target);
-            renderer.Device.BlendState = BlendState.AlphaBlend;
-            renderer.Device.DepthStencilState = DepthStencilState.None;
-
-            _copyTexture.Parameters["Texture"].SetValue(source);
-            _quad.Draw(_copyTexture, renderer.Data);
         }
     }
 }

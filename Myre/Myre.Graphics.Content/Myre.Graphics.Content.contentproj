@@ -53,16 +53,6 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="ClearGBuffer.fx">
-      <Name>ClearGBuffer</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <Compile Include="CopyTexture.fx">
-      <Name>CopyTexture</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="DirectionalLight.fx">
       <Name>DirectionalLight</Name>
       <Importer>EffectImporter</Importer>
@@ -80,6 +70,16 @@
     </Compile>
     <Compile Include="EdgeDetect.fx">
       <Name>EdgeDetect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="ClearGBuffer.fx">
+      <Name>ClearGBuffer</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="CopyTexture.fx">
+      <Name>CopyTexture</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>

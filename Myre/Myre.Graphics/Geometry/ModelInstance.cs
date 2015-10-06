@@ -25,6 +25,8 @@ namespace Myre.Graphics.Geometry
         public static readonly TypedName<bool> IsStaticName = new TypedName<bool>("is_static");
         public static readonly TypedName<bool> IsInvisibleName = new TypedName<bool>("is_invisible");
         public static readonly TypedName<float> OpacityName = new TypedName<float>("opacity");
+        public static readonly TypedName<float> AttenuationName = new TypedName<float>("transmittance");
+        public static readonly TypedName<float> SubSurfaceScatteringName = new TypedName<float>("subsurface_scattering");
         public static readonly TypedName<Matrix4x4?> CustomViewMatrixName = new TypedName<Matrix4x4?>("custom_view_matrix");
         public static readonly TypedName<Matrix4x4?> CustomProjectionMatrixName = new TypedName<Matrix4x4?>("custom_projection_matrix");
 
@@ -33,6 +35,8 @@ namespace Myre.Graphics.Geometry
         private Property<bool> _isStatic;
         private Property<bool> _isInvisible;
         private Property<float> _opacity;
+        private Property<float> _attenuation;
+        private Property<float> _scattering;
         private Property<Matrix4x4?> _customViewMatrix;
         private Property<Matrix4x4?> _customProjectionMatrix;
 
@@ -66,6 +70,18 @@ namespace Myre.Graphics.Geometry
         {
             get { return _opacity.Value; }
             set { _opacity.Value = value; }
+        }
+
+        public float Attenuation
+        {
+            get { return _attenuation.Value; }
+            set { _attenuation.Value = value; }
+        }
+
+        public float SubSurfaceScattering
+        {
+            get { return _scattering.Value; }
+            set { _scattering.Value = value; }
         }
 
 
@@ -106,6 +122,8 @@ namespace Myre.Graphics.Geometry
             _isStatic = context.CreateProperty(IsStaticName);
             _isInvisible = context.CreateProperty(IsInvisibleName);
             _opacity = context.CreateProperty(OpacityName, 1);
+            _attenuation = context.CreateProperty(AttenuationName, 1);
+            _scattering = context.CreateProperty(SubSurfaceScatteringName, 0);
             _customViewMatrix = context.CreateProperty(CustomViewMatrixName);
             _customProjectionMatrix = context.CreateProperty(CustomProjectionMatrixName);
 
@@ -175,6 +193,10 @@ namespace Myre.Graphics.Geometry
                     if (!Mesh.Materials.TryGetValue(phase, out material))
                         return;
 
+                    var renderTransparent = renderer.Data.Get<bool>("render_translucent").Value;
+                    if (!renderTransparent && Instance.Opacity < 1)
+                        return;
+
                     Draw(material, renderer);
                 }
 
@@ -202,6 +224,8 @@ namespace Myre.Graphics.Geometry
                     //Allow the instance to apply any old data that it likes into the renderer
                     Instance.ApplyRendererData(renderer.Data);
                     renderer.Data.Set("opacity", Instance.Opacity);
+                    renderer.Data.Set("attenuation", Instance.Attenuation);
+                    renderer.Data.Set("scattering", Instance.SubSurfaceScattering);
 
                     //Calculate transform matrices
                     world.Value = Instance.Transform;

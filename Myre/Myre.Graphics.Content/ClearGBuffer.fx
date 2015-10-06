@@ -1,21 +1,36 @@
 #include "FullScreenQuad.fxh"
 
-void PixelShaderFunction(out float4 out_Depth : COLOR0,
-						 out float4 out_Normals : COLOR1,
-						 out float4 out_Diffuse : COLOR2)
+float4 defaultDepth = float4(1, 1, 1, 1);
+float4 defaultNormals = float4(0, 0, 0, 0);
+float4 defaultDiffuse = float4(0, 0, 0, 1);
+
+void Pixel_DepthNormalsDiffuse(out float4 out_Depth : COLOR0, out float4 out_Normals : COLOR1, out float4 out_Diffuse : COLOR2)
 {
-	out_Depth = float4(1, 1, 1, 1);
-	out_Normals = float4(0, 0, 0, 1);
-	out_Diffuse = float4(0, 0, 0, 1);
+	out_Depth = defaultDepth;
+	out_Normals = defaultNormals;
+	out_Diffuse = defaultDiffuse;
 }
 
-technique Technique1
+void Pixel_NormalsDiffuse(out float4 out_Normals : COLOR0, out float4 out_Diffuse : COLOR1)
 {
-    pass Pass1
-    {
-        // TODO: set renderstates here.
+	out_Normals = defaultNormals;
+	out_Diffuse = defaultDiffuse;
+}
 
-        VertexShader = compile vs_2_0 FullScreenQuadVS();
-        PixelShader = compile ps_2_0 PixelShaderFunction();
-    }
+technique Clear_DepthNormalsDiffuse
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_2_0 FullScreenQuadVS();
+		PixelShader = compile ps_2_0 Pixel_DepthNormalsDiffuse();
+	}
+}
+
+technique Clear_NormalsDiffuse
+{
+	pass Pass1
+	{
+		VertexShader = compile vs_2_0 FullScreenQuadVS();
+		PixelShader = compile ps_2_0 Pixel_NormalsDiffuse();
+	}
 }

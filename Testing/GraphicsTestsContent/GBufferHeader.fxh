@@ -20,10 +20,11 @@ struct DefaultVertexShaderInput
 
 struct DefaultVertexShaderOutput
 {
-	float4 PositionCS : POSITION0;
+	float4 Position : POSITION0;
 	float2 TexCoord : TEXCOORD0;
 	float Depth : TEXCOORD1;
 	float3x3 TangentToView : TEXCOORD2;
+	float4 PositionCS : COLOR1;
 };
 
 DefaultVertexShaderOutput DefaultVertexShaderFunction(DefaultVertexShaderInput input)
@@ -32,7 +33,8 @@ DefaultVertexShaderOutput DefaultVertexShaderFunction(DefaultVertexShaderInput i
 
 	float4 viewPosition = mul(input.Position, WorldView);
 
-		output.PositionCS = mul(viewPosition, Projection);
+	output.Position = mul(viewPosition, Projection);
+	output.PositionCS = output.Position;
 	output.Depth = CalculateDepth(viewPosition, FarClip);
 	output.TexCoord = input.TexCoord;
 
@@ -60,7 +62,7 @@ DefaultVertexShaderOutput AnimatedVertexShaderFunction(AnimatedVertexShaderInput
 	//Apply animation effects and convert data into a form the default vertex shader can understand
 	DefaultVertexShaderInput postAnimation;
 	float4x3 skinning = CalculateSkinMatrix(input.Indices, input.Weights, WeightsPerVertex);
-		postAnimation.Position = SkinTransformPosition(input.Position, skinning);
+	postAnimation.Position = SkinTransformPosition(input.Position, skinning);
 	postAnimation.TexCoord = input.TexCoord;
 	postAnimation.Tangent = SkinTransformNormal(input.Tangent, skinning);
 	postAnimation.Binormal = SkinTransformNormal(input.Binormal, skinning);
