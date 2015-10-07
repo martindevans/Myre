@@ -45,7 +45,7 @@ namespace Myre.Graphics.Geometry
         {
             //Depth sort geometry (always sort front-to-back, we'll render in reverse order for back-to-front)
             if (sort != DepthSort.None)
-                DepthSortGeometry(geometry);
+                DepthSortGeometryFrontToBack(geometry);
 
             //Draw geometry
             switch (sort)
@@ -67,7 +67,7 @@ namespace Myre.Graphics.Geometry
             }
         }
 
-        public static void DepthSortGeometry(List<IGeometry> meshes)
+        public static void DepthSortGeometryFrontToBack(List<IGeometry> meshes)
         {
             meshes.Sort(RenderDataComparator);
         }

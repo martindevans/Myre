@@ -1,12 +1,10 @@
-﻿using System;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Graphics.Deferred;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Color = Microsoft.Xna.Framework.Color;
-using Vector2 = System.Numerics.Vector2;
 
 namespace Myre.Graphics.Translucency
 {
@@ -16,11 +14,11 @@ namespace Myre.Graphics.Translucency
         private ReadOnlyCollection<IGeometryProvider> _geometryProviders;
 
         private readonly List<IGeometry> _geometry = new List<IGeometry>();
-        private List<IGeometry>[] _layers;  
+        private readonly List<List<IGeometry>> _layers = new List<List<IGeometry>>();
         private DepthPeel _depthPeeler;
 
         private readonly Material _copyTexture;
-        private Material _copyTextureWithStencil;
+        private readonly Material _copyTextureWithStencil;
         private readonly Material _clearGBuffer;
         private readonly Material _restoreDepth;
         private Quad _quad;
@@ -50,12 +48,12 @@ namespace Myre.Graphics.Translucency
             _geometryProviders = renderer.Scene.FindManagers<IGeometryProvider>();
             _depthPeeler = new DepthPeel();
 
-            //create layers to peel geometry into
-            _layers = new List<IGeometry>[] {
-                new List<IGeometry>(),
-                //new List<IGeometry>(),
-                //new List<IGeometry>(),
-            };
+            var settings = renderer.Settings;
+
+            // 1 - Min
+            // 5 - Default
+            // 10 - Extreme
+            settings.Add("transparency_deferred_layers", "the max number of depth peeled layers to use for deferred transparency", 5);
 
             //Make sure deferred lighting is enabled
             LightingComponent.SetupScene(renderer.Scene, out _directLights, out _indirectLights);
@@ -75,12 +73,14 @@ namespace Myre.Graphics.Translucency
 
         public override void Draw(Renderer renderer)
         {
-            var metadata = renderer.Data;
-            var device = renderer.Device;
-
-            var resolution = metadata.GetValue(new TypedName<Vector2>("resolution"));
-            var width = (int)resolution.X;
-            var height = (int)resolution.Y;
+            //Create layers
+            var layersCount = renderer.Data.Get<int>("transparency_deferred_layers", 5, true).Value;
+            while (_layers.Count > layersCount)
+                _layers.RemoveAt(_layers.Count - 1);
+            while (_layers.Count < layersCount)
+                _layers.Add(new List<IGeometry>());
+            foreach (var layer in _layers)
+                layer.Clear();
 
             //Find geometry to draw in this phase
             _geometry.Clear();
@@ -88,9 +88,7 @@ namespace Myre.Graphics.Translucency
                 geometryProvider.Query("translucent", renderer.Data, _geometry);
 
             //Peel geometry into separate layers
-            foreach (var layer in _layers)
-                layer.Clear();
-            _depthPeeler.Peel(_geometry, _layers);
+            _depthPeeler.Peel(_geometry, _layers, renderer.Data.Get<View>("activeview").Value);
 
             //Get the lightbuffer (result of opaque deferred rendering)
             var lightbuffer = GetResource("lightbuffer");
@@ -103,8 +101,11 @@ namespace Myre.Graphics.Translucency
             renderer.Data.Set<bool>("render_translucent", true);
 
             //Render each peeled depth layer
-            for (int i = 0; i < _layers.Length; i++)
+            for (int i = 0; i < _layers.Count; i++)
             {
+                if (_layers[i].Count == 0)
+                    continue;
+
                 //Clear the transparent gbuffer
                 ClearGBuffer(renderer, normals, diffuse);
 

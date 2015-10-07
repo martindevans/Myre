@@ -181,6 +181,7 @@ namespace Myre.Graphics.Geometry
                 public BoundingSphere BoundingSphere { get; private set; }
 
                 public Matrix4x4 WorldView { get; set; }
+                public Matrix4x4 World { get; set; }
 
                 public void UpdateBounds()
                 {
@@ -228,7 +229,7 @@ namespace Myre.Graphics.Geometry
                     renderer.Data.Set("scattering", Instance.SubSurfaceScattering);
 
                     //Calculate transform matrices
-                    world.Value = Instance.Transform;
+                    world.Value = World;
                     worldView.Value = WorldView;
                     if (Instance._customProjectionMatrix.Value.HasValue)
                         worldViewProjection.Value = worldView.Value * Instance._customProjectionMatrix.Value.Value;
@@ -392,11 +393,11 @@ namespace Myre.Graphics.Geometry
             {
                 foreach (var instance in instances)
                 {
-                    Matrix4x4 world = instance.Mesh.MeshTransform * instance.Instance.Transform;
+                    instance.World = instance.Mesh.MeshTransform * instance.Instance.Transform;
                     if (instance.Instance._customViewMatrix.Value.HasValue)
-                        instance.WorldView = world * instance.Instance._customViewMatrix.Value.Value;
+                        instance.WorldView = instance.World * instance.Instance._customViewMatrix.Value.Value;
                     else
-                        instance.WorldView = Matrix4x4.Multiply(world, cameraView);
+                        instance.WorldView = Matrix4x4.Multiply(instance.World, cameraView);
                 }
             }
 

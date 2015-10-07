@@ -1,9 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre;
 using Myre.Entities;
+using Myre.Extensions;
 using Myre.Graphics;
 using Myre.Graphics.Deferred;
 using Myre.Graphics.Geometry;
@@ -13,8 +15,13 @@ using Myre.UI.InputDevices;
 using Ninject;
 using System.Linq;
 using System.Numerics;
+using SwizzleMyVectors;
+using SwizzleMyVectors.Geometry;
+using BoundingBox = SwizzleMyVectors.Geometry.BoundingBox;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
+using GameTime = Microsoft.Xna.Framework.GameTime;
 
 namespace GraphicsTests.Tests
 {
@@ -25,6 +32,7 @@ namespace GraphicsTests.Tests
         private readonly ContentManager _content;
         private readonly GraphicsDevice _device;
         private readonly TestGame _game;
+        private SpriteBatch _batch;
 
         private Scene _scene;
 
@@ -33,6 +41,7 @@ namespace GraphicsTests.Tests
         private Camera _camera;
 
         KeyboardState _previousKeyboard;
+        private View _view;
 
         public TransparencyTest(IKernel kernel, TestGame game, ContentManager content, GraphicsDevice device)
             : base("Transparency", kernel)
@@ -41,6 +50,7 @@ namespace GraphicsTests.Tests
             _content = content;
             _device = device;
             _game = game;
+            _batch = new SpriteBatch(device);
         }
 
         protected override void BeginTransitionOn()
@@ -48,14 +58,15 @@ namespace GraphicsTests.Tests
             _scene = _kernel.Get<Scene>();
 
             //Camera
-            _cameraPosition = new Vector3(100, 50, 0);
+            _cameraPosition = new Vector3(5, 0, -50);
             _camera = new Camera
             {
                 NearClip = 1,
                 FarClip = 700,
-                View = Matrix4x4.CreateLookAt(_cameraPosition, new Vector3(0, 50, 0), Vector3.UnitY)
+                View = Matrix4x4.CreateLookAt(_cameraPosition, new Vector3(0, 0, 0), Vector3.UnitY)
             };
             _camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, _camera.NearClip, _camera.FarClip);
+            _cameraRotation = new Vector3(0, MathHelper.Pi, 0);
 
             //Camera entity
             var cameraDesc = _kernel.Get<EntityDescription>();
@@ -67,6 +78,8 @@ namespace GraphicsTests.Tests
             cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = _device.PresentationParameters.BackBufferWidth, Height = _device.PresentationParameters.BackBufferHeight };
             _scene.Add(cameraEntity);
 
+            _view = cameraEntity.GetBehaviour<View>(null);
+
             //Skybox
             var skyboxDesc = _kernel.Get<EntityDescription>();
             skyboxDesc.AddBehaviour<Skybox>();
@@ -76,21 +89,28 @@ namespace GraphicsTests.Tests
             skybox.GetProperty(new TypedName<bool>("gamma_correct")).Value = false;
             _scene.Add(skybox);
 
-            //Hebe
-            var hebeModel = _content.Load<ModelData>(@"Models\Hebe2");
-            var hebe = _kernel.Get<EntityDescription>();
-            hebe.AddProperty(new TypedName<ModelData>("model"));
-            hebe.AddProperty(new TypedName<Matrix4x4>("transform"));
-            hebe.AddProperty(new TypedName<bool>("is_static"));
-            hebe.AddBehaviour<ModelInstance>();
-            var hebeEntity = hebe.Create();
-            hebeEntity.GetProperty(new TypedName<ModelData>("model")).Value = hebeModel;
-            hebeEntity.GetProperty(new TypedName<Matrix4x4>("transform")).Value = Matrix4x4.CreateScale(25 / hebeModel.Meshes.First().BoundingSphere.Radius)
-                                                                    * Matrix4x4.CreateRotationY(MathHelper.PiOver2)
-                                                                    * Matrix4x4.CreateTranslation(-150, 20, 0);
-            hebeEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
-            hebeEntity.GetProperty(ModelInstance.OpacityName).Value = 0.5f;
-            _scene.Add(hebeEntity);
+            //Sphere
+            for (int i = 0; i < 7; i++)
+            {
+                var sphereModel = _content.Load<ModelData>(@"Models\sphere");
+                var sphere = _kernel.Get<EntityDescription>();
+                sphere.AddProperty(new TypedName<ModelData>("model"));
+                sphere.AddProperty(new TypedName<Matrix4x4>("transform"));
+                sphere.AddProperty(new TypedName<bool>("is_static"));
+                sphere.AddBehaviour<ModelInstance>();
+                var sphereEntity = sphere.Create();
+                sphereEntity.GetProperty(new TypedName<ModelData>("model")).Value = sphereModel;
+                sphereEntity.GetProperty(new TypedName<Matrix4x4>("transform")).Value = Matrix4x4.CreateScale(4 / sphereModel.Meshes.First().BoundingSphere.Radius)
+                                                                                        * Matrix4x4.CreateRotationY(MathHelper.PiOver2)
+                                                                                        * Matrix4x4.CreateTranslation(0, 0, i * 10);
+                sphereEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
+                _scene.Add(sphereEntity);
+
+                var smodel = sphereEntity.GetBehaviour<ModelInstance>(null);
+                smodel.Opacity = 0.15f;
+                smodel.SubSurfaceScattering = 0.5f;
+                smodel.Attenuation = 0.2f;
+            }
 
             _scene.GetService<Renderer>()
                   .StartPlan()
@@ -98,8 +118,7 @@ namespace GraphicsTests.Tests
                   .Then<EdgeDetectComponent>()
                   .Then<Ssao>()
                   .Then<LightingComponent>()
-                  .Then<RestoreDepthPhase>()
-                  .Then<TranslucentComponent>()
+                  .Then<DeferredTransparency>()
                   .Then<ToneMapComponent>()
                   .Then<AntiAliasComponent>()
                   .Show("antialiased")
@@ -160,6 +179,7 @@ namespace GraphicsTests.Tests
         public override void Draw(GameTime gameTime)
         {
             _scene.Draw();
+
             base.Draw(gameTime);
         }
     }

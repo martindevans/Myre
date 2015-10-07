@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using System.Numerics;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Myre.Collections;
@@ -52,6 +51,11 @@ namespace Myre.Graphics.Translucency.Particles
         /// Gets or sets the world transformation matrix to apply to this <see cref="ParticleSystem"/>s' particles.
         /// </summary>
         public Matrix4x4 Transform { get; set; }
+
+        Matrix4x4 IGeometry.World
+        {
+            get { return Transform; }
+        }
 
         /// <summary>
         /// Gets the number of active particles.
