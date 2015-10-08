@@ -119,11 +119,11 @@ namespace Myre.Graphics.Translucency
                 //This leaves the lightbuffer set as the target
                 var tempLightbuffer = PerformLightingPass(renderer, depth, normals, diffuse);
 
-                //Render the layer (alpha blended particles into the lightbuffer)
-                GeometryRenderer.Draw(_layers[i], DepthSort.BackToFront, "translucent_alpha", renderer);
-
                 //Blend tempLightbuffer into lightbuffer
                 BlendTransparencies(renderer, _layers[i], normals, tempLightbuffer, lightbuffer);
+
+                //Render the layer (alpha blended particles into the lightbuffer)
+                GeometryRenderer.Draw(_layers[i], DepthSort.BackToFront, "translucent_alpha", renderer);
 
                 //Recycle the temp lightbuffer
                 RenderTargetManager.RecycleTarget(tempLightbuffer);

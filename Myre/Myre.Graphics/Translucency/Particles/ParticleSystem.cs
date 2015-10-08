@@ -424,7 +424,10 @@ namespace Myre.Graphics.Translucency.Particles
 
         BoundingSphere IGeometry.BoundingSphere
         {
-            get { return new BoundingSphere(Transform.Translation, Description.Lifetime * Description.EndLinearVelocity); }
+            get
+            {
+                return new BoundingSphere(Transform.Translation, Description.Lifetime * Description.EndLinearVelocity * Description.EndScale);
+            }
         }
 
         void IGeometry.Draw(Material material, Renderer renderer)
@@ -434,7 +437,7 @@ namespace Myre.Graphics.Translucency.Particles
 
         void IGeometry.Draw(string phase, Renderer renderer)
         {
-            if (phase != "translucent")
+            if (phase != "translucent_alpha")
                 return;
 
             Draw(renderer.Data);
