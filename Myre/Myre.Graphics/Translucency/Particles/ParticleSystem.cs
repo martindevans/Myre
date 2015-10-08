@@ -422,12 +422,10 @@ namespace Myre.Graphics.Translucency.Particles
             get { return _worldView; }
         }
 
+        internal float RadiusEstimate;
         BoundingSphere IGeometry.BoundingSphere
         {
-            get
-            {
-                return new BoundingSphere(Transform.Translation, Description.Lifetime * Description.EndLinearVelocity * Description.EndScale);
-            }
+            get { return new BoundingSphere(Transform.Translation, RadiusEstimate); }
         }
 
         void IGeometry.Draw(Material material, Renderer renderer)

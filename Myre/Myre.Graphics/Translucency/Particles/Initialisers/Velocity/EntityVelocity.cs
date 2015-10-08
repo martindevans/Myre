@@ -21,7 +21,21 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Velocity
 
         public override void Initialise(Random random, ref Particle particle)
         {
-            particle.Velocity += _velocity * VelocityBleedThrough;
+            Modify(ref particle, _velocity * VelocityBleedThrough);
+        }
+
+        public override void Maximise(ref Particle particle)
+        {
+            var len = particle.Velocity.Length();
+            var pv = len < 0.01 ? Vector3.UnitX : particle.Velocity / len;
+
+            //Assume that we accelerate the particle along the velocity vector of the particle, with a speed of 10m/s (arbitrary)
+            Modify(ref particle, pv * 10 * VelocityBleedThrough);
+        }
+
+        private static void Modify(ref Particle particle, Vector3 velocity)
+        {
+            particle.Velocity += velocity;
         }
 
         public override void Attach(ParticleEmitter emitter)

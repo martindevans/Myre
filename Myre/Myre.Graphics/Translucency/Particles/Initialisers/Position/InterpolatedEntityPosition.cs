@@ -35,6 +35,11 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Position
             particle.Position += Vector3.Lerp(_previousPosition, _position.Value, mu);
         }
 
+        public override void Maximise(ref Particle particle)
+        {
+            //do nothing, the position of the entity could be *anywhere*
+        }
+
         public override void Update(float dt)
         {
             _previousPosition = _position.Value;

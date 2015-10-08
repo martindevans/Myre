@@ -191,21 +191,21 @@ namespace GraphicsTests.Tests
         {
             _scene.Draw();
 
-            ICollection<IGeometry> models = new List<IGeometry>();
-            _scene.FindManagers<IGeometryProvider>().ForEach(a => a.Query("translucent", _scene.GetService<Renderer>().Data, models));
-            var view = _view;
-            _batch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-            foreach (var geometry in models)
-            {
-                var bound = CalculateScreenSpaceBounds(geometry, view);
-                _batch.Draw(_kernel.Get<ContentManager>().Load<Texture2D>("White Dot"), new Rectangle(
-                    (int)bound.Min.X,
-                    (int)bound.Min.Y,
-                    (int)(bound.Max - bound.Min).X,
-                    (int)(bound.Max - bound.Min).Y
-                ), null, new Color(1, 1, 1, 0.5f));
-            }
-            _batch.End();
+            //ICollection<IGeometry> models = new List<IGeometry>();
+            //_scene.FindManagers<IGeometryProvider>().ForEach(a => a.Query("translucent", _scene.GetService<Renderer>().Data, models));
+            //var view = _view;
+            //_batch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
+            //foreach (var geometry in models)
+            //{
+            //    var bound = CalculateScreenSpaceBounds(geometry, view);
+            //    _batch.Draw(_kernel.Get<ContentManager>().Load<Texture2D>("White Dot"), new Rectangle(
+            //        (int)bound.Min.X,
+            //        (int)bound.Min.Y,
+            //        (int)(bound.Max - bound.Min).X,
+            //        (int)(bound.Max - bound.Min).Y
+            //    ), null, new Color(1, 1, 1, 0.5f));
+            //}
+            //_batch.End();
 
             base.Draw(gameTime);
         }

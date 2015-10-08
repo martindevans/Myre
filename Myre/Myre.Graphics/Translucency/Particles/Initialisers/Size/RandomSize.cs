@@ -20,6 +20,16 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Size
         public override void Initialise(Random random, ref Particle particle)
         {
             var size = MathHelper.Lerp(MinSize, MaxSize, (float)random.NextDouble());
+            Modify(ref particle, size);
+        }
+
+        public override void Maximise(ref Particle particle)
+        {
+            Modify(ref particle, MaxSize);
+        }
+
+        private static void Modify(ref Particle particle, float size)
+        {
             particle.Size += size;
         }
 

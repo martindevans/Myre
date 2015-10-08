@@ -20,6 +20,17 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
         public override void Initialise(Random random, ref Particle particle)
         {
             var angularVelocity = MathHelper.Lerp(MinAngularVelocity, MaxAngularVelocity, (float)random.NextDouble());
+
+            Modify(ref particle, angularVelocity);
+        }
+
+        public override void Maximise(ref Particle particle)
+        {
+            Modify(ref particle, MaxAngularVelocity);
+        }
+
+        private static void Modify(ref Particle particle, float angularVelocity)
+        {
             particle.AngularVelocity += angularVelocity;
         }
 
@@ -31,6 +42,8 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
         {
             return new RandomAngularVelocity(MinAngularVelocity, MaxAngularVelocity);
         }
+
+        
     }
 
     public class RandomAngularVelocityReader : ContentTypeReader<RandomAngularVelocity>

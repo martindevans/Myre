@@ -18,6 +18,26 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers
         public abstract void Initialise(Random random, ref Particle particle);
 
         public abstract object Clone();
+
+        /// <summary>
+        /// Initialise the given particle with the maximum value this initializer can provide
+        /// </summary>
+        public abstract void Maximise(ref Particle particle);
+    }
+
+    public struct ParticleInfo
+    {
+        public readonly float? MaxStartingDistanceFromCenter;
+        public readonly float? MaxStartingSize;
+        public readonly float? MaxVelocity;
+
+        public ParticleInfo(float? maxStartingDistanceFromCenter = null, float? maxStartingSize = null, float? maxVelocity = null)
+            : this()
+        {
+            MaxStartingDistanceFromCenter = maxStartingDistanceFromCenter;
+            MaxStartingSize = maxStartingSize;
+            MaxVelocity = maxVelocity;
+        }
     }
 
     public struct Particle

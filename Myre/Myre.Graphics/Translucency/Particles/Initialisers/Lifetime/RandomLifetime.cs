@@ -20,6 +20,16 @@ namespace Myre.Graphics.Translucency.Particles.Initialisers.Lifetime
         public override void Initialise(Random random, ref Particle particle)
         {
             var lifetime = MathHelper.Lerp(MinLifetimeScale, MaxLifetimeScale, (float)random.NextDouble());
+            Modify(ref particle, lifetime);
+        }
+
+        public override void Maximise(ref Particle particle)
+        {
+            Modify(ref particle, MaxLifetimeScale);
+        }
+
+        private static void Modify(ref Particle particle, float lifetime)
+        {
             particle.LifetimeScale += lifetime;
         }
 
