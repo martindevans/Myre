@@ -25,7 +25,7 @@ namespace Myre.Graphics.Geometry
         public static readonly TypedName<bool> IsStaticName = new TypedName<bool>("is_static");
         public static readonly TypedName<bool> IsInvisibleName = new TypedName<bool>("is_invisible");
         public static readonly TypedName<float> OpacityName = new TypedName<float>("opacity");
-        public static readonly TypedName<float> AttenuationName = new TypedName<float>("transmittance");
+        public static readonly TypedName<float> AttenuationName = new TypedName<float>("attenuation");
         public static readonly TypedName<float> SubSurfaceScatteringName = new TypedName<float>("subsurface_scattering");
         public static readonly TypedName<Matrix4x4?> CustomViewMatrixName = new TypedName<Matrix4x4?>("custom_view_matrix");
         public static readonly TypedName<Matrix4x4?> CustomProjectionMatrixName = new TypedName<Matrix4x4?>("custom_projection_matrix");
@@ -136,6 +136,8 @@ namespace Myre.Graphics.Geometry
             initialisationData.TryCopyValue(this, IsStaticName, _isStatic);
             initialisationData.TryCopyValue(this, IsInvisibleName, _isInvisible);
             initialisationData.TryCopyValue(this, OpacityName, _opacity);
+            initialisationData.TryCopyValue(this, AttenuationName, _attenuation);
+            initialisationData.TryCopyValue(this, SubSurfaceScatteringName, _scattering);
             initialisationData.TryCopyValue(this, CustomViewMatrixName, _customViewMatrix);
             initialisationData.TryCopyValue(this, CustomProjectionMatrixName, _customProjectionMatrix);
 

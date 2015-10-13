@@ -9,9 +9,18 @@ namespace Myre.Graphics.Translucency
     {
         private ReadOnlyCollection<IGeometryProvider> _geometryProviders;
 
+        private readonly string _phaseName;
+        private GeometryRenderer _geometryDrawer;
+
+        public TranslucentComponent(string phaseName = "translucent")
+        {
+            _phaseName = phaseName;
+        }
+
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
             _geometryProviders = renderer.Scene.FindManagers<IGeometryProvider>();
+            _geometryDrawer = new GeometryRenderer(_geometryProviders);
 
             // define inputs
             if (context.AvailableResources.Any(r => r.Name == "gbuffer_depth"))
@@ -26,8 +35,7 @@ namespace Myre.Graphics.Translucency
 
         public override void Draw(Renderer renderer)
         {
-            var g = new GeometryRenderer(_geometryProviders);
-            g.Draw("translucent", renderer);
+            _geometryDrawer.Draw(_phaseName, renderer);
         }
     }
 }
