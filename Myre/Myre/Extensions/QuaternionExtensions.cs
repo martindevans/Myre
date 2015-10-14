@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Net;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Myre.Extensions
@@ -48,7 +49,18 @@ namespace Myre.Extensions
             return new Vector3(
                 2 * (a.X * a.Y - a.W * a.Z),
                 1 - 2 * (a.X * a.X + a.Z * a.Z),
-                2 * (a.Y * a.Z + a.W * a.W)
+                2 * (a.Y * a.Z + a.W * a.X)
+            );
+        }
+
+        public static Vector3 Right(this Quaternion a)
+        {
+            // http://nic-gamedev.blogspot.co.uk/2011/11/quaternion-math-getting-local-axis.html
+
+            return new Vector3(
+                1 - 2 * (a.Y * a.Y + a.Z * a.Z),
+                2 * (a.X * a.Y + a.W * a.Z),
+                2 * (a.X * a.Z - a.W * a.Y)
             );
         }
     }
