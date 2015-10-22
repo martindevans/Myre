@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
@@ -37,10 +38,20 @@ namespace Myre.Graphics.Materials
 
         public IEnumerable<EffectPass> Begin(NamedBoxCollection parameterValues)
         {
+            if (_isDisposed)
+                throw new InvalidOperationException("Cannot Begin a disposed Material");
+
             for (int i = 0; i < _parameters.Length; i++)
                 _parameters[i].Apply(parameterValues);
 
             return _effect.CurrentTechnique.Passes;
+        }
+
+        private bool _isDisposed = false;
+        public void Dispose()
+        {
+            _effect.Dispose();
+            _isDisposed = true;
         }
     }
 }

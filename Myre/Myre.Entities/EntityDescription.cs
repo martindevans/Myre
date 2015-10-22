@@ -94,9 +94,6 @@ namespace Myre.Entities
         private readonly List<BehaviourData> _behaviours;
         private readonly List<PropertyData> _properties;
 
-        private readonly Queue<Entity> _pool;
-        private uint _version;
-
         /// <summary>
         /// Gets a list of behaviours in this instance.
         /// </summary>
@@ -118,7 +115,6 @@ namespace Myre.Entities
             _kernel = kernel ?? NinjectKernel.Instance;
             _behaviours = new List<BehaviourData>();
             _properties = new List<PropertyData>();
-            _pool = new Queue<Entity>();
 
             Behaviours = new ReadOnlyCollection<BehaviourData>(_behaviours);
             Properties = new ReadOnlyCollection<PropertyData>(_properties);
@@ -131,7 +127,6 @@ namespace Myre.Entities
         {
             _behaviours.Clear();
             _properties.Clear();
-            IncrementVersion();
         }
 
         /// <summary>
@@ -161,7 +156,6 @@ namespace Myre.Entities
                 return false;
 
             _behaviours.Add(behaviour);
-            IncrementVersion();
 
             return true;
         }
@@ -215,7 +209,6 @@ namespace Myre.Entities
                 if (item.Type == type && (name == null || item.Name == name))
                 {
                     _behaviours.RemoveAt(i);
-                    IncrementVersion();
                     return true;
                 }
             }
@@ -254,7 +247,6 @@ namespace Myre.Entities
                 return false;
 
             _properties.Add(property);
-            IncrementVersion();
 
             return true;
         }
@@ -295,7 +287,6 @@ namespace Myre.Entities
                 if (_properties[i].Name == name)
                 {
                     _properties.RemoveAt(i);
-                    IncrementVersion();
                     return true;
                 }
             }
@@ -310,57 +301,7 @@ namespace Myre.Entities
         /// <returns></returns>
         public virtual Entity Create()
         {
-            Entity e;
-
-            if (_pool.Count > 0)
-                e = InitialisePooledEntity();
-            else
-                e = new Entity(CreateProperties(), CreateBehaviours(), new EntityVersion(this, _version));
-
-            return e;
-        }
-
-        /// <summary>
-        /// Makes the specified entity available for re-use.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns><c>true</c> if the entity was recycled; else <c>false</c>.</returns>
-        public virtual bool Recycle(Entity entity)
-        {
-            if (entity.Version.Creator != this || entity.Version.Version != _version)
-                return false;
-
-            _pool.Enqueue(entity);
-            return true;
-        }
-
-        private Entity InitialisePooledEntity()
-        {
-            var entity = _pool.Dequeue();
-            foreach (IProperty item in entity.Properties)
-            {
-                item.Clear();
-                foreach (var p in _properties)
-                {
-                    if (p.Name == item.Name && p.DataType == item.Type)
-                    {
-                        item.Value = p.InitialValue;
-                        break;
-                    }
-                }
-            }
-
-            return entity;
-        }
-
-        private void IncrementVersion()
-        {
-            unchecked
-            {
-                _version++;
-            }
-
-            _pool.Clear();
+            return new Entity(CreateProperties(), CreateBehaviours());
         }
 
         private IEnumerable<IProperty> CreateProperties()

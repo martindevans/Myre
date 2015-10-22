@@ -8,21 +8,6 @@ using Myre.Extensions;
 
 namespace Myre.Entities
 {
-    public struct EntityVersion
-    {
-        public static readonly EntityVersion None = new EntityVersion(null, 0);
-
-        public EntityDescription Creator { get; private set; }
-        public uint Version { get; private set; }
-
-        public EntityVersion(EntityDescription creator, uint version)
-            : this()
-        {
-            Creator = creator;
-            Version = version;
-        }
-    }
-
     /// <summary>
     /// A class which represents a collection of related properties and behaviours.
     /// </summary>
@@ -80,8 +65,6 @@ namespace Myre.Entities
 
         private readonly List<IProperty> _propertiesList;
 
-        public EntityVersion Version { get; private set; }
-
         /// <summary>
         /// Gets the scene this entity belongs to.
         /// </summary>
@@ -118,10 +101,8 @@ namespace Myre.Entities
         /// </summary>
         internal bool BehavioursShutdown { get; private set; }
 
-        internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours, EntityVersion version)
+        internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours)
         {
-            Version = version;
-
             // create public read-only collections
             _propertiesList = new List<IProperty>(properties);
             List<Behaviour> behavioursList = new List<Behaviour>(behaviours);
@@ -297,9 +278,6 @@ namespace Myre.Entities
         {
             if (Scene != null)
                 Scene.Remove(this);
-
-            if (Version.Creator != null)
-                Version.Creator.Recycle(this);
         }
 
         private void AddProperty(IProperty property)

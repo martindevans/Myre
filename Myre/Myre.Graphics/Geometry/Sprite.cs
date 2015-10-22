@@ -249,10 +249,15 @@ namespace Myre.Graphics.Geometry
     public class SpriteComponent
         : RendererComponent
     {
-        private SpriteBatch _batch;
+        private readonly SpriteBatch _batch;
 
         private Sprite.Manager _sprites;
         private SpriteText2D.Manager _text;
+
+        public SpriteComponent(SpriteBatch batch)
+        {
+            _batch = batch;
+        }
 
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
@@ -264,7 +269,6 @@ namespace Myre.Graphics.Geometry
             //define outputs
             context.DefineOutput(context.SetRenderTargets[0], true);
 
-            _batch = new SpriteBatch(renderer.Device);
             _sprites = renderer.Scene.GetManager<Sprite.Manager>();
             _text = renderer.Scene.GetManager<SpriteText2D.Manager>();
         }

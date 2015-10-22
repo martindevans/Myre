@@ -60,38 +60,34 @@ float3 Scatter(float2 texCoord, float scattering)
 {
 	float2 pixel = 1 / Resolution;
 
-	const float2 offsets[] = {
-		float2(-1, -1),
-		float2(-1,  0),
-		float2(-1,  1),
-		float2( 0, -1),
-		float2( 0,  1),
-		float2( 1, -1),
-		float2( 1,  0),
-		float2( 1,  1),
+	const float offsetsLength = 8;
+
+	//Sample kernel, XY is offset and Z is weight (1 / length)
+	const float3 offsets[] = {
+		float3(-1, -1, 0.7071),
+		float3(-1, 0, 1),
+		float3(-1, 1, 0.7071),
+		float3(0, -1, 1),
+		float3(0, 1, 1),
+		float3(1, -1, 0.7071),
+		float3(1, 0, 1),
+		float3(1, 1, 0.7071),
 	};
 
 	float3 total = float3(0, 0, 0);
-	[loop]
-	for (int d = 0; d < 4; d++)
+	float count = 0;
+
+	for (int i = 0; i < offsetsLength; i++)
 	{
-		float distance = d * 1.5;
-		float3 totalInner = float3(0, 0, 0);
-		float countInner = 0;
-		for (int i = 0; i < 8; i++) {
-			float2 offset = offsets[i];
-			float2 coord = offset * pixel * distance + texCoord;
+		float2 coord = offsets[i].xy + texCoord;
 
-			float3 col = tex2D(transparencyLightbufferSampler, coord).rgb;
-			float alpha = tex2D(normalSampler, coord).rgb;
+		float3 col = tex2D(transparencyLightbufferSampler, coord).rgb;
+		float alpha = tex2D(normalSampler, coord).rgb;
 
-			alpha = min(1, alpha);
+		alpha = min(1, alpha);
 
-			totalInner += col * alpha;
-			countInner += alpha;
-		}
-
-		total += (totalInner / countInner) * pow(scattering, distance);
+		total += col * alpha;
+		count += alpha * pow(scattering, offsets[i].z);
 	}
 
 	return total;
