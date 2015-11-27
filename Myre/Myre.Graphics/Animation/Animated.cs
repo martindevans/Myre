@@ -107,7 +107,7 @@ namespace Myre.Graphics.Animation
         /// </summary>
         /// <param name="ray"></param>
         /// <returns></returns>
-        public IEnumerable<KeyValuePair<string, float>> Intersections(Ray ray)
+        public IEnumerable<KeyValuePair<string, float>> Intersections(Ray3 ray)
         {
             return _model
                 .Model
@@ -121,7 +121,7 @@ namespace Myre.Graphics.Animation
                     var start = Vector3.Transform(ray.Position, transform);             //Transform ray into bone space
                     var direction = Vector3.TransformNormal(ray.Direction, transform);
 
-                    float? depth = b.Intersects(new Ray(start, direction));             //Intersect new ray in bone space
+                    float? depth = b.Intersects(new Ray3(start, direction));             //Intersect new ray in bone space
                     var name = _model.Model.SkinningData.Names[i];
 
                     return new KeyValuePair<string, float?>(name, depth);
