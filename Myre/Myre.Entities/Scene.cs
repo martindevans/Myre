@@ -45,7 +45,7 @@ namespace Myre.Entities
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
-        public ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes
+        public IReadOnlyList<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes
         {
             get { return _services.ExecutionTimes; }
         }
@@ -95,7 +95,7 @@ namespace Myre.Entities
             foreach (var behaviour in entity.Behaviours)
             {
                 var managerType = SearchForDefaultManager(behaviour.GetType());
-                var manager = (managerType != null) ? GetManager(managerType) : null;
+                var manager = managerType != null ? GetManager(managerType) : null;
                 var handler = _managers.Find(behaviour.GetType(), manager);
 
                 if (handler != null)
@@ -107,7 +107,7 @@ namespace Myre.Entities
             _entities.Add(entity);
         }
 
-        private Type SearchForDefaultManager(Type behaviourType)
+        private static Type SearchForDefaultManager(Type behaviourType)
         {
             Type managerType;
             lock (_defaultManagers)

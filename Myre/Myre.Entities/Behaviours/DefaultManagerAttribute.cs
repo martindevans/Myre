@@ -6,7 +6,7 @@ namespace Myre.Entities.Behaviours
     /// An attribute which allows a behaviour to specify a default manager, which a scene will
     /// automatically create if it does not already have a manager for this behaviour type.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class DefaultManagerAttribute : Attribute
     {
         /// <summary>
@@ -24,7 +24,7 @@ namespace Myre.Entities.Behaviours
             if (!typeof(IBehaviourManager).IsAssignableFrom(manager))
                 throw new ArgumentException("The type must implement IBehaviourManager", "manager");
 
-            this.Manager = manager;
+            Manager = manager;
         }
     }
 }

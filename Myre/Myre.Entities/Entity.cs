@@ -15,16 +15,14 @@ namespace Myre.Entities
         : IDisposableObject, IRecycleable
     {
         public sealed class ConstructionContext
+            : IDisposableObject
         {
             private readonly Entity _entity;
-            private readonly Behaviour _behaviour;
+            private Behaviour _behaviour;
 
-            internal bool Frozen = false;
-
-            internal ConstructionContext(Entity entity, Behaviour behaviour)
+            internal ConstructionContext(Entity entity)
             {
                 _entity = entity;
-                _behaviour = behaviour;
             }
 
             /// <summary>
@@ -53,11 +51,31 @@ namespace Myre.Entities
                 return property;
             }
 
+            internal ConstructionContext Next(Behaviour behaviour)
+            {
+                CheckFrozen();
+
+                _behaviour = behaviour;
+
+                return this;
+            }
+
+            #region freezing/disposal
             private void CheckFrozen()
             {
-                if (Frozen)
+                if (IsDisposed)
                     throw new InvalidOperationException("Entity initialisation contexts can only be used during initialisation.");
             }
+
+            public bool IsDisposed { get; private set; }            
+
+            public void Dispose()
+            {
+                if (IsDisposed)
+                    throw new InvalidOperationException("Context is already frozen, cannot freeze a second time");
+                IsDisposed = true;
+            }
+            #endregion
         }
 
         private readonly Dictionary<NameWithType, IProperty> _properties;
@@ -155,13 +173,10 @@ namespace Myre.Entities
 
         private void CreateProperties()
         {
-            foreach (var item in Behaviours)
+            using (var context = new ConstructionContext(this))
             {
-                var context = new ConstructionContext(this, item) { Frozen = false };
-
-                item.CreateProperties(context);
-
-                context.Frozen = true;
+                foreach (var item in Behaviours)
+                    item.CreateProperties(context.Next(item));
             }
 
         }
@@ -262,7 +277,7 @@ namespace Myre.Entities
             return !_delayPropertyShutdown;
         }
 
-        bool _delayPropertyShutdown = false;
+        private bool _delayPropertyShutdown;
         /// <summary>
         /// Delays shutting down the properties of this entity by 1 frame
         /// </summary>

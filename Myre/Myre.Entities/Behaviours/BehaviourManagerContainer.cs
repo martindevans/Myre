@@ -215,7 +215,7 @@ namespace Myre.Entities.Behaviours
                 throw new ArgumentException("behaviourType");
 
             var behaviour = typeof(Behaviour);
-            while (behaviour.IsAssignableFrom(behaviourType))
+            while (behaviour.IsAssignableFrom(behaviourType) && behaviourType != null)
             {
                 IManagerHandler handler;
                 if (TryGetByBehaviour(behaviourType, out handler) && (manager == null || handler.Manager == manager))

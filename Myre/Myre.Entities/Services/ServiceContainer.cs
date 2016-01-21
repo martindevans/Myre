@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Myre.Extensions;
 
@@ -21,7 +20,16 @@ namespace Myre.Entities.Services
 
         readonly Stopwatch _timer = new Stopwatch();
         private readonly List<KeyValuePair<IService, TimeSpan>> _executionTimes;
-        public readonly ReadOnlyCollection<KeyValuePair<IService, TimeSpan>> ExecutionTimes;
+        public IReadOnlyList<KeyValuePair<IService, TimeSpan>> ExecutionTimes
+        {
+            get { return _executionTimes; }
+        }
+
+        private readonly List<KeyValuePair<IService, TimeSpan>> _renderTimes;
+        public IReadOnlyList<KeyValuePair<IService, TimeSpan>> RenderTimes
+        {
+            get { return _renderTimes; }
+        }
 
         public IService this[Type type]
         {
@@ -36,7 +44,7 @@ namespace Myre.Entities.Services
             _buffer = new List<IService>();
 
             _executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
-            ExecutionTimes = new ReadOnlyCollection<KeyValuePair<IService, TimeSpan>>(_executionTimes);
+            _renderTimes = new List<KeyValuePair<IService, TimeSpan>>();
 
             _updateOrder = (a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder);
             _drawOrder = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
@@ -92,12 +100,12 @@ namespace Myre.Entities.Services
 
             _executionTimes.Clear();
 
-            for (int i = 0; i < _update.Count; i++)
+            foreach (var service in _update)
             {
                 _timer.Restart();
-                _update[i].Update(elapsedTime);
+                service.Update(elapsedTime);
                 _timer.Stop();
-                _executionTimes.Add(new KeyValuePair<IService, TimeSpan>(_update[i], _timer.Elapsed));
+                _executionTimes.Add(new KeyValuePair<IService, TimeSpan>(service, _timer.Elapsed));
             }
         }
 
@@ -105,8 +113,16 @@ namespace Myre.Entities.Services
         {
             UpdateLists();
             _draw.InsertionSort(_drawOrder);
-            for (int i = 0; i < _draw.Count; i++)
-                _draw[i].Draw();
+
+            _renderTimes.Clear();
+
+            foreach (var service in _draw)
+            {
+                _timer.Restart();
+                service.Draw();
+                _timer.Stop();
+                _renderTimes.Add(new KeyValuePair<IService, TimeSpan>(service, _timer.Elapsed));
+            }
         }
 
         private void UpdateLists()

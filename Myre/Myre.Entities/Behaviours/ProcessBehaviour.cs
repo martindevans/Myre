@@ -80,12 +80,12 @@ namespace Myre.Entities.Behaviours
 
             protected virtual void Update(float elapsedTime)
             {
-                for (int i = 0; i < _toAdd.Count; i++)
-                    base.Add(_toAdd[i]);
+                foreach (B behaviour in _toAdd)
+                    base.Add(behaviour);
                 _toAdd.Clear();
 
-                for (int i = 0; i < _toRemove.Count; i++)
-                    base.Remove(_toRemove[i]);
+                foreach (B behaviour in _toRemove)
+                    base.Remove(behaviour);
                 _toRemove.Clear();
 
                 foreach (var item in Behaviours)

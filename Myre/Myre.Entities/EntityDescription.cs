@@ -52,13 +52,11 @@ namespace Myre.Entities
     {
         public readonly string Name;
         public readonly Type Type;
-        public readonly Func<String, Behaviour> Factory;
 
-        public BehaviourData(string name, Type type, Func<String, Behaviour> factory)
+        public BehaviourData(string name, Type type)
         {
             Name = name;
             Type = type;
-            Factory = factory;
         }
 
         public override int GetHashCode()
@@ -77,8 +75,7 @@ namespace Myre.Entities
         public bool Equals(BehaviourData data)
         {
             return Name == data.Name
-                && Type == data.Type
-                && Factory == data.Factory;
+                && Type == data.Type;
         }
     }
 
@@ -149,8 +146,8 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(BehaviourData behaviour)
         {
-            if (((object)behaviour.Type ?? behaviour.Factory) == null)
-                throw new ArgumentException("behaviour.TypeAndFactory", "behaviour");
+            if (behaviour.Type == null)
+                throw new ArgumentException("behaviour.Type", "behaviour");
 
             if (_behaviours.Contains(behaviour))
                 return false;
@@ -168,7 +165,7 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(Type type, string name = null)
         {
-            return AddBehaviour(new BehaviourData(name, type, null));
+            return AddBehaviour(new BehaviourData(name, type));
         }
 
         /// <summary>
@@ -181,18 +178,6 @@ namespace Myre.Entities
             where T : Behaviour
         {
             return AddBehaviour(typeof(T), name.Name);
-        }
-
-        /// <summary>
-        /// Adds the behaviour, provided that such a behaviour does not already exist.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="create">A factory function which creates an instance of this behaviour</param>
-        /// <param name="name">the name.</param>
-        /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour<T>(Func<String, T> create, string name = null) where T : Behaviour
-        {
-            return AddBehaviour(new BehaviourData(name, typeof(T), create));
         }
 
         /// <summary>
@@ -338,12 +323,7 @@ namespace Myre.Entities
 
         private Behaviour CreateBehaviourInstance(IKernel kernel, BehaviourData behaviour)
         {
-            Behaviour instance;
-
-            if (behaviour.Factory != null)
-                instance = behaviour.Factory(behaviour.Name);
-            else
-                instance = (Behaviour)kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name));
+            var instance = (Behaviour)kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name));
 
             instance.Name = behaviour.Name;
             return instance;

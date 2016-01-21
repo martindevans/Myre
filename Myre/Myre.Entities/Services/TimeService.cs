@@ -50,7 +50,9 @@ namespace Myre.Entities.Services
         public override void Update(float elapsedTime)
         {
             Interlocked.Exchange(ref _time, _time + elapsedTime);
-            Tick++;
+
+            //Either we overflow, or the game crashes. Either way it doesn't matter because with a 16ms frame time this occurs after 2.1 YEARS of gameplay!
+            unchecked { Tick++; }
 
             base.Update(elapsedTime);
         }

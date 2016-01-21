@@ -4,6 +4,10 @@ using Myre.Entities.Services;
 
 namespace Myre.Entities.Behaviours
 {
+    /// <summary>
+    /// A behaviour which updates in parallel with all other instances of itself.
+    /// This simplifies implementation significantly as the only threading hazards are with yourself, not the rest of the entire game/engine!
+    /// </summary>
     public abstract class ParallelProcessBehaviour
         : Behaviour
     {
@@ -23,11 +27,6 @@ namespace Myre.Entities.Behaviours
             : BehaviourManager<B>, IProcess
             where B : ParallelProcessBehaviour
         {
-            public new IEnumerable<B> Behaviours
-            {
-                get { return base.Behaviours; }
-            }
-
             public bool IsComplete
             {
                 get { return false; }
@@ -55,7 +54,7 @@ namespace Myre.Entities.Behaviours
 
             public override bool Remove(B behaviour)
             {
-                if (base.Behaviours.Contains(behaviour))
+                if (Behaviours.Contains(behaviour))
                 {
                     _toRemove.Add(behaviour);
                     return true;
@@ -68,12 +67,12 @@ namespace Myre.Entities.Behaviours
             {
                 _latestElapsedTime = elapsedTime;
 
-                for (int i = 0; i < _toAdd.Count; i++)
-                    base.Add(_toAdd[i]);
+                foreach (var behaviour in _toAdd)
+                    base.Add(behaviour);
                 _toAdd.Clear();
 
-                for (int i = 0; i < _toRemove.Count; i++)
-                    base.Remove(_toRemove[i]);
+                foreach (var behaviour in _toRemove)
+                    base.Remove(behaviour);
                 _toRemove.Clear();
 
                 Parallel.ForEach(Behaviours, InvokeUpdate);
