@@ -83,7 +83,7 @@ namespace Myre.Debugging
                     var commmandAttributes = method.GetCustomAttributes(typeof(CommandAttribute), false);
                     if (commmandAttributes.Length > 0)
                     {
-                        var commandAtt = commmandAttributes[0] as CommandAttribute;
+                        var commandAtt = (CommandAttribute)commmandAttributes[0];
                         if (string.IsNullOrEmpty(commandAtt.Name))
                             commandAtt.Name = method.Name;
                         if (_commands.ContainsKey(commandAtt.Name))

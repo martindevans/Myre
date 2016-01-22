@@ -38,8 +38,8 @@
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
-    <Reference Include="SwizzleMyVectors, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SwizzleMyVectors.3.0.0.0\lib\net46\SwizzleMyVectors.dll</HintPath>
+    <Reference Include="SwizzleMyVectors, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\Testing\packages\SwizzleMyVectors.6.3.0.0\lib\net46\SwizzleMyVectors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -67,7 +67,6 @@
     <Compile Include="Collections\RingBuffer.cs" />
     <Compile Include="Collections\TokenOctree.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
-    <Compile Include="Delayed.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
     <Compile Include="Extensions\BoundingSphereExtensions.cs" />
@@ -86,7 +85,6 @@
     <Compile Include="Extensions\PlaneExtensions.cs" />
     <Compile Include="Extensions\QuaternionExtensions.cs" />
     <Compile Include="Extensions\RandomExtensions.cs" />
-    <Compile Include="Extensions\RectangleExtensions.cs" />
     <Compile Include="Extensions\StringBuilderExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\SurfaceFormatExtensions.cs" />

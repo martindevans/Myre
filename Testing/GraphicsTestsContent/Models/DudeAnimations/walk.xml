@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline.Animations">
+  <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
+    
+    <AnimationSourceFile>Models/BlockDude.fbx</AnimationSourceFile>
+    <SourceTakeName>ArmatureAction</SourceTakeName>
+    <StartTime>0</StartTime>
+    <EndTime>1.5416</EndTime>
+    <RootBone>Rig1</RootBone>
+		<FixLooping>false</FixLooping>
+    <LinearKeyframeReduction>true</LinearKeyframeReduction>
+  </Asset>
+</XnaContent>

@@ -60,7 +60,7 @@ namespace Myre.Graphics.Animation.Clips
             var index = startIndex;
 
             //Iterate up frames until we find the frame which is greater than the current time index for this channel
-            while (_frames[index].Time <= elapsedTime && index < _frames.Length)
+            while (_frames[index].Time <= elapsedTime && index < _frames.Length - 1)
                 index++;
 
             return index;

@@ -90,7 +90,7 @@ namespace DebugContentPipeline
         ///       Example:
         ///               private const string ProjectToDebug = @"C:\XNA Samples\SkinnedModelExtensions\SkinningSample\Content\SkinningSampleContent.contentproj";
         /// </summary>
-        private const string ProjectToDebug = @"C:\Users\Martin\Documents\Visual Studio 2010\Projects\martin-myre\Testing\GraphicsTests\GraphicsTestsContent\GraphicsTestsContent.contentproj";
+        private const string ProjectToDebug = @"C:\Users\Martin\Documents\dotnet\martin-myre\Testing\GraphicsTestsContent\GraphicsTestsContent.contentproj";
 
         /// <summary>
         /// TODO: Change this to the content item you want to debug. The content pipeline will only
@@ -99,7 +99,7 @@ namespace DebugContentPipeline
         ///       Example:
         ///               private const string SingleItem = @"dude.fbx";
         /// </summary>
-        private const string SingleItem = @"SplatterDecal.decal";
+        private const string SingleItem = @"Models/BlockDude.fbx";
 
         /// <summary>
         /// TODO: Set the XnaProfile to HiDef or Reach, depending on your target graphics profile.

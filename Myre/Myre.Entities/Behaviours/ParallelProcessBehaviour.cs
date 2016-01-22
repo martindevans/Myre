@@ -75,7 +75,12 @@ namespace Myre.Entities.Behaviours
                     base.Remove(behaviour);
                 _toRemove.Clear();
 
+#if DEBUG
+                foreach (var behaviour in Behaviours)
+                    InvokeUpdate(behaviour);
+#else
                 Parallel.ForEach(Behaviours, InvokeUpdate);
+#endif
             }
 
             private void InvokeUpdate(ParallelProcessBehaviour behaviour)

@@ -187,14 +187,6 @@
       <ProcessorParameters_SpecularTexture>White Dot</ProcessorParameters_SpecularTexture>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
-    <Compile Include="Models\zoe.fbx">
-      <Name>zoe</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>MyreModelProcessor</Processor>
-      <ProcessorParameters_DiffuseTexture>Models/zoe_01</ProcessorParameters_DiffuseTexture>
-      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
-      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
-    </Compile>
     <Compile Include="GlassBlend.fx">
       <Name>GlassBlend</Name>
       <Importer>EffectImporter</Importer>
@@ -215,6 +207,13 @@
       <ProcessorParameters_SpecularTexture>White Dot</ProcessorParameters_SpecularTexture>
       <ProcessorParameters_TranslucentEffectName>GlassBlend</ProcessorParameters_TranslucentEffectName>
       <ProcessorParameters_TranslucentEffectTechnique>FoggyGlass</ProcessorParameters_TranslucentEffectTechnique>
+    </Compile>
+    <Compile Include="Models\BlockDude.fbx">
+      <Name>BlockDude</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>MyreModelProcessor</Processor>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
     </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
@@ -352,13 +351,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\zoe_01.jpg">
-      <Name>zoe_01</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Particles\TestEmitter1.xml">
       <Name>TestEmitter1</Name>
       <Importer>XmlImporter</Importer>
@@ -375,28 +367,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\ZoeAnimations\idle01.xml">
-      <Name>idle01</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\ZoeAnimations\jump.xml">
-      <Name>jump</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\ZoeAnimations\sitting.xml">
-      <Name>sitting</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\ZoeAnimations\t-pose.xml">
-      <Name>t-pose</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="null_diffuse.png">
       <Name>null_diffuse</Name>
       <Importer>TextureImporter</Importer>
@@ -404,14 +374,6 @@
       <ProcessorParameters_ColorKeyEnabled>False</ProcessorParameters_ColorKeyEnabled>
       <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
       <ProcessorParameters_TextureFormat>DxtCompressed</ProcessorParameters_TextureFormat>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\ZoeAnimations\walk-forward-0.xml">
-      <Name>walk-forward-0</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -433,20 +395,6 @@
       <Name>RandomMix</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\ZoeAnimations\roll-left-0.xml">
-      <Name>roll-left-0</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\ZoeAnimations\roll-right-0.xml">
-      <Name>roll-right-0</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -489,6 +437,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Myre.Graphics\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\DudeAnimations\walk.xml">
+      <Name>walk</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

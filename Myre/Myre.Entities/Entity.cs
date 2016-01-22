@@ -12,7 +12,7 @@ namespace Myre.Entities
     /// A class which represents a collection of related properties and behaviours.
     /// </summary>
     public sealed class Entity
-        : IDisposableObject, IRecycleable
+        : IDisposableObject
     {
         public sealed class ConstructionContext
             : IDisposableObject
@@ -284,15 +284,6 @@ namespace Myre.Entities
         public void DelayPropertyShutdown()
         {
             _delayPropertyShutdown = true;
-        }
-
-        /// <summary>
-        /// Prepares this instance for re-use.
-        /// </summary>
-        public void Recycle()
-        {
-            if (Scene != null)
-                Scene.Remove(this);
         }
 
         private void AddProperty(IProperty property)

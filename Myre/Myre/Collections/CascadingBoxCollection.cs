@@ -24,7 +24,7 @@ namespace Myre.Collections
             _parent = parent;
             _values = new NamedBoxCollection();
 
-            _enumerable = _parent.Where(a => _values.Contains(a.Key, a.Value.Type)).Append(_values);
+            _enumerable = _parent.Where(a => _values.Contains(a.Key, a.Value.Type)).Concat(_values);
         }
 
         /// <summary>

@@ -61,6 +61,19 @@ namespace Myre.Graphics.Pipeline.Animations
                 }
             );
 
+            //Some channels can be null (becuase the animation specifies nothing for that channel) fill it in with identity transforms
+            for (ushort i = 0; i < animationClip.Channels.Length; i++)
+            {
+                if (animationClip.Channels[i] == null)
+                {
+                    animationClip.Channels[i] = new List<KeyframeContent>() {
+                        new KeyframeContent(i, startFrameTime, Vector3.Zero, Vector3.One, Quaternion.Identity),
+                        new KeyframeContent(i, endFrameTime, Vector3.Zero, Vector3.One, Quaternion.Identity),
+                    };
+                }
+            }
+
+            //Check for empty channels, definitely an error!
             if (animationClip.Channels.Any(a => a.Count == 0))
                 throw new InvalidContentException("Animation has no keyframes for a channel.");
 
@@ -99,9 +112,9 @@ namespace Myre.Graphics.Pipeline.Animations
                 {
                     //Clean up transform
                     var transform = keyframe.Transform;
-                    transform.Right = Vector3.Normalize(transform.Right);
-                    transform.Up = Vector3.Normalize(transform.Up);
-                    transform.Backward = Vector3.Normalize(transform.Backward);
+                    //transform.Right = Vector3.Normalize(transform.Right);
+                    //transform.Up = Vector3.Normalize(transform.Up);
+                    //transform.Backward = Vector3.Normalize(transform.Backward);
 
                     transform.Decompose(out scale, out orientation, out pos);
                 }

@@ -23,7 +23,7 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static bool IsBitSet(this int n, int bit)
         {
-            int mask = 1 << bit;
+            var mask = 1 << bit;
             return (n & mask) == mask;
         }
     }

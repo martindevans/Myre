@@ -21,7 +21,7 @@ namespace Myre.Extensions
         /// </summary>
         /// <param name="t">The t.</param>
         /// <returns>The total number of seconds elapsed since the game started.</returns>
-        public static float TotalSeconds(this Microsoft.Xna.Framework.GameTime t)
+        public static double TotalSeconds(this Microsoft.Xna.Framework.GameTime t)
         {
             return (float)t.TotalGameTime.TotalSeconds;
         }

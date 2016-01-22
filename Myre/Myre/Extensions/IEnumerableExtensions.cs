@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Myre.Extensions
 {
@@ -62,6 +63,7 @@ namespace Myre.Extensions
         /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
         /// <returns></returns>
+        [Obsolete]
         public static IEnumerable<T> Append<T>(this IEnumerable<T> start, IEnumerable<T> end)
         {
             foreach (var item in start)
@@ -96,7 +98,7 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<T> Append<T>(this IEnumerable<T> start, params T[] end)
         {
-            return Append(start, end as IEnumerable<T>);
+            return start.Concat(end);
         }
 
         /// <summary>
@@ -137,7 +139,7 @@ namespace Myre.Extensions
         public static IEnumerable<T> DropLast<T>(this IEnumerable<T> enumerable, int drop)
         {
             if (enumerable == null)
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException("enumerable");
 
             if (drop < 0)
                 throw new ArgumentOutOfRangeException("drop",

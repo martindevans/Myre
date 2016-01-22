@@ -139,7 +139,7 @@ namespace GraphicsTests.Tests
             KeyboardState keyboard = Keyboard.GetState();
 
             foreach (var decals in _scene.Entities.Select(a => a.GetBehaviour<Decal>(null)).Where(a => a != null))
-                decals.Color = new Vector4(time % 1, 1, 1, 1);
+                decals.Color = new Vector4((float)(time % 1), 1, 1, 1);
 
             Game.IsMouseVisible = false;
             if (mouse.IsButtonDown(MouseButtons.Right))

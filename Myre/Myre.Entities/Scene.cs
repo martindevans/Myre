@@ -5,6 +5,7 @@ using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
+using Myre.Extensions;
 using Ninject;
 
 namespace Myre.Entities

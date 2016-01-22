@@ -12,7 +12,7 @@ namespace Myre.Extensions
     /// </summary>
     public static class ColorExtensions
     {
-        static Dictionary<string, Color> _colours;
+        private static Dictionary<string, Color> _colours;
 
         /// <summary>
         /// Multiplies the the specified <see cref="Color"/> with this <see cref="Color"/>.
@@ -33,7 +33,7 @@ namespace Myre.Extensions
         /// <param name="value"></param>
         /// <param name="colour">The parsed colour.</param>
         /// <returns>White if not found, the value otherwise</returns>
-        static public bool ToColour(this string value, out Color colour)
+        public static bool ToColour(this string value, out Color colour)
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentNullException("value");
@@ -111,7 +111,7 @@ namespace Myre.Extensions
         /// </summary>
         /// <param name="value"></param>
         /// <returns>Null if not found, the value otherwise</returns>
-        static public Color FromRgb(this string value)
+        public static Color FromRgb(this string value)
         {
             uint val = Convert.ToUInt32(value, 16);
 
@@ -128,7 +128,7 @@ namespace Myre.Extensions
         /// </summary>
         /// <param name="value"></param>
         /// <returns>Null if not found, the value otherwise</returns>
-        static public Color FromArgb(this string value)
+        public static Color FromArgb(this string value)
         {
             uint val = Convert.ToUInt32(value, 16);
 

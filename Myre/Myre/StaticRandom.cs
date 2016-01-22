@@ -8,7 +8,7 @@ namespace Myre
     public static class StaticRandom
     {
         #region random number generation
-        const uint U = 273326509 >> 19;
+        private const uint U = 273326509 >> 19;
 
         /// <summary>
         /// Creates a random number from the specified seed
@@ -19,8 +19,8 @@ namespace Myre
         public static uint Random(uint seed, uint upperBound)
         {
             uint t = (seed ^ (seed << 11));
-            const uint w = 273326509;
-            long i = (int)(0x7FFFFFFF & ((w ^ U) ^ (t ^ (t >> 8))));
+            const uint W = 273326509;
+            long i = (int)(0x7FFFFFFF & ((W ^ U) ^ (t ^ (t >> 8))));
             return (uint)(i % upperBound);
         }
         #endregion

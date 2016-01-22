@@ -63,8 +63,8 @@
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SwizzleMyVectors, Version=1.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SwizzleMyVectors.1.5.0.0\lib\net46\SwizzleMyVectors.dll</HintPath>
+    <Reference Include="SwizzleMyVectors, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SwizzleMyVectors.6.3.0.0\lib\net46\SwizzleMyVectors.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -86,6 +86,7 @@
     <Compile Include="TestGame.cs" />
     <Compile Include="TestScene.cs" />
     <Compile Include="TestScreen.cs" />
+    <Compile Include="Tests\AnimatedDude2.cs" />
     <Compile Include="Tests\AnimatedDude.cs" />
     <Compile Include="Tests\AntiAliasTest.cs" />
     <Compile Include="Tests\DecalTest.cs" />
