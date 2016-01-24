@@ -3,7 +3,6 @@ using Myre.Graphics.Deferred;
 using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace Myre.Graphics.Translucency
@@ -11,7 +10,7 @@ namespace Myre.Graphics.Translucency
     public class DeferredTransparency
         : RendererComponent
     {
-        private ReadOnlyCollection<IGeometryProvider> _geometryProviders;
+        private IReadOnlyList<IGeometryProvider> _geometryProviders;
 
         private readonly List<IGeometry> _geometry = new List<IGeometry>();
         private readonly List<List<IGeometry>> _layers = new List<List<IGeometry>>();
@@ -23,8 +22,8 @@ namespace Myre.Graphics.Translucency
         private readonly Material _restoreDepth;
         private Quad _quad;
 
-        private ReadOnlyCollection<IDirectLight> _directLights;
-        private ReadOnlyCollection<IIndirectLight> _indirectLights;
+        private IReadOnlyList<IDirectLight> _directLights;
+        private IReadOnlyList<IIndirectLight> _indirectLights;
 
         private readonly DepthStencilState _depthReadGreaterThan = new DepthStencilState {
             DepthBufferEnable = true,

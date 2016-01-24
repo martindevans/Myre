@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -11,6 +12,31 @@ namespace Myre.Graphics.Pipeline.Models
     [ContentProcessor(DisplayName = "Myre Model Processor")]
     public class MyreModelProcessor : BaseModelProcessor<NodeContent, MyreModelContent>
     {
+        //Rotation XYZ based on http://blog.diabolicalgame.co.uk/2011/07/exporting-animated-models-from-blender.html
+        private float _degreesX;
+        [DisplayName("Rotate X"), DefaultValue(null)]
+        public float DegreesX
+        {
+            get { return _degreesX; }
+            set { _degreesX = value; }
+        }
+
+        private float _degreesY;
+        [DisplayName("Rotate Y"), DefaultValue(null)]
+        public float DegreesY
+        {
+            get { return _degreesY; }
+            set { _degreesY = value; }
+        }
+
+        private float _degreesZ;
+        [DisplayName("Rotate Z"), DefaultValue(null)]
+        public float DegreesZ
+        {
+            get { return _degreesZ; }
+            set { _degreesZ = value; }
+        }
+
         private IList<BoneContent> _bones;
         private Dictionary<string, int> _boneIndices;
         private List<Vector3>[] _verticesPerBone = null;
@@ -24,6 +50,10 @@ namespace Myre.Graphics.Pipeline.Models
         protected override MyreModelContent Process(NodeContent input)
         {
             _directory = Path.GetDirectoryName(input.Identity.SourceFilename);
+
+            // http://blog.diabolicalgame.co.uk/2011/07/exporting-animated-models-from-blender.html
+            // Before anything rotate the entire model and animations
+            RotateAll(input, DegreesX, DegreesY, DegreesZ);
 
             AddChannelProcessor<BoneWeightCollection>(VertexChannelNames.Weights(), ProcessWeightsChannel);
 
@@ -60,6 +90,35 @@ namespace Myre.Graphics.Pipeline.Models
 
             return outputModel;
         }
+
+        // Rotate all the content before anything else
+        // see http://forums.xna.com/forums/p/60188/370817.aspx#370817
+        // http://forums.create.msdn.com/forums/p/60188/370817.aspx
+        // http://forums.create.msdn.com/forums/p/64690/395491.aspx#395491
+        /*
+         * Shawn Hargreaves
+         * If you look at the skinned model processor, you will see that it pulls out animation data from the model into its own keyframe data structures,
+         * then chains to the base ModelProcessor which converts the model itself from NodeContent into ModelContent format.
+         * This base ModelProcessor call applies whatever rotation has been specified via these processor parameters,
+         * but this happens AFTER the keyframe data was extracted, so the keyframe values are not rotated.
+         * There are several ways you could fix this:
+         * Manually apply the necessary rotation to each keyframe matrix
+         * Or, instead of using ModelProcessor to apply the rotation, do this yourself at the very start of your Process method (before you call ModelProcessor
+         * and before any of the keyframe extraction). The easiest way to do that is to call MeshHelper.TransformScene. 
+         * */
+        // This only works if the animation keyframes are also rotated
+        // As my animations are separate the source model would need to be rotated first.
+        public static void RotateAll(NodeContent node, float degX, float degY, float degZ)
+        {
+            var rotate = Matrix.Identity *
+                Matrix.CreateRotationX(MathHelper.ToRadians(degX)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(degY)) *
+                Matrix.CreateRotationZ(MathHelper.ToRadians(degZ));
+
+            // http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.content.pipeline.graphics.meshhelper.transformscene.aspx
+            MeshHelper.TransformScene(node, rotate);
+        }
+
 
         /// <summary>
         /// Replace this vertex channel (BoneWeightCollection) with weight and index channels

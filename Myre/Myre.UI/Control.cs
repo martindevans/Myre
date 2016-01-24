@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.UI.Gestures;
-using System.Collections.ObjectModel;
 
 using GameTime = Microsoft.Xna.Framework.GameTime;
 
@@ -32,9 +31,7 @@ namespace Myre.UI
         : Frame, IDisposable
     {
         private List<Control> _children;
-        private ReadOnlyCollection<Control> _childrenReadOnly;
         internal List<ActorFocus> focusedBy;
-        private ReadOnlyCollection<ActorFocus> _focusedByReadOnly;
         private int _focusCount;
         private int _heatCount;
         private bool _isFocused;
@@ -61,9 +58,9 @@ namespace Myre.UI
         /// <summary>
         /// Gets this controls' children.
         /// </summary>
-        public ReadOnlyCollection<Control> Children { get { return _childrenReadOnly; } }
+        public IReadOnlyList<Control> Children { get { return _children; } }
 
-        public ReadOnlyCollection<ActorFocus> FocusedBy { get { return _focusedByReadOnly; } }
+        public IReadOnlyList<ActorFocus> FocusedBy { get { return focusedBy; } }
 
         /// <summary>
         /// Gets this controls' gesture collection.
@@ -252,9 +249,7 @@ namespace Myre.UI
         private void Initialise()
         {
             _children = new List<Control>();
-            _childrenReadOnly = new ReadOnlyCollection<Control>(_children);
             focusedBy = new List<ActorFocus>();
-            _focusedByReadOnly = new ReadOnlyCollection<ActorFocus>(focusedBy);
             Gestures = new GestureGroup(UserInterface);
             _isVisible = true;
             LikesHavingFocus = true;

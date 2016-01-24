@@ -22,9 +22,10 @@ namespace Myre.Graphics.Pipeline.Animations
             NodeContent node = context.BuildAndLoadAsset<NodeContent, NodeContent>(new ExternalReference<NodeContent>(input.AnimationSourceFile), null);
 
             //Find the named animation from the content source
-            var animation = FindAnimations(node).Where(a => a.Key == input.SourceTakeName).Select(a => a.Value).FirstOrDefault();
+            var animations = FindAnimations(node).ToArray();
+            var animation = animations.Where(a => string.Equals(a.Key, input.SourceTakeName, StringComparison.InvariantCultureIgnoreCase)).Select(a => a.Value).FirstOrDefault();
             if (animation == null)
-                throw new KeyNotFoundException(string.Format(@"Animation '{0}' not found, only options are {1}", input.SourceTakeName, FindAnimations(node).Select(a => a.Key).Aggregate((a, b) => a + "," + b)));
+                throw new KeyNotFoundException(string.Format(@"Animation '{0}' not found, only options are {1}", input.SourceTakeName, animations.Select(a => a.Key).Aggregate((a, b) => a + "," + b)));
 
             //Find the skeleton
             _bones = MeshHelper.FlattenSkeleton(MeshHelper.FindSkeleton(node));

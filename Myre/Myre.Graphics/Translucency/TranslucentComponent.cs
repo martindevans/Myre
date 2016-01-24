@@ -1,5 +1,5 @@
-﻿using Myre.Graphics.Geometry;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using Myre.Graphics.Geometry;
 using System.Linq;
 
 namespace Myre.Graphics.Translucency
@@ -7,7 +7,7 @@ namespace Myre.Graphics.Translucency
     public class TranslucentComponent
         : RendererComponent
     {
-        private ReadOnlyCollection<IGeometryProvider> _geometryProviders;
+        private IReadOnlyList<IGeometryProvider> _geometryProviders;
 
         private readonly string _phaseName;
         private GeometryRenderer _geometryDrawer;

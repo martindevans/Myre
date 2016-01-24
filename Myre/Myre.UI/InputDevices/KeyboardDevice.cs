@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Xna.Framework.Input;
 using Myre.Extensions;
@@ -30,7 +29,10 @@ namespace Myre.UI.InputDevices
         /// Gets a collection of chars which were entered in the previous frame.
         /// This only works on Windows. Use Guide.BeginShowKeyboardInput on Xbox or Windows Phone.
         /// </summary>
-        public ReadOnlyCollection<char> Characters { get; private set; }
+        public IReadOnlyList<char> Characters
+        {
+            get { return _characters; }
+        }
 
         public KeyboardDevice(PlayerIndex player)
             : this(player, IntPtr.Zero)
@@ -45,7 +47,6 @@ namespace Myre.UI.InputDevices
             _blocked = new List<int>();
             _newCharacters = new List<char>();
             _characters = new List<char>();
-            Characters = new ReadOnlyCollection<char>(_characters);
 
             if (player == PlayerIndex.One)
             {

@@ -1,8 +1,6 @@
 ﻿using System;
 using Myre.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Myre.Graphics.Materials;
 
 namespace Myre.Graphics.Geometry
 {
@@ -13,13 +11,13 @@ namespace Myre.Graphics.Geometry
 
     public class GeometryRenderer
     {
-        private readonly ReadOnlyCollection<IGeometryProvider> _geometryProviders;
+        private readonly IReadOnlyList<IGeometryProvider> _geometryProviders;
 
         private readonly List<IGeometry> _geometry = new List<IGeometry>();
 
         public bool BackToFront { get; set; }
 
-        public GeometryRenderer(ReadOnlyCollection<IGeometryProvider> geometryProviders)
+        public GeometryRenderer(IReadOnlyList<IGeometryProvider> geometryProviders)
         {
             _geometryProviders = geometryProviders;
         }
@@ -57,7 +55,7 @@ namespace Myre.Graphics.Geometry
                 }
                 case DepthSort.None:
                 case DepthSort.FrontToBack: {
-                    foreach (IGeometry g in geometry)
+                    foreach (var g in geometry)
                         g.Draw(phase, renderer);
 
                     break;

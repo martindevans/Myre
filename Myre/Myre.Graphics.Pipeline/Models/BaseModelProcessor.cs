@@ -79,7 +79,6 @@ namespace Myre.Graphics.Pipeline.Models
             get { return _gbufferTechnique; }
             set { _gbufferTechnique = value; }
         }
-
         #endregion
 
         protected ContentProcessorContext Context { get; private set; }
@@ -97,7 +96,6 @@ namespace Myre.Graphics.Pipeline.Models
 
             return Process(input);
         }
-
         protected abstract TOutput Process(TInput input);
 
         #region textures

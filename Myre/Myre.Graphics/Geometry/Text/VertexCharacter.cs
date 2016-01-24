@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Numerics;
+﻿using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace Myre.Graphics.Geometry.Text
     public class VertexCharacter
     {
         private readonly Dictionary<char, float> _characterKerning;
-        private readonly ReadOnlyDictionary<char, float> _readonlyCharacterKerning;
+        private readonly IReadOnlyDictionary<char, float> _readonlyCharacterKerning;
 
         /// <summary>
         /// Kerning to use to offset the next character in the string.
@@ -19,7 +18,7 @@ namespace Myre.Graphics.Geometry.Text
         /// MovePen(HorizontalCharacterKerning[nextCharacter] + ThisCharacter.Width)
         /// Draw(nextCharacter);
         /// </summary>
-        public ReadOnlyDictionary<char, float> HorizontalCharacterKerning { get { return _readonlyCharacterKerning; } }
+        public IReadOnlyDictionary<char, float> HorizontalCharacterKerning { get { return _readonlyCharacterKerning; } }
 
         private readonly Mesh _mesh;
         public Mesh Mesh { get { return _mesh; } }
@@ -35,7 +34,7 @@ namespace Myre.Graphics.Geometry.Text
             _character = c;
 
             _characterKerning = kerning.ToDictionary(a => a.Key, a => a.Value);
-            _readonlyCharacterKerning = new ReadOnlyDictionary<char, float>(_characterKerning);
+            _readonlyCharacterKerning = new Dictionary<char, float>(_characterKerning);
 
             _size = width;
 

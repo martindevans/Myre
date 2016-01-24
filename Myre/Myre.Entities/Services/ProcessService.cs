@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Myre.Entities.Services
@@ -29,14 +28,13 @@ namespace Myre.Entities.Services
 
         readonly Stopwatch _timer = new Stopwatch();
         private readonly List<KeyValuePair<IProcess, TimeSpan>> _executionTimes;
-        private readonly ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>> _readonlyExecutionTimes;
 
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
-        public ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>> ProcessExecutionTimes
+        public IReadOnlyList<KeyValuePair<IProcess, TimeSpan>> ProcessExecutionTimes
         {
-            get { return _readonlyExecutionTimes; }
+            get { return _executionTimes; }
         }
 
         /// <summary>
@@ -48,7 +46,6 @@ namespace Myre.Entities.Services
             _buffer = new List<IProcess>();
 
             _executionTimes = new List<KeyValuePair<IProcess, TimeSpan>>();
-            _readonlyExecutionTimes = new ReadOnlyCollection<KeyValuePair<IProcess, TimeSpan>>(_executionTimes);
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Myre.Entities.Behaviours
 {
@@ -72,7 +71,6 @@ namespace Myre.Entities.Behaviours
         struct PrivateList
         {
             public object List;
-            public object ReadOnly;
         }
 
         private readonly List<IBehaviourManager> _managers;
@@ -227,7 +225,7 @@ namespace Myre.Entities.Behaviours
             return null;
         }
 
-        public ReadOnlyCollection<T> FindByType<T>()
+        public IReadOnlyList<T> FindByType<T>()
         {
             var type = typeof(T);
 
@@ -238,17 +236,15 @@ namespace Myre.Entities.Behaviours
                 _catagorised[type] = list;
             }
 
-            return list.ReadOnly as ReadOnlyCollection<T>;
+            return list.List as IReadOnlyList<T>;
         }
 
         private PrivateList CreatePrivateList(Type type)
         {
             var listType = typeof(List<>).MakeGenericType(type);
-            var readOnlyType = typeof(ReadOnlyCollection<>).MakeGenericType(type);
 
             PrivateList list;
             list.List = Activator.CreateInstance(listType);
-            list.ReadOnly = Activator.CreateInstance(readOnlyType, list.List);
 
             var addMethod = list.List.GetType().GetMethod("Add", new Type[] { type });
             foreach (var manager in _managers)

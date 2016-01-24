@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Reflection;
 using Myre.Entities.Behaviours;
 using Ninject;
@@ -95,13 +94,13 @@ namespace Myre.Entities
         /// Gets a list of behaviours in this instance.
         /// </summary>
         /// <value>The behaviours.</value>
-        public ReadOnlyCollection<BehaviourData> Behaviours { get; private set; }
+        public IReadOnlyList<BehaviourData> Behaviours { get { return _behaviours; } }
         
         /// <summary>
         /// Gets a list of properties in this instance.
         /// </summary>
         /// <value>The properties.</value>
-        public ReadOnlyCollection<PropertyData> Properties { get; private set; }
+        public IReadOnlyList<PropertyData> Properties { get { return _properties; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityDescription"/> class.
@@ -112,9 +111,6 @@ namespace Myre.Entities
             _kernel = kernel ?? NinjectKernel.Instance;
             _behaviours = new List<BehaviourData>();
             _properties = new List<PropertyData>();
-
-            Behaviours = new ReadOnlyCollection<BehaviourData>(_behaviours);
-            Properties = new ReadOnlyCollection<PropertyData>(_properties);
         }
 
         /// <summary>

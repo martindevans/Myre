@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,8 +16,8 @@ namespace Myre.Graphics.Deferred
         readonly Quad _quad;
         readonly Material _restoreDepth;
         readonly Material _copyTexture;
-        ReadOnlyCollection<IDirectLight> _directLights;
-        ReadOnlyCollection<IIndirectLight> _indirectLights;
+        IReadOnlyList<IDirectLight> _directLights;
+        IReadOnlyList<IIndirectLight> _indirectLights;
 
         public LightingComponent(GraphicsDevice device)
         {
@@ -28,7 +28,7 @@ namespace Myre.Graphics.Deferred
             _copyTexture = new Material(Content.Load<Effect>("CopyTexture"));
         }
 
-        internal static void SetupScene(Scene scene, out ReadOnlyCollection<IDirectLight> directLights, out ReadOnlyCollection<IIndirectLight> indirectLights)
+        internal static void SetupScene(Scene scene, out IReadOnlyList<IDirectLight> directLights, out IReadOnlyList<IIndirectLight> indirectLights)
         {
             // define deferred light managers
             // - This is slightly odd, why do we need to define these here when we could just put [DefaultManager(DeferredAmbientLightManager)] on AmbientLight
@@ -74,7 +74,7 @@ namespace Myre.Graphics.Deferred
             Output("lightbuffer", indirectLightBuffer);
         }
 
-        internal static void PerformLightingPass(Renderer renderer, bool ssao, Quad quad, Material restoreDepth, Material copyTexture, ReadOnlyCollection<IDirectLight> directLights, ReadOnlyCollection<IIndirectLight> indirectLights, out RenderTarget2D directLightBuffer, out RenderTarget2D indirectLightBuffer)
+        internal static void PerformLightingPass(Renderer renderer, bool ssao, Quad quad, Material restoreDepth, Material copyTexture, IReadOnlyList<IDirectLight> directLights, IReadOnlyList<IIndirectLight> indirectLights, out RenderTarget2D directLightBuffer, out RenderTarget2D indirectLightBuffer)
         {
             //Get some handy objects
             var device = renderer.Device;

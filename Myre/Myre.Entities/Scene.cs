@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
-using Myre.Extensions;
 using Ninject;
 
 namespace Myre.Entities
@@ -32,7 +30,7 @@ namespace Myre.Entities
         /// Gets a read only collection of the entities contained in this scene.
         /// </summary>
         /// <value>The entities.</value>
-        public ReadOnlyCollection<Entity> Entities { get; private set; }
+        public IReadOnlyList<Entity> Entities { get { return _entities; } }
 
         /// <summary>
         /// Gets the services.
@@ -75,7 +73,6 @@ namespace Myre.Entities
             _managers = new BehaviourManagerContainer();
             _entities = new List<Entity>();
             Kernel = kernel ?? NinjectKernel.Instance; //new ChildKernel(kernel ?? NinjectKernel.Instance);
-            Entities = new ReadOnlyCollection<Entity>(_entities);
 
             Kernel.Bind<Scene>().ToConstant(this);
         }
@@ -262,7 +259,7 @@ namespace Myre.Entities
         /// </summary>
         /// <typeparam name="T">The type of manager to search for.</typeparam>
         /// <returns></returns>
-        public ReadOnlyCollection<T> FindManagers<T>()
+        public IReadOnlyList<T> FindManagers<T>()
         {
             return _managers.FindByType<T>();
         }

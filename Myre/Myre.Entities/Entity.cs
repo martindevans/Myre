@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
@@ -89,17 +88,24 @@ namespace Myre.Entities
         /// <value>The scene.</value>
         public Scene Scene { get; internal set; }
 
+        private readonly IReadOnlyList<Behaviour> _behavioursList; 
         /// <summary>
         /// Gets the behaviours this entity contains.
         /// </summary>
         /// <value>The behaviours.</value>
-        public ReadOnlyCollection<Behaviour> Behaviours { get; private set; }
+        public IReadOnlyList<Behaviour> Behaviours
+        {
+            get { return _behavioursList; }
+        }
 
         /// <summary>
         /// Gets the properties this entity contains.
         /// </summary>
         /// <value>The properties.</value>
-        public ReadOnlyCollection<IProperty> Properties { get; private set; }
+        public IReadOnlyList<IProperty> Properties
+        {
+            get { return _propertiesList; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -110,7 +116,7 @@ namespace Myre.Entities
         /// <summary>
         /// A map of type to behaviour which maps from *any* type in the type hierarchy to all the behaviours which implement that type
         /// </summary>
-        public ReadOnlyDictionary<Type, Behaviour[]> BehavioursIndex { get; private set; }
+        public IReadOnlyDictionary<Type, Behaviour[]> BehavioursIndex { get; private set; }
 
         private INamedDataProvider _shutdownData;
 
@@ -123,9 +129,7 @@ namespace Myre.Entities
         {
             // create public read-only collections
             _propertiesList = new List<IProperty>(properties);
-            List<Behaviour> behavioursList = new List<Behaviour>(behaviours);
-            Properties = new ReadOnlyCollection<IProperty>(_propertiesList);
-            Behaviours = new ReadOnlyCollection<Behaviour>(behavioursList);
+            _behavioursList = new List<Behaviour>(behaviours);
 
             // add properties
             _properties = new Dictionary<NameWithType, IProperty>();
@@ -145,7 +149,7 @@ namespace Myre.Entities
             foreach (var item in catagorised)
                 _behaviours.Add(item.Key, item.Value.ToArray());
 
-            BehavioursIndex = new ReadOnlyDictionary<Type, Behaviour[]>(_behaviours);
+            BehavioursIndex = new Dictionary<Type, Behaviour[]>(_behaviours);
 
             // allow behaviours to add their own properties
             CreateProperties();
