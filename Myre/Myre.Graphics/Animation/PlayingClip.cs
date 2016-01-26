@@ -9,8 +9,8 @@ namespace Myre.Graphics.Animation
         private int[] _channelFrames;
         public IClip Animation { get; private set; }
 
-        private AnimationQueue.ClipPlaybackParameters _parameters;
-        public AnimationQueue.ClipPlaybackParameters PlaybackParameters
+        private AnimationPlayer.ClipPlaybackParameters _parameters;
+        public AnimationPlayer.ClipPlaybackParameters PlaybackParameters
         {
             get { return _parameters; }
         }
@@ -67,7 +67,7 @@ namespace Myre.Graphics.Animation
             }
         }
 
-        private void Play(AnimationQueue.ClipPlaybackParameters clipParameters, int bones)
+        private void Play(AnimationPlayer.ClipPlaybackParameters clipParameters, int bones)
         {
             _parameters = clipParameters;
             if (_parameters.Clip == null)
@@ -156,7 +156,7 @@ namespace Myre.Graphics.Animation
         }
 
         private static readonly Pool<PlayingClip> _pool = new Pool<PlayingClip>();
-        internal static PlayingClip Create(AnimationQueue.ClipPlaybackParameters clip, int bones)
+        internal static PlayingClip Create(AnimationPlayer.ClipPlaybackParameters clip, int bones)
         {
             PlayingClip instance;
             lock (_pool)
@@ -169,7 +169,8 @@ namespace Myre.Graphics.Animation
         internal static void Return(PlayingClip playing)
         {
             playing.Animation = null;
-            _pool.Return(playing);
+            lock (_pool)
+                _pool.Return(playing);
         }
     }
 }

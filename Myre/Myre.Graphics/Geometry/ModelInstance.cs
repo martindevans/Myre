@@ -174,7 +174,7 @@ namespace Myre.Graphics.Geometry
 // ReSharper restore MemberCanBePrivate.Global
             : BehaviourManager<ModelInstance>, IGeometryProvider
         {
-            class MeshInstance
+            private class MeshInstance
                 : IGeometry
             {
                 public Mesh Mesh;
@@ -395,7 +395,15 @@ namespace Myre.Graphics.Geometry
             {
                 foreach (var instance in instances)
                 {
-                    instance.World = instance.Mesh.MeshTransform * instance.Instance.Transform;
+                    if (instance.Mesh.ParentBoneIndex.HasValue)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        instance.World = instance.Mesh.MeshTransform * instance.Instance.Transform;
+                    }
+
                     if (instance.Instance._customViewMatrix.Value.HasValue)
                         instance.WorldView = instance.World * instance.Instance._customViewMatrix.Value.Value;
                     else

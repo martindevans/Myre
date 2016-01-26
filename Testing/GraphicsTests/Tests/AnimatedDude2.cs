@@ -12,7 +12,7 @@ using Myre.Graphics.Translucency;
 using Ninject;
 using System;
 using System.Numerics;
-
+using Myre.Extensions;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
@@ -21,9 +21,13 @@ namespace GraphicsTests.Tests
     class AnimatedDude2
         : TestScreen
     {
-        private readonly Scene _scene;
-        private readonly ModelInstance _dude;
-        private readonly AnimationQueue _animationQueue;
+        private readonly IKernel _kernel;
+        private readonly ContentManager _content;
+        private readonly GraphicsDevice _device;
+
+        private Scene _scene;
+        private ModelInstance _dude;
+        private AnimationPlayer _animationPlayer;
 
         private readonly string[] _sequence = {
             "walk"
@@ -33,23 +37,30 @@ namespace GraphicsTests.Tests
         public AnimatedDude2(IKernel kernel, ContentManager content, GraphicsDevice device)
             : base("Animated Dude 2", kernel)
         {
-            _scene = kernel.Get<Scene>();
+            _kernel = kernel;
+            _content = content;
+            _device = device;
+        }
 
-            var model = content.Load<ModelData>(@"models/BlockDude");
-            var dude = kernel.Get<EntityDescription>();
+        protected override void BeginTransitionOn()
+        {
+            _scene = _kernel.Get<Scene>();
+
+            var model = _content.Load<ModelData>(@"models/BlockDude");
+            var dude = _kernel.Get<EntityDescription>();
             dude.AddProperty(new TypedName<ModelData>("model"), model);
-            dude.AddProperty(new TypedName<Matrix4x4>("transform"), Matrix4x4.CreateScale(25f) * Matrix4x4.CreateTranslation(0, 0, 150));
+            dude.AddProperty(new TypedName<Matrix4x4>("transform"), Matrix4x4.CreateScale(20f) * Matrix4x4.CreateTranslation(0, 0, 175));
             dude.AddProperty(new TypedName<bool>("is_static"), false);
             dude.AddBehaviour<ModelInstance>();
             dude.AddBehaviour<Animated>();
-            dude.AddBehaviour<AnimationQueue>();
+            dude.AddBehaviour<AnimationPlayer>();
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
-            _animationQueue = dudeEntity.GetBehaviour<AnimationQueue>(null);
-            _animationQueue.EnableRootBoneTranslationY = false;
-            _animationQueue.EnableRootBoneTranslationX = false;
-            _animationQueue.EnableRootBoneTranslationZ = false;
-            _animationQueue.EnableRootBoneScale = false;
+            _animationPlayer = dudeEntity.GetBehaviour<AnimationPlayer>(null);
+            _animationPlayer.EnableRootBoneTranslationY = false;
+            _animationPlayer.EnableRootBoneTranslationX = false;
+            _animationPlayer.EnableRootBoneTranslationZ = false;
+            _animationPlayer.EnableRootBoneScale = false;
 
             _dude = dudeEntity.GetBehaviour<ModelInstance>(null);
 
@@ -63,9 +74,9 @@ namespace GraphicsTests.Tests
 
             foreach (var name in _sequence)
             {
-                _animationQueue.EnqueueClip(new AnimationQueue.ClipPlaybackParameters
+                _animationPlayer.EnqueueClip(new AnimationPlayer.ClipPlaybackParameters
                 {
-                    Clip = content.Load<Clip>("Models/DudeAnimations/" + name),
+                    Clip = new TimeScaleClip(_content.Load<Clip>("Models/DudeAnimations/" + name), 1f),
                     FadeInTime = TimeSpan.FromSeconds(0.1f),
                     FadeOutTime = TimeSpan.FromSeconds(0.0f),
                     Loop = true,
@@ -74,30 +85,30 @@ namespace GraphicsTests.Tests
 
             var camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix4x4.CreateLookAt(new Vector3(100, 50, -200), new Vector3(0, 20, 0), Vector3.UnitY) };
             camera.Projection = Matrix4x4.CreatePerspectiveFieldOfView(MathHelper.ToRadians(60), 16f / 9f, camera.NearClip, camera.FarClip);
-            var cameraDesc = kernel.Get<EntityDescription>();
+            var cameraDesc = _kernel.Get<EntityDescription>();
             cameraDesc.AddProperty(new TypedName<Camera>("camera"));
             cameraDesc.AddProperty(new TypedName<Viewport>("viewport"));
             cameraDesc.AddBehaviour<View>();
             var cameraEntity = cameraDesc.Create();
             cameraEntity.GetProperty(new TypedName<Camera>("camera")).Value = camera;
-            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = device.PresentationParameters.BackBufferWidth, Height = device.PresentationParameters.BackBufferHeight };
+            cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = _device.PresentationParameters.BackBufferWidth, Height = _device.PresentationParameters.BackBufferHeight };
             _scene.Add(cameraEntity);
 
-            var ambientLight = kernel.Get<EntityDescription>();
+            var ambientLight = _kernel.Get<EntityDescription>();
             ambientLight.AddProperty(new TypedName<Vector3>("sky_colour"), new Vector3(0.44f, 0.44f, 0.74f));
             ambientLight.AddProperty(new TypedName<Vector3>("ground_colour"), new Vector3(0.24f, 0.35f, 0.24f));
             ambientLight.AddProperty(new TypedName<Vector3>("up"), Vector3.UnitY);
             ambientLight.AddBehaviour<AmbientLight>();
             _scene.Add(ambientLight.Create());
 
-            var sponza = kernel.Get<EntityDescription>();
-            sponza.AddProperty(new TypedName<ModelData>("model"), content.Load<ModelData>(@"Sponza"));
+            var sponza = _kernel.Get<EntityDescription>();
+            sponza.AddProperty(new TypedName<ModelData>("model"), _content.Load<ModelData>(@"Sponza"));
             sponza.AddProperty(new TypedName<Matrix4x4>("transform"), Matrix4x4.CreateScale(0.5f) * Matrix4x4.CreateTranslation(-350, 0, 0));
             sponza.AddProperty(new TypedName<bool>("is_static"), true);
             sponza.AddBehaviour<ModelInstance>();
             _scene.Add(sponza.Create());
 
-            var spotLight = kernel.Get<EntityDescription>();
+            var spotLight = _kernel.Get<EntityDescription>();
             spotLight.AddProperty(new TypedName<Vector3>("position"), new Vector3(150, 50, -50));
             spotLight.AddProperty(new TypedName<Vector3>("colour"), new Vector3(1));
             spotLight.AddProperty(new TypedName<Vector3>("direction"), new Vector3(-1, 0, 0.25f));
@@ -117,6 +128,8 @@ namespace GraphicsTests.Tests
                   .Then<ToneMapComponent>()
                   .Then<AntiAliasComponent>()
                   .Apply();
+
+            base.OnShown();
         }
 
         public override void Update(GameTime gameTime)
@@ -125,6 +138,7 @@ namespace GraphicsTests.Tests
 
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             //_dude.Transform *= Matrix4x4.CreateTranslation(50 * new Vector3(_animationQueue.RootBoneTransfomationDelta.Translation.X, 0, _animationQueue.RootBoneTransfomationDelta.Translation.Z));
+            //_dude.Transform = Matrix4x4.CreateFromAxisAngle(Vector3.UnitY, (float)gameTime.TotalSeconds() / 4) * Matrix4x4.CreateScale(20f) * Matrix4x4.CreateTranslation(0, 0, 175);
         }
 
         public override void Draw(GameTime gameTime)

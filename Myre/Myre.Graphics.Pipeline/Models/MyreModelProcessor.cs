@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
@@ -77,13 +78,18 @@ namespace Myre.Graphics.Pipeline.Models
             var outputModel = new MyreModelContent();
 
             //Process meshes
-            List<MeshContent> meshes = new List<MeshContent>();
+            var meshes = new List<MeshContent>();
             ModelHelpers.FindMeshes(input, meshes);
 
             var bi = _boneIndices == null ? null : new Dictionary<string, int>(_boneIndices);
             foreach (var mesh in meshes)
+            {
+                if (mesh.Parent is BoneContent)
+                    throw new NotImplementedException("Boney mesh");
+
                 foreach (var geom in ProcessMesh(mesh, _verticesPerBone, bi))
                     outputModel.AddMesh(geom);
+            }
 
             //Extract skeleton data from the input
             outputModel.SkinningData = ProcessSkinningData(skeleton, _bones, _verticesPerBone);

@@ -56,26 +56,26 @@ namespace Myre.Graphics.Pipeline.Animations
 
             Parallel.ForEach(anim.Channels, channel =>
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
-                {
-                    ushort boneIndex = Lookup(_boneNames, channel.Key);
-                    animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction).ToList();
-                }
+            {
+                var boneIndex = Lookup(_boneNames, channel.Key);
+                animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction);
+            }
             );
 
-            //Some channels can be null (becuase the animation specifies nothing for that channel) fill it in with identity transforms
+            //Some channels can be null (becuase the animation specifies nothing for that channel) fill it in with identity transforms and set the channel weight to zero
             for (ushort i = 0; i < animationClip.Channels.Length; i++)
             {
                 if (animationClip.Channels[i] == null)
                 {
-                    animationClip.Channels[i] = new List<KeyframeContent>() {
+                    animationClip.Channels[i] = new Channel(new List<KeyframeContent>() {
                         new KeyframeContent(i, startFrameTime, Vector3.Zero, Vector3.One, Quaternion.Identity),
                         new KeyframeContent(i, endFrameTime, Vector3.Zero, Vector3.One, Quaternion.Identity),
-                    };
+                    }, 0);
                 }
             }
 
             //Check for empty channels, definitely an error!
-            if (animationClip.Channels.Any(a => a.Count == 0))
+            if (animationClip.Channels.Any(a => a.Keyframes.Count == 0))
                 throw new InvalidContentException("Animation has no keyframes for a channel.");
 
             // Sort the keyframes by time.
@@ -90,7 +90,7 @@ namespace Myre.Graphics.Pipeline.Animations
             return animationClip;
         }
 
-        private static IEnumerable<KeyframeContent> ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
+        private static Channel ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
         {
             //Find keyframes for this channel
             var keyframes = channel
@@ -98,13 +98,13 @@ namespace Myre.Graphics.Pipeline.Animations
                 .Where(k => k.Time >= startFrameTime)
                 .Where(k => k.Time < endFrameTime);
 
-            LinkedList<KeyframeContent> animationKeyframes = new LinkedList<KeyframeContent>();
+            var animationKeyframes = new LinkedList<KeyframeContent>();
 
             //Discard any data about channels which come before the root
             bool discard = preRoot.Contains(channel.Key);
 
             // Convert the keyframe data and accumulate in a linked list
-            foreach (AnimationKeyframe keyframe in keyframes.OrderBy(a => a.Time))
+            foreach (var keyframe in keyframes.OrderBy(a => a.Time))
             {
                 //Decompose into parts
                 Vector3 pos, scale;
@@ -138,7 +138,7 @@ namespace Myre.Graphics.Pipeline.Animations
                 LinearKeyframeReduction(animationKeyframes);
 
             //Add these keyframes to the animation
-            return animationKeyframes;
+            return new Channel(animationKeyframes.ToList(), 1);
         }
 
         private IEnumerable<BoneContent> Descendents(BoneContent bone)

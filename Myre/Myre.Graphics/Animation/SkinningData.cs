@@ -44,27 +44,27 @@ namespace Myre.Graphics.Animation
 
             //Read bind pose
             existingInstance.BindPose = new Matrix4x4[input.ReadInt32()];
-            for (int i = 0; i < existingInstance.BindPose.Length; i++)
+            for (var i = 0; i < existingInstance.BindPose.Length; i++)
                 existingInstance.BindPose[i] = new Transform { Translation = input.ReadVector3().FromXNA(), Scale = input.ReadVector3().FromXNA(), Rotation = input.ReadQuaternion().FromXNA() }.ToMatrix();
 
             //Read inverse bind pose
             existingInstance.InverseBindPose = new Matrix4x4[input.ReadInt32()];
-            for (int i = 0; i < existingInstance.InverseBindPose.Length; i++)
+            for (var i = 0; i < existingInstance.InverseBindPose.Length; i++)
                 existingInstance.InverseBindPose[i] = input.ReadMatrix().FromXNA();
 
             //Read skeleton hierarchy
             existingInstance.SkeletonHierarchy = new int[input.ReadInt32()];
-            for (int i = 0; i < existingInstance.SkeletonHierarchy.Length; i++)
+            for (var i = 0; i < existingInstance.SkeletonHierarchy.Length; i++)
                 existingInstance.SkeletonHierarchy[i] = input.ReadInt32();
 
             //Read names
             existingInstance.Names = new string[input.ReadInt32()];
-            for (int i = 0; i < existingInstance.Names.Length; i++)
+            for (var i = 0; i < existingInstance.Names.Length; i++)
                 existingInstance.Names[i] = input.ReadString();
 
             //Read per bone bounding boxes
             existingInstance.Bounds = new BoundingBox[input.ReadInt32()];
-            for (int i = 0; i < existingInstance.Bounds.Length; i++)
+            for (var i = 0; i < existingInstance.Bounds.Length; i++)
                 existingInstance.Bounds[i] = input.ReadObject<Microsoft.Xna.Framework.BoundingBox>().FromXNA();
 
             return existingInstance;

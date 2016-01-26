@@ -103,12 +103,12 @@ namespace Myre.Graphics.Geometry
             //Read meshes
             var meshCount = input.ReadInt32();
             var meshes = new Mesh[meshCount];
-            for (int i = 0; i < meshCount; i++)
+            for (var i = 0; i < meshCount; i++)
                 meshes[i] = input.ReadObject<Mesh>();
 
             //Read animations
             SkinningData skinning = null;
-            bool isAnimated = input.ReadBoolean();
+            var isAnimated = input.ReadBoolean();
             if (isAnimated)
                 skinning = input.ReadObject<SkinningData>();
 

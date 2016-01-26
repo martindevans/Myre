@@ -57,5 +57,10 @@ namespace Myre.Graphics.Animation.Clips
         /// </summary>
         /// <param name="index"></param>
         Keyframe BoneTransform(int index);
+
+        /// <summary>
+        /// Get the weight for the animation data in this channel at the given time index
+        /// </summary>
+        float TransformWeight(int index);
     }
 }

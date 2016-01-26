@@ -172,11 +172,6 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="SSAO.fx">
-      <Name>SSAO</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="Models\Hebe2.FBX">
       <Name>Hebe2</Name>
       <Importer>FbxImporter</Importer>
@@ -214,6 +209,10 @@
       <Processor>MyreModelProcessor</Processor>
       <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
+      <ProcessorParameters_DiffuseTexture>models/skin_manAlternative</ProcessorParameters_DiffuseTexture>
+      <ProcessorParameters_DegreesX>0</ProcessorParameters_DegreesX>
+      <ProcessorParameters_DegreesY>0</ProcessorParameters_DegreesY>
+      <ProcessorParameters_DegreesZ>0</ProcessorParameters_DegreesZ>
     </Compile>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
@@ -443,6 +442,17 @@
       <Name>walk</Name>
       <Importer>XmlImporter</Importer>
       <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\skin_manAlternative.png">
+      <Name>skin_manAlternative</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_TextureFormat>DxtCompressed</ProcessorParameters_TextureFormat>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ColorKeyEnabled>False</ProcessorParameters_ColorKeyEnabled>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

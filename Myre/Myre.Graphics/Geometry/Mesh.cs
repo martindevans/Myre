@@ -23,10 +23,12 @@ namespace Myre.Graphics.Geometry
         public int BaseVertex { get; set; }
         public int MinVertexIndex { get; set; }
         public Matrix4x4 MeshTransform { get; set; }
+        public ushort? ParentBoneIndex { get; set; }
 
         public Mesh()
         {
             MeshTransform = Matrix4x4.Identity;
+            ParentBoneIndex = null;
         }
 
         public void Dispose()
@@ -53,7 +55,7 @@ namespace Myre.Graphics.Geometry
                 }
 
                 _disposed = true;
-            }
+            } 
         }
 
         ~Mesh()
@@ -73,6 +75,8 @@ namespace Myre.Graphics.Geometry
             mesh.Name = input.ReadString();
             mesh.VertexCount = input.ReadInt32();
             mesh.TriangleCount = input.ReadInt32();
+
+            mesh.ParentBoneIndex = input.ReadBoolean() ? input.ReadUInt16() : (ushort?)null;
 
             bool hasVertexData = input.ReadBoolean();
             if (hasVertexData)

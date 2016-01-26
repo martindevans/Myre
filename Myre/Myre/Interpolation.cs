@@ -20,6 +20,18 @@ namespace Myre
         }
         #endregion
 
+        #region none
+        /// <summary>
+        /// Returns a constant value, meaning no interpolation at all
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static Func<float, float> None(float a = 0)
+        {
+            return _ => a;
+        }
+        #endregion
+
         #region Linear
         /// <summary>
         /// Easing equation function for a simple linear tweening, with no easing.

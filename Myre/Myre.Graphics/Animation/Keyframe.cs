@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Myre.Extensions;
 
@@ -12,17 +11,11 @@ namespace Myre.Graphics.Animation
         public readonly TimeSpan Time;
         public readonly Transform Transform;
 
-        public Keyframe(ushort bone, TimeSpan time, Vector3 position, Vector3 scale, Quaternion orientaton)
+        public Keyframe(ushort bone, TimeSpan time, Transform transform)
         {
             Bone = bone;
             Time = time;
-
-            Transform = new Transform
-            {
-                Translation = position,
-                Scale = scale,
-                Rotation = orientaton,
-            };
+            Transform = transform;
         }
 
         public override string ToString()
@@ -35,7 +28,15 @@ namespace Myre.Graphics.Animation
     {
         protected override Keyframe Read(ContentReader input, Keyframe existingInstance)
         {
-            return new Keyframe(input.ReadUInt16(), new TimeSpan(input.ReadInt64()), input.ReadVector3().FromXNA(), input.ReadVector3().FromXNA(), input.ReadQuaternion().FromXNA());
+            return new Keyframe(
+                input.ReadUInt16(),
+                new TimeSpan(input.ReadInt64()),
+                new Transform {
+                    Translation = input.ReadVector3().FromXNA(),
+                    Scale = input.ReadVector3().FromXNA(),
+                    Rotation = input.ReadQuaternion().FromXNA()
+                }
+            );
         }
     }
 }

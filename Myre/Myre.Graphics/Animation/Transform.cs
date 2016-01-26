@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using Myre.Extensions;
 using SwizzleMyVectors;
 
 namespace Myre.Graphics.Animation
@@ -46,9 +45,9 @@ namespace Myre.Graphics.Animation
 
         public void ToMatrix(out Matrix4x4 matrix)
         {
-            Matrix4x4 s = Matrix4x4.CreateScale(Scale);
-            Matrix4x4 r = Matrix4x4.CreateFromQuaternion(Rotation);
-            Matrix4x4 t = Matrix4x4.CreateTranslation(Translation);
+            var s = Matrix4x4.CreateScale(Scale);
+            var r = Matrix4x4.CreateFromQuaternion(Rotation);
+            var t = Matrix4x4.CreateTranslation(Translation);
 
             matrix = Matrix4x4.Multiply(s, r);
             matrix = Matrix4x4.Multiply(matrix, t);

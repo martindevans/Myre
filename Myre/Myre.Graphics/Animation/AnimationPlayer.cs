@@ -10,8 +10,8 @@ using Myre.Graphics.Geometry;
 
 namespace Myre.Graphics.Animation
 {
-    [DefaultManager(typeof(Manager<AnimationQueue>))]
-    public class AnimationQueue
+    [DefaultManager(typeof(Manager<AnimationPlayer>))]
+    public class AnimationPlayer
         : ParallelProcessBehaviour
     {
         public static readonly TypedName<ClipPlaybackParameters> DefaultClipName = new TypedName<ClipPlaybackParameters>("animation_default_clip");
@@ -100,7 +100,7 @@ namespace Myre.Graphics.Animation
         // Information about the currently playing animation clip.
         private TimeSpan _crossfadeDuration;
         private TimeSpan _crossfadeElapsed;
-        private float _crossfadeProgress = 0;
+        private float _crossfadeProgress;
         private PlayingClip _fadingOut;
         private PlayingClip _fadingIn;
 
@@ -109,7 +109,7 @@ namespace Myre.Graphics.Animation
             get { return (_fadingIn ?? _fadingOut).Animation; }
         }
 
-        Matrix4x4[] _boneTransforms;
+        private Matrix4x4[] _boneTransforms;
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
@@ -163,7 +163,7 @@ namespace Myre.Graphics.Animation
             if (model != null && model.Model != null && model.Model.SkinningData != null)
             {
                 _boneTransforms = new Matrix4x4[_model.Model.SkinningData.BindPose.Length];
-                for (int i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
+                for (var i = 0; i < _model.Model.SkinningData.BindPose.Length; i++)
                     _boneTransforms[i] = _model.Model.SkinningData.BindPose[i];
             }
             else
@@ -288,7 +288,7 @@ namespace Myre.Graphics.Animation
 
         private void UpdateBoneTransforms()
         {
-            for (int boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
+            for (var boneIndex = 0; boneIndex < _boneTransforms.Length; boneIndex++)
             {
                 Transform transform;
                 if (_fadingOut != null && _fadingIn == null)

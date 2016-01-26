@@ -23,6 +23,8 @@ namespace Myre.Graphics.Pipeline.Models
         public int StartIndex { get; set; }
         public int BaseVertex { get; set; }
         public int MinVertexIndex { get; set; }
+
+        public ushort? ParentBoneIndex { get; set; }
     }
 
     [ContentTypeWriter]
@@ -41,6 +43,10 @@ namespace Myre.Graphics.Pipeline.Models
             output.Write(value.Name);
             output.Write(value.VertexCount);
             output.Write(value.TriangleCount);
+
+            output.Write(value.ParentBoneIndex.HasValue);
+            if (value.ParentBoneIndex.HasValue)
+                output.Write(value.ParentBoneIndex.Value);
 
             bool hasVertexData = value.VertexBuffer.VertexData.Length > 0;
             output.Write(hasVertexData);

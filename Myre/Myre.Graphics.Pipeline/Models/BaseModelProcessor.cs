@@ -404,7 +404,7 @@ namespace Myre.Graphics.Pipeline.Models
             foreach (var item in mesh.Geometry)
             {
                 if (!item.Vertices.Channels.Contains(texCoord0))
-                    item.Vertices.Channels.Add<Microsoft.Xna.Framework.Vector2>(texCoord0, null);
+                    item.Vertices.Channels.Add<Vector2>(texCoord0, null);
             }
 
             // calculate tangent frames for normal mapping

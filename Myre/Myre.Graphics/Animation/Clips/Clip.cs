@@ -23,10 +23,10 @@ namespace Myre.Graphics.Animation.Clips
         {
         }
 
-        internal Clip(string name, TimeSpan duration, IEnumerable<Keyframe[]> channels, ushort rootBoneIndex)
+        internal Clip(string name, TimeSpan duration, IEnumerable<KeyValuePair<Keyframe[], float>> channels, ushort rootBoneIndex)
         {
             Name = name;
-            _channels = channels.Select((a, i) => new Channel((ushort)i, a)).ToArray();
+            _channels = channels.Select((a, i) => new Channel((ushort)i, a.Key, a.Value)).ToArray();
             Duration = duration;
             RootBoneIndex = rootBoneIndex;
         }
@@ -42,17 +42,28 @@ namespace Myre.Graphics.Animation.Clips
     {
         private readonly Keyframe[] _frames;
 
+        private readonly float _weight;
+
         public ushort BoneIndex { get; private set; }
 
-        public Channel(ushort boneIndex, Keyframe[] frames)
+        public Channel(ushort boneIndex, Keyframe[] frames, float weight)
         {
             _frames = frames;
+            _weight = weight;
+
             BoneIndex = boneIndex;
         }
 
         public Keyframe BoneTransform(int index)
         {
             return _frames[index];
+        }
+
+        public float TransformWeight(int index)
+        {
+            //Weight could change with time, but that isn't supported in this implementation and it is fixed per channel
+            //That's why we're using a method to return a readonly value
+            return _weight;
         }
 
         public int SeekToTimestamp(TimeSpan elapsedTime, int startIndex = 0)
@@ -79,16 +90,21 @@ namespace Myre.Graphics.Animation.Clips
             );
         }
 
-        private static IEnumerable<Keyframe[]> ReadChannels(ContentReader input)
+        private static IEnumerable<KeyValuePair<Keyframe[], float>> ReadChannels(ContentReader input)
         {
-            int count = input.ReadInt32();
-            var channels = new Keyframe[count][];
+            var count = input.ReadInt32();
+            var channels = new KeyValuePair<Keyframe[], float>[count];
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                channels[i] = new Keyframe[input.ReadInt32()];
-                for (int j = 0; j < channels[i].Length; j++)
-                    channels[i][j] = input.ReadObject<Keyframe>();
+                var weight = input.ReadSingle();
+                var keyframes = new Keyframe[input.ReadInt32()];
+                var channel = new KeyValuePair<Keyframe[], float>(keyframes, weight);
+
+                for (int j = 0; j < channel.Key.Length; j++)
+                    channel.Key[j] = input.ReadObject<Keyframe>();
+
+                channels[i] = channel;
             }
 
             return channels;

@@ -12,54 +12,65 @@ namespace Myre.Graphics.Pipeline.Animations
     public class ClipContent
     {
         public ushort RootBoneIndex { get; private set; }
-        public List<KeyframeContent>[] Channels { get; private set; }
+        public Channel[] Channels { get; private set; }
 
         public ClipContent(int boneCount, ushort rootBoneIndex)
         {
             RootBoneIndex = rootBoneIndex;
 
-            Channels = new List<KeyframeContent>[boneCount];
+            Channels = new Channel[boneCount];
         }
 
         public void SortKeyframes()
         {
-            Parallel.ForEach(Channels, k => k.Sort((a, b) => a.Time.CompareTo(b.Time)));
+            Parallel.ForEach(Channels, k => k.Keyframes.Sort((a, b) => a.Time.CompareTo(b.Time)));
         }
 
         public void SubtractKeyframeTime()
         {
-            var min = Channels.Select(a => a.Min(k => k.Time)).Min();
+            var min = Channels.Select(a => a.Keyframes.Min(k => k.Time)).Min();
             Parallel.ForEach(Channels, c =>
             {
-                foreach (KeyframeContent t in c)
+                foreach (var t in c.Keyframes)
                     t.Time -= min;
             });
         }
 
         public void InsertStartAndEndFrames()
         {
-            var endTime = Channels.Select(c => c.Max(k => k.Time)).Max().Ticks;
+            var endTime = Channels.Select(c => c.Keyframes.Max(k => k.Time)).Max().Ticks;
 
             Parallel.ForEach(Channels, (c, i) =>
             {
-                var first = c.First();
-                var last = c.Last();
-                bool insertFirst = first.Time.Ticks != 0;
-                bool insertLast = last.Time.Ticks != endTime;
+                var first = c.Keyframes.First();
+                var last = c.Keyframes.Last();
+                var insertFirst = first.Time.Ticks != 0;
+                var insertLast = last.Time.Ticks != endTime;
 
-                int expansionCount = (insertFirst ? 1 : 0) + (insertLast ? 1 : 0);
-                
+                var expansionCount = (insertFirst ? 1 : 0) + (insertLast ? 1 : 0);
                 if (expansionCount != 0)
                 {
                     //Insert a keyframe at the start
                     if (insertFirst)
-                        c.Insert(0, new KeyframeContent(first.Bone, new TimeSpan(0), first.Translation, first.Scale, first.Rotation));
+                        c.Keyframes.Insert(0, new KeyframeContent(first.Bone, new TimeSpan(0), first.Translation, first.Scale, first.Rotation));
 
                     //Insert a keyframe at the end
                     if (insertLast)
-                        c.Add(new KeyframeContent(last.Bone, new TimeSpan(endTime), last.Translation, last.Scale, last.Rotation));
+                        c.Keyframes.Add(new KeyframeContent(last.Bone, new TimeSpan(endTime), last.Translation, last.Scale, last.Rotation));
                 }
             });
+        }
+    }
+
+    public class Channel
+    {
+        public readonly List<KeyframeContent> Keyframes;
+        public readonly float Weight;
+
+        public Channel(List<KeyframeContent> keyframes, float weight)
+        {
+            Keyframes = keyframes;
+            Weight = weight;
         }
     }
 
@@ -69,15 +80,18 @@ namespace Myre.Graphics.Pipeline.Animations
         protected override void Write(ContentWriter output, ClipContent value)
         {
             //Time index of the last keyframe of this animation
-            output.Write(value.Channels.Select(c => c.Max(k => k.Time)).Max().Ticks);
+            output.Write(value.Channels.Select(c => c.Keyframes).Select(c => c.Max(k => k.Time)).Max().Ticks);
 
             //Keyframes
             output.Write(value.Channels.Length);
             foreach (var channel in value.Channels)
             {
-                output.Write(channel.Count);
-                for (int j = 0; j < channel.Count; j++)
-                    output.WriteObject(channel[j]);
+                //todo: channel weight!
+                output.Write(channel.Weight);
+
+                output.Write(channel.Keyframes.Count);
+                for (var j = 0; j < channel.Keyframes.Count; j++)
+                    output.WriteObject(channel.Keyframes[j]);
             }
 
             //The root bone index

@@ -9,6 +9,9 @@ using SwizzleMyVectors.Geometry;
 
 namespace Myre.Graphics.Animation
 {
+    /// <summary>
+    /// Sets the appropriate bone/skinning data into the renderer (given a set of calculated world transforms)
+    /// </summary>
     [DefaultManager(typeof(Manager<Animated>))]
     public class Animated
         : ParallelProcessBehaviour, ModelInstance.IRenderDataSupplier
@@ -93,11 +96,11 @@ namespace Myre.Graphics.Animation
 
         private void UpdateSkinTransforms()
         {
-            for (int bone = 0; bone < _worldTransforms.Length; bone++)
+            for (var bone = 0; bone < _worldTransforms.Length; bone++)
                 _skinTransforms[bone] = Matrix4x4.Multiply(SkinningData.InverseBindPose[bone], _worldTransforms[bone]);
         }
 
-        public void SetRenderData(NamedBoxCollection metadata)
+        void ModelInstance.IRenderDataSupplier.SetRenderData(NamedBoxCollection metadata)
         {
             metadata.Set<Matrix4x4[]>("bones", _skinTransforms);
         }
