@@ -62,6 +62,7 @@
     <Compile Include="Animation\AnimationHelpers.cs" />
     <Compile Include="Animation\AnimationPlayer.cs" />
     <Compile Include="Animation\Clips\Clip.cs" />
+    <Compile Include="Animation\Clips\ErrorClip.cs" />
     <Compile Include="Animation\Clips\IClip.cs" />
     <Compile Include="Animation\Clips\RandomClip.cs" />
     <Compile Include="Animation\Clips\SequenceClip.cs" />
