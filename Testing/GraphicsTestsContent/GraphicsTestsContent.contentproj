@@ -207,8 +207,8 @@
       <Name>BlockDude</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
-      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
+      <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
       <ProcessorParameters_DiffuseTexture>models/skin_manAlternative</ProcessorParameters_DiffuseTexture>
       <ProcessorParameters_DegreesX>0</ProcessorParameters_DegreesX>
       <ProcessorParameters_DegreesY>0</ProcessorParameters_DegreesY>
@@ -442,6 +442,7 @@
       <Name>walk</Name>
       <Importer>XmlImporter</Importer>
       <Processor>EmbeddedAnimationProcessor</Processor>
+      <SubType>Designer</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
