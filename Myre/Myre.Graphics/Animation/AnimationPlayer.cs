@@ -19,6 +19,7 @@ namespace Myre.Graphics.Animation
         public static readonly TypedName<bool> RootTranslationXName = new TypedName<bool>("animation_enable_root_translation_x");
         public static readonly TypedName<bool> RootTranslationYName = new TypedName<bool>("animation_enable_root_translation_y");
         public static readonly TypedName<bool> RootTranslationZName = new TypedName<bool>("animation_enable_root_translation_z");
+        public static readonly TypedName<Vector3> RootTranslationScaleName = new TypedName<Vector3>("animation_root_translation_scale");
         public static readonly TypedName<bool> EnableRootRotationName = new TypedName<bool>("animation_enable_root_rotation");
         public static readonly TypedName<bool> EnableRootScaleName = new TypedName<bool>("animation_enable_root_scale");
 
@@ -40,6 +41,16 @@ namespace Myre.Graphics.Animation
         {
             get { return _rootBoneTransform.Value; }
             set { _rootBoneTransform.Value = value; }
+        }
+
+        private Property<Vector3> _rootTransformationScale;
+        /// <summary>
+        /// Whether or not to include the X translation part of the root bone in the transform
+        /// </summary>
+        public Vector3 RootBoneTranslationScale
+        {
+            get { return _rootTransformationScale.Value; }
+            set { _rootTransformationScale.Value = value; }
         }
 
         private Property<bool> _enableRootBoneTranslationX;
@@ -120,6 +131,7 @@ namespace Myre.Graphics.Animation
             _enableRootBoneTranslationZ = context.CreateProperty(RootTranslationZName, false);
             _enableRootBoneRotation = context.CreateProperty(EnableRootRotationName, true);
             _enableRootBoneScale = context.CreateProperty(EnableRootScaleName, true);
+            _rootTransformationScale = context.CreateProperty(RootTranslationScaleName, Vector3.One, false);
         }
 
         public override void Initialise(INamedDataProvider initialisationData)

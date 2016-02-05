@@ -137,7 +137,7 @@ namespace GraphicsTests.Tests
             base.Update(gameTime);
 
             _scene.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            //_dude.Transform *= Matrix4x4.CreateTranslation(50 * new Vector3(_animationQueue.RootBoneTransfomationDelta.Translation.X, 0, _animationQueue.RootBoneTransfomationDelta.Translation.Z));
+            //_dude.Transform *= Matrix4x4.CreateTranslation(50 * new Vector3(_animationPlayer.RootBoneTransfomationDelta.Translation.X, 0, _animationPlayer.RootBoneTransfomationDelta.Translation.Z));
             //_dude.Transform = Matrix4x4.CreateFromAxisAngle(Vector3.UnitY, (float)gameTime.TotalSeconds() / 4) * Matrix4x4.CreateScale(20f) * Matrix4x4.CreateTranslation(0, 0, 175);
         }
 
