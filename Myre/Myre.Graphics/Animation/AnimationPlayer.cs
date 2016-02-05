@@ -328,9 +328,9 @@ namespace Myre.Graphics.Animation
                 m = (EnableRootBoneScale ? Matrix4x4.CreateScale(transform.Scale) : Matrix4x4.Identity) *
                     (EnableRootBoneRotation ? Matrix4x4.CreateFromQuaternion(transform.Rotation) : Matrix4x4.Identity) *
                     Matrix4x4.CreateTranslation(new Vector3(
-                        EnableRootBoneTranslationX ? transform.Translation.X : 0,
-                        EnableRootBoneTranslationY ? transform.Translation.Y : 0,
-                        EnableRootBoneTranslationZ ? transform.Translation.Z : 0
+                        EnableRootBoneTranslationX ? transform.Translation.X * RootBoneTranslationScale.X : 0,
+                        EnableRootBoneTranslationY ? transform.Translation.Y * RootBoneTranslationScale.Y : 0,
+                        EnableRootBoneTranslationZ ? transform.Translation.Z * RootBoneTranslationScale.Z : 0
                     )
                 );
             }
