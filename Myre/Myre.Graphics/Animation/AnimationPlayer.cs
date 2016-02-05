@@ -257,6 +257,10 @@ namespace Myre.Graphics.Animation
             {
                 throw new InvalidOperationException("No root bone motion found");
             }
+
+            var root = RootBoneTransfomationDelta;
+            root.Translation *= RootBoneTranslationScale;
+            RootBoneTransfomationDelta = root;
         }
 
         private void UpdateActiveAnimations(TimeSpan dt, out Transform fadingInRootDelta, out Transform fadingOutRootDelta)
