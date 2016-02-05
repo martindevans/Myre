@@ -138,6 +138,7 @@ namespace Myre.Graphics.Animation
         {
             base.Initialise(initialisationData);
 
+            initialisationData.TryCopyValue(this, RootTranslationScaleName, _rootTransformationScale);
             initialisationData.TryCopyValue(this, RootTranslationXName, _enableRootBoneTranslationX);
             initialisationData.TryCopyValue(this, RootTranslationYName, _enableRootBoneTranslationY);
             initialisationData.TryCopyValue(this, RootTranslationZName, _enableRootBoneTranslationZ);
