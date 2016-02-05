@@ -47,7 +47,8 @@ namespace Myre.Entities
     /// <summary>
     /// A struct which contains data about an entity behaviour.
     /// </summary>
-    public struct BehaviourData
+    public class BehaviourData
+        : IBehaviourFactory
     {
         public readonly string Name;
         public readonly Type Type;
@@ -60,15 +61,23 @@ namespace Myre.Entities
 
         public override int GetHashCode()
         {
-            return Type.GetHashCode();
+            unchecked
+            {
+                return Type.GetHashCode() * 113
+                     + Name.GetHashCode() * 131;
+            }
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is BehaviourData)
-                return Equals((BehaviourData)obj);
+            if (ReferenceEquals(this, obj))
+                return true;
 
-            return base.Equals(obj);
+            var a = obj as BehaviourData;
+            if (a != null)
+                return Equals(a);
+
+            return false;
         }
 
         public bool Equals(BehaviourData data)
@@ -76,6 +85,19 @@ namespace Myre.Entities
             return Name == data.Name
                 && Type == data.Type;
         }
+
+        public Behaviour Create(IKernel kernel)
+        {
+            var instance = (Behaviour)kernel.Get(Type, new ConstructorArgument("name", Name));
+
+            instance.Name = Name;
+            return instance;
+        }
+    }
+
+    public interface IBehaviourFactory
+    {
+        Behaviour Create(IKernel kernel);
     }
 
     /// <summary>
@@ -87,14 +109,14 @@ namespace Myre.Entities
         private static readonly Type _genericType = Type.GetType("Myre.Entities.Property`1");
 
         private readonly IKernel _kernel;
-        private readonly List<BehaviourData> _behaviours;
+        private readonly List<IBehaviourFactory> _behaviours;
         private readonly List<PropertyData> _properties;
 
         /// <summary>
         /// Gets a list of behaviours in this instance.
         /// </summary>
         /// <value>The behaviours.</value>
-        public IReadOnlyList<BehaviourData> Behaviours { get { return _behaviours; } }
+        public IReadOnlyList<IBehaviourFactory> Behaviours { get { return _behaviours; } }
         
         /// <summary>
         /// Gets a list of properties in this instance.
@@ -109,7 +131,7 @@ namespace Myre.Entities
         public EntityDescription(IKernel kernel = null)
         {
             _kernel = kernel ?? NinjectKernel.Instance;
-            _behaviours = new List<BehaviourData>();
+            _behaviours = new List<IBehaviourFactory>();
             _properties = new List<PropertyData>();
         }
 
@@ -140,11 +162,8 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="behaviour">The behaviour.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour(BehaviourData behaviour)
+        public bool AddBehaviour(IBehaviourFactory behaviour)
         {
-            if (behaviour.Type == null)
-                throw new ArgumentException("behaviour.Type", "behaviour");
-
             if (_behaviours.Contains(behaviour))
                 return false;
 
@@ -174,39 +193,6 @@ namespace Myre.Entities
             where T : Behaviour
         {
             return AddBehaviour(typeof(T), name.Name);
-        }
-
-        /// <summary>
-        /// Removes the behaviour.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public bool RemoveBehaviour(Type type, string name = null)
-        {
-            for (int i = 0; i < _behaviours.Count; i++)
-            {
-                var item = _behaviours[i];
-                if (item.Type == type && (name == null || item.Name == name))
-                {
-                    _behaviours.RemoveAt(i);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Removes the behaviour.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public bool RemoveBehaviour<T>(string name = null)
-            where T : Behaviour
-        {
-            return RemoveBehaviour(typeof(T), name);
         }
 
         #region properties
@@ -255,25 +241,6 @@ namespace Myre.Entities
         {
             return AddProperty(typeof(T), name.Name, initialValue);
         }
-
-        /// <summary>
-        /// Removes the property.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns></returns>
-        public bool RemoveProperty(string name)
-        {
-            for (int i = 0; i < _properties.Count; i++)
-            {
-                if (_properties[i].Name == name)
-                {
-                    _properties.RemoveAt(i);
-                    return true;
-                }
-            }
-
-            return false;
-        }
         #endregion
 
         /// <summary>
@@ -294,7 +261,7 @@ namespace Myre.Entities
         private IEnumerable<Behaviour> CreateBehaviours()
         {
             foreach (var item in _behaviours)
-                yield return CreateBehaviourInstance(_kernel, item);
+                yield return item.Create(_kernel);
         }
 
         private IProperty CreatePropertyInstance(PropertyData property)

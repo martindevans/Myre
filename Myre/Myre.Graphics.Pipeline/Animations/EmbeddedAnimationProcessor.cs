@@ -23,6 +23,8 @@ namespace Myre.Graphics.Pipeline.Animations
 
             //Find the named animation from the content source
             var animations = FindAnimations(node).ToArray();
+            if (animations.Length == 0)
+                throw new InvalidContentException(string.Format("No animations found in '{0}'", input.AnimationSourceFile));
             var animation = animations.Where(a => string.Equals(a.Key, input.SourceTakeName, StringComparison.InvariantCultureIgnoreCase)).Select(a => a.Value).FirstOrDefault();
             if (animation == null)
                 throw new KeyNotFoundException(string.Format(@"Animation '{0}' not found, only options are {1}", input.SourceTakeName, animations.Select(a => a.Key).Aggregate((a, b) => a + "," + b)));
