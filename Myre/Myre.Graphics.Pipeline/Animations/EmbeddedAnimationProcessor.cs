@@ -41,10 +41,10 @@ namespace Myre.Graphics.Pipeline.Animations
             ancestors.ExceptWith(descendents);
             ancestors.Remove(root.Name);
 
-            return ProcessAnimation(animation, input.StartTime, input.EndTime, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction);
+            return ProcessAnimation(animation, input.StartTime, input.EndTime, input.FrameTime, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction);
         }
 
-        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction)
+        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, float frameTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
@@ -55,12 +55,13 @@ namespace Myre.Graphics.Pipeline.Animations
 
             var startFrameTime = TimeSpan.FromSeconds(startTime);
             var endFrameTime = TimeSpan.FromSeconds(endTime);
+            var singleFrameTime = TimeSpan.FromSeconds(frameTime);
 
             Parallel.ForEach(anim.Channels, channel =>
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
             {
                 var boneIndex = Lookup(_boneNames, channel.Key);
-                animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction);
+                animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, singleFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction);
             }
             );
 
@@ -92,13 +93,44 @@ namespace Myre.Graphics.Pipeline.Animations
             return animationClip;
         }
 
-        private static Channel ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
+        /// <summary>
+        /// Find all keyframes within the specified time range. If there is not a keyframe at the exact time specified the range will be widened up to half frameTime each way to find a keyframe
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="frameTime"></param>
+        /// <returns></returns>
+        private static IEnumerable<AnimationKeyframe> KeyframesInTimeRange(AnimationChannel channel, TimeSpan start, TimeSpan end, TimeSpan frameTime)
+        {
+            var halfFrameTime = TimeSpan.FromTicks(frameTime.Ticks / 2);
+
+            //Find all frames within the expanded range
+            var frames = channel.Where(k => k.Time >= start - halfFrameTime && k.Time <= end + halfFrameTime)
+                                .ToArray();
+
+            //Find the first frame which is greater than or equal to the start time.
+            //If it is not equal (and we have available frames below) expand the range down one
+            int startIndex = Array.FindIndex(frames, k => k.Time >= start);
+            if (frames[startIndex].Time > start && startIndex > 0)
+                startIndex--;
+
+            //Same technique as above but reversed. Find the last frame less than or equal to the end then, if not equal (and we have space) expand the range upwards
+            int endIndex = Array.FindLastIndex(frames, k => k.Time <= end);
+            if (frames[endIndex].Time < end && endIndex < frames.Length - 1)
+                endIndex++;
+
+            //slice is not IEnumerable<T> in .net4 :|
+            var slice = new ArraySegment<AnimationKeyframe>(frames, startIndex, endIndex - startIndex);
+            for (var i = 0; i < slice.Count; i++)
+                yield return slice.Array[slice.Offset + i];
+
+        }
+
+        private static Channel ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, TimeSpan frameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
         {
             //Find keyframes for this channel
-            var keyframes = channel
-                .Value
-                .Where(k => k.Time >= startFrameTime)
-                .Where(k => k.Time < endFrameTime);
+            var keyframes = KeyframesInTimeRange(channel.Value, startFrameTime, endFrameTime, frameTime);
 
             var animationKeyframes = new LinkedList<KeyframeContent>();
 

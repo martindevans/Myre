@@ -1,8 +1,4 @@
-﻿
-using System.Xml;
-using System.Xml.Linq;
-
-namespace Myre.Graphics.Pipeline.Animations
+﻿namespace Myre.Graphics.Pipeline.Animations
 {
     public class MyreEmbeddedAnimationDefinition
     {
@@ -11,6 +7,7 @@ namespace Myre.Graphics.Pipeline.Animations
         public string SourceTakeName;
         public float StartTime;
         public float EndTime;
+        public float FrameTime;
         public string RootBone;
         public bool FixLooping;
         public bool LinearKeyframeReduction;
