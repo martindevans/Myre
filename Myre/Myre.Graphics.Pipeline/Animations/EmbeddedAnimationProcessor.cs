@@ -109,18 +109,36 @@ namespace Myre.Graphics.Pipeline.Animations
             var frames = channel.Where(k => k.Time >= start - halfFrameTime && k.Time <= end + halfFrameTime)
                                 .ToArray();
 
-            //Find the first frame which is greater than or equal to the start time.
-            //If it is not equal (and we have available frames below) expand the range down one
-            int startIndex = Array.FindIndex(frames, k => k.Time >= start);
-            if (frames[startIndex].Time > start && startIndex > 0)
-                startIndex--;
+            //Now we have a range which is expanded by the maximum allowed amount (0.5 frames)
+            //We want to *narrow* the range as much as possible so that the closest keyframe is chosen to the start and end points
 
-            //Same technique as above but reversed. Find the last frame less than or equal to the end then, if not equal (and we have space) expand the range upwards
-            int endIndex = Array.FindLastIndex(frames, k => k.Time <= end);
-            if (frames[endIndex].Time < end && endIndex < frames.Length - 1)
-                endIndex++;
+            //Find the first frame which is greater than or equal to the start time. The frame immediately before this (if there is one) is the last keyframe before the specified time
+            //Choose between these two options - whichever is closer
+            var startIndex = Array.FindIndex(frames, k => k.Time >= start);
+            if (startIndex > 0)
+            {
+                var a = frames[startIndex - 1];
+                var b = frames[startIndex];
 
-            //slice is not IEnumerable<T> in .net4 :|
+                //Check if A (before) is closer than B (after)
+                if ((a.Time - start).Duration() < (b.Time - start).Duration())
+                    startIndex--;
+            }
+
+            //Same technique as above but reversed. Find the last frame less than or equal to the end then expand up if necessary and possible
+            var endIndex = Array.FindLastIndex(frames, k => k.Time <= end);
+            if (endIndex < frames.Length - 1)
+            {
+                var a = frames[endIndex];
+                var b = frames[endIndex + 1];
+
+                //Check if A (before) is further than B (after)
+                if ((a.Time - start).Duration() > (b.Time - start).Duration())
+                    startIndex++;
+            }
+
+            //slice is not IEnumerable<T> in .net4! :/
+            //return new ArraySegment<AnimationKeyframe>(frames, startIndex, endIndex - startIndex);
             var slice = new ArraySegment<AnimationKeyframe>(frames, startIndex, endIndex - startIndex);
             for (var i = 0; i < slice.Count; i++)
                 yield return slice.Array[slice.Offset + i];
