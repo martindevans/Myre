@@ -7,7 +7,7 @@
         public string SourceTakeName;
         public float StartTime;
         public float EndTime;
-        public float FrameTime;
+        public double FramesPerSecond;
         public string RootBone;
         public bool FixLooping;
         public bool LinearKeyframeReduction;

@@ -41,10 +41,10 @@ namespace Myre.Graphics.Pipeline.Animations
             ancestors.ExceptWith(descendents);
             ancestors.Remove(root.Name);
 
-            return ProcessAnimation(animation, input.StartTime, input.EndTime, input.FrameTime, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction);
+            return ProcessAnimation(animation, input.StartTime, input.EndTime, 1 / input.FramesPerSecond, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction);
         }
 
-        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, float frameTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction)
+        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, double frameTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
