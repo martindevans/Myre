@@ -6,6 +6,7 @@
     <SourceTakeName>Armature|ArmatureAction</SourceTakeName>
     <StartTime>0</StartTime>
     <EndTime>1.5416</EndTime>
+    <FramesPerSecond>24</FramesPerSecond>
     <RootBone>Rig1</RootBone>
 		<FixLooping>false</FixLooping>
     <LinearKeyframeReduction>true</LinearKeyframeReduction>

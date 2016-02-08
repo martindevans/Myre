@@ -101,20 +101,22 @@ namespace Myre.Graphics.Pipeline.Animations
         /// <param name="end"></param>
         /// <param name="frameTime"></param>
         /// <returns></returns>
-        private static IEnumerable<AnimationKeyframe> KeyframesInTimeRange(AnimationChannel channel, TimeSpan start, TimeSpan end, TimeSpan frameTime)
+        private static IEnumerable<AnimationKeyframe> KeyframesInTimeRange(AnimationChannel channel, ref TimeSpan start, ref TimeSpan end, TimeSpan frameTime)
         {
+            var stTime = start;
+            var edTime = end;
+
             var halfFrameTime = TimeSpan.FromTicks(frameTime.Ticks / 2);
 
-            //Find all frames within the expanded range
-            var frames = channel.Where(k => k.Time >= start - halfFrameTime && k.Time <= end + halfFrameTime)
-                                .ToArray();
+            //Find all frames within the specified range (expanded by half a frame either direction)
+            var frames = channel.Where(k => k.Time >= stTime - halfFrameTime && k.Time <= edTime + halfFrameTime).ToArray();
 
             //Now we have a range which is expanded by the maximum allowed amount (0.5 frames)
             //We want to *narrow* the range as much as possible so that the closest keyframe is chosen to the start and end points
 
             //Find the first frame which is greater than or equal to the start time. The frame immediately before this (if there is one) is the last keyframe before the specified time
             //Choose between these two options - whichever is closer
-            var startIndex = Array.FindIndex(frames, k => k.Time >= start);
+            var startIndex = Array.FindIndex(frames, k => k.Time >= stTime);
             if (startIndex > 0)
             {
                 var a = frames[startIndex - 1];
@@ -126,7 +128,7 @@ namespace Myre.Graphics.Pipeline.Animations
             }
 
             //Same technique as above but reversed. Find the last frame less than or equal to the end then expand up if necessary and possible
-            var endIndex = Array.FindLastIndex(frames, k => k.Time <= end);
+            var endIndex = Array.FindLastIndex(frames, k => k.Time <= edTime);
             if (endIndex < frames.Length - 1)
             {
                 var a = frames[endIndex];
@@ -137,18 +139,26 @@ namespace Myre.Graphics.Pipeline.Animations
                     startIndex++;
             }
 
+            //Fixup start and end times so that they sit exactly on the keyframes
+            start = frames[startIndex].Time;
+            end = frames[endIndex].Time;
+
             //slice is not IEnumerable<T> in .net4! :/
             //return new ArraySegment<AnimationKeyframe>(frames, startIndex, endIndex - startIndex);
+
+            //Copy slice into result array and return that instead
             var slice = new ArraySegment<AnimationKeyframe>(frames, startIndex, endIndex - startIndex);
+            var result = new AnimationKeyframe[slice.Count];
             for (var i = 0; i < slice.Count; i++)
-                yield return slice.Array[slice.Offset + i];
+                result[i] = slice.Array[slice.Offset + i];
+            return result;
 
         }
 
         private static Channel ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, TimeSpan frameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
         {
             //Find keyframes for this channel
-            var keyframes = KeyframesInTimeRange(channel.Value, startFrameTime, endFrameTime, frameTime);
+            var keyframes = KeyframesInTimeRange(channel.Value, ref startFrameTime, ref endFrameTime, frameTime);
 
             var animationKeyframes = new LinkedList<KeyframeContent>();
 
