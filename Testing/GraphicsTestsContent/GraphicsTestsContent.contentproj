@@ -207,13 +207,20 @@
       <Name>BlockDude</Name>
       <Importer>FbxImporter</Importer>
       <Processor>MyreModelProcessor</Processor>
-      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
       <ProcessorParameters_GBufferEffectName>DefaultGBuffer</ProcessorParameters_GBufferEffectName>
-      <ProcessorParameters_DiffuseTexture>models/skin_manAlternative</ProcessorParameters_DiffuseTexture>
-      <ProcessorParameters_DegreesX>0</ProcessorParameters_DegreesX>
-      <ProcessorParameters_DegreesY>0</ProcessorParameters_DegreesY>
-      <ProcessorParameters_DegreesZ>0</ProcessorParameters_DegreesZ>
+      <ProcessorParameters_ShadowEffectName>DefaultShadows</ProcessorParameters_ShadowEffectName>
+      <ProcessorParameters_DiffuseTexture>Models/skin_manAlternative</ProcessorParameters_DiffuseTexture>
     </Compile>
+    <None Include="Models\DudeAnimations\Idle-Stand.fbx">
+      <Name>Idle-Stand</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </None>
+    <None Include="Models\DudeAnimations\Walk-Forward-Stand.fbx">
+      <Name>Walk-Forward-Stand</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </None>
     <None Include="Shadows.fxh">
       <Name>Shadows</Name>
       <Importer>EffectImporter</Importer>
@@ -438,14 +445,6 @@
     <Folder Include="Myre.Graphics\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\DudeAnimations\walk.xml">
-      <Name>walk</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>EmbeddedAnimationProcessor</Processor>
-      <SubType>Designer</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Models\skin_manAlternative.png">
       <Name>skin_manAlternative</Name>
       <Importer>TextureImporter</Importer>
@@ -454,6 +453,20 @@
       <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
       <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
       <ProcessorParameters_ColorKeyEnabled>False</ProcessorParameters_ColorKeyEnabled>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\DudeAnimations\Walk-Forward-Stand.xml">
+      <Name>Walk-Forward-Stand</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>EmbeddedAnimationProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\DudeAnimations\Idle-Stand.xml">
+      <Name>Idle-Stand</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>EmbeddedAnimationProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

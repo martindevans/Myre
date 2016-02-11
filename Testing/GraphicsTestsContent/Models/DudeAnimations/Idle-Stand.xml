@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline.Animations">
   <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
-    
-    <AnimationSourceFile>Models/BlockDude.fbx</AnimationSourceFile>
+    <AnimationSourceFile>Models/DudeAnimations/Idle-Stand.fbx</AnimationSourceFile>
     <SourceTakeName>Armature|ArmatureAction</SourceTakeName>
     <StartTime>0</StartTime>
-    <EndTime>1.5416</EndTime>
+    <EndTime>2</EndTime>
     <FramesPerSecond>24</FramesPerSecond>
     <RootBone>Rig1</RootBone>
-		<FixLooping>false</FixLooping>
+    <FixLooping>false</FixLooping>
     <LinearKeyframeReduction>true</LinearKeyframeReduction>
+    <RootTranslationSwizzle />
   </Asset>
 </XnaContent>

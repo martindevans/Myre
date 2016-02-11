@@ -41,10 +41,43 @@ namespace Myre.Graphics.Pipeline.Animations
             ancestors.ExceptWith(descendents);
             ancestors.Remove(root.Name);
 
-            return ProcessAnimation(animation, input.StartTime, input.EndTime, 1 / input.FramesPerSecond, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction);
+            return ProcessAnimation(animation, input.StartTime, input.EndTime, 1 / input.FramesPerSecond, ancestors, root.Name, input.FixLooping, input.LinearKeyframeReduction, input.RootTranslationSwizzle);
         }
 
-        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, double frameTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction)
+        private static Func<Vector3, Vector3> Swizzler(string str)
+        {
+            str = str.ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(str) || str == "null" || str == "none" || str == "x,y,z")
+                return a => a;
+
+            var parts = str.Split(',');
+            if (parts.Length != 3)
+                throw new Exception(string.Format("Swizzle vector '{0}' has {1} elements; expected three", str, parts.Length));
+
+            var vectors = new Vector4[4];
+            for (int i = 0; i < 3; i++)
+            {
+                float p = parts[i].StartsWith("-") ? -1 : 1;
+
+                if (parts[i].Contains("x"))
+                    vectors[i].X = p;
+                else if (parts[i].Contains("y"))
+                    vectors[i].Y = p;
+                else if (parts[i].Contains("z"))
+                    vectors[i].Z = p;
+            }
+
+            var swizzle = new Matrix(
+                vectors[0].X, vectors[1].X, vectors[2].X, vectors[3].X,
+                vectors[0].Y, vectors[1].Y, vectors[2].Y, vectors[3].Y,
+                vectors[0].Z, vectors[1].Z, vectors[2].Z, vectors[3].Z,
+                vectors[0].W, vectors[1].W, vectors[2].W, vectors[3].W
+            );
+
+            return a => Vector3.Transform(a, swizzle);
+        }
+
+        private ClipContent ProcessAnimation(AnimationContent anim, float startTime, float endTime, double frameTime, ISet<string> preRootBones, string rootBone, bool fixLooping, bool linearKeyframeReduction, string rootSwizzle)
         {
             if (anim.Duration.Ticks < TICKS_PER_60_FPS)
                 throw new InvalidContentException("Source animation is shorter than 1/60 seconds");
@@ -61,7 +94,7 @@ namespace Myre.Graphics.Pipeline.Animations
             //foreach (KeyValuePair<string, AnimationChannel> channel in anim.Channels)
             {
                 var boneIndex = Lookup(_boneNames, channel.Key);
-                animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, singleFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction);
+                animationClip.Channels[boneIndex] = ProcessChannel(boneIndex, channel, startFrameTime, endFrameTime, singleFrameTime, preRootBones, rootBone, fixLooping, linearKeyframeReduction, Swizzler(rootSwizzle));
             }
             );
 
@@ -155,7 +188,7 @@ namespace Myre.Graphics.Pipeline.Animations
 
         }
 
-        private static Channel ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, TimeSpan frameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction)
+        private static Channel ProcessChannel(ushort boneIndex, KeyValuePair<string, AnimationChannel> channel, TimeSpan startFrameTime, TimeSpan endFrameTime, TimeSpan frameTime, ICollection<string> preRoot, string root, bool fixLooping, bool linearKeyframeReduction, Func<Vector3, Vector3> swizzle)
         {
             //Find keyframes for this channel
             var keyframes = KeyframesInTimeRange(channel.Value, ref startFrameTime, ref endFrameTime, frameTime);
@@ -190,6 +223,11 @@ namespace Myre.Graphics.Pipeline.Animations
 
                 animationKeyframes.AddLast(new KeyframeContent(boneIndex, keyframe.Time, pos, scale, orientation));
             }
+
+            //If this is the root, apply the root swizzler
+            if (channel.Key.Equals(root, StringComparison.InvariantCulture))
+                foreach (var animationKeyframe in animationKeyframes)
+                    animationKeyframe.Translation = swizzle(animationKeyframe.Translation);
 
             //If necessary copy the first keyframe into the data of the last keyframe
             if (fixLooping && !discard && !channel.Key.Equals(root, StringComparison.InvariantCulture))

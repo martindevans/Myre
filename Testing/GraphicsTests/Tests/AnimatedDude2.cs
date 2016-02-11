@@ -30,7 +30,7 @@ namespace GraphicsTests.Tests
         private AnimationPlayer _animationPlayer;
 
         private readonly string[] _sequence = {
-            "walk"
+            //"Walk-Forward-Stand", "Walk-Forward-Stand", "Walk-Forward-Stand", "Walk-Forward-Stand", "Walk-Forward-Stand",
 
         };
 
@@ -64,13 +64,13 @@ namespace GraphicsTests.Tests
 
             _dude = dudeEntity.GetBehaviour<ModelInstance>(null);
 
-            //_animationQueue.DefaultClip = new AnimationQueue.ClipPlaybackParameters
-            //{
-            //    Clip = content.Load<Clip>("Models/ZoeAnimations/t-pose"),
-            //    FadeInTime = TimeSpan.FromSeconds(0.25f),
-            //    FadeOutTime = TimeSpan.FromSeconds(0.25f),
-            //    Loop = true,
-            //};
+            _animationPlayer.DefaultClip = new AnimationPlayer.ClipPlaybackParameters
+            {
+                Clip = _content.Load<Clip>("Models/DudeAnimations/Idle-Stand"),
+                FadeInTime = TimeSpan.FromSeconds(0.15f),
+                FadeOutTime = TimeSpan.FromSeconds(0.15f),
+                Loop = true,
+            };
 
             foreach (var name in _sequence)
             {
@@ -79,7 +79,6 @@ namespace GraphicsTests.Tests
                     Clip = new TimeScaleClip(_content.Load<Clip>("Models/DudeAnimations/" + name), 1f),
                     FadeInTime = TimeSpan.FromSeconds(0.1f),
                     FadeOutTime = TimeSpan.FromSeconds(0.0f),
-                    Loop = true,
                 });
             }
 

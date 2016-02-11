@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XnaContent xmlns:Pipeline="Myre.Graphics.Pipeline.Animations">
+  <Asset Type="Pipeline:MyreEmbeddedAnimationDefinition">
+    <AnimationSourceFile>Models/DudeAnimations/Walk-Forward-Stand.fbx</AnimationSourceFile>
+    <SourceTakeName>Armature|ArmatureAction</SourceTakeName>
+    <StartTime>0</StartTime>
+    <EndTime>1.541666</EndTime>
+    <FramesPerSecond>24</FramesPerSecond>
+    <RootBone>Rig1</RootBone>
+    <FixLooping>false</FixLooping>
+    <LinearKeyframeReduction>true</LinearKeyframeReduction>
+    <RootTranslationSwizzle />
+  </Asset>
+</XnaContent>
