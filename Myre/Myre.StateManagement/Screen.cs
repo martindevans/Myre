@@ -13,11 +13,6 @@ namespace Myre.StateManagement
         private TransitionState _transitionState = TransitionState.Hidden;
 
         /// <summary>
-        /// State of game.IsMouseVisible when this screen was hidden by another screen
-        /// </summary>
-        internal bool? IsMouseVisible;
-
-        /// <summary>
         /// Gets the <see cref="ScreenManager"/> which this screen was last pushed onto.
         /// </summary>
         /// <value>The manager.</value>
