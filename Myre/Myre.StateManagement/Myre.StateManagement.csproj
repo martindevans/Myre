@@ -55,7 +55,6 @@
     <Compile Include="ScreenManager.cs" />
     <Compile Include="Transition.cs" />
     <Compile Include="TransitionState.cs" />
-    <Compile Include="TransitionType.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Myre\Myre.csproj">

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Microsoft.Xna.Framework;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
@@ -12,14 +12,13 @@ namespace Myre.StateManagement
     /// </summary>
     public class ScreenManager
     {
-        readonly Stack<Screen> _screenStack;
-        readonly List<Screen> _screens;
+        private readonly Game _game;
+        private readonly Stack<Screen> _screenStack;
+        private readonly List<Screen> _screens;
 
-        readonly IEnumerable<Screen> _transitioningOn;
-        readonly IEnumerable<Screen> _transitioningOff;
-        readonly IEnumerable<Screen> _visible;
-
-        public TransitionType TransitionType { get; private set; }
+        private readonly IEnumerable<Screen> _transitioningOn;
+        private readonly IEnumerable<Screen> _transitioningOff;
+        private readonly IEnumerable<Screen> _visible;
 
         public int StackCount
         {
@@ -37,8 +36,10 @@ namespace Myre.StateManagement
         /// <summary>
         /// Initializes a new instance of the <see cref="ScreenManager"/> class.
         /// </summary>
-        public ScreenManager()
+        /// <param name="game">The game instance to set mouse capture on</param>
+        public ScreenManager(Game game)
         {
+            _game = game;
             _screenStack = new Stack<Screen>();
             _screens = new List<Screen>();
 
@@ -65,6 +66,8 @@ namespace Myre.StateManagement
             {
                 if (s.TransitionState == TransitionState.On || s.TransitionState == TransitionState.Shown)
                     s.TransitionState = TransitionState.Off;
+
+                s.IsMouseVisible = _game.IsMouseVisible;
             }
 
             _screens.Add(screen);
@@ -76,7 +79,7 @@ namespace Myre.StateManagement
         /// <summary>
         /// Pops this instance.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The screen which was just removed</returns>
         public Screen Pop()
         {
             var oldScreen = _screenStack.Pop();
@@ -88,6 +91,10 @@ namespace Myre.StateManagement
                 newScreen.TransitionState = TransitionState.On;
                 if (!_screens.Contains(newScreen))
                     _screens.Add(newScreen);
+
+                if (newScreen.IsMouseVisible.HasValue)
+                    _game.IsMouseVisible = newScreen.IsMouseVisible.Value;
+                newScreen.IsMouseVisible = null;
             }
             
             return oldScreen;
@@ -99,48 +106,36 @@ namespace Myre.StateManagement
         /// <param name="gameTime">The game time.</param>
         public void Update(GameTime gameTime)
         {
-            //screens.AddRange(screenStack);
-
-            bool screensAreTransitioningOff = false;
             foreach (var screen in _transitioningOff)
             {
-                UpdateTransition(screen, gameTime);
+                UpdateTransitionProgress(screen, gameTime);
 
-// ReSharper disable CompareOfFloatsByEqualityOperator
-                if (screen.TransitionProgress == 0)
-// ReSharper restore CompareOfFloatsByEqualityOperator
+                if (screen.TransitionProgress <= 0)
                 {
                     screen.TransitionState = TransitionState.Hidden;
                     if (!_screenStack.Contains(screen))
                         screen.Dispose();
                 }
-                else
-                    screensAreTransitioningOff = true;
             }
 
             foreach (var screen in _transitioningOn)
             {
-                if (TransitionType == TransitionType.CrossFade || !screensAreTransitioningOff)
-                    UpdateTransition(screen, gameTime);
+                UpdateTransitionProgress(screen, gameTime);
 
-// ReSharper disable CompareOfFloatsByEqualityOperator
-                if (screen.TransitionProgress == 1)
-// ReSharper restore CompareOfFloatsByEqualityOperator
+                if (screen.TransitionProgress >= 1)
                     screen.TransitionState = TransitionState.Shown;
             }
             
-            for (int i = _screens.Count - 1; i >= 0; i--)
+            for (var i = _screens.Count - 1; i >= 0; i--)
             {
                 if (_screens[i].TransitionState == TransitionState.Hidden)
                     _screens.RemoveAt(i);
                 else
                     _screens[i].Update(gameTime);
             }
-
-            //screens.Clear();
         }
 
-        private void UpdateTransition(Screen screen, GameTime gameTime)
+        private static void UpdateTransitionProgress(Screen screen, GameTime gameTime)
         {
             if (screen.TransitionState == TransitionState.On)
             {
@@ -163,14 +158,8 @@ namespace Myre.StateManagement
         /// </summary>
         public void PrepareDraw()
         {
-            //screens.AddRange(screenStack);
-
             foreach (var screen in _visible)
-            {
                 screen.PrepareDraw();
-            }
-
-            //screens.Clear();
         }
 
         /// <summary>
@@ -179,15 +168,11 @@ namespace Myre.StateManagement
         /// <param name="gameTime">The game time.</param>
         public void Draw(GameTime gameTime)
         {
-            //screens.AddRange(screenStack);
-
             foreach (var screen in _screens)
             {
                 if (screen.TransitionState != TransitionState.Hidden)
                     screen.Draw(gameTime);
             }
-
-            //screens.Clear();
         }
     }
 }
