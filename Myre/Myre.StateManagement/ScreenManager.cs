@@ -12,7 +12,6 @@ namespace Myre.StateManagement
     /// </summary>
     public class ScreenManager
     {
-        private readonly Game _game;
         private readonly Stack<Screen> _screenStack;
         private readonly List<Screen> _screens;
 
@@ -36,10 +35,8 @@ namespace Myre.StateManagement
         /// <summary>
         /// Initializes a new instance of the <see cref="ScreenManager"/> class.
         /// </summary>
-        /// <param name="game">The game instance to set mouse capture on</param>
-        public ScreenManager(Game game)
+        public ScreenManager()
         {
-            _game = game;
             _screenStack = new Stack<Screen>();
             _screens = new List<Screen>();
 
