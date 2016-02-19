@@ -65,9 +65,10 @@ namespace Myre.StateManagement
             foreach (var s in _screenStack)
             {
                 if (s.TransitionState == TransitionState.On || s.TransitionState == TransitionState.Shown)
+                {
                     s.TransitionState = TransitionState.Off;
-
-                s.IsMouseVisible = _game.IsMouseVisible;
+                    s.IsMouseVisible = _game.IsMouseVisible;
+                }
             }
 
             _screens.Add(screen);
