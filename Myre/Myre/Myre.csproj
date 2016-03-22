@@ -81,7 +81,7 @@
     <CodeContractsRuntimeOnlyPublicSurface>True</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
     <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRuntimeSkipQuantifiers>True</CodeContractsRuntimeSkipQuantifiers>
     <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
     <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
     <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
@@ -148,7 +148,6 @@
     <Compile Include="Collections\INamedDataProvider.cs" />
     <Compile Include="Collections\ISettingsCollection.cs" />
     <Compile Include="Collections\NamedBoxCollection.cs" />
-    <Compile Include="Collections\Octree.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\TypedWeakReference.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
