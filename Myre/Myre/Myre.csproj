@@ -149,7 +149,6 @@
     <Compile Include="Collections\ISettingsCollection.cs" />
     <Compile Include="Collections\NamedBoxCollection.cs" />
     <Compile Include="Collections\Pool.cs" />
-    <Compile Include="Collections\TypedWeakReference.cs" />
     <Compile Include="Extensions\ArrayExtensions.cs" />
     <Compile Include="Extensions\BoundingBoxExtensions.cs" />
     <Compile Include="Extensions\BoundingSphereExtensions.cs" />

@@ -32,6 +32,11 @@ namespace Myre.Collections
         {
             return _values.ContainsKey(new NameWithType(key, type));
         }
+
+        public bool Contains<T>(TypedName<T> name)
+        {
+            return _values.ContainsKey(new NameWithType(name.Name, typeof(T)));
+        }
         #endregion
 
         #region get (box)
