@@ -87,6 +87,34 @@ namespace Myre
     }
 
     /// <summary>
+    /// Provides a safe way to convert an int32 to 4 bytes
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    public struct LongUInt2Union
+    {
+        /// <summary>
+        /// The value of the first 32 bits of the union
+        /// </summary>
+        [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public uint IntValue1;
+
+        /// <summary>
+        /// The last 32 bits of this union
+        /// </summary>
+        [FieldOffset(sizeof(int))]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public uint IntValue2;
+
+        /// <summary>
+        /// The complete 64 bits of this union
+        /// </summary>
+        [FieldOffset(0)]
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
+        public long LongValue;
+    }
+
+    /// <summary>
     /// Provides a safe way of converting an Int32 to a UInt32
     /// </summary>
     [StructLayout(LayoutKind.Explicit)]

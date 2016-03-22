@@ -58,14 +58,14 @@ namespace GraphicsTests.Tests
             public override void Draw(Renderer renderer)
             {
                 var metadata = renderer.Data;
-                var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+                var resolution = metadata.GetOrCreate<Vector2>(Names.View.Resolution).Value;
                 var targetInfo = new RenderTargetInfo((int) resolution.X, (int) resolution.Y, default(SurfaceFormat), default(DepthFormat), default(int), default(bool), default(RenderTargetUsage));
                 var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
                 renderer.Device.SetRenderTarget(target);
 
-                var depth = metadata.Get<Texture2D>("gbuffer_depth").Value;
-                var normals = metadata.Get<Texture2D>("gbuffer_normals").Value;
-                var diffuse = metadata.Get<Texture2D>("gbuffer_diffuse").Value;
+                var depth = metadata.GetValue<Texture2D>(Names.Deferred.Textures.Depth);
+                var normals = metadata.GetValue<Texture2D>(Names.Deferred.Textures.Normals);
+                var diffuse = metadata.GetValue<Texture2D>(Names.Deferred.Textures.Diffuse);
 
                 //Save(depth, "depth.jpg");
                 //Save(normals, "normal.jpg");

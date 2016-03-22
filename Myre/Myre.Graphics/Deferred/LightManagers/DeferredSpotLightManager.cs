@@ -140,9 +140,9 @@ namespace Myre.Graphics.Deferred.LightManagers
             _touchesBothPlanes.Clear();
             _touchesNeitherPlane.Clear();
 
-            var frustum = renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
+            var frustum = renderer.Data.GetValue(Names.View.ViewFrustum);
 
-            float falloffFactor = renderer.Data.Get("lighting_attenuationscale", 100).Value;
+            float falloffFactor = renderer.Data.GetOrCreate(Names.Lighting.AttenuationScale, 100).Value;
             _geometryLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
             _quadLightingMaterial.Parameters["LightFalloffFactor"].SetValue(falloffFactor);
 
@@ -202,7 +202,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.SetRenderTarget(target);
             renderer.Device.Clear(Color.Black);
 
-            var resolution = renderer.Data.Get<Vector2>("resolution", default(Vector2), true);
+            var resolution = renderer.Data.GetOrCreate<Vector2>(Names.View.Resolution);
             var previousResolution = resolution.Value;
             resolution.Value = new Vector2(light.ShadowResolution);
 
@@ -210,7 +210,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.BlendState = BlendState.Opaque;
             renderer.Device.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            var view = renderer.Data.Get<View>("activeview", default(View), true);
+            var view = renderer.Data.GetOrCreate<View>(Names.View.ActiveView);
             var previousView = view.Value;
             view.Value = _shadowView;
 
@@ -334,7 +334,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             var world = Matrix4x4.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius)
                         * Matrix4x4.CreateTranslation(light.Position);
-            metadata.Set<Matrix4x4>("world", world);
+            metadata.Set<Matrix4x4>(Names.Matrix.World, world);
 
             var projection = metadata.GetValue(new TypedName<Matrix4x4>("projection"));
 

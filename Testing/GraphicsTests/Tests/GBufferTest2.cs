@@ -67,7 +67,7 @@ namespace GraphicsTests.Tests
             cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = v;
 
             NamedBoxCollection init = new NamedBoxCollection();
-            init.Set<string>("output", show);
+            init.Set(new TypedName<string>("output"), show);
 
             _scene.Scene.Add(cameraEntity, init);
         }

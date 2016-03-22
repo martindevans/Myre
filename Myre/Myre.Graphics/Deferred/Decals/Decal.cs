@@ -136,6 +136,13 @@ namespace Myre.Graphics.Deferred.Decals
         public class Manager
             : BehaviourManager<Decal>
         {
+            private static readonly TypedName<Matrix4x4> _worldMatrixName = new TypedName<Matrix4x4>("world");
+            private static readonly TypedName<Matrix4x4> _inverseWorldMatrixName = new TypedName<Matrix4x4>("inverseworld");
+            private static readonly TypedName<Matrix4x4> _viewMatrixName = new TypedName<Matrix4x4>("view");
+            private static readonly TypedName<Matrix4x4> _worldViewMatrixName = new TypedName<Matrix4x4>("worldview");
+            private static readonly TypedName<Vector3> _cameraPositionName = new TypedName<Vector3>("cameraposition");
+            private static readonly TypedName<float> _nearClipName = new TypedName<float>("nearclip");
+
             private VertexBuffer _unitCube;
             private IndexBuffer _unitCubeIndices;
 
@@ -237,15 +244,15 @@ namespace Myre.Graphics.Deferred.Decals
                 device.Indices = _unitCubeIndices;
 
                 //Get data from the renderer
-                var worldBox = renderer.Data.Get<Matrix4x4>("world");
-                var inverseWorldBox = renderer.Data.Get<Matrix4x4>("inverseworld");
-                var cameraViewBox = renderer.Data.Get<Matrix4x4>("view");
-                var worldViewBox = renderer.Data.Get<Matrix4x4>("worldview");
+                var worldBox = renderer.Data.GetOrCreate(_worldMatrixName);
+                var inverseWorldBox = renderer.Data.GetOrCreate(_inverseWorldMatrixName);
+                var cameraViewBox = renderer.Data.GetOrCreate(_viewMatrixName);
+                var worldViewBox = renderer.Data.GetOrCreate(_worldViewMatrixName);
 
-                var cameraPosition = renderer.Data.Get<Vector3>("cameraposition");
-                var cameraNearClip = renderer.Data.Get<float>("nearclip");
+                var cameraPosition = renderer.Data.GetOrCreate(_cameraPositionName);
+                var cameraNearClip = renderer.Data.GetOrCreate(_nearClipName);
 
-                var viewFrustum = renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
+                var viewFrustum = renderer.Data.GetValue(Names.View.ViewFrustum);
 
                 foreach (var behaviour in Behaviours)
                 {

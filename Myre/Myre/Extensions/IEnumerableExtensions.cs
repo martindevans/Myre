@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Myre.Extensions
@@ -17,6 +18,9 @@ namespace Myre.Extensions
         /// <param name="action">The action.</param>
         public static void ForEach<T>(this IEnumerable<T> collection, Action<T> action)
         {
+            Contract.Requires(collection != null);
+            Contract.Requires(action != null);
+
             foreach (var item in collection)
             {
                 action(item);
@@ -31,13 +35,12 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> collection)
         {
+            Contract.Requires(collection != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
+
             foreach (var innerCollection in collection)
-            {
                 foreach (var item in innerCollection)
-                {
                     yield return item;
-                }
-            }
         }
 
         /// <summary>
@@ -49,10 +52,11 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static T FirstOrDefaultValue<T>(this IEnumerable<T> collection, T defaultValue)
         {
+            Contract.Requires(collection != null);
+
             foreach (var item in collection)
-            {
                 return item;
-            }
+
             return defaultValue;
         }
 
@@ -66,6 +70,10 @@ namespace Myre.Extensions
         [Obsolete]
         public static IEnumerable<T> Append<T>(this IEnumerable<T> start, IEnumerable<T> end)
         {
+            Contract.Requires(start != null);
+            Contract.Requires(end != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
+
             foreach (var item in start)
                 yield return item;
 
@@ -82,6 +90,10 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<T> Prepend<T>(this IEnumerable<T> end, IEnumerable<T> start)
         {
+            Contract.Requires(start != null);
+            Contract.Requires(end != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
+
             foreach (var item in start)
                 yield return item;
 
@@ -98,6 +110,10 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<T> Append<T>(this IEnumerable<T> start, params T[] end)
         {
+            Contract.Requires(start != null);
+            Contract.Requires(end != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
+
             return start.Concat(end);
         }
 
@@ -110,6 +126,10 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<T> Prepend<T>(this IEnumerable<T> end, params T[] start)
         {
+            Contract.Requires(end != null);
+            Contract.Requires(start != null);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
+
             return Prepend(end, start as IEnumerable<T>);
         }
 
@@ -122,7 +142,10 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<KeyValuePair<int, T>> ZipWithIndex<T>(this IEnumerable<T> enumerable, int startIndex = 0)
         {
-            int index = startIndex;
+            Contract.Requires(enumerable != null);
+            Contract.Ensures(Contract.Result<IEnumerable<KeyValuePair<int, T>>>() != null);
+
+            var index = startIndex;
             foreach (var item in enumerable)
                 yield return new KeyValuePair<int, T>(index++, item);
         }
@@ -138,16 +161,13 @@ namespace Myre.Extensions
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public static IEnumerable<T> DropLast<T>(this IEnumerable<T> enumerable, int drop)
         {
-            if (enumerable == null)
-                throw new ArgumentNullException("enumerable");
+            Contract.Requires(enumerable != null);
+            Contract.Requires(drop > 0);
+            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
 
-            if (drop < 0)
-                throw new ArgumentOutOfRangeException("drop",
-                    "Argument drop should be non-negative.");
+            var buffer = new Queue<T>(drop + 1);
 
-            Queue<T> buffer = new Queue<T>(drop + 1);
-
-            foreach (T x in enumerable)
+            foreach (var x in enumerable)
             {
                 buffer.Enqueue(x);
 

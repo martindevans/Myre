@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace Myre
 {
@@ -18,6 +19,8 @@ namespace Myre
         /// <returns></returns>
         public static uint Random(uint seed, uint upperBound)
         {
+            Contract.Requires(upperBound > 0);
+
             uint t = (seed ^ (seed << 11));
             const uint W = 273326509;
             long i = (int)(0x7FFFFFFF & ((W ^ U) ^ (t ^ (t >> 8))));
@@ -32,8 +35,10 @@ namespace Myre
         /// <returns></returns>
         public static uint Random(uint upperBound = uint.MaxValue)
         {
-            long ticks = DateTime.Now.Ticks;
-            uint time = ((uint)(ticks & uint.MaxValue)) | ((uint)((ticks >> 32) & uint.MaxValue));
+            Contract.Requires(upperBound > 0);
+
+            var u = new LongUInt2Union { LongValue = DateTime.Now.Ticks };
+            var time = u.IntValue1 | u.IntValue2;
 
             return Random(time, upperBound);
         }

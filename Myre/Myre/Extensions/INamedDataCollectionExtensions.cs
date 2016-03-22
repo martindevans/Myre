@@ -1,4 +1,5 @@
-﻿using Myre.Collections;
+﻿using System.Diagnostics.Contracts;
+using Myre.Collections;
 
 namespace Myre.Extensions
 {
@@ -16,6 +17,8 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static T? GetMaybeValue<T>(this INamedDataCollection data, TypedName<T> name) where T : struct
         {
+            Contract.Requires(data != null);
+
             T v;
             if (data.TryGetValue<T>(name, out v))
                 return v;

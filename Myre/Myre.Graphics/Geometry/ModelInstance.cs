@@ -29,6 +29,7 @@ namespace Myre.Graphics.Geometry
         public static readonly TypedName<float> SubSurfaceScatteringName = new TypedName<float>("subsurface_scattering");
         public static readonly TypedName<Matrix4x4?> CustomViewMatrixName = new TypedName<Matrix4x4?>("custom_view_matrix");
         public static readonly TypedName<Matrix4x4?> CustomProjectionMatrixName = new TypedName<Matrix4x4?>("custom_projection_matrix");
+        public static readonly TypedName<bool> RenderTranslucentFlagName = new TypedName<bool>("render_translucent");
 
         private Property<ModelData> _model;
         private Property<Matrix4x4> _transform;
@@ -91,12 +92,14 @@ namespace Myre.Graphics.Geometry
 
         private void MeshAdded(ModelData data, Mesh mesh)
         {
-            ModelMeshAdded(this, mesh);
+            if (ModelMeshAdded != null)
+                ModelMeshAdded(this, mesh);
         }
 
         private void MeshRemoved(ModelData data, Mesh mesh)
         {
-            ModelMeshRemoved(this, mesh);
+            if (ModelMeshRemoved != null)
+                ModelMeshRemoved(this, mesh);
         }
 
         private void HookEvents(ModelData data)
@@ -196,7 +199,7 @@ namespace Myre.Graphics.Geometry
                     if (!Mesh.Materials.TryGetValue(phase, out material))
                         return;
 
-                    var renderTransparent = renderer.Data.Get<bool>("render_translucent").Value;
+                    var renderTransparent = renderer.Data.GetOrCreate(RenderTranslucentFlagName).Value;
                     if (!renderTransparent && Instance.Opacity < 1)
                         return;
 
@@ -216,19 +219,19 @@ namespace Myre.Graphics.Geometry
                     renderer.Device.Indices = Mesh.IndexBuffer;
 
                     //Extract useful data boxes
-                    var world = renderer.Data.Get<Matrix4x4>("world", Matrix4x4.Identity);
-                    var projection = renderer.Data.Get<Matrix4x4>("projection", Matrix4x4.Identity);
-                    var worldView = renderer.Data.Get<Matrix4x4>("worldview", Matrix4x4.Identity);
-                    var worldViewProjection = renderer.Data.Get<Matrix4x4>("worldviewprojection", Matrix4x4.Identity);
+                    var world = renderer.Data.GetOrCreate(Names.Matrix.World, Matrix4x4.Identity);
+                    var projection = renderer.Data.GetOrCreate(Names.Matrix.Projection, Matrix4x4.Identity);
+                    var worldView = renderer.Data.GetOrCreate(Names.Matrix.WorldView, Matrix4x4.Identity);
+                    var worldViewProjection = renderer.Data.GetOrCreate(Names.Matrix.WorldViewProjection, Matrix4x4.Identity);
 
                     //We are limited in per call primitives, depending on profile. These are the max possible values for each profile
                     int maxPrimitives = renderer.Device.GraphicsProfile == GraphicsProfile.HiDef ? 1048575 : 65535;
 
                     //Allow the instance to apply any old data that it likes into the renderer
                     Instance.ApplyRendererData(renderer.Data);
-                    renderer.Data.Set("opacity", Instance.Opacity);
-                    renderer.Data.Set("attenuation", Instance.Attenuation);
-                    renderer.Data.Set("scattering", Instance.SubSurfaceScattering);
+                    renderer.Data.Set(new TypedName<float>("opacity"), Instance.Opacity);
+                    renderer.Data.Set(new TypedName<float>("attenuation"), Instance.Attenuation);
+                    renderer.Data.Set(new TypedName<float>("scattering"), Instance.SubSurfaceScattering);
 
                     //Calculate transform matrices
                     world.Value = World;
@@ -371,7 +374,7 @@ namespace Myre.Graphics.Geometry
                     return;
 
                 //Find all items which are in the view bounds
-                var viewFrustum = metadata.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
+                var viewFrustum = metadata.GetValue(Names.View.ViewFrustum);
                 _bounds.Clear();
                 _bounds.Add(viewFrustum);
                 QueryVisible(meshes, _bounds, _buffer);
@@ -382,7 +385,7 @@ namespace Myre.Graphics.Geometry
                         result.Add(item);
 
                 //Calculate world view matrices for each mesh
-                var view = metadata.GetValue(new TypedName<Matrix4x4>("view"));
+                var view = metadata.GetValue(Names.Matrix.View);
 
                 //Calculate WorldView for all mesh instances
                 CalculateWorldViews(_buffer, view);

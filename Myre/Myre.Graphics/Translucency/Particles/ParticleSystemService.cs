@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities.Services;
 using System.Collections.Generic;
@@ -39,7 +38,7 @@ namespace Myre.Graphics.Translucency.Particles
                 return;
 
             //Get the view matrix from the renderer
-            var view = metadata.Get<Matrix4x4>("view").Value;
+            var view = metadata.GetOrCreate(Names.Matrix.View).Value;
 
             //Add all particle systems to the output buffer
             foreach (var particleSystem in _particleSystems.Values)

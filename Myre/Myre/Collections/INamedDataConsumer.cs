@@ -1,9 +1,12 @@
 ﻿
+using System.Diagnostics.Contracts;
+
 namespace Myre.Collections
 {
     /// <summary>
-    /// 
+    /// A collection of named data which is writeable
     /// </summary>
+    [ContractClass(typeof(INamedDataConsumerContract))]
     public interface INamedDataConsumer
     {
         /// <summary>
@@ -14,5 +17,14 @@ namespace Myre.Collections
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         void Set<T>(TypedName<T> key, T value);
+    }
+
+    [ContractClassFor(typeof(INamedDataConsumer))]
+    internal abstract class INamedDataConsumerContract : INamedDataConsumer
+    {
+        public void Set<T>(TypedName<T> key, T value)
+        {
+            Contract.Requires(key.Name != null);
+        }
     }
 }

@@ -118,6 +118,7 @@
     <Compile Include="Materials\Material.cs" />
     <Compile Include="Materials\MaterialParameter.cs" />
     <Compile Include="Materials\MaterialReader.cs" />
+    <Compile Include="Names.cs" />
     <Compile Include="PlanView.cs" />
     <Compile Include="PostProcessing\BasePostProcessComponent.cs" />
     <Compile Include="PostProcessing\Gaussian.cs" />

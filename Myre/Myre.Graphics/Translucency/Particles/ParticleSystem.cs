@@ -204,7 +204,7 @@ namespace Myre.Graphics.Translucency.Particles
                 // shader particle animation is keyed off this value.
                 _currentTimeParameter.SetValue(_time);
 
-                data.Set<Matrix4x4>("world", Transform);
+                data.Set<Matrix4x4>(Names.Matrix.World, Transform);
 
                 // Set the particle vertex and index buffer.
                 _device.SetVertexBuffer(_vertices);

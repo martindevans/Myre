@@ -59,7 +59,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             _touchesBothPlanes.Clear();
             _doesntTouchNear.Clear();
 
-            var frustum = renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum"));
+            var frustum = renderer.Data.GetValue(Names.View.ViewFrustum);
             
             foreach (var light in Behaviours)
             {
@@ -158,7 +158,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             var projection = metadata.GetValue<Matrix4x4>(new TypedName<Matrix4x4>("projection"));
 
             var world = Matrix4x4.CreateScale(light.Range / _geometry.Meshes[0].BoundingSphere.Radius) * Matrix4x4.CreateTranslation(light.Position);
-            metadata.Set<Matrix4x4>("world", world);
+            metadata.Set<Matrix4x4>(Names.Matrix.World, world);
 
             var worldview = world * view;
             metadata.Set(new TypedName<Matrix4x4>("worldview"), worldview);

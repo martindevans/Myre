@@ -3,13 +3,12 @@ using Myre.Collections;
 using Myre.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.Contracts;
 using System.Numerics;
-using System.Text;
 
 namespace Myre.Graphics.Materials
 {
-    struct ParameterType
+    internal struct ParameterType
     {
         public readonly EffectParameterType Type;
         public readonly int Rows;
@@ -123,390 +122,295 @@ namespace Myre.Graphics.Materials
 
             Type setterType;
             if (_setterTypeMappings.TryGetValue(typeName, out setterType))
-                return Activator.CreateInstance(setterType, parameter) as MaterialParameterSetter;
+                return (MaterialParameterSetter)Activator.CreateInstance(setterType, parameter);
             else
                 return null;
         }
     }
 
-    abstract class MaterialParameterSetter
+    internal abstract class MaterialParameterSetter
     {
-        protected readonly EffectParameter Parameter;
-        protected readonly string Semantic;
+        public abstract void Apply(NamedBoxCollection globals);
+    }
 
-        protected MaterialParameterSetter(EffectParameter parameter)
+    internal abstract class BaseMaterialParameterSetter<T>
+        : MaterialParameterSetter
+    {
+        private readonly EffectParameter _parameter;
+        private readonly TypedName<T> _semanticName;
+
+        private Box<T> _box;
+        private NamedBoxCollection _previousGlobals;
+
+        protected BaseMaterialParameterSetter(EffectParameter parameter)
         {
-            Parameter = parameter;
-            Semantic = parameter.Semantic.ToLower();
+            Contract.Requires(parameter != null);
+
+            _parameter = parameter;
+            _semanticName = new TypedName<T>(parameter.Semantic.ToLower());
         }
 
-        //Why does this take a BoxedValueStore<string> and not a NamedValueCollection?
-        //Because I don't *want* named values, I want boxed values!
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_parameter != null);
+        }
 
-        public abstract void Apply(BoxedValueStore<string> globals);
+        public override void Apply(NamedBoxCollection globals)
+        {
+            //If the box is null, or the globals collection has changed, get the box
+            if (_box == null || _previousGlobals != globals)
+            {
+                globals.TryGet(_semanticName, out _box);
+                _previousGlobals = globals;
+            }
+
+            //Set the value into the box
+            if (_box != null)
+                Set(_parameter, _box);
+        }
+
+        protected abstract void Set(EffectParameter parameter, Box<T> value);
     }
 
     #region SetterGenerator
-    static class ParameterSetterGenerator
-    {
-        private const string CLASS_TEMPLATE = @"
-    class [ClassPrefix]MaterialParameterSetter
-        : MaterialParameterSetter
-    {
-        private Box<[Type]> value;
-        private NamedBoxCollection previousGlobals;
+//    internal static class ParameterSetterGenerator
+//    {
+//        private const string CLASS_TEMPLATE = @"
+//    class [ClassPrefix]MaterialParameterSetter
+//        : MaterialParameterSetter
+//    {
+//        private Box<[Type]> value;
+//        private NamedBoxCollection previousGlobals;
+//
+//        public [ClassPrefix]MaterialParameterSetter(EffectParameter parameter)
+//            : base(parameter)
+//        {
+//        }
+//
+//        public override void Apply(NamedBoxCollection globals)
+//        {
+//            if (value == null || previousGlobals != globals)
+//            {
+//                globals.TryGet(Semantic, out value);
+//                previousGlobals = globals;
+//            }
+//
+//            if (value != null)
+//                Parameter.SetValue(value.Value);
+//        }
+//    }";
 
-        public [ClassPrefix]MaterialParameterSetter(EffectParameter parameter)
-            : base(parameter)
-        {
-        }
+//        private const string INITIALISATION_TEMPLATE = "{ typeof([Type]).Name, typeof([ClassPrefix]MaterialParameterSetter) },";
 
-        public override void Apply(BoxedValueStore<string> globals)
-        {
-            if (value == null || previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out value);
-                previousGlobals = globals;
-            }
+//        public static string Generate()
+//        {
+//            StringBuilder output = new StringBuilder();
+//            StringBuilder initialisation = new StringBuilder();
 
-            if (value != null)
-                Parameter.SetValue(value.Value);
-        }
-    }";
+//            var effectParameterType = typeof(EffectParameter);
+//            var types = from type in MaterialParameter.ParameterTypeMappings.Values
+//                        select type.Name;
 
-        private const string INITIALISATION_TEMPLATE = "{ typeof([Type]).Name, typeof([ClassPrefix]MaterialParameterSetter) },";
+//            var parameters = (from method in effectParameterType.GetMethods()
+//                              where method.Name == "SetValue"
+//                              select (from parameter in method.GetParameters()
+//                                      select parameter.ParameterType.Name))
+//                              .Flatten();
 
-        public static string Generate()
-        {
-            StringBuilder output = new StringBuilder();
-            StringBuilder initialisation = new StringBuilder();
+//            var arrays = from type in types
+//                         let typeArray = type + "[]"
+//                         where parameters.Contains(typeArray)
+//                         select typeArray;
 
-            var effectParameterType = typeof(EffectParameter);
-            var types = from type in MaterialParameter.ParameterTypeMappings.Values
-                        select type.Name;
+//            foreach (var type in types.Union(arrays))
+//            {
+//                var classDefinition = CLASS_TEMPLATE.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
+//                output.AppendLine(classDefinition);
 
-            var parameters = (from method in effectParameterType.GetMethods()
-                              where method.Name == "SetValue"
-                              select (from parameter in method.GetParameters()
-                                      select parameter.ParameterType.Name))
-                              .Flatten();
+//                var initialisationLine = INITIALISATION_TEMPLATE.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
+//                initialisation.AppendLine(initialisationLine);
+//            }
 
-            var arrays = from type in types
-                         let typeArray = type + "[]"
-                         where parameters.Contains(typeArray)
-                         select typeArray;
+//            output.AppendLine(initialisation.ToString());
 
-            foreach (var type in types.Union(arrays))
-            {
-                var classDefinition = CLASS_TEMPLATE.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
-                output.AppendLine(classDefinition);
-
-                var initialisationLine = INITIALISATION_TEMPLATE.Replace("[ClassPrefix]", type.Replace("[]", "Array")).Replace("[Type]", type);
-                initialisation.AppendLine(initialisationLine);
-            }
-
-            output.AppendLine(initialisation.ToString());
-
-            return output.ToString();
-        }
-    }
+//            return output.ToString();
+//        }
+//    }
     #endregion
 
     #region Setters
-    class BooleanMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class BooleanMaterialParameterSetter
+        : BaseMaterialParameterSetter<bool>
     {
-        private Box<Boolean> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public BooleanMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<bool> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Texture2DMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Texture2DMaterialParameterSetter
+        : BaseMaterialParameterSetter<Texture2D>
     {
-        private Box<Texture2D> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Texture2DMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Texture2D> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Int32MaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Int32MaterialParameterSetter
+        : BaseMaterialParameterSetter<int>
     {
-        private Box<Int32> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Int32MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<int> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class SingleMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class SingleMaterialParameterSetter
+        : BaseMaterialParameterSetter<float>
     {
-        private Box<Single> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public SingleMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<float> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Vector2MaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Vector2MaterialParameterSetter
+        : BaseMaterialParameterSetter<Vector2>
     {
-        private Box<Vector2> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Vector2MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Vector2> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Vector3MaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Vector3MaterialParameterSetter
+        : BaseMaterialParameterSetter<Vector3>
     {
-        private Box<Vector3> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Vector3MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Vector3> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Vector4MaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Vector4MaterialParameterSetter
+        : BaseMaterialParameterSetter<Vector4>
     {
-        private Box<Vector4> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Vector4MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Vector4> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Matrix4X4MaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Matrix4X4MaterialParameterSetter
+        : BaseMaterialParameterSetter<Matrix4x4>
     {
-        private Box<Matrix4x4> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Matrix4X4MaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Matrix4x4> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class StringMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class StringMaterialParameterSetter
+        : BaseMaterialParameterSetter<string>
     {
-        private Box<String> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public StringMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<string> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class BooleanArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class BooleanArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<bool[]>
     {
-        private Box<Boolean[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public BooleanArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<bool[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Int32ArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Int32ArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<int[]>
     {
-        private Box<Int32[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public Int32ArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<int[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class SingleArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class SingleArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<float[]>
     {
-        private Box<Single[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         public SingleArrayMaterialParameterSetter(EffectParameter parameter)
             : base(parameter)
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<float[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
-
-            if (_value != null)
-                Parameter.SetValue(_value.Value);
+            parameter.SetValue(value.Value);
         }
     }
 
-    class Vector2ArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Vector2ArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<Vector2[]>
     {
-        private Box<Vector2[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         private Microsoft.Xna.Framework.Vector2[] _conversion;
 
         public Vector2ArrayMaterialParameterSetter(EffectParameter parameter)
@@ -514,35 +418,23 @@ namespace Myre.Graphics.Materials
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Vector2[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
+            //Create an array to convert into (or reuse existing one)
+            if (_conversion == null || _conversion.Length != value.Value.Length)
+                _conversion = new Microsoft.Xna.Framework.Vector2[value.Value.Length];
 
-            if (_value != null)
-            {
-                //Create an array to convert into (or reuse existing one)
-                if (_conversion == null || _conversion.Length != _value.Value.Length)
-                    _conversion = new Microsoft.Xna.Framework.Vector2[_value.Value.Length];
+            //Convert to XNA types
+            for (int i = 0; i < value.Value.Length; i++)
+                _conversion[i] = value.Value[i].ToXNA();
 
-                //Convert to XNA types
-                for (int i = 0; i < _value.Value.Length; i++)
-                    _conversion[i] = _value.Value[i].ToXNA();
-
-                Parameter.SetValue(_conversion);
-            }
+            parameter.SetValue(_conversion);
         }
     }
 
-    class Vector3ArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Vector3ArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<Vector3[]>
     {
-        private Box<Vector3[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         private Microsoft.Xna.Framework.Vector3[] _conversion;
 
         public Vector3ArrayMaterialParameterSetter(EffectParameter parameter)
@@ -550,35 +442,23 @@ namespace Myre.Graphics.Materials
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Vector3[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
+            //Create an array to convert into (or reuse existing one)
+            if (_conversion == null || _conversion.Length != value.Value.Length)
+                _conversion = new Microsoft.Xna.Framework.Vector3[value.Value.Length];
 
-            if (_value != null)
-            {
-                //Create an array to convert into (or reuse existing one)
-                if (_conversion == null || _conversion.Length != _value.Value.Length)
-                    _conversion = new Microsoft.Xna.Framework.Vector3[_value.Value.Length];
+            //Convert to XNA types
+            for (int i = 0; i < value.Value.Length; i++)
+                _conversion[i] = value.Value[i].ToXNA();
 
-                //Convert to XNA types
-                for (int i = 0; i < _value.Value.Length; i++)
-                    _conversion[i] = _value.Value[i].ToXNA();
-
-                Parameter.SetValue(_conversion);
-            }
+            parameter.SetValue(_conversion);
         }
     }
 
-    class Vector4ArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Vector4ArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<Vector4[]>
     {
-        private Box<Vector4[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         private Microsoft.Xna.Framework.Vector4[] _conversion;
 
         public Vector4ArrayMaterialParameterSetter(EffectParameter parameter)
@@ -586,35 +466,23 @@ namespace Myre.Graphics.Materials
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Vector4[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
+            //Create an array to convert into (or reuse existing one)
+            if (_conversion == null || _conversion.Length != value.Value.Length)
+                _conversion = new Microsoft.Xna.Framework.Vector4[value.Value.Length];
 
-            if (_value != null)
-            {
-                //Create an array to convert into (or reuse existing one)
-                if (_conversion == null || _conversion.Length != _value.Value.Length)
-                    _conversion = new Microsoft.Xna.Framework.Vector4[_value.Value.Length];
+            //Convert to XNA types
+            for (int i = 0; i < value.Value.Length; i++)
+                _conversion[i] = value.Value[i].ToXNA();
 
-                //Convert to XNA types
-                for (int i = 0; i < _value.Value.Length; i++)
-                    _conversion[i] = _value.Value[i].ToXNA();
-
-                Parameter.SetValue(_conversion);
-            }
+            parameter.SetValue(_conversion);
         }
     }
 
-    class Matrix4X4ArrayMaterialParameterSetter
-        : MaterialParameterSetter
+    internal class Matrix4X4ArrayMaterialParameterSetter
+        : BaseMaterialParameterSetter<Matrix4x4[]>
     {
-        private Box<Matrix4x4[]> _value;
-        private BoxedValueStore<string> _previousGlobals;
-
         private Microsoft.Xna.Framework.Matrix[] _conversion;
 
         public Matrix4X4ArrayMaterialParameterSetter(EffectParameter parameter)
@@ -622,26 +490,17 @@ namespace Myre.Graphics.Materials
         {
         }
 
-        public override void Apply(BoxedValueStore<string> globals)
+        protected override void Set(EffectParameter parameter, Box<Matrix4x4[]> value)
         {
-            if (_value == null || _previousGlobals != globals)
-            {
-                globals.TryGet(Semantic, out _value);
-                _previousGlobals = globals;
-            }
+            //Create an array to convert into (or reuse existing one)
+            if (_conversion == null || _conversion.Length != value.Value.Length)
+                _conversion = new Microsoft.Xna.Framework.Matrix[value.Value.Length];
 
-            if (_value != null)
-            {
-                //Create an array to convert into (or reuse existing one)
-                if (_conversion == null || _conversion.Length != _value.Value.Length)
-                    _conversion = new Microsoft.Xna.Framework.Matrix[_value.Value.Length];
+            //Convert to XNA types
+            for (int i = 0; i < value.Value.Length; i++)
+                _conversion[i] = value.Value[i].ToXNA();
 
-                //Convert to XNA types
-                for (int i = 0; i < _value.Value.Length; i++)
-                    _conversion[i] = _value.Value[i].ToXNA();
-
-                Parameter.SetValue(_conversion);
-            }
+            parameter.SetValue(_conversion);
         }
     }
 #endregion

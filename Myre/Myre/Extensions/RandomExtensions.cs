@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Numerics;
 
 namespace Myre.Extensions
@@ -15,6 +16,7 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static Vector3 RandomNormalVector(this Random random)
         {
+            Contract.Requires(random != null);
 
             float randomA = (float)random.NextDouble() * 2 - 1;
             float randomB = (float)random.NextDouble() * 2 - 1;

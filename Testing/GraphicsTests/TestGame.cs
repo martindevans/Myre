@@ -38,7 +38,7 @@ namespace GraphicsTests
 
         public TestGame()
         {
-            GraphicsDeviceManager graphics = new GraphicsDeviceManager(this) {
+            var graphics = new GraphicsDeviceManager(this) {
                 GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferWidth = 1440,
                 PreferredBackBufferHeight = 900,
@@ -107,7 +107,7 @@ namespace GraphicsTests
             var console = new CommandConsole(this, Content.Load<SpriteFont>("Consolas"), _ui.Root);
             Kernel.Bind<CommandConsole>().ToConstant(console);
 
-            _screens = new ScreenManager(this);
+            _screens = new ScreenManager();
             _screens.Push(Kernel.Get<MainMenu>());  
 
             base.Initialize();

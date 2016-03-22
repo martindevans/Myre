@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace Myre
 {
@@ -12,6 +13,8 @@ namespace Myre
         #region Derivative
         public static Func<float, float> Derivative(this Func<float, float> interpolation, float dt)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => {
                 var a = interpolation(t);
                 var b = interpolation(t + dt);
@@ -28,6 +31,8 @@ namespace Myre
         /// <returns></returns>
         public static Func<float, float> None(float a = 0)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return _ => a;
         }
         #endregion
@@ -42,6 +47,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> Linear(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * t / d + b;
         }
         #endregion
@@ -57,6 +64,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ExpoEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => (Math.Abs(t - d) < EPSILON) ? b + c : c * (-(float)Math.Pow(2, -10 * t / d) + 1) + b;
         }
 
@@ -70,6 +79,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ExpoEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => (Math.Abs(t - 0) < EPSILON) ? b : c * (float)Math.Pow(2, 10 * (t / d - 1)) + b;
         }
 
@@ -83,6 +94,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ExpoEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if (Math.Abs(t - 0) < EPSILON)
@@ -108,6 +121,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ExpoEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = ExpoEaseOut(b, c / 2, d);
             var easeIn = ExpoEaseIn(b + c / 2, c / 2, d);
 
@@ -133,6 +148,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CircEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (float)Math.Sqrt(1 - (t = t / d - 1) * t) + b;
         }
 
@@ -146,6 +163,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CircEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => -c * ((float)Math.Sqrt(1 - (t /= d) * t) - 1) + b;
         }
 
@@ -159,6 +178,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CircEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d / 2) < 1)
@@ -178,6 +199,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CircEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = CircEaseOut(b, c / 2, d);
             var easeIn = CircEaseIn(b + c / 2, c / 2, d);
 
@@ -202,6 +225,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuadEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => -c * (t /= d) * (t - 2) + b;
         }
 
@@ -215,6 +240,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuadEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (t /= d) * t + b;
         }
 
@@ -228,6 +255,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuadEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d / 2) < 1)
@@ -247,6 +276,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuadEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = QuadEaseOut(b, c / 2, d);
             var easeIn = QuadEaseIn(b + c / 2, c / 2, d);
 
@@ -271,6 +302,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> SineEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (float)Math.Sin(t / d * (Math.PI / 2)) + b;
         }
 
@@ -284,6 +317,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> SineEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => -c * (float)Math.Cos(t / d * (Math.PI / 2)) + c + b;
         }
 
@@ -297,6 +332,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> SineEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d / 2) < 1)
@@ -316,6 +353,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> SineEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = SineEaseOut(b, c / 2, d);
             var easeIn = SineEaseIn(b + c / 2, c / 2, d);
 
@@ -340,6 +379,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CubicEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * ((t = t / d - 1) * t * t + 1) + b;
         }
 
@@ -353,6 +394,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CubicEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (t /= d) * t * t + b;
         }
 
@@ -366,6 +409,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CubicEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d / 2) < 1)
@@ -385,6 +430,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> CubicEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeIn = CubicEaseOut(b, c / 2, d);
             var easeOut = CubicEaseIn(b + c / 2, c / 2, d);
 
@@ -409,6 +456,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuartEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => -c * ((t = t / d - 1) * t * t * t - 1) + b;
         }
 
@@ -422,6 +471,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuartEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (t /= d) * t * t * t + b;
         }
 
@@ -435,6 +486,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuartEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d / 2) < 1)
@@ -454,6 +507,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuartEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = QuartEaseOut(b, c / 2, d);
             var easeIn = QuartEaseIn(b + c / 2, c / 2, d);
 
@@ -478,6 +533,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuintEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * ((t = t / d - 1) * t * t * t * t + 1) + b;
         }
 
@@ -491,6 +548,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuintEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (t /= d) * t * t * t * t + b;
         }
 
@@ -504,6 +563,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuintEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d / 2) < 1)
@@ -522,6 +583,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> QuintEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = QuintEaseOut(b, c / 2, d);
             var easeIn = QuintEaseIn(b + c / 2, c / 2, d);
 
@@ -545,6 +608,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ElasticEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if (Math.Abs((t /= d) - 1) < EPSILON)
@@ -567,6 +632,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ElasticEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if (Math.Abs((t /= d) - 1) < EPSILON)
@@ -589,6 +656,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ElasticEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if (Math.Abs((t /= d / 2) - 2) < EPSILON)
@@ -613,6 +682,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> ElasticEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = ElasticEaseOut(b, c / 2, d);
             var easeIn = ElasticEaseIn(b + c / 2, c / 2, d);
 
@@ -636,6 +707,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BounceEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 if ((t /= d) < (1 / 2.75f))
@@ -659,6 +732,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BounceEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var bounceOut = BounceEaseOut(0, c, d);
 
             return t => c - bounceOut(d - t) + b;
@@ -674,6 +749,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BounceEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeIn = BounceEaseIn(0, c, d);
             var easeOut = BounceEaseOut(0, c, d);
 
@@ -696,6 +773,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BounceEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = BounceEaseOut(b, c / 2, d);
             var easeIn = BounceEaseIn(b + c / 2, c / 2, d);
 
@@ -719,6 +798,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BackEaseOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * ((t = t / d - 1) * t * ((1.70158f + 1) * t + 1.70158f) + 1) + b;
         }
 
@@ -732,6 +813,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BackEaseIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t => c * (t /= d) * t * ((1.70158f + 1) * t - 1.70158f) + b;
         }
 
@@ -745,6 +828,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BackEaseInOut(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             return t =>
             {
                 float s = 1.70158f;
@@ -764,6 +849,8 @@ namespace Myre
         /// <returns>A function which returns the correct value.</returns>
         public static Func<float, float> BackEaseOutIn(float b = 0, float c = 1, float d = 1)
         {
+            Contract.Ensures(Contract.Result<Func<float, float>>() != null);
+
             var easeOut = BackEaseOut(b, c / 2, d);
             var easeIn = BackEaseIn(b + c / 2, c / 2, d);
 

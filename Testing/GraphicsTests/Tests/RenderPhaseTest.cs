@@ -29,7 +29,7 @@ namespace GraphicsTests.Tests
 
         public override void Draw(Renderer renderer)
         {
-            var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+            var resolution = renderer.Data.GetOrCreate(Names.View.Resolution).Value;
             var targetInfo = new RenderTargetInfo((int) resolution.X, (int) resolution.Y, SurfaceFormat.Color, DepthFormat.None, 4, default(bool), default(RenderTargetUsage));
 
             var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
@@ -64,7 +64,7 @@ namespace GraphicsTests.Tests
 
             public override void Draw(Renderer renderer)
             {
-                var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+                var resolution = renderer.Data.GetValue(Names.View.Resolution);
                 var targetInfo = new RenderTargetInfo((int) resolution.X, (int) resolution.Y, default(SurfaceFormat), default(DepthFormat), default(int), default(bool), default(RenderTargetUsage));
                 var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
                 renderer.Device.SetRenderTarget(target);

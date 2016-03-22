@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Diagnostics.Contracts;
 
 namespace Myre
 {
@@ -24,7 +25,15 @@ namespace Myre
         /// <param name="name"></param>
         public TypedName(string name)
         {
+            Contract.Requires(name != null);
+
             Name = name;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(Name != null);
         }
 
         /// <summary>
@@ -58,14 +67,15 @@ namespace Myre
         /// <returns></returns>
         public static explicit operator TypedName<T>(string name)
         {
+            Contract.Requires(name != null);
+
             return new TypedName<T>(name);
         }
     }
 
     /// <summary>
-    /// A string with an associated Type
+    /// A string with an associated Type (non generic)
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     [Serializable]
     public struct NameWithType
         : IEquatable<NameWithType>

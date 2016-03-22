@@ -129,7 +129,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
         public void Prepare(Renderer renderer)
         {
-            renderer.Data.GetValue(new TypedName<BoundingFrustum>("viewfrustum")).GetCorners(_frustumCornersWs);
+            renderer.Data.GetValue(Names.View.ViewFrustum).GetCorners(_frustumCornersWs);
 
             for (int i = 0; i < _lights.Count; i++)
             {
@@ -203,7 +203,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.SetRenderTarget(target);
             renderer.Device.Clear(Color.Black);
 
-            var resolution = renderer.Data.Get<Vector2>("resolution", default(Vector2), true);
+            var resolution = renderer.Data.GetOrCreate<Vector2>(Names.View.Resolution);
             var previousResolution = resolution.Value;
             resolution.Value = new Vector2(light.ShadowResolution);
 
@@ -211,7 +211,7 @@ namespace Myre.Graphics.Deferred.LightManagers
             renderer.Device.BlendState = BlendState.Opaque;
             renderer.Device.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            var view = renderer.Data.Get<View>("activeview", default(View), true);
+            var view = renderer.Data.GetOrCreate<View>(Names.View.ActiveView);
             var previousView = view.Value;
             view.Value = _shadowView;
 

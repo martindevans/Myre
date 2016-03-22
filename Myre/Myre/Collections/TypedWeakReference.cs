@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Collections
 {
@@ -56,6 +57,8 @@ namespace Myre.Collections
         /// <param name="target">The target.</param>
         public TypedWeakReference(T target)
         {
+            Contract.Requires(target != null);
+
             _reference = new WeakReference(target);
         }
 
@@ -66,7 +69,15 @@ namespace Myre.Collections
         /// <param name="trackResurrection">if set to <c>true</c> the object referenced by this weak reference is tracked after finalisation.</param>
         public TypedWeakReference(T target, bool trackResurrection)
         {
+            Contract.Requires(target != null);
+
             _reference = new WeakReference(target, trackResurrection);
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_reference != null);
         }
     }
 }

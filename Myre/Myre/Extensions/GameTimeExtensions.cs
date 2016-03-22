@@ -1,4 +1,7 @@
 ﻿
+using System.Diagnostics.Contracts;
+using Microsoft.Xna.Framework;
+
 namespace Myre.Extensions
 {
     /// <summary>
@@ -11,8 +14,10 @@ namespace Myre.Extensions
         /// </summary>
         /// <param name="t">The t.</param>
         /// <returns>The number of seconds elapsed since the last frame.</returns>
-        public static float Seconds(this Microsoft.Xna.Framework.GameTime t)
+        public static float Seconds(this GameTime t)
         {
+            Contract.Requires(t != null);
+
             return (float)t.ElapsedGameTime.TotalSeconds;
         }
 
@@ -21,8 +26,10 @@ namespace Myre.Extensions
         /// </summary>
         /// <param name="t">The t.</param>
         /// <returns>The total number of seconds elapsed since the game started.</returns>
-        public static double TotalSeconds(this Microsoft.Xna.Framework.GameTime t)
+        public static double TotalSeconds(this GameTime t)
         {
+            Contract.Requires(t != null);
+
             return (float)t.TotalGameTime.TotalSeconds;
         }
     }

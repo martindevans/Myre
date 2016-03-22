@@ -75,7 +75,7 @@ namespace GraphicsTests.Tests
             var entity = particleEntityDesc.Create();
             entity.GetProperty(new TypedName<Vector3>("position")).Value = Vector3.Zero;
             NamedBoxCollection initData = new NamedBoxCollection();
-            initData.Set<ParticleEmitterDescription>("particlesystem", _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
+            initData.Set(new TypedName<ParticleEmitterDescription>("particlesystem"), _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
             _scene.Add(entity, initData);
             
             base.OnShown();

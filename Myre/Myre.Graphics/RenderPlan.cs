@@ -205,7 +205,7 @@ namespace Myre.Graphics
         internal void SetResource(string name, RenderTarget2D resource)
         {
             _resources[name].RenderTarget = resource;
-            Renderer.Data.Set<Texture2D>(name, resource);
+            Renderer.Data.Set(new TypedName<Texture2D>(name), resource);
         }
 
         public IEnumerable<string> Resources

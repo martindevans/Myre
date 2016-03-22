@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Extensions
 {
@@ -18,17 +19,15 @@ namespace Myre.Extensions
         /// <param name="comparison">The comparison.</param>
         public static void InsertionSort<T>(this IList<T> list, Comparison<T> comparison)
         {
-            if (list == null)
-                throw new ArgumentNullException("list");
-            if (comparison == null)
-                throw new ArgumentNullException("comparison");
+            Contract.Requires(list != null);
+            Contract.Requires(comparison != null);
 
-            int count = list.Count;
-            for (int j = 1; j < count; j++)
+            var count = list.Count;
+            for (var j = 1; j < count; j++)
             {
-                T key = list[j];
+                var key = list[j];
 
-                int i = j - 1;
+                var i = j - 1;
                 for (; i >= 0 && comparison(list[i], key) > 0; i--)
                 {
                     list[i + 1] = list[i];
@@ -47,17 +46,15 @@ namespace Myre.Extensions
         /// <param name="comparer">The comparer.</param>
         public static void InsertionSort<T>(this IList<T> list, IComparer<T> comparer)
         {
-            if (list == null)
-                throw new ArgumentNullException("list");
-            if (comparer == null)
-                throw new ArgumentNullException("comparer");
+            Contract.Requires(list != null);
+            Contract.Requires(comparer != null);
 
-            int count = list.Count;
-            for (int j = 1; j < count; j++)
+            var count = list.Count;
+            for (var j = 1; j < count; j++)
             {
-                T key = list[j];
+                var key = list[j];
 
-                int i = j - 1;
+                var i = j - 1;
                 for (; i >= 0 && comparer.Compare(list[i], key) > 0; i--)
                 {
                     list[i + 1] = list[i];
@@ -74,7 +71,10 @@ namespace Myre.Extensions
         /// <param name="predicate"></param>
         public static void RemoveAll<T>(this IList<T> list, Predicate<T> predicate)
         {
-            for (int i = list.Count - 1; i >= 0; i--)
+            Contract.Requires(list != null);
+            Contract.Requires(predicate != null);
+
+            for (var i = list.Count - 1; i >= 0; i--)
             {
                 if (predicate.Invoke(list[i]))
                     list.RemoveAt(i);
@@ -90,7 +90,10 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static int FindIndex<T>(this IList<T> list, Predicate<T> predicate)
         {
-            for (int i = 0; i < list.Count; i++)
+            Contract.Requires(list != null);
+            Contract.Requires(predicate != null);
+
+            for (var i = 0; i < list.Count; i++)
             {
                 if (predicate(list[i]))
                     return i;

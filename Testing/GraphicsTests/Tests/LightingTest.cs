@@ -4,8 +4,6 @@ using Microsoft.Xna.Framework.Input;
 using Myre.Graphics;
 using Myre.Graphics.Deferred;
 using Ninject;
-using System.Numerics;
-
 using Color = Microsoft.Xna.Framework.Color;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
@@ -65,15 +63,15 @@ namespace GraphicsTests.Tests
                 _previousKeyboard = keyboard;
 
                 var metadata = renderer.Data;
-                var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+                var resolution = renderer.Data.GetValue(Names.View.Resolution);
                 var targetInfo = new RenderTargetInfo((int)resolution.X, (int)resolution.Y, SurfaceFormat.Rgba64, default(DepthFormat), default(int), default(bool), default(RenderTargetUsage));
                 var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
                 renderer.Device.SetRenderTarget(target);
 
-                var depth = metadata.Get<Texture2D>("gbuffer_depth").Value;
-                var normals = metadata.Get<Texture2D>("gbuffer_normals").Value;
-                var diffuse = metadata.Get<Texture2D>("gbuffer_diffuse").Value;
-                var light = metadata.Get<Texture2D>("lightbuffer").Value;
+                var depth = metadata.GetValue(Names.Deferred.Textures.Depth);
+                var normals = metadata.GetValue(Names.Deferred.Textures.Normals);
+                var diffuse = metadata.GetValue(Names.Deferred.Textures.Diffuse);
+                var light = metadata.GetValue(Names.Deferred.Textures.LightBuffer);
 
                 //using (var stream = File.Create("lightbuffer.jpg"))
                 //    light.SaveAsJpeg(stream, light.Width, light.Height);

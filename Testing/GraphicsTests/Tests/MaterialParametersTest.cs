@@ -7,7 +7,8 @@ using Myre.Graphics.Materials;
 using Ninject;
 using System;
 using System.Collections.Generic;
-
+using Myre;
+using Myre.Extensions;
 using Color = Microsoft.Xna.Framework.Color;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 
@@ -46,7 +47,7 @@ namespace GraphicsTests.Tests
             _quad = new Quad(_device);
             _metadata = new NamedBoxCollection();
 
-            _metadata.Set("colour", Color.White.ToVector4());
+            _metadata.Set(new TypedName<Vector4>("colour"), Color.White.ToVector4().FromXNA());
 
             base.OnShown();
         }
@@ -54,7 +55,7 @@ namespace GraphicsTests.Tests
         public override void Update(GameTime gameTime)
         {
             var time = gameTime.TotalGameTime.TotalSeconds;
-            _metadata.Set("colour", new Vector4((float)Math.Sin(time), (float)Math.Sin(time * 2), (float)Math.Sin(time * 3), 1f));
+            _metadata.Set(new TypedName<Vector4>("colour"), new Vector4((float)Math.Sin(time), (float)Math.Sin(time * 2), (float)Math.Sin(time * 3), 1f));
             
             base.Update(gameTime);
         }

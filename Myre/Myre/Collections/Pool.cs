@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Collections
 {
@@ -17,6 +18,7 @@ namespace Myre.Collections
         {
             get
             {
+                Contract.Ensures(Contract.Result<Pool<T>>() != null);
                 return _instance;
             }
         }
@@ -51,6 +53,8 @@ namespace Myre.Collections
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Get()
         {
+            Contract.Ensures(Contract.Result<T>() != null);
+
             T item;
             if (!_items.TryPop(out item))
             {
@@ -72,6 +76,8 @@ namespace Myre.Collections
         /// <param name="item">The item to be returned.</param>
         public void Return(T item)
         {
+            Contract.Requires(item != null);
+
             _items.Push(item);
         }
     }

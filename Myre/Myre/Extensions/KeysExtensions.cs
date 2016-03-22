@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace Myre.Extensions
 {
@@ -17,6 +18,9 @@ namespace Myre.Extensions
         {
             switch (key)
             {
+                default:
+                    throw new ArgumentOutOfRangeException("key", string.Format("Unknown key code {0}", key));
+
                 case Keys.Apps:
                 case Keys.Attn:
                 case Keys.BrowserBack:
@@ -102,7 +106,83 @@ namespace Myre.Extensions
                 case Keys.Zoom:
                     return false;
 
-                default:
+                case Keys.A:
+                case Keys.Add:
+                case Keys.B:
+                case Keys.Back:
+                case Keys.C:
+                case Keys.CapsLock:
+                case Keys.D:
+                case Keys.D0:
+                case Keys.D1:
+                case Keys.D2:
+                case Keys.D3:
+                case Keys.D4:
+                case Keys.D5:
+                case Keys.D6:
+                case Keys.D7:
+                case Keys.D8:
+                case Keys.D9:
+                case Keys.Decimal:
+                case Keys.Delete:
+                case Keys.Divide:
+                case Keys.Down:
+                case Keys.E:
+                case Keys.End:
+                case Keys.F:
+                case Keys.G:
+                case Keys.H:
+                case Keys.Home:
+                case Keys.I:
+                case Keys.Insert:
+                case Keys.J:
+                case Keys.K:
+                case Keys.L:
+                case Keys.Left:
+                case Keys.LeftShift:
+                case Keys.M:
+                case Keys.Multiply:
+                case Keys.N:
+                case Keys.NumLock:
+                case Keys.NumPad0:
+                case Keys.NumPad1:
+                case Keys.NumPad2:
+                case Keys.NumPad3:
+                case Keys.NumPad4:
+                case Keys.NumPad5:
+                case Keys.NumPad6:
+                case Keys.NumPad7:
+                case Keys.NumPad8:
+                case Keys.NumPad9:
+                case Keys.O:
+                case Keys.OemSemicolon:
+                case Keys.OemBackslash:
+                case Keys.OemQuestion:
+                case Keys.OemTilde:
+                case Keys.OemOpenBrackets:
+                case Keys.OemPipe:
+                case Keys.OemCloseBrackets:
+                case Keys.OemQuotes:
+                case Keys.OemComma:
+                case Keys.OemMinus:
+                case Keys.OemPeriod:
+                case Keys.OemPlus:
+                case Keys.P:
+                case Keys.Q:
+                case Keys.R:
+                case Keys.Right:
+                case Keys.RightShift:
+                case Keys.S:
+                case Keys.Space:
+                case Keys.Subtract:
+                case Keys.T:
+                case Keys.U:
+                case Keys.Up:
+                case Keys.V:
+                case Keys.W:
+                case Keys.X:
+                case Keys.Y:
+                case Keys.Z:
                     return true;
             }
         }

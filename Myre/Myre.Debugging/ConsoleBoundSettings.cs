@@ -66,7 +66,7 @@ namespace Myre.Debugging
         /// <returns>The box which this setting references</returns>
         public Box<T> Add<T>(string name, string description = null, T defaultValue = default(T))
         {
-            var box = _data.Get(name, defaultValue);
+            var box = _data.GetOrCreate(new TypedName<T>(name), defaultValue);
             var setting = new Setting<T>
             {
                 Name = name,

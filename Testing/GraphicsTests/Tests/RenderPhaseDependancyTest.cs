@@ -125,8 +125,8 @@ namespace GraphicsTests.Tests
                 renderer.Device.SetRenderTarget(target);
 
                 var metadata = renderer.Data;
-                var a = metadata.Get<Texture2D>("a").Value;
-                var b = metadata.Get<Texture2D>("b").Value;
+                var a = metadata.GetValue(new TypedName<Texture2D>("a"));
+                var b = metadata.GetValue(new TypedName<Texture2D>("b"));
 
                 _spriteBatch.Begin();
                 _spriteBatch.Draw(a, new Rectangle(0, 0, 50, 50), Color.White);
@@ -170,7 +170,7 @@ namespace GraphicsTests.Tests
                 renderer.Device.SetRenderTarget(target);
 
                 var metadata = renderer.Data;
-                var c = metadata.Get<Texture2D>("c").Value;
+                var c = metadata.GetValue(new TypedName<Texture2D>("c"));
 
                 _spriteBatch.Begin();
                 _spriteBatch.Draw(c, new Rectangle(590, 335, 100, 50), Color.White);

@@ -102,7 +102,7 @@ namespace Myre.Graphics.Animation
 
         void ModelInstance.IRenderDataSupplier.SetRenderData(NamedBoxCollection metadata)
         {
-            metadata.Set<Matrix4x4[]>("bones", _skinTransforms);
+            metadata.Set<Matrix4x4[]>(Names.Animation.Bones, _skinTransforms);
         }
 
         /// <summary>

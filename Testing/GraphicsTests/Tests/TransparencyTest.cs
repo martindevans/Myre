@@ -119,7 +119,7 @@ namespace GraphicsTests.Tests
             particleEntityDesc.AddBehaviour<ParticleEmitter>();
             var entity = particleEntityDesc.Create();
             NamedBoxCollection initData = new NamedBoxCollection();
-            initData.Set<ParticleEmitterDescription>("particlesystem", _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
+            initData.Set(new TypedName<ParticleEmitterDescription>("particlesystem"), _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
             _scene.Add(entity, initData);
 
             _scene.GetService<Renderer>()
@@ -151,10 +151,10 @@ namespace GraphicsTests.Tests
             if (mouse.IsButtonDown(MouseButtons.Right))
             {
                 var renderer = _scene.GetService<Renderer>();
-                var resolution = renderer.Data.Get<Vector2>("resolution");
+                var resolution = renderer.Data.GetValue(Names.View.Resolution);
 
                 var mousePosition = new Vector2(mouse.X, mouse.Y);
-                var mouseDelta = mousePosition - resolution.Value / 2;
+                var mouseDelta = mousePosition - resolution / 2;
 
                 _cameraRotation.Y -= mouseDelta.X * time * 0.1f;
                 _cameraRotation.X -= mouseDelta.Y * time * 0.1f;
@@ -176,7 +176,7 @@ namespace GraphicsTests.Tests
                 Matrix4x4.Invert(rotation * Matrix4x4.CreateTranslation(_cameraPosition), out invView);
                 _camera.View = invView;
 
-                Mouse.SetPosition((int)resolution.Value.X / 2, (int)resolution.Value.Y / 2);
+                Mouse.SetPosition((int)resolution.X / 2, (int)resolution.Y / 2);
             }
 
             _previousKeyboard = keyboard;

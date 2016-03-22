@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace Myre.Extensions
 {
@@ -13,6 +14,8 @@ namespace Myre.Extensions
         /// <param name="sb"></param>
         public static void Clear(this StringBuilder sb)
         {
+            Contract.Requires(sb != null);
+
             sb.Remove(0, sb.Length);
         }
 
@@ -23,6 +26,9 @@ namespace Myre.Extensions
         /// <param name="stringBuilder">The string builder.</param>
         public static void Append(this StringBuilder sb, StringBuilder stringBuilder)
         {
+            Contract.Requires(sb != null);
+            Contract.Requires(stringBuilder != null);
+
             sb.Append(stringBuilder, 0, stringBuilder.Length);
         }
 
@@ -35,8 +41,11 @@ namespace Myre.Extensions
         /// <param name="length">The number of characters to append..</param>
         public static void Append(this StringBuilder sb, StringBuilder stringBuilder, int start, int length)
         {
+            Contract.Requires(sb != null);
+            Contract.Requires(stringBuilder != null);
+
             var end = start + length;
-            for (int i = start; i < end; i++)
+            for (var i = start; i < end; i++)
                 sb.Append(stringBuilder[i]);
         }
     }

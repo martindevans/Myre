@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 
 namespace Myre.Extensions
@@ -21,6 +22,8 @@ namespace Myre.Extensions
                 return s;
 
             var parseMethod = t.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null);
+            if (parseMethod == null)
+                throw new InvalidOperationException(string.Format("No default Parse method found for type '{0}'", t.Name));
 
             return parseMethod.Invoke(null, new object[] {s});
         }
@@ -32,6 +35,9 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<Type> GetImplementedTypes(this Type t)
         {
+            Contract.Requires(t != null);
+            Contract.Ensures(Contract.Result<IEnumerable<Type>>() != null);
+
             //A type obviously is itself
             yield return t;
 

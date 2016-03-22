@@ -1,5 +1,6 @@
-﻿using Myre.Extensions;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Myre.Collections
@@ -11,20 +12,34 @@ namespace Myre.Collections
     public class CascadingBoxCollection
         : INamedDataCollection
     {
+        #region fields
         private readonly INamedDataProvider _parent;
         private readonly NamedBoxCollection _values;
         private readonly IEnumerable<KeyValuePair<string, IBox>> _enumerable;
+        #endregion
 
+        #region constructor
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parent"></param>
         public CascadingBoxCollection(INamedDataProvider parent)
         {
+            Contract.Requires(parent != null);
+
             _parent = parent;
             _values = new NamedBoxCollection();
 
             _enumerable = _parent.Where(a => _values.Contains(a.Key, a.Value.Type)).Concat(_values);
+        }
+        #endregion
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_parent != null);
+            Contract.Invariant(_values != null);
+            Contract.Invariant(_enumerable != null);
         }
 
         /// <summary>
@@ -70,25 +85,15 @@ namespace Myre.Collections
             return _parent.TryGetValue<T>(name, out value);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="create"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public Box<T> Get<T>(TypedName<T> key, T defaultValue = default(T), bool create = true)
-        {
-            return _values.Get<T>(key.Name, defaultValue, create);
-        }
-
+        #region enumeration
         /// <summary>
         /// Enumerate all values in this collection
         /// </summary>
         /// <returns></returns>
         public IEnumerator<KeyValuePair<string, IBox>> GetEnumerator()
         {
+            Contract.Ensures(Contract.Result<IEnumerator<KeyValuePair<string, IBox>>>() != null);
+
             return _enumerable.GetEnumerator();
         }
 
@@ -96,9 +101,12 @@ namespace Myre.Collections
         /// Enumerate this collection
         /// </summary>
         /// <returns></returns>
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
+            Contract.Ensures(Contract.Result<IEnumerator>() != null);
+
             return GetEnumerator();
         }
+        #endregion
     }
 }

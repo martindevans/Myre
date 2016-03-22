@@ -256,7 +256,7 @@ namespace GraphicsTests
             _scene.Add(sponzaEntity);
 
             var renderer = _scene.GetService<Renderer>();
-            _resolution = renderer.Data.Get<Vector2>("resolution");
+            _resolution = renderer.Data.GetOrCreate(Names.View.Resolution);
 
             var console = kernel.Get<CommandConsole>();
             renderer.Settings.BindCommandEngine(console.Engine);

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.Contracts;
+using System.Numerics;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Myre.Extensions
@@ -14,7 +15,9 @@ namespace Myre.Extensions
         /// <returns>Half the size of a pixel</returns>
         public static Vector2 CalculateHalfPixel(this GraphicsDevice device)
         {
-            Vector2 resolution = device.GetResolution();
+            Contract.Requires(device != null);
+
+            var resolution = device.GetResolution();
             return new Vector2(0.5f / resolution.X, 0.5f / resolution.Y);
         }
 
@@ -24,7 +27,11 @@ namespace Myre.Extensions
         /// <returns>The resolution of the currently set render target or back buffer.</returns>
         public static Vector2 GetResolution(this GraphicsDevice device)
         {
-            PresentationParameters pp = device.PresentationParameters;
+            Contract.Requires(device != null);
+
+            var pp = device.PresentationParameters;
+            Contract.Assume(pp != null);
+
             return new Vector2(pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
@@ -35,6 +42,8 @@ namespace Myre.Extensions
         /// <param name="depth">The depth to clear the depth buffer to.</param>
         public static void ClearDepth(this GraphicsDevice device, int depth)
         {
+            Contract.Requires(device != null);
+
             device.Clear(ClearOptions.DepthBuffer, Microsoft.Xna.Framework.Color.White, depth, 0);
         }
     }

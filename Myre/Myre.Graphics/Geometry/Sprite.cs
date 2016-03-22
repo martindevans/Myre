@@ -275,7 +275,7 @@ namespace Myre.Graphics.Geometry
 
         public override void Draw(Renderer renderer)
         {
-            var viewport = renderer.Data.Get<View>("activeview");
+            var viewport = renderer.Data.GetOrCreate<View>(Names.View.ActiveView);
 
             _batch.Begin();
             _sprites.Draw(viewport.Value, _batch);

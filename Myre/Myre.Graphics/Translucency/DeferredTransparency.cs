@@ -73,7 +73,7 @@ namespace Myre.Graphics.Translucency
         public override void Draw(Renderer renderer)
         {
             //Create layers
-            var layersCount = renderer.Data.Get<int>("transparency_deferred_layers", 5, true).Value;
+            var layersCount = renderer.Data.GetOrCreate(Names.Translucency.Deferred.DepthPeelLayers, 5).Value;
             while (_layers.Count > layersCount)
                 _layers.RemoveAt(_layers.Count - 1);
             while (_layers.Count < layersCount)
@@ -87,7 +87,7 @@ namespace Myre.Graphics.Translucency
                 geometryProvider.Query("translucent", renderer.Data, _geometry);
 
             //Peel geometry into separate layers
-            _depthPeeler.Peel(_geometry, _layers, renderer.Data.Get<View>("activeview").Value);
+            _depthPeeler.Peel(_geometry, _layers, renderer.Data.GetOrCreate(Names.View.ActiveView).Value);
 
             //Get the lightbuffer (result of opaque deferred rendering)
             var lightbuffer = GetResource("lightbuffer");
@@ -97,7 +97,7 @@ namespace Myre.Graphics.Translucency
             var normals = GetResource("gbuffer_normals");
             var diffuse = GetResource("gbuffer_diffuse");
 
-            renderer.Data.Set<bool>("render_translucent", true);
+            renderer.Data.Set<bool>(ModelInstance.RenderTranslucentFlagName, true);
 
             //Render each peeled depth layer
             for (int i = 0; i < _layers.Count; i++)
@@ -128,7 +128,7 @@ namespace Myre.Graphics.Translucency
                 RenderTargetManager.RecycleTarget(tempLightbuffer);
             }
 
-            renderer.Data.Set<bool>("render_translucent", false);
+            renderer.Data.Set<bool>(ModelInstance.RenderTranslucentFlagName, false);
 
             //Now output the modified lightbuffer
             Output("lightbuffer", lightbuffer);
@@ -152,7 +152,7 @@ namespace Myre.Graphics.Translucency
             RestoreDepthPhase.RestoreDepth(renderer, _quad, _restoreDepth, false);
 
             //Put the transparency lightbuffer into the metadata so pixel shader semantics can access it
-            renderer.Data.Set<Texture2D>("transparency_lightbuffer", transparencyLightbuffer);
+            renderer.Data.Set(Names.Translucency.Deferred.TransparencyLightbuffer, transparencyLightbuffer);
 
             //Draw the transparent geometry again, but this time draw the back side and set depth read to greaterequal
             //The material applied here has the distance to the front (read from gbuffer_depth) and the distance to the back (calculate from geometry being rendered)
@@ -164,7 +164,7 @@ namespace Myre.Graphics.Translucency
             renderer.Device.RasterizerState = RasterizerState.CullCounterClockwise;
 
             //Remove transparency lightbuffer from the metadata
-            renderer.Data.Set<Texture2D>("transparency_lightbuffer", null);
+            renderer.Data.Set(Names.Translucency.Deferred.TransparencyLightbuffer, null);
 
             //Blend the temp lightbuffer into the real lightbuffer
             renderer.Device.SetRenderTarget(lightbuffer);

@@ -85,7 +85,7 @@ namespace Myre.Graphics
 
         public override void Update(float elapsedTime)
         {
-            _data.Set<float>("timedelta", elapsedTime);
+            _data.Set<float>(Names.TimeDelta, elapsedTime);
             base.Update(elapsedTime);
         }
 

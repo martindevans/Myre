@@ -28,7 +28,7 @@ namespace Myre.Graphics.Deferred.Decals
         {
             var device = renderer.Device;
 
-            var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+            var resolution = renderer.Data.GetOrCreate<Vector2>(Names.View.Resolution).Value;
 
             //Create targets to write our changes into
             var decalNormals = RenderTargetManager.GetTarget(device, (int)resolution.X, (int)resolution.Y, SurfaceFormat.Rgba1010102, usage: RenderTargetUsage.DiscardContents);

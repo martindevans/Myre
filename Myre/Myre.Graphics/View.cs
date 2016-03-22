@@ -28,18 +28,18 @@ namespace Myre.Graphics
 
         public override void CreateProperties(Entity.ConstructionContext context)
         {
-            _camera = context.CreateProperty(new TypedName<Camera>("camera"));
-            _viewport = context.CreateProperty(new TypedName<Viewport>("viewport"));
+            _camera = context.CreateProperty(Names.View.Camera);
+            _viewport = context.CreateProperty(Names.View.ViewPort);
 
             base.CreateProperties(context);
         }
 
         public virtual void SetMetadata(RendererMetadata metadata)
         {
-            metadata.Set("activeview", this);
-            metadata.Set("resolution", new Vector2(_viewport.Value.Width, _viewport.Value.Height));
-            metadata.Set("viewport", _viewport.Value);
-            metadata.Set("aspectratio", _viewport.Value.AspectRatio);
+            metadata.Set(Names.View.ActiveView, this);
+            metadata.Set(Names.View.Resolution, new Vector2(_viewport.Value.Width, _viewport.Value.Height));
+            metadata.Set(Names.View.ViewPort, _viewport.Value);
+            metadata.Set(Names.View.AspectRatio, _viewport.Value.AspectRatio);
             _camera.Value.SetMetadata(metadata);
         }
 

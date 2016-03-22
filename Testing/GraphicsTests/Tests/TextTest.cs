@@ -55,7 +55,7 @@ namespace GraphicsTests.Tests
                 .Then<AntiAliasComponent>()
                 .Show("antialiased")
                 .Apply();
-            _resolution = renderer.Data.Get<Vector2>("resolution");
+            _resolution = renderer.Data.GetOrCreate<Vector2>(Names.View.Resolution);
 
             //Create camera
             _camera = new Camera { NearClip = 1, FarClip = 7000, View = Matrix4x4.CreateLookAt(new Vector3(-100, 300, 10), new Vector3(300, 0, 0), -Vector3.UnitZ) };

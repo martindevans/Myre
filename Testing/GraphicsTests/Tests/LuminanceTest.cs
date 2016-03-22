@@ -60,13 +60,13 @@ namespace GraphicsTests.Tests
             public override void Draw(Renderer renderer)
             {
                 var metadata = renderer.Data;
-                var resolution = renderer.Data.Get<Vector2>("resolution").Value;
+                var resolution = renderer.Data.GetValue(Names.View.Resolution);
                 var targetInfo = new RenderTargetInfo((int)resolution.X, (int)resolution.Y, SurfaceFormat.Rgba64, DepthFormat.Depth24Stencil8, default(int), default(bool), default(RenderTargetUsage));
                 var target = RenderTargetManager.GetTarget(renderer.Device, targetInfo);
                 renderer.Device.SetRenderTarget(target);
 
-                var light = metadata.Get<Texture2D>("tonemapped").Value;
-                var luminance = metadata.Get<Texture2D>("luminancemap").Value;
+                var light = metadata.GetValue(new TypedName<Texture2D>("tonemapped"));
+                var luminance = metadata.GetValue(new TypedName<Texture2D>("luminancemap"));
 
                 //using (var stream = File.Create("luminance.jpg"))
                 //    light.SaveAsJpeg(stream, light.Width, light.Height);

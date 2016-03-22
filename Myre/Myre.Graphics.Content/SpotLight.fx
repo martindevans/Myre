@@ -92,7 +92,7 @@ float4 CalculateLighting(float2 texCoord, float3 viewPosition)
 		// Falloff with anglular distance from center of light
 		// falloff is 1 at center of light and 0 at edge
 		float falloff = (Angle - LdD) / (Angle - 1);
-		attenuation *= pow(falloff, Falloff);
+		attenuation *= pow(abs(falloff), Falloff);
 
 		float3 V = normalize(CameraPosition - viewPosition);
 		float3 R = normalize(reflect(-L, normal));

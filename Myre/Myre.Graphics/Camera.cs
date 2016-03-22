@@ -110,17 +110,17 @@ namespace Myre.Graphics
 
         public void SetMetadata(NamedBoxCollection metadata)
         {
-            metadata.Set("camera", this);
-            metadata.Set("view", View);
-            metadata.Set("projection", Projection);
-            metadata.Set("viewprojection", ViewProjection);
-            metadata.Set("inverseview", _inverseView);
-            metadata.Set("inverseprojection", _inverseProjection);
-            metadata.Set("inverseviewprojection", _inverseViewProjection);
-            metadata.Set("viewfrustum", Bounds);
-            metadata.Set("nearclip", NearClip);
-            metadata.Set("farclip", FarClip);
-            metadata.Set("cameraposition", Position);
+            metadata.Set(Names.View.Camera, this);
+            metadata.Set(Names.Matrix.View, View);
+            metadata.Set(Names.Matrix.Projection, Projection);
+            metadata.Set(Names.Matrix.ViewProjection, ViewProjection);
+            metadata.Set(Names.Matrix.InverseView, _inverseView);
+            metadata.Set(Names.Matrix.InverseProjection, _inverseProjection);
+            metadata.Set(Names.Matrix.InverseViewProjection, _inverseViewProjection);
+            metadata.Set(Names.View.ViewFrustum, Bounds);
+            metadata.Set(Names.View.NearClip, NearClip);
+            metadata.Set(Names.View.FarClip, FarClip);
+            metadata.Set(Names.View.CameraPosition, Position);
 
             _bounds.GetCorners(_frustumCorners);
             for (int i = 0; i < 4; i++)
@@ -129,7 +129,7 @@ namespace Myre.Graphics
             for (int i = 0; i < _farFrustumCorners.Length; i++)
                 _farFrustumCorners[i] = Vector3.Transform(_farFrustumCorners[i], _view);
 
-            metadata.Set("farfrustumcorners", _farFrustumCorners);
+            metadata.Set(Names.View.FarFrustumCorners, _farFrustumCorners);
         }
     }
 }

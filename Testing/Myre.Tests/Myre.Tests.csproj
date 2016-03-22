@@ -60,8 +60,6 @@
   <ItemGroup>
     <Compile Include="Myre.Entities\Events\EventServiceTest.cs" />
     <Compile Include="Myre\Collections\NamedBoxCollectionTest.cs" />
-    <Compile Include="Myre\Collections\Octree.cs" />
-    <Compile Include="Myre\Collections\RingBufferTest.cs" />
     <Compile Include="Myre\Extensions\PlaneExtensionsTest.cs" />
     <Compile Include="Myre\Extensions\Vector2ExtensionsTest.cs" />
     <Compile Include="Playground.cs" />

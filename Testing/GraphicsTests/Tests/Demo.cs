@@ -55,12 +55,12 @@ namespace GraphicsTests.Tests
             var entity = particleEntityDesc.Create();
             entity.GetProperty(new TypedName<Vector3>("position")).Value = Vector3.Zero;
             NamedBoxCollection initData = new NamedBoxCollection();
-            initData.Set<ParticleEmitterDescription>("particlesystem", _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
+            initData.Set(new TypedName<ParticleEmitterDescription>("particlesystem"), _content.Load<ParticleEmitterDescription>("Particles/TestEmitter1"));
             _scene.Scene.Add(entity, initData);
 
             var renderer = _scene.Scene.GetService<Renderer>();
 
-            _ssaoIntensity = renderer.Data.Get<float>("ssao_intensity");
+            _ssaoIntensity = renderer.Data.GetOrCreate(new TypedName<float>("ssao_intensity"));
 
             _fullPlan = renderer.StartPlan()
                                 .Then<GeometryBufferComponent>()

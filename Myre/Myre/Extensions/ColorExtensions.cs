@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 
 using Color = Microsoft.Xna.Framework.Color;
@@ -101,6 +102,7 @@ namespace Myre.Extensions
                     continue;
 
                 var value = p.GetValue(null, null);
+                Contract.Assume(value != null);
                 if (value.GetType() == t)
                     _colours.Add(p.Name.ToUpper(), (Color)value);
             }
@@ -143,6 +145,8 @@ namespace Myre.Extensions
 
         private static bool TryGetColourByName(this string name, out Color colour)
         {
+            Contract.Requires(name != null);
+
             if (_colours == null)
                 InitialiseColours();
 

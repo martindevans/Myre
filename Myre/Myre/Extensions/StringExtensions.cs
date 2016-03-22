@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Extensions
 {
@@ -60,6 +61,10 @@ namespace Myre.Extensions
         /// <returns>A list of the split string parts.</returns>
         public static IList<string> SplitKeepDelimiters(this string s, params char[] delimiters)
         {
+            Contract.Requires(s != null);
+            Contract.Requires(delimiters != null);
+            Contract.Ensures(Contract.Result<IList<string>>() != null);
+
             List<string> words = new List<string>();
             int i = 0, j = 0;
             while (j < s.Length && (j = s.IndexOfAny(delimiters, i + 1)) > -1)
@@ -80,7 +85,7 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static bool EndsWith(this string s, char c)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
                 return false;
             return s[s.Length - 1] == c;
         }
@@ -93,7 +98,7 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static bool StartsWith(this string s, char c)
         {
-            if (String.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(s))
                 return false;
             return s[0] == c;
         }
