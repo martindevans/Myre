@@ -1,7 +1,6 @@
 ﻿using System;
+using MathHelperRedux;
 using Microsoft.Xna.Framework.Content;
-
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Translucency.Particles.Initialisers.AngularVelocity
 {

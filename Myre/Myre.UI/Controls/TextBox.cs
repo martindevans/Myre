@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using MathHelperRedux;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Myre.Extensions;
@@ -12,7 +13,6 @@ using Myre.UI.InputDevices;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 using Color = Microsoft.Xna.Framework.Color;
 using Game = Microsoft.Xna.Framework.Game;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
 

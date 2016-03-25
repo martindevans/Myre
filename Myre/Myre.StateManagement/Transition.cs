@@ -1,8 +1,8 @@
 ﻿using System;
+using MathHelperRedux;
 using Myre.Extensions;
 
 using GameTime = Microsoft.Xna.Framework.GameTime;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.StateManagement
 {

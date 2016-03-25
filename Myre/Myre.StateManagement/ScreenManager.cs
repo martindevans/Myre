@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
+using MathHelperRedux;
 using GameTime = Microsoft.Xna.Framework.GameTime;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.StateManagement
 {

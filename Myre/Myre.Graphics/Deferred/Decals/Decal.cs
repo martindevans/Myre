@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using MathHelperRedux;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Collections;
 using Myre.Entities;
@@ -9,7 +10,6 @@ using Myre.Graphics.Geometry;
 using Myre.Graphics.Materials;
 using Ninject;
 using SwizzleMyVectors.Geometry;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 
 #if PROFILE

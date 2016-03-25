@@ -3,9 +3,8 @@ using Myre.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-
+using MathHelperRedux;
 using GameTime = Microsoft.Xna.Framework.GameTime;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 using PlayerIndex = Microsoft.Xna.Framework.PlayerIndex;
 
 namespace Myre.UI.InputDevices

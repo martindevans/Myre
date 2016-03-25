@@ -11,12 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using MathHelperRedux;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Extensions;
 using SwizzleMyVectors.Geometry;
 using Color = Microsoft.Xna.Framework.Color;
 using GameTime = Microsoft.Xna.Framework.GameTime;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Debugging
 {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
+using MathHelperRedux;
 using Microsoft.Xna.Framework.Graphics;
 using Myre.Extensions;
 using Myre.Graphics.Materials;
 
 using Color = Microsoft.Xna.Framework.Color;
-using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace Myre.Graphics.Deferred
 {
