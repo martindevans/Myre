@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using MathHelperRedux;
 using Microsoft.Xna.Framework.Graphics;
-using Myre.Extensions;
 using Myre.Graphics.Materials;
 
 using Color = Microsoft.Xna.Framework.Color;
@@ -25,14 +23,13 @@ namespace Myre.Graphics.Deferred
             Random rand = new Random();
             _ssaoMaterial.Parameters["Random"].SetValue(GenerateRandomNormals(device, 4, 4, rand));//content.Load<Texture2D>("randomnormals"));
             _ssaoMaterial.Parameters["RandomResolution"].SetValue(4);
-            _ssaoMaterial.Parameters["Samples"].SetValue(GenerateRandomSamplePositions(16, rand));
             _quad = new Quad(device);
         }
 
-        private Texture2D GenerateRandomNormals(GraphicsDevice device, int width, int height, Random rand)
+        private static Texture2D GenerateRandomNormals(GraphicsDevice device, int width, int height, Random rand)
         {
-            Color[] colours = new Color[width * height];
-            for (int i = 0; i < colours.Length; i++)
+            var colours = new Color[width * height];
+            for (var i = 0; i < colours.Length; i++)
             {
                 var vector = new Vector2(
                     (float)rand.NextDouble(),
@@ -49,38 +46,14 @@ namespace Myre.Graphics.Deferred
             return texture;
         }
 
-        private Microsoft.Xna.Framework.Vector2[] GenerateRandomSamplePositions(int numSamples, Random rand)
-        {
-            Microsoft.Xna.Framework.Vector2[] samples = new Microsoft.Xna.Framework.Vector2[numSamples];
-
-            for (int i = 0; i < numSamples; i++)
-            {
-                var angle = rand.NextDouble() * MathHelper.TwoPi;
-                var vector = new Vector2((float)Math.Sin(angle), (float)Math.Cos(angle));
-
-                var length = i / (float)numSamples;
-                length = MathHelper.Lerp(0.1f, 1.0f, length * length);
-                samples[i] = (vector * length).ToXNA();
-            }
-
-            return samples;
-        }
-
         public override void Initialise(Renderer renderer, ResourceContext context)
         {
             // define settings
             var settings = renderer.Settings;
-            //settings.Add("ssao_enabled", "Determines if Screen Space Ambient Occlusion is enabled.", true);
-            //settings.Add("ssao_halfres", "Determines if SSAO will run at full of half screen resolution.", true);
             settings.Add("ssao_radius", "SSAO sample radius", 1f);
             settings.Add("ssao_intensity", "SSAO intensity", 2.5f);
             settings.Add("ssao_scale", "Scales distance between occluders and occludee.", 1f);
-            //settings.Add("ssao_detailradius", "SSAO sample radius", 2.3f);
-            //settings.Add("ssao_detailintensity", "SSAO intensity", 15f);
-            //settings.Add("ssao_detailscale", "Scales distance between occluders and occludee.", 1.5f);
             settings.Add("ssao_blur", "The amount to blur SSAO.", 1f);
-            //settings.Add("ssao_radiosityintensity", "The intensity of local radiosity colour transfer.", 0.0f);
-            settings.Add("ssao_highquality", "Switches between high and low quality SSAO sampling pattern.", false);
 
             // define inputs
             context.DefineInput("gbuffer_depth_downsample");
@@ -100,14 +73,9 @@ namespace Myre.Graphics.Deferred
         {
             var resolution = renderer.Data.GetValue(new TypedName<Vector2>("resolution"));
 
-            //if (renderer.Data.Get<float>("ssao_radiosityintensity").Value > 0)
-            //    ssaoMaterial.CurrentTechnique = ssaoMaterial.Techniques["SSGI"];
-            //else
-            //{
-                _ssaoMaterial.CurrentTechnique = renderer.Data.GetValue<bool>(new TypedName<bool>("ssao_highquality")) ? _ssaoMaterial.Techniques["HQ_SSAO"] : _ssaoMaterial.Techniques["LQ_SSAO"];
-            //}
+            _ssaoMaterial.CurrentTechnique = _ssaoMaterial.Techniques["SSAO"];
 
-                var unblured = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, surfaceFormat: SurfaceFormat.HalfVector4, name: "ssao unblurred", usage: RenderTargetUsage.DiscardContents);
+            var unblured = RenderTargetManager.GetTarget(renderer.Device, (int)resolution.X, (int)resolution.Y, surfaceFormat: SurfaceFormat.HalfVector4, name: "ssao unblurred", usage: RenderTargetUsage.DiscardContents);
             renderer.Device.SetRenderTarget(unblured);
             renderer.Device.Clear(Color.Transparent);
             renderer.Device.BlendState = BlendState.Opaque;

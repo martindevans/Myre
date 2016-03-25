@@ -172,9 +172,6 @@
   <data name="sphere" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\sphere.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="SSAO" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\SSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="ToneMap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\ToneMap.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -198,5 +195,8 @@
   </data>
   <data name="Decal" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Decal.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="SSAO" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SSAO.xnb;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
