@@ -98,6 +98,15 @@ namespace Myre.Entities.Behaviours
         /// </summary>
         internal ManagerBinding CurrentManager { get; set; }
 
+        protected Behaviour()
+        {
+        }
+
+        protected Behaviour(string name)
+        {
+            Name = name;
+        }
+
         /// <summary>
         /// Initialises this instance.
         /// </summary>
