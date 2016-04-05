@@ -54,30 +54,6 @@ namespace Myre.Extensions
         }
 
         /// <summary>
-        /// Splits this string, while keeping delimiters.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="delimiters">The delimiters around which to split.</param>
-        /// <returns>A list of the split string parts.</returns>
-        public static IList<string> SplitKeepDelimiters(this string s, params char[] delimiters)
-        {
-            Contract.Requires(s != null);
-            Contract.Requires(delimiters != null);
-            Contract.Ensures(Contract.Result<IList<string>>() != null);
-
-            List<string> words = new List<string>();
-            int i = 0, j = 0;
-            while (j < s.Length && (j = s.IndexOfAny(delimiters, i + 1)) > -1)
-            {
-                words.Add(s.Substring(i, j - i));
-                i = j;
-            }
-            if (i < s.Length - 1)
-                words.Add(s.Substring(i, s.Length - i));
-            return words;
-        }
-
-        /// <summary>
         /// Checks if the given string ends with the given character
         /// </summary>
         /// <param name="s"></param>

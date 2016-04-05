@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Ninject;
-
+using Ninject.Syntax;
 using Game = Microsoft.Xna.Framework.Game;
 using GameServiceContainer = Microsoft.Xna.Framework.GameServiceContainer;
 using GameComponentCollection = Microsoft.Xna.Framework.GameComponentCollection;
@@ -15,7 +16,6 @@ namespace Myre.Entities
     public static class NinjectKernel
     {
         private static IKernel _kernel;
-
         /// <summary>
         /// Gets the instance.
         /// </summary>
@@ -23,6 +23,8 @@ namespace Myre.Entities
         {
             get
             {
+                Contract.Ensures(Contract.Result<IKernel>() != null);
+
                 if (_kernel == null)
                     _kernel = new StandardKernel();
 
@@ -39,7 +41,29 @@ namespace Myre.Entities
         /// <param name="bindServiceContainer">if set to <c>true</c> binds game.Services.</param>
         public static void BindGame(Game game, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true)
         {
+            Contract.Requires(game != null);
+
             BindGame(game, Instance, bindGraphicsDevice, bindContentManager, bindServiceContainer);
+        }
+
+        private static IBindingToSyntax<T> Bind<T>(IKernel kernel)
+        {
+            Contract.Requires(kernel != null);
+            Contract.Ensures(Contract.Result<IBindingToSyntax<T>>() != null);
+
+            var b = kernel.Bind<T>();
+            Contract.Assume(b != null);
+            return b;
+        }
+
+        private static IBindingToSyntax<object> Bind(IKernel kernel, params Type[] types)
+        {
+            Contract.Requires(kernel != null);
+            Contract.Ensures(Contract.Result<IBindingToSyntax<object>>() != null);
+
+            var b = kernel.Bind(types);
+            Contract.Assume(b != null);
+            return b;
         }
 
         /// <summary>
@@ -53,29 +77,32 @@ namespace Myre.Entities
         /// <param name="bindComponentCollection"></param>
         public static void BindGame(Game game, IKernel kernel, bool bindGraphicsDevice = true, bool bindContentManager = true, bool bindServiceContainer = true, bool bindComponentCollection = true)
         {
+            Contract.Requires(game != null);
+            Contract.Requires(kernel != null);
+
             // bind the game to a singleton instance
             var thisType = game.GetType();
-            kernel.Bind(thisType).ToConstant(game);
-            kernel.Bind<Game>().ToConstant(game);
+            Bind(kernel, thisType).ToConstant(game);
+            Bind<Game>(kernel).ToConstant(game);
 
             // bind the graphics device
             if (bindGraphicsDevice)
-                kernel.Bind<GraphicsDevice>().ToMethod(c => game.GraphicsDevice);
+                Bind<GraphicsDevice>(kernel).ToMethod(c => game.GraphicsDevice);
 
             // bind the content manager
             if (bindContentManager)
-                kernel.Bind<ContentManager>().ToMethod(c => game.Content);
+                Bind<ContentManager>(kernel).ToMethod(c => game.Content);
 
             // bind services
             if (bindServiceContainer)
             {
-                kernel.Bind<GameServiceContainer>().ToMethod(c => game.Services);
-                kernel.Bind<IServiceProvider>().ToMethod(c => game.Services);
+                Bind<GameServiceContainer>(kernel).ToMethod(c => game.Services);
+                Bind<IServiceProvider>(kernel).ToMethod(c => game.Services);
             }
 
             if (bindComponentCollection)
             {
-                kernel.Bind<GameComponentCollection>().ToMethod(c => game.Components);
+                Bind<GameComponentCollection>(kernel).ToMethod(c => game.Components);
             }
         }
     }

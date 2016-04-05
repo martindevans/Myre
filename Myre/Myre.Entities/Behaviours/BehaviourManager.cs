@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Myre.Entities.Behaviours
@@ -12,10 +13,23 @@ namespace Myre.Entities.Behaviours
     /// Each scene contains an manager instance for each behaviour type, and these managers batch process all behaviours in the scene.</para>
     /// <para>Managers can utilise the services contained in the scene to register for updates or events.</para>
     /// </remarks>
+    [ContractClass(typeof(IBehaviourManagerContract))]
     public interface IBehaviourManager
         : IDisposableObject
     {
         void Initialise(Scene scene);
+    }
+
+    [ContractClassFor(typeof(IBehaviourManager))]
+    abstract class IBehaviourManagerContract : IBehaviourManager
+    {
+        public void Initialise(Scene scene)
+        {
+            Contract.Requires(scene != null);
+        }
+
+        public abstract void Dispose();
+        public abstract bool IsDisposed { get; }
     }
 
     public static class BehaviourManagerExtensions
@@ -25,6 +39,9 @@ namespace Myre.Entities.Behaviours
 
         public static IEnumerable<Type> GetManagedTypes(this IBehaviourManager manager)
         {
+            Contract.Requires(manager != null);
+            Contract.Ensures(Contract.Result<IEnumerable<Type>>() != null);
+
             var managerType = manager.GetType();
 
             Type[] behaviourTypes;
@@ -50,6 +67,7 @@ namespace Myre.Entities.Behaviours
     /// Each scene contains an manager instance for each behaviour type, and these managers batch process all behaviours in the scene.</para>
     /// <para>Managers can utilise the services contained in the scene to register for updates or events.</para>
     /// </remarks>
+    [ContractClass(typeof(IBehaviourManagerContract<>))]
     public interface IBehaviourManager<in T>
         : IBehaviourManager
         where T : Behaviour
@@ -66,6 +84,34 @@ namespace Myre.Entities.Behaviours
         /// <param name="behaviour">The behaviour this manager should stop managing.</param>
         /// <returns><c>true</c> if the behaviour was removed; else <c>false</c>.</returns>
         bool Remove(T behaviour);
+    }
+
+    [ContractClassFor(typeof(IBehaviourManager<>))]
+    abstract class IBehaviourManagerContract<T>
+        : IBehaviourManager<T>
+        where T : Behaviour
+    {
+        public void Dispose()
+        {
+        }
+
+        public bool IsDisposed
+        {
+            get { return false; }
+        }
+
+        public abstract void Initialise(Scene scene);
+
+        public void Add(T behaviour)
+        {
+            Contract.Requires(behaviour != null);
+        }
+
+        public bool Remove(T behaviour)
+        {
+            Contract.Requires(behaviour != null);
+            return false;
+        }
     }
 
     /// <summary>
@@ -94,7 +140,11 @@ namespace Myre.Entities.Behaviours
         /// <value></value>
         public Type BehaviourType
         {
-            get { return typeof(T); }
+            get
+            {
+                Contract.Ensures(Contract.Result<Type>() != null);
+                return typeof(T);
+            }
         }
 
         /// <summary>
@@ -136,7 +186,6 @@ namespace Myre.Entities.Behaviours
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -154,18 +203,13 @@ namespace Myre.Entities.Behaviours
 
             if (disposeManagedResources)
             {
-                for (int i = Behaviours.Count - 1; i >= 0; i--)
-                    Remove(Behaviours[i]);
+                for (var i = Behaviours.Count - 1; i >= 0; i--)
+                {
+                    var b = Behaviours[i];
+                    Contract.Assume(b != null);
+                    Remove(b);
+                }
             }
-        }
-
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="BehaviourManager&lt;T&gt;"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~BehaviourManager()
-        {
-            Dispose(false);
         }
     }
 }

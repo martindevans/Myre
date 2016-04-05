@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.Threading;
 using Ninject;
 
@@ -43,8 +44,16 @@ namespace Myre.Entities.Services
 
         public TimeService(Game game)
         {
+            Contract.Requires(game != null);
+
             _game = game;
             UpdateOrder = int.MaxValue;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_game != null);
         }
 
         public override void Update(float elapsedTime)
@@ -64,7 +73,9 @@ namespace Myre.Entities.Services
         /// <returns></returns>
         public static uint ConvertToTick(double time)
         {
-            var target = NinjectKernel.Instance.Get<Game>().TargetElapsedTime;
+            var game = NinjectKernel.Instance.Get<Game>();
+            Contract.Assume(game != null);
+            var target = game.TargetElapsedTime;
             return (uint)(time / target.TotalSeconds);
         }
 
@@ -75,7 +86,9 @@ namespace Myre.Entities.Services
         /// <returns></returns>
         public static double ConvertFromTick(uint tick)
         {
-            var target = NinjectKernel.Instance.Get<Game>().TargetElapsedTime;
+            var game = NinjectKernel.Instance.Get<Game>();
+            Contract.Assume(game != null);
+            var target = game.TargetElapsedTime;
             return tick * (float)target.TotalSeconds;
         }
 

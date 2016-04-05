@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Entities
 {
@@ -14,7 +15,7 @@ namespace Myre.Entities
         /// <summary>
         /// The name of this property
         /// </summary>
-        String Name { get; }
+        string Name { get; }
 
         /// <summary>
         /// The current value of this property
@@ -47,10 +48,18 @@ namespace Myre.Entities
     public sealed class Property<T>
         : IProperty
     {
+        private readonly string _name;
         /// <summary>
         /// The name of this instance
         /// </summary>
-        public String Name { get; private set; }
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                return _name;
+            }
+        }
 
         public TypedName<T> TypedName
         {
@@ -58,6 +67,7 @@ namespace Myre.Entities
         }
 
         private T _value;
+
         /// <summary>
         /// The value of this property
         /// </summary>
@@ -93,16 +103,15 @@ namespace Myre.Entities
 
         void IProperty.Clear()
         {
-            if (PropertySet != null)
-                foreach (var item in PropertySet.GetInvocationList())
-                    PropertySet -= (PropertySetDelegate<T>)item;
-
+            PropertySet = null;
             _value = default(T);
         }
 
-        public Property(String name)
+        public Property(string name)
         {
-            Name = name;
+            Contract.Requires(name != null);
+
+            _name = name;
             _value = default(T);
         }
 

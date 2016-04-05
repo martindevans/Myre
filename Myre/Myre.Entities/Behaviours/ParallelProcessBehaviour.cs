@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Myre.Entities.Services;
 
@@ -29,7 +30,11 @@ namespace Myre.Entities.Behaviours
         {
             public bool IsComplete
             {
-                get { return false; }
+                get
+                {
+                    Contract.Ensures(!Contract.Result<bool>());
+                    return false;
+                }
             }
 
             public override void Initialise(Scene scene)
@@ -85,6 +90,8 @@ namespace Myre.Entities.Behaviours
 
             private void InvokeUpdate(ParallelProcessBehaviour behaviour)
             {
+                Contract.Requires(behaviour != null);
+
                 behaviour.ParallelUpdate(_latestElapsedTime);
             }
         }

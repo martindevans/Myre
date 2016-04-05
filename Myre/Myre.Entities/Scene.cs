@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Ninject;
+using Ninject.Syntax;
 
 namespace Myre.Entities
 {
@@ -14,6 +16,7 @@ namespace Myre.Entities
     public class Scene
         : IDisposableObject
     {
+        #region fields and properties
         private static readonly Dictionary<Type, Type> _defaultManagers = new Dictionary<Type, Type>();
 
         private readonly ServiceContainer _services;
@@ -30,7 +33,14 @@ namespace Myre.Entities
         /// Gets a read only collection of the entities contained in this scene.
         /// </summary>
         /// <value>The entities.</value>
-        public IReadOnlyList<Entity> Entities { get { return _entities; } }
+        public IReadOnlyList<Entity> Entities
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IReadOnlyList<Entity>>() != null);
+                return _entities;
+            }
+        }
 
         /// <summary>
         /// Gets the services.
@@ -38,7 +48,11 @@ namespace Myre.Entities
         /// <value>The services.</value>
         public IEnumerable<IService> Services
         {
-            get { return _services; }
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable<IService>>() != null);
+                return _services;
+            }
         }
 
         /// <summary>
@@ -46,7 +60,11 @@ namespace Myre.Entities
         /// </summary>
         public IReadOnlyList<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes
         {
-            get { return _services.ExecutionTimes; }
+            get
+            {
+                Contract.Ensures(Contract.Result<IReadOnlyList<KeyValuePair<IService, TimeSpan>>>() != null);
+                return _services.ExecutionTimes;
+            }
         }
 
         /// <summary>
@@ -55,14 +73,20 @@ namespace Myre.Entities
         /// <value>The managers.</value>
         public IEnumerable<IBehaviourManager> Managers
         {
-            get { return _managers; }
+            get
+            {
+                Contract.Ensures(Contract.Result<IEnumerable<IBehaviourManager>>() != null);
+                return _managers;
+            }
         }
 
         /// <summary>
         /// Gets the Ninject kernel used to instantiate services and behaviour managers.
         /// </summary>
         public IKernel Kernel { get; private set; }
+        #endregion
 
+        #region constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="Scene"/> class.
         /// </summary>
@@ -77,6 +101,15 @@ namespace Myre.Entities
             Kernel.Bind<Scene>().ToConstant(this);
         }
 
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_services != null);
+            Contract.Invariant(_managers != null);
+            Contract.Invariant(_entities != null);
+        }
+        #endregion
+
         /// <summary>
         /// Adds the specified entity.
         /// </summary>
@@ -84,8 +117,8 @@ namespace Myre.Entities
         /// <param name="initialisationData">Data to initialise the entity with.</param>
         public void Add(Entity entity, INamedDataProvider initialisationData = null)
         {
-            if (entity.Scene != null)
-                throw new InvalidOperationException("Cannot add an entity to a scene if it is in a scene already");
+            Contract.Requires(entity != null);
+            Contract.Requires(entity.Scene == null);
 
             entity.Scene = this;
             entity.Initialise(initialisationData);
@@ -107,6 +140,8 @@ namespace Myre.Entities
 
         private static Type SearchForDefaultManager(Type behaviourType)
         {
+            Contract.Requires(behaviourType != null);
+
             Type managerType;
             lock (_defaultManagers)
             {
@@ -136,21 +171,24 @@ namespace Myre.Entities
         /// <summary>
         /// Removes the specified entity.
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param name="index">The index of entity to remove</param>
         /// <returns><c>true</c> if the entity was removed; else <c>false</c>.</returns>
-        internal void Remove(Entity entity)
+        private void RemoveAt(int index)
         {
-            var index = _entities.IndexOf(entity);
+            if (index >= _entities.Count)
+                throw new ArgumentOutOfRangeException("index", string.Format("Cannot remove entity at index {0}, there are only {1} entities in the scene", index, _entities.Count));
+
             if (index != -1)
             {
+                var entity = _entities[index];
+
                 foreach (var behaviour in entity.Behaviours)
                 {
                     if (behaviour.CurrentManager.Handler != null)
                         behaviour.CurrentManager.Handler.Remove(behaviour);
                 }
 
-                bool removeNow = entity.Shutdown();
-
+                var removeNow = entity.Shutdown();
                 if (removeNow)
                 {
                     entity.Scene = null;
@@ -167,11 +205,15 @@ namespace Myre.Entities
         /// <returns></returns>
         public IBehaviourManager GetManager(Type managerType)
         {
+            Contract.Requires(managerType != null);
+            Contract.Ensures(Contract.Result<IBehaviourManager>() != null);
+
             IBehaviourManager manager;
             if (_managers.TryGet(managerType, out manager))
                 return manager;
 
             manager = (IBehaviourManager)Kernel.Get(managerType);
+            Contract.Assume(manager != null);
 
             var behaviourTypes = manager.GetManagedTypes();
             foreach (var type in behaviourTypes)
@@ -190,6 +232,8 @@ namespace Myre.Entities
 
         private void AddBehavioursToManager(IEnumerable<Type> behaviourTypes)
         {
+            Contract.Requires(behaviourTypes != null);
+
             var behavioursToBeAdded = 
                 from behaviourType in behaviourTypes
                 let handler = _managers.GetByBehaviour(behaviourType)
@@ -227,6 +271,9 @@ namespace Myre.Entities
         /// <returns></returns>
         public IService GetService(Type serviceType)
         {
+            Contract.Requires(serviceType != null);
+            Contract.Ensures(Contract.Result<IService>() != null);
+
             IService service;
             if (_services.TryGet(serviceType, out service))
                 return service;
@@ -235,6 +282,7 @@ namespace Myre.Entities
                 throw new ArgumentException("serviceType is not an IService.");
 
             service = (IService)Kernel.Get(serviceType);
+            Contract.Assume(service != null);
             _services.Add(service);
 
             service.Initialise(this);
@@ -251,7 +299,9 @@ namespace Myre.Entities
         public T GetService<T>()
             where T : class, IService
         {
-            return GetService(typeof(T)) as T;
+            Contract.Ensures(Contract.Result<T>() != null);
+
+            return (T)GetService(typeof(T));
         }
 
         /// <summary>
@@ -272,10 +322,12 @@ namespace Myre.Entities
         {
             _services.Update(elapsedTime);
 
-            for (int i = _entities.Count - 1; i >= 0; i--)
+            for (var i = _entities.Count - 1; i >= 0; i--)
             {
-                if (_entities[i].IsDisposed)
-                    Remove(_entities[i]);
+                var e = _entities[i];
+                Contract.Assume(e != null);
+                if (e.IsDisposed)
+                    RemoveAt(i);
             }
         }
 
@@ -288,48 +340,25 @@ namespace Myre.Entities
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
         /// Releases unmanaged and - optionally - managed resources
         /// </summary>
-        /// <param name="disposeManagedResources"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        protected virtual void Dispose(bool disposeManagedResources)
+        public virtual void Dispose()
         {
             if (IsDisposed)
                 return;
-
             IsDisposed = true;
 
-            if (disposeManagedResources)
-            {
-                Kernel.Unbind<Scene>();
+            Kernel.Unbind<Scene>();
 
-                _entities.Clear();
+            _entities.Clear();
 
-                foreach (var manager in _managers)
-                    manager.Dispose();
-                _managers.Clear();
+            foreach (var manager in _managers)
+                manager.Dispose();
+            _managers.Clear();
 
-                foreach (var service in _services)
-                    service.Dispose();
-                _services.Clear();
-            }
-        }
-
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="Scene"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~Scene()
-        {
-            Dispose(true);
+            foreach (var service in _services)
+                service.Dispose();
+            _services.Clear();
         }
     }
 }

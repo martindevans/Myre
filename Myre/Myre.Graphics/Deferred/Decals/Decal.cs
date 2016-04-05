@@ -220,7 +220,7 @@ namespace Myre.Graphics.Deferred.Decals
                 {
                     var tmp = Behaviours.Find(a => a.Temporary && !a.Owner.IsDisposed);
                     if (tmp != null)
-                        tmp.Owner.Dispose();
+                        tmp.Owner.Dispose(null);
                 }
             }
 

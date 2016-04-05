@@ -37,15 +37,11 @@ namespace Myre.Collections
     {
         public T GetValue<T>(TypedName<T> name, bool useDefaultValue = true)
         {
-            Contract.Requires(name.Name != null);
-
             throw new NotSupportedException();
         }
 
         public bool TryGetValue<T>(TypedName<T> name, out T value)
         {
-            Contract.Requires(name.Name != null);
-
             throw new NotSupportedException();
         }
 

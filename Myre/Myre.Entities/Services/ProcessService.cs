@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Entities.Services
 {
@@ -34,7 +35,11 @@ namespace Myre.Entities.Services
         /// </summary>
         public IReadOnlyList<KeyValuePair<IProcess, TimeSpan>> ProcessExecutionTimes
         {
-            get { return _executionTimes; }
+            get
+            {
+                Contract.Ensures(Contract.Result<IReadOnlyList<KeyValuePair<IProcess, TimeSpan>>>() != null);
+                return _executionTimes;
+            }
         }
 
         /// <summary>
@@ -93,6 +98,8 @@ namespace Myre.Entities.Services
 
         public void Add(Func<float, bool> update)
         {
+            Contract.Requires(update != null);
+
             Add(new ActionProcess(update));
         }
 
@@ -102,7 +109,15 @@ namespace Myre.Entities.Services
 
             public ActionProcess(Func<float, bool> update)
             {
+                Contract.Requires(update != null);
+
                 _update = update;
+            }
+
+            [ContractInvariantMethod]
+            private void ObjectInvariant()
+            {
+                Contract.Invariant(_update != null);
             }
 
             public bool IsComplete { get; private set; }

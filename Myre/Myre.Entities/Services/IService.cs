@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Myre.Entities.Services
+﻿namespace Myre.Entities.Services
 {
     /// <summary>
     /// An interface defining a service.
@@ -93,7 +91,6 @@ namespace Myre.Entities.Services
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -103,15 +100,6 @@ namespace Myre.Entities.Services
         protected virtual void Dispose(bool disposeManagedResources)
         {
             IsDisposed = true;
-        }
-
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="Service"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~Service()
-        {
-            Dispose(false);
         }
     }
 }

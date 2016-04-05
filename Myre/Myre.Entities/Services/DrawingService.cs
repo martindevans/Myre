@@ -86,7 +86,6 @@ namespace Myre.Entities.Services
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -98,15 +97,6 @@ namespace Myre.Entities.Services
 // ReSharper restore UnusedParameter.Global
         {
             IsDisposed = true;
-        }
-
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="Scene"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~DrawingService()
-        {
-            Dispose(true);
         }
     }
 }

@@ -30,12 +30,6 @@ namespace Myre
             Name = name;
         }
 
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Name != null);
-        }
-
         /// <summary>
         /// Append a string to the name of a TypedName
         /// </summary>

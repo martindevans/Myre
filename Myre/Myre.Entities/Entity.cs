@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
@@ -11,7 +12,6 @@ namespace Myre.Entities
     /// A class which represents a collection of related properties and behaviours.
     /// </summary>
     public sealed class Entity
-        : IDisposableObject
     {
         public sealed class ConstructionContext
             : IDisposableObject
@@ -21,6 +21,8 @@ namespace Myre.Entities
 
             internal ConstructionContext(Entity entity)
             {
+                Contract.Requires(entity != null);
+
                 _entity = entity;
             }
 
@@ -34,9 +36,11 @@ namespace Myre.Entities
             /// <returns>The property created</returns>
             public Property<T> CreateProperty<T>(TypedName<T> name, T value = default(T), bool appendBehaviourName = true)
             {
+                Contract.Ensures(Contract.Result<Property<T>>() != null);
+
                 CheckFrozen();
 
-                string fullName = name.Name;
+                var fullName = name.Name;
                 if (appendBehaviourName)
                     fullName = _behaviour.GetFullPropertyName(name.Name);
 
@@ -50,8 +54,17 @@ namespace Myre.Entities
                 return property;
             }
 
+            /// <summary>
+            /// There is a (notionally) a new construction context per behaviour. However we only need one at a time so we can reuse the same context object.
+            /// This method mutates the context to indicate which behaviour it is currently acting for
+            /// </summary>
+            /// <param name="behaviour"></param>
+            /// <returns></returns>
             internal ConstructionContext Next(Behaviour behaviour)
             {
+                Contract.Requires(behaviour != null);
+                Contract.Ensures(Contract.Result<ConstructionContext>() != null);
+
                 CheckFrozen();
 
                 _behaviour = behaviour;
@@ -95,7 +108,11 @@ namespace Myre.Entities
         /// <value>The behaviours.</value>
         public IReadOnlyList<Behaviour> Behaviours
         {
-            get { return _behavioursList; }
+            get
+            {
+                Contract.Ensures(Contract.Result<IReadOnlyList<Behaviour>>() != null);
+                return _behavioursList;
+            }
         }
 
         /// <summary>
@@ -104,7 +121,11 @@ namespace Myre.Entities
         /// <value>The properties.</value>
         public IReadOnlyList<IProperty> Properties
         {
-            get { return _propertiesList; }
+            get
+            {
+                Contract.Ensures(Contract.Result<IReadOnlyList<IProperty>>() != null);
+                return _propertiesList;
+            }
         }
 
         /// <summary>
@@ -127,6 +148,9 @@ namespace Myre.Entities
 
         internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours)
         {
+            Contract.Requires(properties != null);
+            Contract.Requires(behaviours != null);
+
             // create public read-only collections
             _propertiesList = new List<IProperty>(properties);
             _behavioursList = new List<Behaviour>(behaviours);
@@ -155,16 +179,32 @@ namespace Myre.Entities
             CreateProperties();
         }
 
-        private void CatagoriseBehaviour(Dictionary<Type, List<Behaviour>> catagorised, Behaviour behaviour)
+        [ContractInvariantMethod]
+        private void ContractInvariants()
         {
-            Type type = behaviour.GetType();
+            Contract.Invariant(_behavioursList != null);
+            Contract.Invariant(_propertiesList != null);
+            Contract.Invariant(_properties != null);
+            Contract.Invariant(_behaviours != null);
+        }
+
+        private static void CatagoriseBehaviour(IDictionary<Type, List<Behaviour>> catagorised, Behaviour behaviour)
+        {
+            Contract.Requires(catagorised != null);
+            Contract.Requires(behaviour != null);
+
+            var type = behaviour.GetType();
 
             foreach (var t in type.GetImplementedTypes().Distinct())
                 LazyGetCategoryList(t, catagorised).Add(behaviour);
         }
 
-        private List<Behaviour> LazyGetCategoryList(Type type, Dictionary<Type, List<Behaviour>> catagorised)
+        private static List<Behaviour> LazyGetCategoryList(Type type, IDictionary<Type, List<Behaviour>> catagorised)
         {
+            Contract.Requires(type != null);
+            Contract.Requires(catagorised != null);
+            Contract.Ensures(Contract.Result<List<Behaviour>>() != null);
+
             List<Behaviour> behavioursOfType;
             if (!catagorised.TryGetValue(type, out behavioursOfType))
             {
@@ -179,19 +219,10 @@ namespace Myre.Entities
         {
             using (var context = new ConstructionContext(this))
             {
-                foreach (var item in Behaviours)
-                    item.CreateProperties(context.Next(item));
+                foreach (var behaviour in Behaviours)
+                    behaviour.CreateProperties(context.Next(behaviour));
             }
 
-        }
-
-        /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the
-        /// <see cref="Entity"/> is reclaimed by garbage collection.
-        /// </summary>
-        ~Entity()
-        {
-            Dispose(true);
         }
 
         /// <summary>
@@ -200,20 +231,6 @@ namespace Myre.Entities
         public void Dispose(INamedDataProvider shutdownData)
         {
             _shutdownData = shutdownData;
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(null);
-        }
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources
-        /// </summary>
-        /// <param name="disposeManagedResources"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        public void Dispose(bool disposeManagedResources)
-        {
             IsDisposed = true;
         }
 
@@ -292,6 +309,8 @@ namespace Myre.Entities
 
         private void AddProperty(IProperty property)
         {
+            Contract.Requires(property != null);
+
             _properties.Add(new NameWithType(property.Name, property.Type), property);
             _propertiesList.Add(property);
         }
@@ -328,6 +347,8 @@ namespace Myre.Entities
         /// <returns></returns>
         public Behaviour GetBehaviour(Type type, string name)
         {
+            Contract.Requires(type != null);
+
             Behaviour[] array;
             if (_behaviours.TryGetValue(type, out array))
             {
@@ -349,13 +370,21 @@ namespace Myre.Entities
         /// <param name="type">The type.</param>
         /// <returns></returns>
 // ReSharper disable ReturnTypeCanBeEnumerable.Global
-        public Behaviour[] GetBehaviours(Type type)
+        public IReadOnlyList<Behaviour> GetBehaviours(Type type)
 // ReSharper restore ReturnTypeCanBeEnumerable.Global
         {
+            Contract.Requires(type != null);
+            Contract.Ensures(Contract.Result<IReadOnlyList<Behaviour>>() != null);
+
             Behaviour[] array;
             _behaviours.TryGetValue(type, out array);
 
-            return array ?? new Behaviour[0];
+            if (array != null)
+                return array;
+
+            var empty = Array.Empty<Behaviour>();
+            Contract.Assume(empty != null);
+            return empty;
         }
 
         /// <summary>
@@ -366,7 +395,13 @@ namespace Myre.Entities
         /// <returns></returns>
         public T GetBehaviour<T>(string name)
         {
-            return (T)(object)GetBehaviour(typeof(T), name);
+            Contract.Ensures(Contract.Result<T>() != null);
+
+            var b = GetBehaviour(typeof(T), name);
+            if (b == null)
+                throw new KeyNotFoundException(string.Format("Cannot find entity of type {0} with name \"{1}\"", typeof(T), name));
+
+            return (T)(object)b;
         }
 
         /// <summary>
@@ -374,8 +409,10 @@ namespace Myre.Entities
         /// </summary>
         /// <typeparam name="T">The type.</typeparam>
         /// <returns></returns>
-        public T[] GetBehaviours<T>()
+        public IReadOnlyList<T> GetBehaviours<T>()
         {
+            Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
+
             return GetBehaviours(typeof(T))
                 .Cast<T>()
                 .ToArray();

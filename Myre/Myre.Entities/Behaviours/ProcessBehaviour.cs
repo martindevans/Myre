@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading;
 using Myre.Entities.Services;
 
@@ -41,13 +42,18 @@ namespace Myre.Entities.Behaviours
             {
                 get
                 {
+                    Contract.Ensures(Contract.Result<IEnumerable<B>>() != null);
                     return base.Behaviours;
                 }
             }
 
             public bool IsComplete
             {
-                get { return false; }
+                get
+                {
+                    Contract.Ensures(!Contract.Result<bool>());
+                    return false;
+                }
             }
 
             public override void Initialise(Scene scene)
@@ -90,7 +96,7 @@ namespace Myre.Entities.Behaviours
 
                 foreach (var item in Behaviours)
                 {
-                    if (item.Owner != null && !item.Owner.IsDisposed)
+                    if (!item.Owner.IsDisposed)
                     {
                         unchecked { item._counter++; }  //Don't really care if this overflows
                         if (item.Period == 0 || (item.Period != uint.MaxValue && item._counter % (item.Period + 1) == item.Period))

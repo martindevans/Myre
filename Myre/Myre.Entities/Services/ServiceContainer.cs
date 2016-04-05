@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using Myre.Extensions;
 
 namespace Myre.Entities.Services
@@ -8,24 +9,24 @@ namespace Myre.Entities.Services
     class ServiceContainer
         : IEnumerable<IService>
     {
-        private readonly Dictionary<Type, IService> _dictionary;
-        private readonly List<IService> _update;
-        private readonly List<IService> _draw;        
+        private readonly Dictionary<Type, IService> _dictionary = new Dictionary<Type, IService>();
+        private readonly List<IService> _update = new List<IService>();
+        private readonly List<IService> _draw = new List<IService>();
 
-        private readonly List<IService> _buffer;
+        private readonly List<IService> _buffer = new List<IService>();
         private bool _dirty;
 
         private readonly Comparison<IService> _updateOrder;
         private readonly Comparison<IService> _drawOrder;
 
-        readonly Stopwatch _timer = new Stopwatch();
-        private readonly List<KeyValuePair<IService, TimeSpan>> _executionTimes;
+        private readonly Stopwatch _timer = new Stopwatch();
+        private readonly List<KeyValuePair<IService, TimeSpan>> _executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
         public IReadOnlyList<KeyValuePair<IService, TimeSpan>> ExecutionTimes
         {
             get { return _executionTimes; }
         }
 
-        private readonly List<KeyValuePair<IService, TimeSpan>> _renderTimes;
+        private readonly List<KeyValuePair<IService, TimeSpan>> _renderTimes = new List<KeyValuePair<IService, TimeSpan>>();
         public IReadOnlyList<KeyValuePair<IService, TimeSpan>> RenderTimes
         {
             get { return _renderTimes; }
@@ -33,25 +34,27 @@ namespace Myre.Entities.Services
 
         public IService this[Type type]
         {
-            get { return _dictionary[type]; }
+            get
+            {
+                Contract.Requires(type != null);
+                Contract.Ensures(Contract.Result<IService>() != null);
+
+                var item = _dictionary[type];
+                Contract.Assume(item != null);
+                return item;
+            }
         }
 
         public ServiceContainer()
         {
-            _dictionary = new Dictionary<Type, IService>();
-            _update = new List<IService>();
-            _draw = new List<IService>();
-            _buffer = new List<IService>();
-
-            _executionTimes = new List<KeyValuePair<IService, TimeSpan>>();
-            _renderTimes = new List<KeyValuePair<IService, TimeSpan>>();
-
             _updateOrder = (a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder);
             _drawOrder = (a, b) => a.DrawOrder.CompareTo(b.DrawOrder);
         }
 
         public void Add(IService service)
         {
+            Contract.Requires(service != null);
+
             _buffer.Add(service);
             _dictionary[service.GetType()] = service;
             _dirty = true;
@@ -72,6 +75,8 @@ namespace Myre.Entities.Services
 
         public bool TryGet(Type serviceType, out IService service)
         {
+            Contract.Requires(serviceType != null);
+
             if (_dictionary.TryGetValue(serviceType, out service))
                 return true;
 
@@ -143,9 +148,11 @@ namespace Myre.Entities.Services
 
         private void RemoveDisposed()
         {
-            for (int i = _buffer.Count - 1; i >= 0; i--)
+            for (var i = _buffer.Count - 1; i >= 0; i--)
             {
-                if (_buffer[i].IsDisposed)
+                var item = _buffer[i];
+                Contract.Assume(item != null);
+                if (item.IsDisposed)
                 {
                     _buffer.RemoveAt(i);
                     _dirty = true;

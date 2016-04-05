@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using Myre.Entities.Behaviours;
 using Ninject;
@@ -18,9 +19,19 @@ namespace Myre.Entities
 
         public PropertyData(string name, Type dataType, object initialValue)
         {
+            Contract.Requires(name != null);
+            Contract.Requires(dataType != null);
+
             Name = name;
             DataType = dataType;
             InitialValue = initialValue;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(Name != null);
+            Contract.Invariant(DataType != null);
         }
 
         public override int GetHashCode()
@@ -55,8 +66,16 @@ namespace Myre.Entities
 
         public BehaviourData(string name, Type type)
         {
+            Contract.Requires(type != null);
+
             Name = name;
             Type = type;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(Type != null);
         }
 
         public override int GetHashCode()
@@ -64,7 +83,7 @@ namespace Myre.Entities
             unchecked
             {
                 return Type.GetHashCode() * 113
-                     + Name.GetHashCode() * 131;
+                     + (Name ?? "").GetHashCode() * 131;
             }
         }
 
@@ -82,6 +101,8 @@ namespace Myre.Entities
 
         public bool Equals(BehaviourData data)
         {
+            Contract.Requires(data != null);
+
             return Name == data.Name
                 && Type == data.Type;
         }
@@ -116,13 +137,23 @@ namespace Myre.Entities
         /// Gets a list of behaviours in this instance.
         /// </summary>
         /// <value>The behaviours.</value>
-        public IReadOnlyList<IBehaviourFactory> Behaviours { get { return _behaviours; } }
+        public IReadOnlyList<IBehaviourFactory> Behaviours { get
+        {
+            Contract.Ensures(Contract.Result<IReadOnlyList<IBehaviourFactory>>() != null);
+            return _behaviours;
+        }
+        }
         
         /// <summary>
         /// Gets a list of properties in this instance.
         /// </summary>
         /// <value>The properties.</value>
-        public IReadOnlyList<PropertyData> Properties { get { return _properties; } }
+        public IReadOnlyList<PropertyData> Properties { get
+        {
+            Contract.Ensures(Contract.Result<IReadOnlyList<PropertyData>>() != null);
+            return _properties;
+        }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityDescription"/> class.
@@ -133,6 +164,14 @@ namespace Myre.Entities
             _kernel = kernel ?? NinjectKernel.Instance;
             _behaviours = new List<IBehaviourFactory>();
             _properties = new List<PropertyData>();
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_kernel != null);
+            Contract.Invariant(_behaviours != null);
+            Contract.Invariant(_properties != null);
         }
 
         /// <summary>
@@ -150,6 +189,8 @@ namespace Myre.Entities
         /// <param name="description">The entity description to copy from</param>
         public void AddFrom(EntityDescription description)
         {
+            Contract.Requires(description != null);
+
             foreach (var item in description.Behaviours)
                 AddBehaviour(item);
 
@@ -164,6 +205,8 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(IBehaviourFactory behaviour)
         {
+            Contract.Requires(behaviour != null);
+
             if (_behaviours.Contains(behaviour))
                 return false;
 
@@ -180,6 +223,8 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(Type type, string name = null)
         {
+            Contract.Requires(type != null);
+
             return AddBehaviour(new BehaviourData(name, type));
         }
 
@@ -227,6 +272,8 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddProperty(Type dataType, string name, object initialValue)
         {
+            Contract.Requires(dataType != null);
+
             return AddProperty(new PropertyData(name, dataType, initialValue));
         }
 
@@ -249,22 +296,28 @@ namespace Myre.Entities
         /// <returns></returns>
         public virtual Entity Create()
         {
+            Contract.Ensures(Contract.Result<Entity>() != null);
+
             return new Entity(CreateProperties(), CreateBehaviours());
         }
 
         private IEnumerable<IProperty> CreateProperties()
         {
+            Contract.Ensures(Contract.Result<IEnumerable<IProperty>>() != null);
+
             foreach (var item in _properties)
                 yield return CreatePropertyInstance(item);
         }
 
         private IEnumerable<Behaviour> CreateBehaviours()
         {
+            Contract.Ensures(Contract.Result<IEnumerable<Behaviour>>() != null);
+
             foreach (var item in _behaviours)
                 yield return item.Create(_kernel);
         }
 
-        private IProperty CreatePropertyInstance(PropertyData property)
+        private static IProperty CreatePropertyInstance(PropertyData property)
         {
             ConstructorInfo constructor;
             if (!_propertyConstructors.TryGetValue(property.DataType, out constructor))
@@ -282,14 +335,6 @@ namespace Myre.Entities
 
             prop.Value = property.InitialValue;
             return prop;
-        }
-
-        private Behaviour CreateBehaviourInstance(IKernel kernel, BehaviourData behaviour)
-        {
-            var instance = (Behaviour)kernel.Get(behaviour.Type, new ConstructorArgument("name", behaviour.Name));
-
-            instance.Name = behaviour.Name;
-            return instance;
         }
     }
 }

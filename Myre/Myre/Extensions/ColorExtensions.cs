@@ -98,6 +98,8 @@ namespace Myre.Extensions
             var properties = t.GetProperties(BindingFlags.Public | BindingFlags.Static);
             foreach (var p in properties)
             {
+                Contract.Assume(p != null);
+
                 if (!p.CanRead)
                     continue;
 

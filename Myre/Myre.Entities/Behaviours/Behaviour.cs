@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using Myre.Collections;
 
 namespace Myre.Entities.Behaviours
@@ -25,10 +26,28 @@ namespace Myre.Entities.Behaviours
         /// </summary>
         public string Name { get; internal set; }
 
+        private Entity _owner;
         /// <summary>
         /// Gets the owner of this behaviour.
         /// </summary>
-        public Entity Owner { get; internal set; }
+        public Entity Owner
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Entity>() != null);
+
+                //Owner is set immediately after behaviour is constructed
+                //Why is it not a non-nullable constructor parameter, you ask?
+                //That would require all derived classes to pass a half initialised entity object through their constructors, ugly!
+                Contract.Assume(_owner != null);
+                return _owner;
+            }
+            set
+            {
+                Contract.Requires(value != null);
+                _owner = value;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating if this behaviour has been initialised.
@@ -110,6 +129,9 @@ namespace Myre.Entities.Behaviours
 
         public string GetFullPropertyName(string propertyName)
         {
+            Contract.Requires(propertyName != null);
+            Contract.Ensures(Contract.Result<string>() != null);
+
             return Name == null ? propertyName : string.Format("{0}_{1}", propertyName, Name);
         }
     }

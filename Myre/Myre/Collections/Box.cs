@@ -41,7 +41,12 @@ namespace Myre.Collections
             set
             {
                 var old = Value;
-                Value = (T)value;
+
+                if (value == null)
+                    Value = default(T);
+                else
+                    Value = (T)value;
+
                 if (BoxChanged != null)
                     BoxChanged(this, old, Value);
             }

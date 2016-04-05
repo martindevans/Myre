@@ -2,6 +2,7 @@
 using Myre.Entities.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace Myre.Entities.Events
 {
@@ -40,20 +41,16 @@ namespace Myre.Entities.Events
             public readonly Dictionary<object, IEvent> LocalScopes = new Dictionary<object, IEvent>();
         }
 
-        private readonly Dictionary<Type, Events> _events;
-        private Queue<IEventInvocation> _waitingEvents;
-        private Queue<IEventInvocation> _executingEvents;
-        private SpinLock _spinLock;
+        private readonly Dictionary<Type, Events> _events = new Dictionary<Type, Events>();
+        private Queue<IEventInvocation> _waitingEvents = new Queue<IEventInvocation>();
+        private Queue<IEventInvocation> _executingEvents = new Queue<IEventInvocation>();
+        private SpinLock _spinLock = new SpinLock();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventService"/> class.
-        /// </summary>
-        public EventService()
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
         {
-            _spinLock = new SpinLock();
-            _events = new Dictionary<Type, Events>();
-            _waitingEvents = new Queue<IEventInvocation>();
-            _executingEvents = new Queue<IEventInvocation>();
+            Contract.Invariant(_waitingEvents != null);
+            Contract.Invariant(_executingEvents != null);
         }
 
         /// <summary>
@@ -72,6 +69,8 @@ namespace Myre.Entities.Events
                 e = new Events { GlobalScope = new Event<T>(this) };
                 _events[type] = e;
             }
+
+            Contract.Assume(e != null);
 
             IEvent instance;
             if (scope == null)
@@ -120,7 +119,9 @@ namespace Myre.Entities.Events
         {
             while (_executingEvents.Count > 0)
             {
-                IEventInvocation invocation = _executingEvents.Dequeue();
+                var invocation = _executingEvents.Dequeue();
+                Contract.Assume(invocation != null);
+
                 invocation.Execute();
                 invocation.Recycle();
             }
@@ -128,7 +129,7 @@ namespace Myre.Entities.Events
 
         private void FlipBuffers()
         {
-            bool taken = false;
+            var taken = false;
             try
             {
                 _spinLock.Enter(ref taken);

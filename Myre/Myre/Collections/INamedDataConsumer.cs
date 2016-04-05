@@ -24,7 +24,6 @@ namespace Myre.Collections
     {
         public void Set<T>(TypedName<T> key, T value)
         {
-            Contract.Requires(key.Name != null);
         }
     }
 }

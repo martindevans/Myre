@@ -93,11 +93,11 @@
     <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
     <CodeContractsMissingPublicEnsuresAsWarnings>True</CodeContractsMissingPublicEnsuresAsWarnings>
     <CodeContractsInferRequires>True</CodeContractsInferRequires>
-    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferEnsures>True</CodeContractsInferEnsures>
     <CodeContractsInferEnsuresAutoProperties>True</CodeContractsInferEnsuresAutoProperties>
     <CodeContractsInferObjectInvariants>True</CodeContractsInferObjectInvariants>
-    <CodeContractsSuggestAssumptions>False</CodeContractsSuggestAssumptions>
-    <CodeContractsSuggestAssumptionsForCallees>False</CodeContractsSuggestAssumptionsForCallees>
+    <CodeContractsSuggestAssumptions>True</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestAssumptionsForCallees>True</CodeContractsSuggestAssumptionsForCallees>
     <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
     <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
     <CodeContractsSuggestObjectInvariants>True</CodeContractsSuggestObjectInvariants>
@@ -119,7 +119,7 @@
     <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
     <CodeContractsRuntimeCheckingLevel>ReleaseRequires</CodeContractsRuntimeCheckingLevel>
     <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
-    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
+    <CodeContractsAnalysisWarningLevel>2</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MathHelperRedux, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
