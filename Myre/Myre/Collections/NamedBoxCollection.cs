@@ -11,12 +11,15 @@ namespace Myre.Collections
     {
         #region fields
         private readonly Dictionary<NameWithType, IBox> _values = new Dictionary<NameWithType, IBox>();
+
+        private static readonly Type _boxType = typeof(Box<>);
         #endregion
 
         [ContractInvariantMethod]
         private void ObjectInvariant()
         {
             Contract.Invariant(_values != null);
+            Contract.Invariant(_boxType != null);
         }
 
         #region queries
@@ -30,6 +33,9 @@ namespace Myre.Collections
         /// </returns>
         public bool Contains(string key, Type type)
         {
+            Contract.Requires(key != null);
+            Contract.Requires(type != null);
+
             return _values.ContainsKey(new NameWithType(key, type));
         }
 
@@ -49,7 +55,6 @@ namespace Myre.Collections
         /// <returns>The value at the specified key, or null if the existing box contains a different value type.</returns>
         public Box<T> GetOrCreate<T>(TypedName<T> key, T defaultValue = default(T))
         {
-            Contract.Requires(key.Name != null);
             Contract.Ensures(Contract.Result<Box<T>>() != null);
 
             var box = Get(key.Name, typeof(T));
@@ -173,7 +178,7 @@ namespace Myre.Collections
 
             if (box == null)
             {
-                var genericType = typeof(Box<>).MakeGenericType(type);
+                var genericType = _boxType.MakeGenericType(type);
                 Contract.Assert(genericType != null);
                 box = (IBox)Activator.CreateInstance(genericType);
                 _values.Add(new NameWithType(key, type), box);

@@ -12,7 +12,6 @@ using Myre.Graphics.Translucency;
 using Ninject;
 using System;
 using System.Numerics;
-using Myre.Extensions;
 using GameTime = Microsoft.Xna.Framework.GameTime;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
@@ -56,13 +55,13 @@ namespace GraphicsTests.Tests
             dude.AddBehaviour<AnimationPlayer>();
             var dudeEntity = dude.Create();
             _scene.Add(dudeEntity);
-            _animationPlayer = dudeEntity.GetBehaviour<AnimationPlayer>(null);
+            _animationPlayer = dudeEntity.GetBehaviour<AnimationPlayer>();
             _animationPlayer.EnableRootBoneTranslationY = false;
             _animationPlayer.EnableRootBoneTranslationX = false;
             _animationPlayer.EnableRootBoneTranslationZ = false;
             _animationPlayer.EnableRootBoneScale = false;
 
-            _dude = dudeEntity.GetBehaviour<ModelInstance>(null);
+            _dude = dudeEntity.GetBehaviour<ModelInstance>();
 
             _animationPlayer.DefaultClip = new AnimationPlayer.ClipPlaybackParameters
             {

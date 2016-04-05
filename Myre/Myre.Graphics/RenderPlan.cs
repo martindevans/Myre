@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Ninject;
@@ -204,6 +205,8 @@ namespace Myre.Graphics
 
         internal void SetResource(string name, RenderTarget2D resource)
         {
+            Contract.Requires(name != null);
+
             _resources[name].RenderTarget = resource;
             Renderer.Data.Set(new TypedName<Texture2D>(name), resource);
         }

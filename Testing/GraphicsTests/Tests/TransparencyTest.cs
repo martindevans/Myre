@@ -79,7 +79,7 @@ namespace GraphicsTests.Tests
             cameraEntity.GetProperty(new TypedName<Viewport>("viewport")).Value = new Viewport() { Width = _device.PresentationParameters.BackBufferWidth, Height = _device.PresentationParameters.BackBufferHeight };
             _scene.Add(cameraEntity);
 
-            _view = cameraEntity.GetBehaviour<View>(null);
+            _view = cameraEntity.GetBehaviour<View>();
 
             //Skybox
             var skyboxDesc = _kernel.Get<EntityDescription>();
@@ -107,7 +107,7 @@ namespace GraphicsTests.Tests
                 sphereEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
                 _scene.Add(sphereEntity);
 
-                var smodel = sphereEntity.GetBehaviour<ModelInstance>(null);
+                var smodel = sphereEntity.GetBehaviour<ModelInstance>();
                 smodel.Opacity = 0.15f;
                 smodel.SubSurfaceScattering = 0.5f;
                 smodel.Attenuation = 0.2f;

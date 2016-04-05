@@ -52,7 +52,7 @@ namespace Myre.Graphics.Deferred.LightManagers
 
             var shadowCameraEntity = kernel.Get<EntityDescription>();
             shadowCameraEntity.AddBehaviour<View>();
-            _shadowView = shadowCameraEntity.Create().GetBehaviour<View>(null);
+            _shadowView = shadowCameraEntity.Create().GetBehaviour<View>();
             _shadowView.Camera = new Camera();
         }
 

@@ -17,16 +17,55 @@ namespace Myre.Entities.Behaviours
     {
         internal struct ManagerBinding
         {
-            public IManagerHandler Handler;
-            public Type ManagedAs;
+            private readonly IManagerHandler _handler;
+            public IManagerHandler Handler
+            {
+                get
+                {
+                    return _handler;
+                }
+            }
+
+            private readonly Type _managedAs;
+            public Type ManagedAs
+            {
+                get
+                {
+                    return _managedAs;
+                }
+            }
+
+            public ManagerBinding(IManagerHandler handler, Type managedAs)
+            {
+                Contract.Requires(handler != null);
+                Contract.Requires(managedAs != null);
+
+                _handler = handler;
+                _managedAs = managedAs;
+            }
         }
 
         /// <summary>
         /// Gets the name of this behaviour.
         /// </summary>
-        public string Name { get; internal set; }
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                Contract.Assume(_name != null);
+                return _name;
+            }
+            internal set
+            {
+                Contract.Requires(value != null);
+                _name = value;
+            }
+        }
 
         private Entity _owner;
+        private string _name;
+
         /// <summary>
         /// Gets the owner of this behaviour.
         /// </summary>
@@ -58,23 +97,6 @@ namespace Myre.Entities.Behaviours
         /// Gets the manager this behaviour belongs to.
         /// </summary>
         internal ManagerBinding CurrentManager { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Behaviour"/> class.
-        /// </summary>
-        protected Behaviour()
-            : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Behaviour"/> class.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        protected Behaviour(string name)
-        {
-            Name = name;
-        }
 
         /// <summary>
         /// Initialises this instance.
@@ -132,7 +154,7 @@ namespace Myre.Entities.Behaviours
             Contract.Requires(propertyName != null);
             Contract.Ensures(Contract.Result<string>() != null);
 
-            return Name == null ? propertyName : string.Format("{0}_{1}", propertyName, Name);
+            return string.IsNullOrEmpty(Name) ? propertyName : string.Format("{0}_{1}", propertyName, Name);
         }
     }
 }

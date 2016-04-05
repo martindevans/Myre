@@ -48,13 +48,10 @@ namespace Myre.Entities.Behaviours
             if (behaviour.CurrentManager.Handler != null)
                 behaviour.CurrentManager.Handler.Remove(behaviour);
 
+            Contract.Assume(_manager != null);
             _manager.Add(behaviour);
 
-            behaviour.CurrentManager = new Behaviour.ManagerBinding
-            {
-                Handler = this,
-                ManagedAs = typeof(T)
-            };
+            behaviour.CurrentManager = new Behaviour.ManagerBinding(this, typeof(T));
         }
 
         public void Remove(T behaviour)
@@ -64,11 +61,7 @@ namespace Myre.Entities.Behaviours
             if (behaviour.CurrentManager.Handler != this)
                 return;
 
-            behaviour.CurrentManager = new Behaviour.ManagerBinding
-            {
-                Handler = null,
-                ManagedAs = null
-            };
+            behaviour.CurrentManager = default(Behaviour.ManagerBinding);
 
             _manager.Remove(behaviour);
         }
@@ -96,17 +89,19 @@ namespace Myre.Entities.Behaviours
             public object List;
         }
 
-        private readonly List<IBehaviourManager> _managers;
-        private readonly Dictionary<Type, IBehaviourManager> _byType;
-        private readonly Dictionary<Type, IManagerHandler> _byBehaviour;
-        private readonly Dictionary<Type, PrivateList> _catagorised;
+        private readonly List<IBehaviourManager> _managers = new List<IBehaviourManager>();
+        private readonly Dictionary<Type, IBehaviourManager> _byType = new Dictionary<Type, IBehaviourManager>();
+        private readonly Dictionary<Type, IManagerHandler> _byBehaviour = new Dictionary<Type, IManagerHandler>();
+        private readonly Dictionary<Type, PrivateList> _catagorised = new Dictionary<Type, PrivateList>();
 
-        public BehaviourManagerContainer()
+        private static readonly Type _managerHandlerType = typeof(ManagerHandler<>);
+        private static readonly Type _listType = typeof(List<>);
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
         {
-            _managers = new List<IBehaviourManager>();
-            _byType = new Dictionary<Type, IBehaviourManager>();
-            _byBehaviour = new Dictionary<Type, IManagerHandler>();
-            _catagorised = new Dictionary<Type, PrivateList>();
+            Contract.Invariant(_managerHandlerType != null);
+            Contract.Invariant(_listType != null);
         }
 
         public void Add(IBehaviourManager manager)
@@ -123,7 +118,7 @@ namespace Myre.Entities.Behaviours
                 IManagerHandler handler;
                 if (!_byBehaviour.TryGetValue(type, out handler))
                 {
-                    var handlerType = typeof(ManagerHandler<>).MakeGenericType(type);
+                    var handlerType = _managerHandlerType.MakeGenericType(type);
                     handler = (IManagerHandler)Activator.CreateInstance(handlerType);
                     _byBehaviour[type] = handler;
                 }
@@ -165,7 +160,11 @@ namespace Myre.Entities.Behaviours
                 _byType.Remove(managerType);
 
                 foreach (var type in manager.GetManagedTypes())
-                    _byBehaviour[type].Manager = null;
+                {
+                    var handler = _byBehaviour[type];
+                    Contract.Assume(handler != null);
+                    handler.Manager = null;
+                }
 
                 foreach (var type in managerType.GetImplementedTypes())
                 {
@@ -182,6 +181,7 @@ namespace Myre.Entities.Behaviours
         {
             var listType = list.List.GetType();
             var removeMethod = listType.GetMethod("Remove", new Type[] { type });
+            Contract.Assume(removeMethod != null);
             removeMethod.Invoke(list.List, new object[] { manager });
         }
 
@@ -275,7 +275,7 @@ namespace Myre.Entities.Behaviours
 
         private PrivateList CreatePrivateList(Type type)
         {
-            var listType = typeof(List<>).MakeGenericType(type);
+            var listType = _listType.MakeGenericType(type);
 
             PrivateList list;
             list.List = Activator.CreateInstance(listType);

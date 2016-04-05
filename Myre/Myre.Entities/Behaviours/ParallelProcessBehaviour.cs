@@ -12,16 +12,6 @@ namespace Myre.Entities.Behaviours
     public abstract class ParallelProcessBehaviour
         : Behaviour
     {
-        protected ParallelProcessBehaviour(string name)
-            : base(name)
-        {
-        }
-
-        protected ParallelProcessBehaviour()
-            : base(null)
-        {
-        }
-
         protected abstract void ParallelUpdate(float elapsedTime);
 
         public class Manager<B>

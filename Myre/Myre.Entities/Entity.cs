@@ -321,8 +321,11 @@ namespace Myre.Entities
         /// <param name="name">The name of the propery.</param>
         /// <param name="type">The type of the value contained in this property</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public IProperty GetProperty(String name, Type type)
+        public IProperty GetProperty(string name, Type type)
         {
+            Contract.Requires(name != null);
+            Contract.Requires(type != null);
+
             IProperty property;
             _properties.TryGetValue(new NameWithType(name, type), out property);
             return property;
@@ -348,6 +351,7 @@ namespace Myre.Entities
         public Behaviour GetBehaviour(Type type, string name)
         {
             Contract.Requires(type != null);
+            Contract.Requires(name != null);
 
             Behaviour[] array;
             if (_behaviours.TryGetValue(type, out array))
@@ -393,8 +397,9 @@ namespace Myre.Entities
         /// <typeparam name="T">The type.</typeparam>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        public T GetBehaviour<T>(string name)
+        public T GetBehaviour<T>(string name = "")
         {
+            Contract.Requires(name != null);
             Contract.Ensures(Contract.Result<T>() != null);
 
             var b = GetBehaviour(typeof(T), name);

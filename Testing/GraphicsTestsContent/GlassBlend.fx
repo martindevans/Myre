@@ -87,7 +87,7 @@ float3 Scatter(float2 texCoord, float scattering)
 		alpha = min(1, alpha);
 
 		total += col * alpha;
-		count += alpha * pow(scattering, offsets[i].z);
+		count += alpha * pow(abs(scattering), offsets[i].z);
 	}
 
 	return total;
@@ -121,7 +121,7 @@ float3 Transmit(float2 texCoord, float thickness, float scattering, float attenu
 	float3 center = tex2D(lightbufferSampler, texCoord).rgb;
 
 	//Attenuate by thickness and distance
-	float attn = pow(1 - attenuation, thickness);
+	float attn = pow(clamp(1 - attenuation, 0, 1), thickness);
 	center *= attn;
 	totali *= attn;
 	totalo *= attn;

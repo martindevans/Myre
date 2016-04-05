@@ -35,7 +35,7 @@ namespace Myre.Entities.Events
     public class EventService
         : Service, IEventService
     {
-        class Events
+        private class Events
         {
             public IEvent GlobalScope;
             public readonly Dictionary<object, IEvent> LocalScopes = new Dictionary<object, IEvent>();
@@ -102,7 +102,9 @@ namespace Myre.Entities.Events
 
         internal void Queue(IEventInvocation eventInvocation)
         {
-            bool taken = false;
+            Contract.Requires(eventInvocation != null);
+
+            var taken = false;
             try
             {
                 _spinLock.Enter(ref taken);

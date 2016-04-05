@@ -10,6 +10,7 @@ namespace Myre.Entities
     /// <summary>
     /// Base class for generically typed properties
     /// </summary>
+    [ContractClass(typeof(IPropertyContract))]
     public interface IProperty
     {
         /// <summary>
@@ -38,7 +39,43 @@ namespace Myre.Entities
         /// <summary>
         /// Event triggered whenever the property value changes
         /// </summary>
+        // ReSharper disable once EventNeverSubscribedTo.Global (Justification: Public API)
         event PropertySetDelegate PropertySet;
+    }
+
+    [ContractClassFor(typeof(IProperty))]
+    internal abstract class IPropertyContract : IProperty
+    {
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+
+                return null;
+            }
+        }
+
+        public object Value
+        {
+            get { return null; }
+            set { }
+        }
+
+        public Type Type
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Type>() != null);
+                return null;
+            }
+        }
+
+        public void Clear()
+        {
+        }
+
+        public event PropertySetDelegate PropertySet;
     }
 
     /// <summary>
@@ -93,7 +130,13 @@ namespace Myre.Entities
         object IProperty.Value
         {
             get { return Value; }
-            set { Value = (T)value; }
+            set
+            {
+                if (value == null)
+                    Value = default(T);
+                else
+                    Value = (T)value;
+            }
         }
 
         Type IProperty.Type
@@ -125,7 +168,7 @@ namespace Myre.Entities
 
         public override string ToString()
         {
-            return Value.Equals(default(T)) ? "null" : Value.ToString();
+            return Value == null ? "null" : Value.ToString();
         }
 
         private event PropertySetDelegate _propertySet;

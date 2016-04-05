@@ -16,20 +16,33 @@ namespace Myre.Entities.Events
             : IEventInvocation
         {
             public TData Data;
-            public Event<TData> Event;
+
+            private Event<TData> _event;
+            public Event<TData> Event
+            {
+                private get
+                {
+                    Contract.Ensures(Contract.Result<Event<TData>>() != null);
+                    Contract.Assume(_event != null);
+                    return _event;
+                }
+                set
+                {
+                    Contract.Requires(value != null);
+                    _event = value;
+                }
+            }
 
             public void Execute()
             {
-                //Loop over event listeners backwards so most recent handlers are executed first
-                //This makes events compatible with using them as a chained system where more recent handlers can temporarily block lower handlers (by modifying the event data)
-                for (var i = Event._listeners.Count - 1; i >= 0; i--)
-                    Data = Event._listeners[i].HandleEvent(Data, Event._scope);
+                Event.Dispatch(this);
             }
 
 
             public void Recycle()
             {
                 Data = default(TData);
+                _event = null;
                 Pool<Invocation>.Instance.Return(this);
             }
         }
@@ -37,7 +50,7 @@ namespace Myre.Entities.Events
         private readonly EventService _service;
         private readonly object _scope;
         private readonly Event<TData> _global;
-        private readonly List<IEventListener<TData>> _listeners;
+        private readonly List<IEventListener<TData>> _listeners = new List<IEventListener<TData>>();
 
         /// <summary>
         /// Gets the service.
@@ -59,7 +72,12 @@ namespace Myre.Entities.Events
             _service = service;
             _scope = scope;
             _global = globalScoped;
-            _listeners = new List<IEventListener<TData>>();
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_listeners != null);
         }
 
         /// <summary>
@@ -68,6 +86,8 @@ namespace Myre.Entities.Events
         /// <param name="listener">The listener.</param>
         public void AddListener(IEventListener<TData> listener)
         {
+            Contract.Requires(listener != null);
+
             _listeners.Add(listener);
         }
 
@@ -78,6 +98,8 @@ namespace Myre.Entities.Events
         /// <returns></returns>
         public bool RemoveListener(IEventListener<TData> listener)
         {
+            Contract.Requires(listener != null);
+
             return _listeners.Remove(listener);
         }
 
@@ -95,11 +117,25 @@ namespace Myre.Entities.Events
 
         private void Send(TData data, Event<TData> channel)
         {
-            Invocation invocation = Pool<Invocation>.Instance.Get();
+            Contract.Requires(channel != null);
+
+            var invocation = Pool<Invocation>.Instance.Get();
             invocation.Event = channel;
             invocation.Data = data;
 
             _service.Queue(invocation);
+        }
+
+        private void Dispatch(Invocation invocation)
+        {
+            //Loop over event listeners backwards so most recent handlers are executed first
+            //This makes events compatible with using them as a chained system where more recent handlers can temporarily block lower handlers (by modifying the event data)
+            for (var i = _listeners.Count - 1; i >= 0; i--)
+            {
+                var listener = _listeners[i];
+                Contract.Assume(listener != null);
+                invocation.Data = listener.HandleEvent(invocation.Data, _scope);
+            }
         }
     }
 }

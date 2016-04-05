@@ -116,7 +116,7 @@ namespace GraphicsTests
                 entity.GetProperty(new TypedName<Vector3>("colour")).Value = new Vector3(0, 5, 0);
                 entity.GetProperty(new TypedName<float>("range")).Value = 200;
 
-                var light = entity.GetBehaviour<PointLight>(null);
+                var light = entity.GetBehaviour<PointLight>();
                 light.Colour = Vector3.Normalize(new Vector3(0.1f + (float)rng.NextDouble(), 0.1f + (float)rng.NextDouble(), 0.1f + (float)rng.NextDouble())) * 10;
                 _lights.Add(light);
             }
@@ -140,7 +140,7 @@ namespace GraphicsTests
                 spotLightEntity.GetProperty(new TypedName<float>("range")).Value = 500;
                 spotLightEntity.GetProperty(new TypedName<Texture2D>("mask")).Value = content.Load<Texture2D>("Chrysanthemum");
                 spotLightEntity.GetProperty(new TypedName<int>("shadow_resolution")).Value = 1024;
-                _spotLight = spotLightEntity.GetBehaviour<SpotLight>(null);
+                _spotLight = spotLightEntity.GetBehaviour<SpotLight>();
                 _scene.Add(spotLightEntity);
             }
 
@@ -228,7 +228,7 @@ namespace GraphicsTests
             sphereEntity.GetProperty(new TypedName<bool>("is_static")).Value = true;
             _scene.Add(sphereEntity);
 
-            var smodel = sphereEntity.GetBehaviour<ModelInstance>(null);
+            var smodel = sphereEntity.GetBehaviour<ModelInstance>();
             smodel.Opacity = 0.5f;
             smodel.SubSurfaceScattering = 0.5f;
             smodel.Attenuation = 0.3f;

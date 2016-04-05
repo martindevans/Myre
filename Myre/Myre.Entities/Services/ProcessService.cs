@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Threading;
 
 namespace Myre.Entities.Services
 {
     /// <summary>
     /// An interface which defines a service to manage processes.
     /// </summary>
+    [ContractClass(typeof(IProcessServiceContract))]
     public interface IProcessService
         : IService
     {
@@ -18,6 +20,23 @@ namespace Myre.Entities.Services
         void Add(IProcess process);
     }
 
+    [ContractClassFor(typeof(IProcessService))]
+    abstract class IProcessServiceContract : IProcessService
+    {
+        public void Add(IProcess process)
+        {
+            Contract.Requires(process != null);
+        }
+
+        public abstract void Dispose();
+        public abstract bool IsDisposed { get; }
+        public abstract int UpdateOrder { get; }
+        public abstract int DrawOrder { get; }
+        public abstract void Initialise(Scene scene);
+        public abstract void Update(float elapsedTime);
+        public abstract void Draw();
+    }
+
     /// <summary>
     /// A class which manages the updating of processes.
     /// </summary>
@@ -26,6 +45,8 @@ namespace Myre.Entities.Services
     {
         private readonly List<IProcess> _processes;
         private readonly List<IProcess> _buffer;
+
+        private SpinLock _bufferLock = new SpinLock();
 
         readonly Stopwatch _timer = new Stopwatch();
         private readonly List<KeyValuePair<IProcess, TimeSpan>> _executionTimes;
@@ -59,17 +80,25 @@ namespace Myre.Entities.Services
         /// <param name="elapsedTime">The number of seconds which have elapsed since the previous frame.</param>
         public override void Update(float elapsedTime)
         {
-            lock (_buffer)
+            bool taken = false;
+            try
             {
+                _bufferLock.Enter(ref taken);
                 _processes.AddRange(_buffer);
                 _buffer.Clear();
+            }
+            finally
+            {
+                if (taken)
+                    _bufferLock.Exit();
             }
 
             _executionTimes.Clear();
 
-            for (int i = _processes.Count - 1; i >= 0; i--)
+            for (var i = _processes.Count - 1; i >= 0; i--)
             {
                 var process = _processes[i];
+                Contract.Assume(process != null);
 
                 if (process.IsComplete)
                 {
@@ -92,8 +121,17 @@ namespace Myre.Entities.Services
         /// <param name="process">The process.</param>
         public void Add(IProcess process)
         {
-            lock (_buffer)
+            var taken = false;
+            try
+            {
+                _bufferLock.Enter(ref taken);
                 _buffer.Add(process);
+            }
+            finally
+            {
+                if (taken)
+                    _bufferLock.Exit();
+            }
         }
 
         public void Add(Func<float, bool> update)

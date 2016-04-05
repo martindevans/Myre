@@ -138,7 +138,7 @@ namespace GraphicsTests.Tests
             MouseState mouse = Mouse.GetState();
             KeyboardState keyboard = Keyboard.GetState();
 
-            foreach (var decals in _scene.Entities.Select(a => a.GetBehaviour<Decal>(null)).Where(a => a != null))
+            foreach (var decals in _scene.Entities.Select(a => a.GetBehaviour<Decal>("")).Where(a => a != null))
                 decals.Color = new Vector4((float)(time % 1), 1, 1, 1);
 
             Game.IsMouseVisible = false;

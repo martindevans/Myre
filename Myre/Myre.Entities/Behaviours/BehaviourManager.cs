@@ -41,6 +41,7 @@ namespace Myre.Entities.Behaviours
         {
             Contract.Requires(manager != null);
             Contract.Ensures(Contract.Result<IEnumerable<Type>>() != null);
+            Contract.Ensures(Contract.ForAll(Contract.Result<IEnumerable<Type>>(), a => a != null));
 
             var managerType = manager.GetType();
 
@@ -203,9 +204,10 @@ namespace Myre.Entities.Behaviours
 
             if (disposeManagedResources)
             {
-                for (var i = Behaviours.Count - 1; i >= 0; i--)
+                var behaviours = Behaviours;
+                for (var i = behaviours.Count - 1; i >= 0; i--)
                 {
-                    var b = Behaviours[i];
+                    var b = behaviours[i];
                     Contract.Assume(b != null);
                     Remove(b);
                 }

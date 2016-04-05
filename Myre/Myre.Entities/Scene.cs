@@ -6,7 +6,6 @@ using Myre.Collections;
 using Myre.Entities.Behaviours;
 using Myre.Entities.Services;
 using Ninject;
-using Ninject.Syntax;
 
 namespace Myre.Entities
 {
@@ -19,9 +18,9 @@ namespace Myre.Entities
         #region fields and properties
         private static readonly Dictionary<Type, Type> _defaultManagers = new Dictionary<Type, Type>();
 
-        private readonly ServiceContainer _services;
-        private readonly BehaviourManagerContainer _managers;
-        private readonly List<Entity> _entities;
+        private readonly ServiceContainer _services = new ServiceContainer();
+        private readonly BehaviourManagerContainer _managers = new BehaviourManagerContainer();
+        private readonly List<Entity> _entities = new List<Entity>();
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -93,12 +92,11 @@ namespace Myre.Entities
         /// <param name="kernel">The kernel used to instantiate services and behaviours. <c>null</c> for NinjectKernel.Instance.</param>
         public Scene(IKernel kernel = null)
         {
-            _services = new ServiceContainer();
-            _managers = new BehaviourManagerContainer();
-            _entities = new List<Entity>();
             Kernel = kernel ?? NinjectKernel.Instance; //new ChildKernel(kernel ?? NinjectKernel.Instance);
 
-            Kernel.Bind<Scene>().ToConstant(this);
+            var binding = Kernel.Bind<Scene>();
+            Contract.Assume(binding != null);
+            binding.ToConstant(this);
         }
 
         [ContractInvariantMethod]
@@ -181,6 +179,7 @@ namespace Myre.Entities
             if (index != -1)
             {
                 var entity = _entities[index];
+                Contract.Assume(entity != null);
 
                 foreach (var behaviour in entity.Behaviours)
                 {
@@ -248,7 +247,12 @@ namespace Myre.Entities
                 select new { Handler = handler, Behaviour = behaviour };
 
             foreach (var item in behavioursToBeAdded)
+            {
+                Contract.Assume(item != null);
+                Contract.Assume(item.Handler != null);
+                Contract.Assume(item.Behaviour != null);
                 item.Handler.Add(item.Behaviour);
+            }
         }
 
         /// <summary>

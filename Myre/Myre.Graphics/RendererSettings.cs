@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Myre.Collections;
 using Myre.Debugging;
 
@@ -47,6 +48,8 @@ namespace Myre.Graphics
         public Box<T> Add<T>(string name, string description = null, T defaultValue = default(T))
 // ReSharper restore UnusedMethodReturnValue.Global
         {
+            Contract.Requires(name != null);
+
             var box = _renderer.Data.GetOrCreate(new TypedName<T>(name), defaultValue);
             var setting = new Setting<T>()
             {

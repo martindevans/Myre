@@ -61,30 +61,16 @@ namespace Myre.Entities
     public class BehaviourData
         : IBehaviourFactory
     {
-        public readonly string Name;
-        public readonly Type Type;
+        public readonly NameWithType Name;
 
-        public BehaviourData(string name, Type type)
+        public BehaviourData(NameWithType name)
         {
-            Contract.Requires(type != null);
-
             Name = name;
-            Type = type;
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Type != null);
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return Type.GetHashCode() * 113
-                     + (Name ?? "").GetHashCode() * 131;
-            }
+            return Name.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -103,15 +89,15 @@ namespace Myre.Entities
         {
             Contract.Requires(data != null);
 
-            return Name == data.Name
-                && Type == data.Type;
+            return Name.Equals(data.Name);
         }
 
         public Behaviour Create(IKernel kernel)
         {
-            var instance = (Behaviour)kernel.Get(Type, new ConstructorArgument("name", Name));
+            var instance = (Behaviour)kernel.Get(Name.Type, new ConstructorArgument("name", Name.Name));
+            Contract.Assume(instance != null);
 
-            instance.Name = Name;
+            instance.Name = Name.Name;
             return instance;
         }
     }
@@ -221,11 +207,12 @@ namespace Myre.Entities
         /// <param name="type">The type.</param>
         /// <param name="name">The name.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour(Type type, string name = null)
+        public bool AddBehaviour(Type type, string name = "")
         {
             Contract.Requires(type != null);
+            Contract.Requires(name != null);
 
-            return AddBehaviour(new BehaviourData(name, type));
+            return AddBehaviour(new BehaviourData(new NameWithType(name, type)));
         }
 
         /// <summary>
@@ -234,10 +221,21 @@ namespace Myre.Entities
         /// <typeparam name="T"></typeparam>
         /// <param name="name">The name.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour<T>(TypedName<T> name = default(TypedName<T>))
+        public bool AddBehaviour<T>(TypedName<T> name)
             where T : Behaviour
         {
             return AddBehaviour(typeof(T), name.Name);
+        }
+
+        /// <summary>
+        /// Adds the behaviour, provided that such a behaviour does not already exist. (Uses default name "")
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
+        public bool AddBehaviour<T>()
+            where T : Behaviour
+        {
+            return AddBehaviour(typeof(T), "");
         }
 
         #region properties
@@ -273,6 +271,7 @@ namespace Myre.Entities
         public bool AddProperty(Type dataType, string name, object initialValue)
         {
             Contract.Requires(dataType != null);
+            Contract.Requires(name != null);
 
             return AddProperty(new PropertyData(name, dataType, initialValue));
         }
