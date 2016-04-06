@@ -20,11 +20,22 @@ namespace Myre.Entities.Behaviours
 
         protected ProcessBehaviour()
         {
+            Cons();
+        }
+
+        protected ProcessBehaviour(string name)
+            : base(name)
+        {
+            Cons();
+        }
+
+        private void Cons()
+        {
             Period = 0;
             _counter = new IntUIntUnion { IntValue = Interlocked.Increment(ref _nextCounter) }.UIntValue;   //Spread updates out across time to prevent clumping
         }
 
-// ReSharper disable MemberCanBeProtected.Global
+        // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
         public class Manager<B>
 // ReSharper restore ClassWithVirtualMembersNeverInherited.Global
