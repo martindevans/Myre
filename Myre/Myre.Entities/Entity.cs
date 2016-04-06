@@ -400,11 +400,10 @@ namespace Myre.Entities
         public T GetBehaviour<T>(string name = "")
         {
             Contract.Requires(name != null);
-            Contract.Ensures(Contract.Result<T>() != null);
 
             var b = GetBehaviour(typeof(T), name);
             if (b == null)
-                throw new KeyNotFoundException(string.Format("Cannot find entity of type {0} with name \"{1}\"", typeof(T), name));
+                return default(T);
 
             return (T)(object)b;
         }
