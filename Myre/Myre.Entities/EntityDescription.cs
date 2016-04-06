@@ -313,7 +313,12 @@ namespace Myre.Entities
             Contract.Ensures(Contract.Result<IEnumerable<Behaviour>>() != null);
 
             foreach (var item in _behaviours)
-                yield return item.Create(_kernel);
+            {
+                var b = item.Create(_kernel);
+                if (b.Name == null)
+                    throw new InvalidOperationException("'Name' property of behaviour is null!");
+                yield return b;
+            }
         }
 
         private static IProperty CreatePropertyInstance(PropertyData property)

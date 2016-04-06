@@ -104,6 +104,7 @@ namespace Myre.Entities.Behaviours
 
         protected Behaviour(string name)
         {
+            Contract.Requires(name != null);
             Name = name;
         }
 
