@@ -4,11 +4,12 @@ using System.Diagnostics.Contracts;
 namespace Myre.Collections
 {
     /// <summary>
-    /// Maintains pool of class instances.
+    /// Maintains pool of class instances. Completely threadsafe.
     /// </summary>
     /// <typeparam name="T"> The type of object to store. It must define a parameterless constructor</typeparam>
     public class Pool<T> where T : class, new()
     {
+        #region fields and properties
         private static readonly Pool<T> _instance = new Pool<T>();
         /// <summary>
         /// Gets the static instance.
@@ -23,8 +24,14 @@ namespace Myre.Collections
             }
         }
 
+        /// <summary>
+        /// Maximum number of items to keep in this pool (0 or less will be interpreted as infinite capacity)
+        /// </summary>
+        public int Capacity { get; set; }
+
         private readonly ConcurrentStack<T> _items;
         private readonly bool _recycleable;
+        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Pool&lt;T&gt;"/> class.
@@ -39,11 +46,18 @@ namespace Myre.Collections
         /// </summary>
         /// <param name="initialCapacity">The initial number of elements contained within the <see cref="Pool&lt;T&gt;"/>.</param>
         public Pool(int initialCapacity)
+            // ReSharper disable once IntroduceOptionalParameters.Global (Justification: this would be a breaking change)
+            : this(initialCapacity, -1)
+        {   
+        }
+
+        public Pool(int initialCapacity, int maxCapacity)
         {
             _items = new ConcurrentStack<T>();
-            for (int i = 0; i < initialCapacity; i++)
+            for (var i = 0; i < initialCapacity; i++)
                 _items.Push(new T());
 
+            Capacity = maxCapacity;
             _recycleable = typeof(IRecycleable).IsAssignableFrom(typeof(T));
         }
 
@@ -78,7 +92,8 @@ namespace Myre.Collections
         {
             Contract.Requires(item != null);
 
-            _items.Push(item);
+            if (Capacity < 1 || _items.Count < Capacity)
+                _items.Push(item);
         }
     }
 }
