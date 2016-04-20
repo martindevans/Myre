@@ -80,26 +80,5 @@ namespace Myre.Extensions
                     list.RemoveAt(i);
             }
         }
-
-        /// <summary>
-        /// Find the first item which the given predicate matches
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="predicate"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static int FindIndex<T>(this IList<T> list, Predicate<T> predicate)
-        {
-            Contract.Requires(list != null);
-            Contract.Requires(predicate != null);
-
-            for (var i = 0; i < list.Count; i++)
-            {
-                if (predicate(list[i]))
-                    return i;
-            }
-
-            return -1;
-        }
     }
 }

@@ -5,6 +5,7 @@ namespace Myre.Collections
 {
     /// <summary>
     /// Maintains pool of class instances. Completely threadsafe.
+    /// If a request is made for an item when the pool is empty a new item will be constructed
     /// </summary>
     /// <typeparam name="T"> The type of object to store. It must define a parameterless constructor</typeparam>
     public class Pool<T> where T : class, new()
