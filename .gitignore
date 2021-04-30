@@ -3,6 +3,7 @@
 *.suo
 *.user
 *.nupkg
+push-all.ps1
 /Documentation
 /Myre/Packages
 /Myre/obj
