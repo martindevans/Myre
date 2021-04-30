@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 
 namespace Myre
 {
@@ -13,18 +12,10 @@ namespace Myre
     [Serializable]
     public struct TypedName<T>
     {
-        private readonly string _name;
         /// <summary>
         /// The name
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
-            }
-        }
+        public string Name { get; }
 
         /// <summary>
         /// Construct a new TypedName
@@ -32,9 +23,7 @@ namespace Myre
         /// <param name="name"></param>
         public TypedName(string name)
         {
-            Contract.Requires(name != null);
-
-            _name = name;
+            Name = name;
         }
 
         /// <summary>
@@ -48,7 +37,7 @@ namespace Myre
             if (string.IsNullOrEmpty(b))
                 return a;
 
-            return new TypedName<T>(string.Format("{0}_{1}", a._name, b));
+            return new TypedName<T>(string.Format("{0}_{1}", a.Name, b));
         }
 
         /// <summary>
@@ -58,8 +47,6 @@ namespace Myre
         /// <returns></returns>
         public static explicit operator string(TypedName<T> name)
         {
-            Contract.Ensures(Contract.Result<string>() != null);
-
             return name.Name;
         }
 
@@ -70,8 +57,6 @@ namespace Myre
         /// <returns></returns>
         public static explicit operator TypedName<T>(string name)
         {
-            Contract.Requires(name != null);
-
             return new TypedName<T>(name);
         }
 
@@ -93,31 +78,15 @@ namespace Myre
     public struct NameWithType
         : IEquatable<NameWithType>
     {
-        private readonly string _name;
         /// <summary>
         /// The name
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
-            }
-        }
+        public string Name { get; }
 
-        private readonly Type _type;
         /// <summary>
         /// The type
         /// </summary>
-        public Type Type
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Type>() != null);
-                return _type;
-            }
-        }
+        public Type Type { get; }
 
         /// <summary>
         /// Construct a new NameWithType
@@ -126,46 +95,36 @@ namespace Myre
         /// <param name="type"></param>
         public NameWithType(string name, Type type)
         {
-            Contract.Requires(name != null);
-            Contract.Requires(type != null);
-
-            _name = name;
-            _type = type;
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_name != null);
-            Contract.Invariant(_type != null);
+            Name = name;
+            Type = type;
         }
 
         public override bool Equals(object obj)
         {
-            if (!(obj is NameWithType))
+            if (obj is not NameWithType type)
                 return false;
 
-            return Equals((NameWithType)obj);
+            return Equals(type);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (_name.GetHashCode() * 397)
+                return (Name.GetHashCode() * 397)
                     + (Type.GetHashCode() * 587);
             }
         }
 
         public bool Equals(NameWithType other)
         {
-            return other._type == _type
-                && other._name == _name;
+            return other.Type == Type
+                && other.Name == Name;
         }
 
         public override string ToString()
         {
-            return string.Format("{0}<{1}>", _name, _type.Name);
+            return $"{Name}<{Type.Name}>";
         }
     }
 }

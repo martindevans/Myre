@@ -7,28 +7,6 @@ namespace Myre.Extensions
     public static class Matrix4x4Extensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Microsoft.Xna.Framework.Matrix ToXNA(this Matrix4x4 matrix)
-        {
-            return new Microsoft.Xna.Framework.Matrix(
-                matrix.M11, matrix.M12, matrix.M13, matrix.M14,
-                matrix.M21, matrix.M22, matrix.M23, matrix.M24,
-                matrix.M31, matrix.M32, matrix.M33, matrix.M34,
-                matrix.M41, matrix.M42, matrix.M43, matrix.M44
-            );
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix4x4 FromXNA(this Microsoft.Xna.Framework.Matrix matrix)
-        {
-            return new Matrix4x4(
-                matrix.M11, matrix.M12, matrix.M13, matrix.M14,
-                matrix.M21, matrix.M22, matrix.M23, matrix.M24,
-                matrix.M31, matrix.M32, matrix.M33, matrix.M34,
-                matrix.M41, matrix.M42, matrix.M43, matrix.M44
-            );
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Up(this Matrix4x4 matrix)
         {
             return new Vector3(matrix.M21, matrix.M22, matrix.M23);

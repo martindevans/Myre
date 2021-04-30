@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
@@ -16,11 +15,11 @@ namespace Myre.Entities
         : IDisposableObject
     {
         #region fields and properties
-        private static readonly Dictionary<Type, Type> _defaultManagers = new Dictionary<Type, Type>();
+        private static readonly Dictionary<Type, Type> _defaultManagers = new();
 
-        private readonly ServiceContainer _services = new ServiceContainer();
-        private readonly BehaviourManagerContainer _managers = new BehaviourManagerContainer();
-        private readonly List<Entity> _entities = new List<Entity>();
+        private readonly ServiceContainer _services = new();
+        private readonly BehaviourManagerContainer _managers = new();
+        private readonly List<Entity> _entities = new();
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -32,57 +31,29 @@ namespace Myre.Entities
         /// Gets a read only collection of the entities contained in this scene.
         /// </summary>
         /// <value>The entities.</value>
-        public IReadOnlyList<Entity> Entities
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<Entity>>() != null);
-                return _entities;
-            }
-        }
+        public IReadOnlyList<Entity> Entities => _entities;
 
         /// <summary>
         /// Gets the services.
         /// </summary>
         /// <value>The services.</value>
-        public IEnumerable<IService> Services
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<IService>>() != null);
-                return _services;
-            }
-        }
+        public IEnumerable<IService> Services => _services;
 
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
-        public IReadOnlyList<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<KeyValuePair<IService, TimeSpan>>>() != null);
-                return _services.ExecutionTimes;
-            }
-        }
+        public IReadOnlyList<KeyValuePair<IService, TimeSpan>> ServiceExecutionTimes => _services.ExecutionTimes;
 
         /// <summary>
         /// Gets the managers.
         /// </summary>
         /// <value>The managers.</value>
-        public IEnumerable<IBehaviourManager> Managers
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IEnumerable<IBehaviourManager>>() != null);
-                return _managers;
-            }
-        }
+        public IEnumerable<IBehaviourManager> Managers => _managers;
 
         /// <summary>
         /// Gets the Ninject kernel used to instantiate services and behaviour managers.
         /// </summary>
-        public IKernel Kernel { get; private set; }
+        public IKernel Kernel { get; }
         #endregion
 
         #region constructor
@@ -90,21 +61,12 @@ namespace Myre.Entities
         /// Initializes a new instance of the <see cref="Scene"/> class.
         /// </summary>
         /// <param name="kernel">The kernel used to instantiate services and behaviours. <c>null</c> for NinjectKernel.Instance.</param>
-        public Scene(IKernel kernel = null)
+        public Scene(IKernel? kernel = null)
         {
             Kernel = kernel ?? NinjectKernel.Instance; //new ChildKernel(kernel ?? NinjectKernel.Instance);
 
             var binding = Kernel.Bind<Scene>();
-            Contract.Assume(binding != null);
             binding.ToConstant(this);
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_services != null);
-            Contract.Invariant(_managers != null);
-            Contract.Invariant(_entities != null);
         }
         #endregion
 
@@ -113,11 +75,8 @@ namespace Myre.Entities
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <param name="initialisationData">Data to initialise the entity with.</param>
-        public void Add(Entity entity, INamedDataProvider initialisationData = null)
+        public void Add(Entity entity, INamedDataProvider? initialisationData = null)
         {
-            Contract.Requires(entity != null);
-            Contract.Requires(entity.Scene == null);
-
             entity.Scene = this;
             entity.Initialise(initialisationData);
 
@@ -136,10 +95,8 @@ namespace Myre.Entities
             _entities.Add(entity);
         }
 
-        private static Type SearchForDefaultManager(Type behaviourType)
+        private static Type? SearchForDefaultManager(Type behaviourType)
         {
-            Contract.Requires(behaviourType != null);
-
             Type managerType;
             lock (_defaultManagers)
             {
@@ -174,12 +131,11 @@ namespace Myre.Entities
         private void RemoveAt(int index)
         {
             if (index >= _entities.Count)
-                throw new ArgumentOutOfRangeException("index", string.Format("Cannot remove entity at index {0}, there are only {1} entities in the scene", index, _entities.Count));
+                throw new ArgumentOutOfRangeException(nameof(index), $"Cannot remove entity at index {index}, there are only {_entities.Count} entities in the scene");
 
             if (index != -1)
             {
                 var entity = _entities[index];
-                Contract.Assume(entity != null);
 
                 foreach (var behaviour in entity.Behaviours)
                 {
@@ -204,15 +160,10 @@ namespace Myre.Entities
         /// <returns></returns>
         public IBehaviourManager GetManager(Type managerType)
         {
-            Contract.Requires(managerType != null);
-            Contract.Ensures(Contract.Result<IBehaviourManager>() != null);
-
-            IBehaviourManager manager;
-            if (_managers.TryGet(managerType, out manager))
+            if (_managers.TryGet(managerType, out var manager))
                 return manager;
 
             manager = (IBehaviourManager)Kernel.Get(managerType);
-            Contract.Assume(manager != null);
 
             var behaviourTypes = manager.GetManagedTypes();
             foreach (var type in behaviourTypes)
@@ -231,8 +182,6 @@ namespace Myre.Entities
 
         private void AddBehavioursToManager(IEnumerable<Type> behaviourTypes)
         {
-            Contract.Requires(behaviourTypes != null);
-
             var behavioursToBeAdded = 
                 from behaviourType in behaviourTypes
                 let handler = _managers.GetByBehaviour(behaviourType)
@@ -247,12 +196,7 @@ namespace Myre.Entities
                 select new { Handler = handler, Behaviour = behaviour };
 
             foreach (var item in behavioursToBeAdded)
-            {
-                Contract.Assume(item != null);
-                Contract.Assume(item.Handler != null);
-                Contract.Assume(item.Behaviour != null);
                 item.Handler.Add(item.Behaviour);
-            }
         }
 
         /// <summary>
@@ -264,7 +208,7 @@ namespace Myre.Entities
         public T GetManager<T>()
             where T : class, IBehaviourManager
         {
-            return GetManager(typeof(T)) as T;
+            return (T)GetManager(typeof(T));
         }
 
         /// <summary>
@@ -275,18 +219,13 @@ namespace Myre.Entities
         /// <returns></returns>
         public IService GetService(Type serviceType)
         {
-            Contract.Requires(serviceType != null);
-            Contract.Ensures(Contract.Result<IService>() != null);
-
-            IService service;
-            if (_services.TryGet(serviceType, out service))
+            if (_services.TryGet(serviceType, out IService service))
                 return service;
             
             if (!typeof(IService).IsAssignableFrom(serviceType))
                 throw new ArgumentException("serviceType is not an IService.");
 
             service = (IService)Kernel.Get(serviceType);
-            Contract.Assume(service != null);
             _services.Add(service);
 
             service.Initialise(this);
@@ -303,8 +242,6 @@ namespace Myre.Entities
         public T GetService<T>()
             where T : class, IService
         {
-            Contract.Ensures(Contract.Result<T>() != null);
-
             return (T)GetService(typeof(T));
         }
 
@@ -329,7 +266,6 @@ namespace Myre.Entities
             for (var i = _entities.Count - 1; i >= 0; i--)
             {
                 var e = _entities[i];
-                Contract.Assume(e != null);
                 if (e.IsDisposed)
                     RemoveAt(i);
             }

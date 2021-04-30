@@ -16,11 +16,9 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static Vector3 RandomNormalVector(this Random random)
         {
-            Contract.Requires(random != null);
-
-            float randomA = (float)random.NextDouble() * 2 - 1;
-            float randomB = (float)random.NextDouble() * 2 - 1;
-            float randomC = (float)random.NextDouble() * 2 - 1;
+            var randomA = (float)random.NextDouble() * 2 - 1;
+            var randomB = (float)random.NextDouble() * 2 - 1;
+            var randomC = (float)random.NextDouble() * 2 - 1;
             var randomVector = Vector3.Normalize(new Vector3(randomA, randomB, randomC));
             return randomVector;
         }

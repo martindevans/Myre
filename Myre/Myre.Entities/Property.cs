@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 
 namespace Myre.Entities
 {
-    public delegate void PropertySetDelegate<T>(Property<T> property, T oldValue, T newValue);
+    public delegate void PropertySetDelegate<T>(Property<T> property, T? oldValue, T? newValue);
 
-    public delegate void PropertySetDelegate(IProperty property, object oldValue, object newValue);
+    public delegate void PropertySetDelegate(IProperty property, object? oldValue, object? newValue);
 
     /// <summary>
     /// Base class for generically typed properties
     /// </summary>
-    [ContractClass(typeof(IPropertyContract))]
     public interface IProperty
     {
         /// <summary>
@@ -21,7 +19,7 @@ namespace Myre.Entities
         /// <summary>
         /// The current value of this property
         /// </summary>
-        object Value { get; set; }
+        object? Value { get; set; }
 
         /// <summary>
         /// The type this property contains
@@ -43,41 +41,6 @@ namespace Myre.Entities
         event PropertySetDelegate PropertySet;
     }
 
-    [ContractClassFor(typeof(IProperty))]
-    internal abstract class IPropertyContract : IProperty
-    {
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-
-                return null;
-            }
-        }
-
-        public object Value
-        {
-            get { return null; }
-            set { }
-        }
-
-        public Type Type
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Type>() != null);
-                return null;
-            }
-        }
-
-        public void Clear()
-        {
-        }
-
-        public event PropertySetDelegate PropertySet;
-    }
-
     /// <summary>
     /// A generically typed property
     /// </summary>
@@ -85,35 +48,21 @@ namespace Myre.Entities
     public sealed class Property<T>
         : IProperty
     {
-        private readonly string _name;
         /// <summary>
         /// The name of this instance
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                return _name;
-            }
-        }
+        public string Name { get; }
 
-        public TypedName<T> TypedName
-        {
-            get { return new TypedName<T>(Name); }
-        }
+        public TypedName<T> TypedName => new(Name);
 
-        private T _value;
+        private T? _value;
 
         /// <summary>
         /// The value of this property
         /// </summary>
-        public T Value
+        public T? Value
         {
-            get
-            {
-                return _value;
-            }
+            get => _value;
             set
             {
                 var oldValue = _value;
@@ -125,57 +74,53 @@ namespace Myre.Entities
         /// <summary>
         /// Called after the value of this property is changed
         /// </summary>
-        public event PropertySetDelegate<T> PropertySet;
+        public event PropertySetDelegate<T>? PropertySet;
 
-        object IProperty.Value
+        object? IProperty.Value
         {
-            get { return Value; }
+            get => Value;
             set
             {
                 if (value == null)
-                    Value = default(T);
+                    Value = default;
                 else
                     Value = (T)value;
             }
         }
 
-        Type IProperty.Type
-        {
-            get { return typeof(T); }
-        }
+        Type IProperty.Type => typeof(T);
 
         void IProperty.Clear()
         {
             PropertySet = null;
-            _value = default(T);
+            _value = default;
         }
 
         public Property(string name)
         {
-            Contract.Requires(name != null);
-
-            _name = name;
-            _value = default(T);
+            Name = name;
+            _value = default;
         }
 
-        private void OnValueSet(T oldValue)
+        private void OnValueSet(T? oldValue)
         {
-            if (PropertySet != null)
-                PropertySet(this, oldValue, Value);
-            if (_propertySet != null)
-                _propertySet(this, oldValue, Value);
+            PropertySet?.Invoke(this, oldValue, Value);
+            _propertySet?.Invoke(this, oldValue, Value);
         }
 
         public override string ToString()
         {
-            return Value == null ? "null" : Value.ToString();
+            return Value is null ? "null" : Value.ToString();
         }
 
-        private event PropertySetDelegate _propertySet;
+        // ReSharper disable once InconsistentNaming
+#pragma warning disable IDE1006 // Naming Styles
+        private event PropertySetDelegate? _propertySet;
+#pragma warning restore IDE1006 // Naming Styles
         event PropertySetDelegate IProperty.PropertySet
         {
-            add { _propertySet += value; }
-            remove { _propertySet -= value; }
+            add => _propertySet += value;
+            remove => _propertySet -= value;
         }
     }
 }

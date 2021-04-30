@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using Myre.Collections;
 
 namespace Myre.Entities.Events
@@ -15,69 +14,40 @@ namespace Myre.Entities.Events
         private class Invocation
             : IEventInvocation
         {
-            public TData Data;
+            public TData? Data;
 
-            private Event<TData> _event;
-            public Event<TData> Event
-            {
-                private get
-                {
-                    Contract.Ensures(Contract.Result<Event<TData>>() != null);
-                    Contract.Assume(_event != null);
-                    return _event;
-                }
-                set
-                {
-                    Contract.Requires(value != null);
-                    _event = value;
-                }
-            }
+            internal Event<TData>? Event { private get; set; }
 
             public void Execute()
             {
-                Event.Dispatch(this);
+                Event?.Dispatch(this);
             }
 
 
             public void Recycle()
             {
-                Data = default(TData);
-                _event = null;
+                Data = default;
+                Event = null;
+
                 Pool<Invocation>.Instance.Return(this);
             }
         }
 
-        private readonly EventService _service;
-        private readonly object _scope;
-        private readonly Event<TData> _global;
-        private readonly List<IEventListener<TData>> _listeners = new List<IEventListener<TData>>();
+        private readonly object? _scope;
+        private readonly Event<TData>? _global;
+        private readonly List<IEventListener<TData>> _listeners = new();
 
         /// <summary>
         /// Gets the service.
         /// </summary>
         /// <value>The service.</value>
-        public EventService Service
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<EventService>() != null);
-                return _service;
-            }
-        }
+        public EventService Service { get; }
 
-        internal Event(EventService service, object scope = null, Event<TData> globalScoped = null)
+        internal Event(EventService service, object? scope = null, Event<TData>? globalScoped = null)
         {
-            Contract.Requires(service != null);
-
-            _service = service;
+            Service = service;
             _scope = scope;
             _global = globalScoped;
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_listeners != null);
         }
 
         /// <summary>
@@ -86,8 +56,6 @@ namespace Myre.Entities.Events
         /// <param name="listener">The listener.</param>
         public void AddListener(IEventListener<TData> listener)
         {
-            Contract.Requires(listener != null);
-
             _listeners.Add(listener);
         }
 
@@ -98,8 +66,6 @@ namespace Myre.Entities.Events
         /// <returns></returns>
         public bool RemoveListener(IEventListener<TData> listener)
         {
-            Contract.Requires(listener != null);
-
             return _listeners.Remove(listener);
         }
 
@@ -117,13 +83,11 @@ namespace Myre.Entities.Events
 
         private void Send(TData data, Event<TData> channel)
         {
-            Contract.Requires(channel != null);
-
             var invocation = Pool<Invocation>.Instance.Get();
             invocation.Event = channel;
             invocation.Data = data;
 
-            _service.Queue(invocation);
+            Service.Queue(invocation);
         }
 
         private void Dispatch(Invocation invocation)
@@ -133,7 +97,6 @@ namespace Myre.Entities.Events
             for (var i = _listeners.Count - 1; i >= 0; i--)
             {
                 var listener = _listeners[i];
-                Contract.Assume(listener != null);
                 invocation.Data = listener.HandleEvent(invocation.Data, _scope);
             }
         }

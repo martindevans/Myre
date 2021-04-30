@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using SwizzleMyVectors.Geometry;
 
 namespace Myre.Extensions
@@ -10,24 +9,6 @@ namespace Myre.Extensions
     /// </summary>
     public static class BoundingBoxExtensions
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Microsoft.Xna.Framework.BoundingBox ToXNA(this BoundingBox box)
-        {
-            return new Microsoft.Xna.Framework.BoundingBox(
-                box.Min.ToXNA(),
-                box.Max.ToXNA()
-            );
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BoundingBox FromXNA(this Microsoft.Xna.Framework.BoundingBox box)
-        {
-            return new BoundingBox(
-                box.Min.FromXNA(),
-                box.Max.FromXNA()
-            );
-        }
-
         /// <summary>
         /// Transformes the <see cref="BoundingBox"/> with a specified <see cref="Matrix4x4"/>.
         /// </summary>
@@ -70,15 +51,15 @@ namespace Myre.Extensions
             return new BoundingBox(min, max);
         }
 
-        /// <summary>
-        /// Finds the closest point on a bounding box from another point
-        /// </summary>
-        /// <param name="box"></param>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public static Vector3 ClosestPoint(this BoundingBox box, Vector3 point)
-        {
-            return point.Clamp(box.Min, box.Max);
-        }
+        ///// <summary>
+        ///// Finds the closest point on a bounding box from another point
+        ///// </summary>
+        ///// <param name="box"></param>
+        ///// <param name="point"></param>
+        ///// <returns></returns>
+        //public static Vector3 ClosestPoint(this BoundingBox box, Vector3 point)
+        //{
+        //    return point.Clamp(box.Min, box.Max);
+        //}
     }
 }

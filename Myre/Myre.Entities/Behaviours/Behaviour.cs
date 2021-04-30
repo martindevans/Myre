@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using Myre.Collections;
 
 namespace Myre.Entities.Behaviours
@@ -15,78 +14,22 @@ namespace Myre.Entities.Behaviours
     /// </remarks>
     public abstract class Behaviour
     {
-        internal struct ManagerBinding
+        internal readonly struct ManagerBinding
         {
-            private readonly IManagerHandler _handler;
-            public IManagerHandler Handler
-            {
-                get
-                {
-                    return _handler;
-                }
-            }
-
-            private readonly Type _managedAs;
-            public Type ManagedAs
-            {
-                get
-                {
-                    return _managedAs;
-                }
-            }
+            public IManagerHandler Handler { get; }
+            public Type ManagedAs { get; }
 
             public ManagerBinding(IManagerHandler handler, Type managedAs)
             {
-                Contract.Requires(handler != null);
-                Contract.Requires(managedAs != null);
-
-                _handler = handler;
-                _managedAs = managedAs;
+                Handler = handler;
+                ManagedAs = managedAs;
             }
         }
-
-        /// <summary>
-        /// Gets the name of this behaviour.
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<string>() != null);
-                Contract.Assume(_name != null);
-                return _name;
-            }
-            internal set
-            {
-                Contract.Requires(value != null);
-                _name = value;
-            }
-        }
-
-        private Entity _owner;
-        private string _name;
 
         /// <summary>
         /// Gets the owner of this behaviour.
         /// </summary>
-        public Entity Owner
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Entity>() != null);
-
-                //Owner is set immediately after behaviour is constructed
-                //Why is it not a non-nullable constructor parameter, you ask?
-                //That would require all derived classes to pass a half initialised entity object through their constructors, ugly!
-                Contract.Assume(_owner != null);
-                return _owner;
-            }
-            set
-            {
-                Contract.Requires(value != null);
-                _owner = value;
-            }
-        }
+        public Entity Owner { get; set; }
 
         /// <summary>
         /// Gets a value indicating if this behaviour has been initialised.
@@ -100,12 +43,9 @@ namespace Myre.Entities.Behaviours
 
         protected Behaviour()
         {
-        }
-
-        protected Behaviour(string name)
-        {
-            Contract.Requires(name != null);
-            Name = name;
+            // Owner property is null when the behaviour is constructed and is set to non-null
+            // during the Entity initialisation process.
+            Owner = null!;
         }
 
         /// <summary>
@@ -119,7 +59,7 @@ namespace Myre.Entities.Behaviours
         /// Here the behaviour should do any setup needed to put the behaviour into its' initial state, including getting optional properties from the entity which may have been created by other behaviours, and register to any services.
         /// Initialise is called before the behaviour is added to the manager.
         /// </remarks>
-        public virtual void Initialise(INamedDataProvider initialisationData)
+        public virtual void Initialise(INamedDataProvider? initialisationData)
         {
             IsReady = true;
         }
@@ -154,17 +94,9 @@ namespace Myre.Entities.Behaviours
         /// Initialise/Shutdown may be called multiple times, as the instance is recycled.
         /// Shutdown is called after the behaviour has been removed from the manager.
         /// </remarks>
-        public virtual void Shutdown(INamedDataProvider shutdownData)
+        public virtual void Shutdown(INamedDataProvider? shutdownData)
         {
             IsReady = false;
-        }
-
-        public string GetFullPropertyName(string propertyName)
-        {
-            Contract.Requires(propertyName != null);
-            Contract.Ensures(Contract.Result<string>() != null);
-
-            return string.IsNullOrEmpty(Name) ? propertyName : string.Format("{0}_{1}", propertyName, Name);
         }
     }
 }

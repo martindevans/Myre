@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using Myre.Collections;
 using Myre.Entities.Behaviours;
@@ -17,12 +16,10 @@ namespace Myre.Entities
             : IDisposableObject
         {
             private readonly Entity _entity;
-            private Behaviour _behaviour;
+            private Behaviour? _behaviour;
 
             internal ConstructionContext(Entity entity)
             {
-                Contract.Requires(entity != null);
-
                 _entity = entity;
             }
 
@@ -32,17 +29,15 @@ namespace Myre.Entities
             /// <typeparam name="T">The Type of this property (usually inferred from the name parameter)</typeparam>
             /// <param name="name">The Type and name of this property</param>
             /// <param name="value">The initial value of this property</param>
-            /// <param name="appendBehaviourName">If true, the name will be appended with "_BEHAVIOURNAME"</param>
             /// <returns>The property created</returns>
-            public Property<T> CreateProperty<T>(TypedName<T> name, T value = default(T), bool appendBehaviourName = true)
+            public Property<T> CreateProperty<T>(TypedName<T> name, T? value = default)
             {
-                Contract.Ensures(Contract.Result<Property<T>>() != null);
+                if (_behaviour == null)
+                    throw new InvalidOperationException("Must initialise ConstructionContext first");
 
                 CheckFrozen();
 
                 var fullName = name.Name;
-                if (appendBehaviourName)
-                    fullName = _behaviour.GetFullPropertyName(name.Name);
 
                 var property = _entity.GetProperty(new TypedName<T>(fullName));
                 if (property == null)
@@ -62,9 +57,6 @@ namespace Myre.Entities
             /// <returns></returns>
             internal ConstructionContext Next(Behaviour behaviour)
             {
-                Contract.Requires(behaviour != null);
-                Contract.Ensures(Contract.Result<ConstructionContext>() != null);
-
                 CheckFrozen();
 
                 _behaviour = behaviour;
@@ -99,34 +91,19 @@ namespace Myre.Entities
         /// Gets the scene this entity belongs to.
         /// </summary>
         /// <value>The scene.</value>
-        public Scene Scene { get; internal set; }
+        public Scene? Scene { get; internal set; }
 
-        private readonly IReadOnlyList<Behaviour> _behavioursList; 
         /// <summary>
         /// Gets the behaviours this entity contains.
         /// </summary>
         /// <value>The behaviours.</value>
-        public IReadOnlyList<Behaviour> Behaviours
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<Behaviour>>() != null);
-                return _behavioursList;
-            }
-        }
+        public IReadOnlyList<Behaviour> Behaviours { get; }
 
         /// <summary>
         /// Gets the properties this entity contains.
         /// </summary>
         /// <value>The properties.</value>
-        public IReadOnlyList<IProperty> Properties
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<IProperty>>() != null);
-                return _propertiesList;
-            }
-        }
+        public IReadOnlyList<IProperty> Properties => _propertiesList;
 
         /// <summary>
         /// Gets a value indicating whether this instance is disposed.
@@ -137,9 +114,9 @@ namespace Myre.Entities
         /// <summary>
         /// A map of type to behaviour which maps from *any* type in the type hierarchy to all the behaviours which implement that type
         /// </summary>
-        public IReadOnlyDictionary<Type, Behaviour[]> BehavioursIndex { get; private set; }
+        public IReadOnlyDictionary<Type, Behaviour[]> BehavioursIndex { get; }
 
-        private INamedDataProvider _shutdownData;
+        private INamedDataProvider? _shutdownData;
 
         /// <summary>
         /// Gets a value indicating whether behaviours have already been shutdown
@@ -148,12 +125,9 @@ namespace Myre.Entities
 
         internal Entity(IEnumerable<IProperty> properties, IEnumerable<Behaviour> behaviours)
         {
-            Contract.Requires(properties != null);
-            Contract.Requires(behaviours != null);
-
             // create public read-only collections
             _propertiesList = new List<IProperty>(properties);
-            _behavioursList = new List<Behaviour>(behaviours);
+            Behaviours = new List<Behaviour>(behaviours);
 
             // add properties
             _properties = new Dictionary<NameWithType, IProperty>();
@@ -164,8 +138,8 @@ namespace Myre.Entities
             var catagorised = new Dictionary<Type, List<Behaviour>>();
             foreach (var item in Behaviours)
             {
-                CatagoriseBehaviour(catagorised, item);
                 item.Owner = this;
+                CatagoriseBehaviour(catagorised, item);
             }
 
             // add behaviours
@@ -179,20 +153,8 @@ namespace Myre.Entities
             CreateProperties();
         }
 
-        [ContractInvariantMethod]
-        private void ContractInvariants()
-        {
-            Contract.Invariant(_behavioursList != null);
-            Contract.Invariant(_propertiesList != null);
-            Contract.Invariant(_properties != null);
-            Contract.Invariant(_behaviours != null);
-        }
-
         private static void CatagoriseBehaviour(IDictionary<Type, List<Behaviour>> catagorised, Behaviour behaviour)
         {
-            Contract.Requires(catagorised != null);
-            Contract.Requires(behaviour != null);
-
             var type = behaviour.GetType();
 
             foreach (var t in type.GetImplementedTypes().Distinct())
@@ -201,12 +163,7 @@ namespace Myre.Entities
 
         private static List<Behaviour> LazyGetCategoryList(Type type, IDictionary<Type, List<Behaviour>> catagorised)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(catagorised != null);
-            Contract.Ensures(Contract.Result<List<Behaviour>>() != null);
-
-            List<Behaviour> behavioursOfType;
-            if (!catagorised.TryGetValue(type, out behavioursOfType))
+            if (!catagorised.TryGetValue(type, out var behavioursOfType))
             {
                 behavioursOfType = new List<Behaviour>();
                 catagorised.Add(type, behavioursOfType);
@@ -217,12 +174,10 @@ namespace Myre.Entities
 
         private void CreateProperties()
         {
-            using (var context = new ConstructionContext(this))
-            {
-                foreach (var behaviour in Behaviours)
-                    behaviour.CreateProperties(context.Next(behaviour));
-            }
+            using var context = new ConstructionContext(this);
 
+            foreach (var behaviour in Behaviours)
+                behaviour.CreateProperties(context.Next(behaviour));
         }
 
         /// <summary>
@@ -238,7 +193,7 @@ namespace Myre.Entities
         /// Initialises this instance. Automatically assigns initialisation values to properties with the same name and an assignable type
         /// </summary>
         /// <param name="initialisationData">Initialisation data to pass to behaviours</param>
-        internal void Initialise(INamedDataProvider initialisationData)
+        internal void Initialise(INamedDataProvider? initialisationData)
         {
             BehavioursShutdown = false;
             IsDisposed = false;
@@ -309,8 +264,6 @@ namespace Myre.Entities
 
         private void AddProperty(IProperty property)
         {
-            Contract.Requires(property != null);
-
             _properties.Add(new NameWithType(property.Name, property.Type), property);
             _propertiesList.Add(property);
         }
@@ -321,13 +274,9 @@ namespace Myre.Entities
         /// <param name="name">The name of the propery.</param>
         /// <param name="type">The type of the value contained in this property</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public IProperty GetProperty(string name, Type type)
+        public IProperty? GetProperty(string name, Type type)
         {
-            Contract.Requires(name != null);
-            Contract.Requires(type != null);
-
-            IProperty property;
-            _properties.TryGetValue(new NameWithType(name, type), out property);
+            _properties.TryGetValue(new NameWithType(name, type), out var property);
             return property;
         }
 
@@ -337,33 +286,21 @@ namespace Myre.Entities
         /// <typeparam name="T">The data type this property contains.</typeparam>
         /// <param name="name">The name of the propery.</param>
         /// <returns>The property with the specified name and data type.</returns>
-        public Property<T> GetProperty<T>(TypedName<T> name)
+        public Property<T>? GetProperty<T>(TypedName<T> name)
         {
-            return GetProperty(name.Name, typeof(T)) as Property<T>;
+            return (Property<T>?)GetProperty(name.Name, typeof(T));
         }
 
         /// <summary>
-        /// Gets the behaviour of the specified type and name.
+        /// Gets the first behaviour of the specified type
         /// </summary>
         /// <param name="type">The type.</param>
-        /// <param name="name">The name.</param>
         /// <returns></returns>
-        public Behaviour GetBehaviour(Type type, string name)
+        public Behaviour? GetBehaviour(Type type)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(name != null);
-
-            Behaviour[] array;
-            if (_behaviours.TryGetValue(type, out array))
-            {
-// ReSharper disable LoopCanBeConvertedToQuery
-                foreach (var item in array)
-// ReSharper restore LoopCanBeConvertedToQuery
-                {
-                    if (item.Name == name)
-                        return item;
-                }
-            }
+            if (_behaviours.TryGetValue(type, out var array))
+                if (array.Length > 0)
+                    return array[0];
 
             return null;
         }
@@ -377,35 +314,24 @@ namespace Myre.Entities
         public IReadOnlyList<Behaviour> GetBehaviours(Type type)
 // ReSharper restore ReturnTypeCanBeEnumerable.Global
         {
-            Contract.Requires(type != null);
-            Contract.Ensures(Contract.Result<IReadOnlyList<Behaviour>>() != null);
-
-            Behaviour[] array;
-            _behaviours.TryGetValue(type, out array);
+            _behaviours.TryGetValue(type, out var array);
 
             if (array != null)
                 return array;
 
             var empty = Array.Empty<Behaviour>();
-            Contract.Assume(empty != null);
             return empty;
         }
 
         /// <summary>
-        /// Gets the behaviour of the specified type and name.
+        /// Gets the first behaviour of the specified type.
         /// </summary>
         /// <typeparam name="T">The type.</typeparam>
-        /// <param name="name">The name.</param>
         /// <returns></returns>
-        public T GetBehaviour<T>(string name = "")
+        public T? GetBehaviour<T>()
         {
-            Contract.Requires(name != null);
-
-            var b = GetBehaviour(typeof(T), name);
-            if (b == null)
-                return default(T);
-
-            return (T)(object)b;
+            var b = GetBehaviour(typeof(T));
+            return (T?)(object?)b;
         }
 
         /// <summary>
@@ -415,11 +341,9 @@ namespace Myre.Entities
         /// <returns></returns>
         public IReadOnlyList<T> GetBehaviours<T>()
         {
-            Contract.Ensures(Contract.Result<IReadOnlyList<T>>() != null);
-
             return GetBehaviours(typeof(T))
-                .Cast<T>()
-                .ToArray();
+                   .Cast<T>()
+                   .ToArray();
         }
     }
 }

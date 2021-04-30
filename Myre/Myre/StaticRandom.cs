@@ -21,9 +21,9 @@ namespace Myre
         {
             Contract.Requires(upperBound > 0);
 
-            uint t = (seed ^ (seed << 11));
-            const uint W = 273326509;
-            long i = (int)(0x7FFFFFFF & ((W ^ U) ^ (t ^ (t >> 8))));
+            var t = (seed ^ (seed << 11));
+            const uint w = 273326509;
+            long i = (int)(0x7FFFFFFF & ((w ^ U) ^ (t ^ (t >> 8))));
             return (uint)(i % upperBound);
         }
         #endregion

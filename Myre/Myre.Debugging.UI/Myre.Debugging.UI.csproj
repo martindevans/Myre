@@ -64,10 +64,6 @@
       <Project>{830b5721-1e84-4f33-beac-4b4d12e795e1}</Project>
       <Name>Myre.Debugging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Myre.UI\Myre.UI.csproj">
-      <Project>{56fa6d49-e949-4a90-a5ea-ed48805cba92}</Project>
-      <Name>Myre.UI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Myre\Myre.csproj">
       <Project>{150b5101-1046-43e9-9fd0-a2ddd33c352f}</Project>
       <Name>Myre</Name>

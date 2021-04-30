@@ -17,10 +17,7 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static T? GetMaybeValue<T>(this INamedDataCollection data, TypedName<T> name) where T : struct
         {
-            Contract.Requires(data != null);
-
-            T v;
-            if (data.TryGetValue<T>(name, out v))
+            if (data.TryGetValue<T>(name, out var v))
                 return v;
             return null;
         }

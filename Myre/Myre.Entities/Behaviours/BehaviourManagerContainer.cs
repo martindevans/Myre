@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using Myre.Extensions;
 
 namespace Myre.Entities.Behaviours
 {
-    [ContractClass(typeof(IManagerHandlerContract))]
     internal interface IManagerHandler
     {
         IBehaviourManager Manager { get; set; }
@@ -13,57 +11,36 @@ namespace Myre.Entities.Behaviours
         void Remove(Behaviour behaviour);
     }
 
-    [ContractClassFor(typeof(IManagerHandler))]
-    internal abstract class IManagerHandlerContract : IManagerHandler
-    {
-        public abstract IBehaviourManager Manager { get; set; }
-
-        public void Add(Behaviour behaviour)
-        {
-            Contract.Requires(behaviour != null);
-        }
-
-        public void Remove(Behaviour behaviour)
-        {
-            Contract.Requires(behaviour != null);
-        }
-    }
-
     internal class ManagerHandler<T>
         : IManagerHandler
         where T : Behaviour
     {
-        private IBehaviourManager<T> _manager;
+        private IBehaviourManager<T>? _manager;
 
         public IBehaviourManager Manager
         {
-            get { return _manager; }
-            set { _manager = value as IBehaviourManager<T>; }
+            get => _manager!;
+            set => _manager = value as IBehaviourManager<T>;
         }
 
         public void Add(T behaviour)
         {
-            Contract.Requires(behaviour != null);
-
             if (behaviour.CurrentManager.Handler != null)
                 behaviour.CurrentManager.Handler.Remove(behaviour);
 
-            Contract.Assume(_manager != null);
-            _manager.Add(behaviour);
+            _manager!.Add(behaviour);
 
             behaviour.CurrentManager = new Behaviour.ManagerBinding(this, typeof(T));
         }
 
         public void Remove(T behaviour)
         {
-            Contract.Requires(behaviour != null);
-
             if (behaviour.CurrentManager.Handler != this)
                 return;
 
-            behaviour.CurrentManager = default(Behaviour.ManagerBinding);
+            behaviour.CurrentManager = default;
 
-            _manager.Remove(behaviour);
+            _manager!.Remove(behaviour);
         }
 
         #region IManagerHandler Members
@@ -89,25 +66,16 @@ namespace Myre.Entities.Behaviours
             public object List;
         }
 
-        private readonly List<IBehaviourManager> _managers = new List<IBehaviourManager>();
-        private readonly Dictionary<Type, IBehaviourManager> _byType = new Dictionary<Type, IBehaviourManager>();
-        private readonly Dictionary<Type, IManagerHandler> _byBehaviour = new Dictionary<Type, IManagerHandler>();
-        private readonly Dictionary<Type, PrivateList> _catagorised = new Dictionary<Type, PrivateList>();
+        private readonly List<IBehaviourManager> _managers = new();
+        private readonly Dictionary<Type, IBehaviourManager> _byType = new();
+        private readonly Dictionary<Type, IManagerHandler> _byBehaviour = new();
+        private readonly Dictionary<Type, PrivateList> _catagorised = new();
 
         private static readonly Type _managerHandlerType = typeof(ManagerHandler<>);
         private static readonly Type _listType = typeof(List<>);
 
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_managerHandlerType != null);
-            Contract.Invariant(_listType != null);
-        }
-
         public void Add(IBehaviourManager manager)
         {
-            Contract.Requires(manager != null);
-
             var managerType = manager.GetType();
 
             _managers.Add(manager);
@@ -115,15 +83,13 @@ namespace Myre.Entities.Behaviours
 
             foreach (var type in manager.GetManagedTypes())
             {
-                IManagerHandler handler;
-                if (!_byBehaviour.TryGetValue(type, out handler))
+                if (!_byBehaviour.TryGetValue(type, out IManagerHandler handler))
                 {
                     var handlerType = _managerHandlerType.MakeGenericType(type);
                     handler = (IManagerHandler)Activator.CreateInstance(handlerType);
                     _byBehaviour[type] = handler;
                 }
 
-                Contract.Assume(handler != null);
                 handler.Manager = manager;
             }
 
@@ -132,12 +98,9 @@ namespace Myre.Entities.Behaviours
 
         private void CatagoriseManager(IBehaviourManager manager)
         {
-            Contract.Requires(manager != null);
-
             foreach (var item in manager.GetType().GetImplementedTypes())
             {
-                PrivateList list;
-                if (_catagorised.TryGetValue(item, out list))
+                if (_catagorised.TryGetValue(item, out var list))
                     AddToList(list, item, manager);
             }
         }
@@ -146,8 +109,7 @@ namespace Myre.Entities.Behaviours
         {
             var listType = list.List.GetType();
             var addMethod = listType.GetMethod("Add", new Type[] { type });
-            Contract.Assume(addMethod != null);
-            addMethod.Invoke(list.List, new object[] { manager });
+            addMethod!.Invoke(list.List, new object[] { manager });
         }
 
         public bool Remove(IBehaviourManager manager)
@@ -162,14 +124,12 @@ namespace Myre.Entities.Behaviours
                 foreach (var type in manager.GetManagedTypes())
                 {
                     var handler = _byBehaviour[type];
-                    Contract.Assume(handler != null);
                     handler.Manager = null;
                 }
 
                 foreach (var type in managerType.GetImplementedTypes())
                 {
-                    PrivateList list;
-                    if (_catagorised.TryGetValue(type, out list))
+                    if (_catagorised.TryGetValue(type, out var list))
                         RemoveFromList(list, type, manager);
                 }
             }
@@ -181,56 +141,41 @@ namespace Myre.Entities.Behaviours
         {
             var listType = list.List.GetType();
             var removeMethod = listType.GetMethod("Remove", new Type[] { type });
-            Contract.Assume(removeMethod != null);
-            removeMethod.Invoke(list.List, new object[] { manager });
+            removeMethod!.Invoke(list.List, new object[] { manager });
         }
 
         public bool Contains(Type managerType)
         {
-            Contract.Requires(managerType != null);
-
             return _byType.ContainsKey(managerType);
         }
 
         public bool Contains(IBehaviourManager manager)
         {
-            Contract.Requires(manager != null);
-
             return _managers.Contains(manager);
         }
 
         public bool ContainsForBehaviour(Type behaviourType)
         {
-            Contract.Requires(behaviourType != null);
-
             return _byBehaviour.ContainsKey(behaviourType);
         }
 
         public IBehaviourManager Get(Type managerType)
         {
-            Contract.Requires(managerType != null);
-
             return _byType[managerType];
         }
 
         public bool TryGet(Type managerType, out IBehaviourManager manager)
         {
-            Contract.Requires(managerType != null);
-
             return _byType.TryGetValue(managerType, out manager);
         }
 
         public IManagerHandler GetByBehaviour(Type behaviourType)
         {
-            Contract.Requires(behaviourType != null);
-
             return _byBehaviour[behaviourType];
         }
 
         public bool TryGetByBehaviour(Type behaviourType, out IManagerHandler manager)
         {
-            Contract.Requires(behaviourType != null);
-
             return _byBehaviour.TryGetValue(behaviourType, out manager);
         }
 
@@ -241,19 +186,16 @@ namespace Myre.Entities.Behaviours
             _byType.Clear();
         }
 
-        public IManagerHandler Find(Type behaviourType, IBehaviourManager manager = null)
+        public IManagerHandler? Find(Type behaviourType, IBehaviourManager? manager = null)
         {
-            if (behaviourType == null)
-                throw new ArgumentException("behaviourType");
-
+            var bt = behaviourType;
             var behaviour = typeof(Behaviour);
-            while (behaviour.IsAssignableFrom(behaviourType) && behaviourType != null)
+            while (behaviour.IsAssignableFrom(behaviourType) && bt != null)
             {
-                IManagerHandler handler;
-                if (TryGetByBehaviour(behaviourType, out handler) && (manager == null || handler.Manager == manager))
+                if (TryGetByBehaviour(bt, out IManagerHandler handler) && (manager == null || handler.Manager == manager))
                     return handler;
 
-                behaviourType = behaviourType.BaseType;
+                bt = bt.BaseType;
             }
 
             return null;
@@ -263,14 +205,13 @@ namespace Myre.Entities.Behaviours
         {
             var type = typeof(T);
 
-            PrivateList list;
-            if (!_catagorised.TryGetValue(type, out list))
+            if (!_catagorised.TryGetValue(type, out var list))
             {
                 list = CreatePrivateList(type);
                 _catagorised[type] = list;
             }
 
-            return list.List as IReadOnlyList<T>;
+            return (IReadOnlyList<T>)list.List;
         }
 
         private PrivateList CreatePrivateList(Type type)
@@ -285,7 +226,7 @@ namespace Myre.Entities.Behaviours
             {
                 var managerType = manager.GetType();
                 if (type.IsAssignableFrom(managerType))
-                    addMethod.Invoke(list.List, new object[] { manager });
+                    addMethod!.Invoke(list.List, new object[] { manager });
             }
 
             return list;

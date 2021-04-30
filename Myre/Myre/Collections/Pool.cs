@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics.Contracts;
 
 namespace Myre.Collections
 {
@@ -11,19 +10,11 @@ namespace Myre.Collections
     public class Pool<T> where T : class, new()
     {
         #region fields and properties
-        private static readonly Pool<T> _instance = new Pool<T>();
         /// <summary>
         /// Gets the static instance.
         /// </summary>
         /// <value>The instance.</value>
-        public static Pool<T> Instance
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Pool<T>>() != null);
-                return _instance;
-            }
-        }
+        public static Pool<T> Instance { get; } = new();
 
         /// <summary>
         /// Maximum number of items to keep in this pool (0 or less will be interpreted as infinite capacity)
@@ -68,17 +59,13 @@ namespace Myre.Collections
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         public T Get()
         {
-            Contract.Ensures(Contract.Result<T>() != null);
-
-            T item;
-            if (!_items.TryPop(out item))
+            if (!_items.TryPop(out T item))
             {
                 item = new T();
             }
             else if (_recycleable)
             {
-                var recycleable = item as IRecycleable;
-                if (recycleable != null)
+                if (item is IRecycleable recycleable)
                     recycleable.Recycle();
             }
 
@@ -91,8 +78,6 @@ namespace Myre.Collections
         /// <param name="item">The item to be returned.</param>
         public void Return(T item)
         {
-            Contract.Requires(item != null);
-
             if (Capacity < 1 || _items.Count < Capacity)
                 _items.Push(item);
         }

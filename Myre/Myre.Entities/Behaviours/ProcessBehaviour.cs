@@ -20,34 +20,19 @@ namespace Myre.Entities.Behaviours
 
         protected ProcessBehaviour()
         {
-            Cons();
-        }
-
-        protected ProcessBehaviour(string name)
-            : base(name)
-        {
-            Cons();
-        }
-
-        private void Cons()
-        {
             Period = 0;
             _counter = new IntUIntUnion { IntValue = Interlocked.Increment(ref _nextCounter) }.UIntValue;   //Spread updates out across time to prevent clumping
         }
 
-        // ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
-        public class Manager<B>
-// ReSharper restore ClassWithVirtualMembersNeverInherited.Global
-// ReSharper restore MemberCanBeProtected.Global
-            : BehaviourManager<B>, IProcess
-            where B : ProcessBehaviour
+        public class Manager<TB>
+            : BehaviourManager<TB>, IProcess
+            where TB : ProcessBehaviour
         {
-            public new IEnumerable<B> Behaviours
+            public new IEnumerable<TB> Behaviours
             {
                 get
                 {
-                    Contract.Ensures(Contract.Result<IEnumerable<B>>() != null);
+                    Contract.Ensures(Contract.Result<IEnumerable<TB>>() != null);
                     return base.Behaviours;
                 }
             }
@@ -72,14 +57,14 @@ namespace Myre.Entities.Behaviours
                 Update(elapsedTime);
             }
 
-            private readonly List<B> _toAdd = new List<B>();
-            public override void Add(B behaviour)
+            private readonly List<TB> _toAdd = new();
+            public override void Add(TB behaviour)
             {
                 _toAdd.Add(behaviour);
             }
 
-            private readonly List<B> _toRemove = new List<B>();
-            public override bool Remove(B behaviour)
+            private readonly List<TB> _toRemove = new();
+            public override bool Remove(TB behaviour)
             {
                 if (base.Behaviours.Contains(behaviour))
                 {
@@ -91,11 +76,11 @@ namespace Myre.Entities.Behaviours
 
             protected virtual void Update(float elapsedTime)
             {
-                foreach (B behaviour in _toAdd)
+                foreach (TB behaviour in _toAdd)
                     base.Add(behaviour);
                 _toAdd.Clear();
 
-                foreach (B behaviour in _toRemove)
+                foreach (TB behaviour in _toRemove)
                     base.Remove(behaviour);
                 _toRemove.Clear();
 

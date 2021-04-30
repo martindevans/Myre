@@ -14,6 +14,6 @@ namespace Myre.Collections
         /// <param name="description">A description of what this setting is</param>
         /// <param name="defaultValue">The default value to give this setting</param>
         /// <returns>A box, which holds the value of this setting</returns>
-        Box<T> Add<T>(string name, string description = null, T defaultValue = default(T));
+        Box<T> Add<T>(string name, string? description = null, T? defaultValue = default);
     }
 }

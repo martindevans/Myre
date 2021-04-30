@@ -9,18 +9,6 @@ namespace Myre.Extensions
     /// </summary>
     public static class QuaternionExtensions
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Quaternion FromXNA(this Microsoft.Xna.Framework.Quaternion quat)
-        {
-            return new Quaternion(quat.X, quat.Y, quat.Z, quat.W);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Microsoft.Xna.Framework.Quaternion ToXNA(this Quaternion quat)
-        {
-            return new Microsoft.Xna.Framework.Quaternion(quat.X, quat.Y, quat.Z, quat.W);
-        }
-
         /// <summary>
         /// Get the forward direction vector from this quaternion
         /// </summary>

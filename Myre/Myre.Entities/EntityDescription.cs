@@ -1,37 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Reflection;
 using Myre.Entities.Behaviours;
 using Ninject;
-using Ninject.Parameters;
 
 namespace Myre.Entities
 {
     /// <summary>
     /// A struct which contains data about an entity property.
     /// </summary>
-    public struct PropertyData
+    public readonly struct PropertyData
     {
         public readonly string Name;
         public readonly Type DataType;
-        public readonly object InitialValue;
+        public readonly object? InitialValue;
 
-        public PropertyData(string name, Type dataType, object initialValue)
+        public PropertyData(string name, Type dataType, object? initialValue)
         {
-            Contract.Requires(name != null);
-            Contract.Requires(dataType != null);
-
             Name = name;
             DataType = dataType;
             InitialValue = initialValue;
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(Name != null);
-            Contract.Invariant(DataType != null);
         }
 
         public override int GetHashCode()
@@ -41,8 +29,8 @@ namespace Myre.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj is PropertyData)
-                return Equals((PropertyData)obj);
+            if (obj is PropertyData data)
+                return Equals(data);
             
             return base.Equals(obj);
         }
@@ -61,16 +49,16 @@ namespace Myre.Entities
     public class BehaviourData
         : IBehaviourFactory
     {
-        public readonly NameWithType Name;
+        public readonly Type Type;
 
-        public BehaviourData(NameWithType name)
+        public BehaviourData(Type type)
         {
-            Name = name;
+            Type = type;
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return Type.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -78,8 +66,7 @@ namespace Myre.Entities
             if (ReferenceEquals(this, obj))
                 return true;
 
-            var a = obj as BehaviourData;
-            if (a != null)
+            if (obj is BehaviourData a)
                 return Equals(a);
 
             return false;
@@ -87,18 +74,12 @@ namespace Myre.Entities
 
         public bool Equals(BehaviourData data)
         {
-            Contract.Requires(data != null);
-
-            return Name.Equals(data.Name);
+            return Type == data.Type;
         }
 
         public Behaviour Create(IKernel kernel)
         {
-            var instance = (Behaviour)kernel.Get(Name.Type, new ConstructorArgument("name", Name.Name));
-            Contract.Assume(instance != null);
-
-            instance.Name = Name.Name;
-            return instance;
+            return (Behaviour)kernel.Get(Type);
         }
     }
 
@@ -112,8 +93,8 @@ namespace Myre.Entities
     /// </summary>
     public class EntityDescription
     {
-        private static readonly Dictionary<Type, ConstructorInfo> _propertyConstructors = new Dictionary<Type, ConstructorInfo>();
-        private static readonly Type _genericType = Type.GetType("Myre.Entities.Property`1");
+        private static readonly Dictionary<Type, ConstructorInfo> _propertyConstructors = new();
+        private static readonly Type _genericType = Type.GetType("Myre.Entities.Property`1")!;
 
         private readonly IKernel _kernel;
         private readonly List<IBehaviourFactory> _behaviours;
@@ -123,41 +104,23 @@ namespace Myre.Entities
         /// Gets a list of behaviours in this instance.
         /// </summary>
         /// <value>The behaviours.</value>
-        public IReadOnlyList<IBehaviourFactory> Behaviours { get
-        {
-            Contract.Ensures(Contract.Result<IReadOnlyList<IBehaviourFactory>>() != null);
-            return _behaviours;
-        }
-        }
-        
+        public IReadOnlyList<IBehaviourFactory> Behaviours => _behaviours;
+
         /// <summary>
         /// Gets a list of properties in this instance.
         /// </summary>
         /// <value>The properties.</value>
-        public IReadOnlyList<PropertyData> Properties { get
-        {
-            Contract.Ensures(Contract.Result<IReadOnlyList<PropertyData>>() != null);
-            return _properties;
-        }
-        }
+        public IReadOnlyList<PropertyData> Properties => _properties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EntityDescription"/> class.
         /// </summary>
         /// <param name="kernel">The kernel.</param>
-        public EntityDescription(IKernel kernel = null)
+        public EntityDescription(IKernel? kernel = null)
         {
             _kernel = kernel ?? NinjectKernel.Instance;
             _behaviours = new List<IBehaviourFactory>();
             _properties = new List<PropertyData>();
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_kernel != null);
-            Contract.Invariant(_behaviours != null);
-            Contract.Invariant(_properties != null);
         }
 
         /// <summary>
@@ -175,8 +138,6 @@ namespace Myre.Entities
         /// <param name="description">The entity description to copy from</param>
         public void AddFrom(EntityDescription description)
         {
-            Contract.Requires(description != null);
-
             foreach (var item in description.Behaviours)
                 AddBehaviour(item);
 
@@ -191,8 +152,6 @@ namespace Myre.Entities
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour(IBehaviourFactory behaviour)
         {
-            Contract.Requires(behaviour != null);
-
             if (_behaviours.Contains(behaviour))
                 return false;
 
@@ -205,37 +164,21 @@ namespace Myre.Entities
         /// Adds the behaviour, provided that such a behaviour does not already exist.
         /// </summary>
         /// <param name="type">The type.</param>
-        /// <param name="name">The name.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour(Type type, string name = "")
+        public bool AddBehaviour(Type type)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(name != null);
-
-            return AddBehaviour(new BehaviourData(new NameWithType(name, type)));
+            return AddBehaviour(new BehaviourData(type));
         }
 
         /// <summary>
         /// Adds the behaviour, provided that such a behaviour does not already exist.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="name">The name.</param>
-        /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddBehaviour<T>(TypedName<T> name)
-            where T : Behaviour
-        {
-            return AddBehaviour(typeof(T), name.Name);
-        }
-
-        /// <summary>
-        /// Adds the behaviour, provided that such a behaviour does not already exist. (Uses default name "")
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
         public bool AddBehaviour<T>()
             where T : Behaviour
         {
-            return AddBehaviour(typeof(T), "");
+            return AddBehaviour(typeof(T));
         }
 
         #region properties
@@ -247,11 +190,11 @@ namespace Myre.Entities
         public bool AddProperty(PropertyData property)
         {
             if (property.Name == null)
-                throw new ArgumentException("property.Name", "property");
+                throw new ArgumentException("property.Name", nameof(property));
             if (property.DataType == null)
-                throw new ArgumentException("property.DataType", "property");
+                throw new ArgumentException("property.DataType", nameof(property));
             if (property.InitialValue != null && !property.DataType.IsAssignableFrom(property.InitialValue.GetType()))
-                throw new ArgumentException("property.InitialValue cannot be cast to property.DataType", "property");
+                throw new ArgumentException("property.InitialValue cannot be cast to property.DataType", nameof(property));
 
             if (_properties.Contains(property))
                 return false;
@@ -268,11 +211,8 @@ namespace Myre.Entities
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty(Type dataType, string name, object initialValue)
+        public bool AddProperty(Type dataType, string name, object? initialValue)
         {
-            Contract.Requires(dataType != null);
-            Contract.Requires(name != null);
-
             return AddProperty(new PropertyData(name, dataType, initialValue));
         }
 
@@ -283,7 +223,7 @@ namespace Myre.Entities
         /// <param name="name">The name.</param>
         /// <param name="initialValue">The initial value.</param>
         /// <returns><c>true</c> if the behaviour was added; else <c>false</c>.</returns>
-        public bool AddProperty<T>(TypedName<T> name, T initialValue = default(T))
+        public bool AddProperty<T>(TypedName<T> name, T? initialValue = default)
         {
             return AddProperty(typeof(T), name.Name, initialValue);
         }
@@ -295,46 +235,35 @@ namespace Myre.Entities
         /// <returns></returns>
         public virtual Entity Create()
         {
-            Contract.Ensures(Contract.Result<Entity>() != null);
-
             return new Entity(CreateProperties(), CreateBehaviours());
         }
 
         private IEnumerable<IProperty> CreateProperties()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<IProperty>>() != null);
-
             foreach (var item in _properties)
                 yield return CreatePropertyInstance(item);
         }
 
         private IEnumerable<Behaviour> CreateBehaviours()
         {
-            Contract.Ensures(Contract.Result<IEnumerable<Behaviour>>() != null);
-
             foreach (var item in _behaviours)
             {
-                var b = item.Create(_kernel);
-                if (b.Name == null)
-                    throw new InvalidOperationException("'Name' property of behaviour is null!");
-                yield return b;
+                yield return item.Create(_kernel);
             }
         }
 
         private static IProperty CreatePropertyInstance(PropertyData property)
         {
-            ConstructorInfo constructor;
-            if (!_propertyConstructors.TryGetValue(property.DataType, out constructor))
+            if (!_propertyConstructors.TryGetValue(property.DataType, out ConstructorInfo constructor))
             {
                 var type = _genericType.MakeGenericType(property.DataType);
-                constructor = type.GetConstructor(new Type[] { typeof(string) });
+                constructor = type.GetConstructor(new Type[] { typeof(string) })!;
                 _propertyConstructors.Add(property.DataType, constructor);
             }
             if (constructor == null)
                 throw new InvalidOperationException(string.Format("Cannot find constructor(string) for {0}", property.DataType));
 
-            IProperty prop = constructor.Invoke(new object[] { property.Name }) as IProperty;
-            if (prop == null)
+            if (constructor.Invoke(new object[] { property.Name }) is not IProperty prop)
                 throw new InvalidOperationException(string.Format("Constructor for Property<{0}> returned null", property.DataType));
 
             prop.Value = property.InitialValue;

@@ -2,18 +2,17 @@
 using Myre.Entities.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 
 namespace Myre.Entities.Events
 {
-    interface IEventInvocation
+    internal interface IEventInvocation
     {
         void Execute();
 
         void Recycle();
     }
 
-    interface IEvent
+    internal interface IEvent
     {
 
     }
@@ -24,9 +23,7 @@ namespace Myre.Entities.Events
     public interface IEventService
         : IService
     {
-// ReSharper disable UnusedMemberInSuper.Global
-        Event<T> GetEvent<T>(object scope = null);
-// ReSharper restore UnusedMemberInSuper.Global
+        Event<T> GetEvent<T>();
     }
 
     /// <summary>
@@ -35,56 +32,27 @@ namespace Myre.Entities.Events
     public class EventService
         : Service, IEventService
     {
-        private class Events
-        {
-            public IEvent GlobalScope;
-            public readonly Dictionary<object, IEvent> LocalScopes = new Dictionary<object, IEvent>();
-        }
-
-        private readonly Dictionary<Type, Events> _events = new Dictionary<Type, Events>();
-        private Queue<IEventInvocation> _waitingEvents = new Queue<IEventInvocation>();
-        private Queue<IEventInvocation> _executingEvents = new Queue<IEventInvocation>();
-        private SpinLock _spinLock = new SpinLock();
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_waitingEvents != null);
-            Contract.Invariant(_executingEvents != null);
-        }
+        private readonly Dictionary<Type, IEvent> _events = new();
+        private Queue<IEventInvocation> _waitingEvents = new();
+        private Queue<IEventInvocation> _executingEvents = new();
+        private SpinLock _spinLock;
 
         /// <summary>
         /// Gets an event of the specified type.
         /// </summary>
         /// <typeparam name="T">The type of data this event sends.</typeparam>
-        /// <param name="scope">The scope of this event. Messages sent to an unscoped event are only received by the unscoped event, messages sent to a scoped event are only sent to listeners with the same scope *and* to the unscoped event</param>
         /// <returns></returns>
-        public Event<T> GetEvent<T>(object scope = null)
+        public Event<T> GetEvent<T>()
         {
             var type = typeof(T);
 
-            Events e;
-            if (!_events.TryGetValue(type, out e))
+            if (!_events.TryGetValue(type, out var e))
             {
-                e = new Events { GlobalScope = new Event<T>(this) };
+                e = new Event<T>(this);
                 _events[type] = e;
             }
 
-            Contract.Assume(e != null);
-
-            IEvent instance;
-            if (scope == null)
-                instance = e.GlobalScope;
-            else
-            {
-                if (!e.LocalScopes.TryGetValue(scope, out instance))
-                {
-                    instance = new Event<T>(this, scope, e.GlobalScope as Event<T>);
-                    e.LocalScopes[scope] = instance;
-                }
-            }
-
-            return instance as Event<T>;
+            return (Event<T>)e;
         }
 
         /// <summary>
@@ -102,8 +70,6 @@ namespace Myre.Entities.Events
 
         internal void Queue(IEventInvocation eventInvocation)
         {
-            Contract.Requires(eventInvocation != null);
-
             var taken = false;
             try
             {
@@ -122,7 +88,6 @@ namespace Myre.Entities.Events
             while (_executingEvents.Count > 0)
             {
                 var invocation = _executingEvents.Dequeue();
-                Contract.Assume(invocation != null);
 
                 invocation.Execute();
                 invocation.Recycle();

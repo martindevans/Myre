@@ -8,7 +8,7 @@ namespace Myre
     /// </summary>
     public static class Interpolation
     {
-        private const float EPSILON = float.Epsilon;
+        private const float Epsilon = float.Epsilon;
 
         #region Derivative
         public static Func<float, float> Derivative(this Func<float, float> interpolation, float dt)
@@ -66,7 +66,7 @@ namespace Myre
         {
             Contract.Ensures(Contract.Result<Func<float, float>>() != null);
 
-            return t => (Math.Abs(t - d) < EPSILON) ? b + c : c * (-(float)Math.Pow(2, -10 * t / d) + 1) + b;
+            return t => (Math.Abs(t - d) < Epsilon) ? b + c : c * (-(float)Math.Pow(2, -10 * t / d) + 1) + b;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Myre
         {
             Contract.Ensures(Contract.Result<Func<float, float>>() != null);
 
-            return t => (Math.Abs(t - 0) < EPSILON) ? b : c * (float)Math.Pow(2, 10 * (t / d - 1)) + b;
+            return t => (Math.Abs(t - 0) < Epsilon) ? b : c * (float)Math.Pow(2, 10 * (t / d - 1)) + b;
         }
 
         /// <summary>
@@ -98,10 +98,10 @@ namespace Myre
 
             return t =>
             {
-                if (Math.Abs(t - 0) < EPSILON)
+                if (Math.Abs(t - 0) < Epsilon)
                     return b;
 
-                if (Math.Abs(t - d) < EPSILON)
+                if (Math.Abs(t - d) < Epsilon)
                     return b + c;
 
                 if ((t /= d / 2) < 1)
@@ -612,7 +612,7 @@ namespace Myre
 
             return t =>
             {
-                if (Math.Abs((t /= d) - 1) < EPSILON)
+                if (Math.Abs((t /= d) - 1) < Epsilon)
                     return b + c;
 
                 float p = d * 0.3f;
@@ -636,7 +636,7 @@ namespace Myre
 
             return t =>
             {
-                if (Math.Abs((t /= d) - 1) < EPSILON)
+                if (Math.Abs((t /= d) - 1) < Epsilon)
                     return b + c;
 
                 float p = d * 0.3f;
@@ -660,7 +660,7 @@ namespace Myre
 
             return t =>
             {
-                if (Math.Abs((t /= d / 2) - 2) < EPSILON)
+                if (Math.Abs((t /= d / 2) - 2) < Epsilon)
                     return b + c;
 
                 float p = d * (0.3f * 1.5f);

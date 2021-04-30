@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Threading;
 
 namespace Myre.Entities.Services
@@ -9,7 +8,6 @@ namespace Myre.Entities.Services
     /// <summary>
     /// An interface which defines a service to manage processes.
     /// </summary>
-    [ContractClass(typeof(IProcessServiceContract))]
     public interface IProcessService
         : IService
     {
@@ -18,23 +16,6 @@ namespace Myre.Entities.Services
         /// </summary>
         /// <param name="process">The process to add.</param>
         void Add(IProcess process);
-    }
-
-    [ContractClassFor(typeof(IProcessService))]
-    abstract class IProcessServiceContract : IProcessService
-    {
-        public void Add(IProcess process)
-        {
-            Contract.Requires(process != null);
-        }
-
-        public abstract void Dispose();
-        public abstract bool IsDisposed { get; }
-        public abstract int UpdateOrder { get; }
-        public abstract int DrawOrder { get; }
-        public abstract void Initialise(Scene scene);
-        public abstract void Update(float elapsedTime);
-        public abstract void Draw();
     }
 
     /// <summary>
@@ -46,22 +27,15 @@ namespace Myre.Entities.Services
         private readonly List<IProcess> _processes;
         private readonly List<IProcess> _buffer;
 
-        private SpinLock _bufferLock = new SpinLock();
+        private SpinLock _bufferLock;
 
-        readonly Stopwatch _timer = new Stopwatch();
+        readonly Stopwatch _timer = new();
         private readonly List<KeyValuePair<IProcess, TimeSpan>> _executionTimes;
 
         /// <summary>
         /// A collection of diagnostic data about service execution time
         /// </summary>
-        public IReadOnlyList<KeyValuePair<IProcess, TimeSpan>> ProcessExecutionTimes
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyList<KeyValuePair<IProcess, TimeSpan>>>() != null);
-                return _executionTimes;
-            }
-        }
+        public IReadOnlyList<KeyValuePair<IProcess, TimeSpan>> ProcessExecutionTimes => _executionTimes;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessService"/> class.
@@ -98,7 +72,6 @@ namespace Myre.Entities.Services
             for (var i = _processes.Count - 1; i >= 0; i--)
             {
                 var process = _processes[i];
-                Contract.Assume(process != null);
 
                 if (process.IsComplete)
                 {
@@ -136,8 +109,6 @@ namespace Myre.Entities.Services
 
         public void Add(Func<float, bool> update)
         {
-            Contract.Requires(update != null);
-
             Add(new ActionProcess(update));
         }
 
@@ -147,15 +118,7 @@ namespace Myre.Entities.Services
 
             public ActionProcess(Func<float, bool> update)
             {
-                Contract.Requires(update != null);
-
                 _update = update;
-            }
-
-            [ContractInvariantMethod]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(_update != null);
             }
 
             public bool IsComplete { get; private set; }

@@ -35,9 +35,6 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static IEnumerable<Type> GetImplementedTypes(this Type t)
         {
-            Contract.Requires(t != null);
-            Contract.Ensures(Contract.Result<IEnumerable<Type>>() != null);
-
             //A type obviously is itself
             yield return t;
 

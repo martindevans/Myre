@@ -8,7 +8,7 @@ namespace Myre
     /// <summary>
     /// An integer location in 3space
     /// </summary>
-    public struct Int3
+    public readonly struct Int3
         : IEquatable<Int3>
     {
         /// <summary>
@@ -68,10 +68,8 @@ namespace Myre
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj is Int3)
-            {
-                return Equals((Int3)obj);
-            }
+            if (obj is Int3 i)
+                return Equals(i);
 
             return false;
         }

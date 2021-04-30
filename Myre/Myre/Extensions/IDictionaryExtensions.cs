@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 
 namespace Myre.Extensions
 {
@@ -21,21 +20,10 @@ namespace Myre.Extensions
         /// <returns></returns>
         public static TV AddOrUpdate<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, Func<TK, TV> add, Func<TK, TV, TV> update)
         {
-            Contract.Requires(dictionary != null);
-            Contract.Requires(key != null);
-            Contract.Requires(add != null);
-            Contract.Requires(update != null);
-            Contract.Ensures(Contract.Result<TV>() != null);
-
-            TV added;
-
-            if (dictionary.TryGetValue(key, out added))
+            if (dictionary.TryGetValue(key, out var added))
                 added = update(key, added);
             else
                 added = add(key);
-
-            //We can't add contracts to Func<TK, TV> so we just have to assume they're conformant (sadface)
-            Contract.Assume(added != null);
 
             dictionary[key] = added;
             return added;

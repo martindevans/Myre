@@ -25,22 +25,12 @@ namespace Myre.Collections
         /// <param name="parent"></param>
         public CascadingBoxCollection(INamedDataProvider parent)
         {
-            Contract.Requires(parent != null);
-
             _parent = parent;
             _values = new NamedBoxCollection();
 
             _enumerable = _parent.Where(a => _values.Contains(a.Key, a.Value.Type)).Concat(_values);
         }
         #endregion
-
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_parent != null);
-            Contract.Invariant(_values != null);
-            Contract.Invariant(_enumerable != null);
-        }
 
         /// <summary>
         /// Set the value with the given name
@@ -60,14 +50,13 @@ namespace Myre.Collections
         /// <param name="name">The name and type of this value</param>
         /// <param name="useDefaultValue">Indicates if the default value should be used if no value can be found</param>
         /// <returns></returns>
-        public T GetValue<T>(TypedName<T> name, bool useDefaultValue = true)
+        public T? GetValue<T>(TypedName<T> name, bool useDefaultValue = true)
         {
-            T value;
-            if (TryGetValue<T>(name, out value))
-                return value;
+            if (TryGetValue(name, out var value))
+                return value!;
 
-            //DIdn't manage to get it from parent or self, get it from self using default value flag
-            return _values.GetValue<T>(name, useDefaultValue);
+            //Didn't manage to get it from parent or self, get it from self using default value flag
+            return _values.GetValue(name, useDefaultValue);
         }
 
         /// <summary>
@@ -77,7 +66,7 @@ namespace Myre.Collections
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool TryGetValue<T>(TypedName<T> name, out T value)
+        public bool TryGetValue<T>(TypedName<T> name, out T? value)
         {
             if (_values.TryGetValue<T>(name, out value))
                 return true;

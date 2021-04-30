@@ -4,6 +4,9 @@
 *.user
 *.nupkg
 /Documentation
+/Myre/Packages
+/Myre/obj
+/Myre/bin
 /Myre/ContentBuilder.ContentShim/bin
 /Myre/ContentBuilder.ContentShim/obj
 /Myre/ContentBuilder/bin

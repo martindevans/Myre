@@ -12,20 +12,11 @@ namespace Myre.Entities.Behaviours
     public abstract class ParallelProcessBehaviour
         : Behaviour
     {
-        protected ParallelProcessBehaviour()
-        {
-        }
-
-        protected ParallelProcessBehaviour(string name)
-            : base(name)
-        {
-        }
-
         protected abstract void ParallelUpdate(float elapsedTime);
 
-        public class Manager<B>
-            : BehaviourManager<B>, IProcess
-            where B : ParallelProcessBehaviour
+        public class Manager<TB>
+            : BehaviourManager<TB>, IProcess
+            where TB : ParallelProcessBehaviour
         {
             public bool IsComplete
             {
@@ -47,16 +38,16 @@ namespace Myre.Entities.Behaviours
                 Update(elapsedTime);
             }
 
-            private readonly List<B> _toAdd = new List<B>();
+            private readonly List<TB> _toAdd = new();
 
-            public override void Add(B behaviour)
+            public override void Add(TB behaviour)
             {
                 _toAdd.Add(behaviour);
             }
 
-            private readonly List<B> _toRemove = new List<B>();
+            private readonly List<TB> _toRemove = new();
 
-            public override bool Remove(B behaviour)
+            public override bool Remove(TB behaviour)
             {
                 if (Behaviours.Contains(behaviour))
                 {
@@ -79,18 +70,12 @@ namespace Myre.Entities.Behaviours
                     base.Remove(behaviour);
                 _toRemove.Clear();
 
-#if DEBUG
-                foreach (var behaviour in Behaviours)
-                    InvokeUpdate(behaviour);
-#else
                 Parallel.ForEach(Behaviours, InvokeUpdate);
-#endif
+
             }
 
             private void InvokeUpdate(ParallelProcessBehaviour behaviour)
             {
-                Contract.Requires(behaviour != null);
-
                 behaviour.ParallelUpdate(_latestElapsedTime);
             }
         }

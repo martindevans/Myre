@@ -16,9 +16,6 @@ namespace Myre.Extensions
         /// <returns>An IEnumerable which iterates over this IEnumerator.</returns>
         public static IEnumerable<T> AsEnumerable<T>(this IEnumerator<T> enumerator)
         {
-            Contract.Requires(enumerator != null);
-            Contract.Ensures(Contract.Result<IEnumerable<T>>() != null);
-
             while (enumerator.MoveNext())
                 yield return enumerator.Current;
         }

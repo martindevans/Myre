@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 
 namespace Myre.Extensions
 {
@@ -19,9 +18,6 @@ namespace Myre.Extensions
         /// <param name="comparison">The comparison.</param>
         public static void InsertionSort<T>(this IList<T> list, Comparison<T> comparison)
         {
-            Contract.Requires(list != null);
-            Contract.Requires(comparison != null);
-
             var count = list.Count;
             for (var j = 1; j < count; j++)
             {
@@ -46,9 +42,6 @@ namespace Myre.Extensions
         /// <param name="comparer">The comparer.</param>
         public static void InsertionSort<T>(this IList<T> list, IComparer<T> comparer)
         {
-            Contract.Requires(list != null);
-            Contract.Requires(comparer != null);
-
             var count = list.Count;
             for (var j = 1; j < count; j++)
             {
@@ -71,9 +64,6 @@ namespace Myre.Extensions
         /// <param name="predicate"></param>
         public static void RemoveAll<T>(this IList<T> list, Predicate<T> predicate)
         {
-            Contract.Requires(list != null);
-            Contract.Requires(predicate != null);
-
             for (var i = list.Count - 1; i >= 0; i--)
             {
                 if (predicate.Invoke(list[i]))
