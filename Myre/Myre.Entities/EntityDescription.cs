@@ -116,9 +116,9 @@ namespace Myre.Entities
         /// Initializes a new instance of the <see cref="EntityDescription"/> class.
         /// </summary>
         /// <param name="kernel">The kernel.</param>
-        public EntityDescription(IKernel? kernel = null)
+        public EntityDescription(IKernel kernel)
         {
-            _kernel = kernel ?? NinjectKernel.Instance;
+            _kernel = kernel;
             _behaviours = new List<IBehaviourFactory>();
             _properties = new List<PropertyData>();
         }

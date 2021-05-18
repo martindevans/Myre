@@ -4,6 +4,7 @@
 *.user
 *.nupkg
 push-all.ps1
+
 /Documentation
 /Myre/Packages
 /Myre/obj
@@ -49,4 +50,6 @@ push-all.ps1
 /Testing/TestResults
 /Testing/Myre.Tests/bin
 /Testing/Myre.Tests/obj
+
 _Resharper.*
+/Myre/.vs/Myre/DesignTimeBuild/.dtbcache.v2

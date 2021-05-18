@@ -15,7 +15,7 @@ namespace Myre.Entities
         : IDisposableObject
     {
         #region fields and properties
-        private static readonly Dictionary<Type, Type> _defaultManagers = new();
+        private static readonly Dictionary<Type, Type> DefaultManagers = new();
 
         private readonly ServiceContainer _services = new();
         private readonly BehaviourManagerContainer _managers = new();
@@ -60,13 +60,11 @@ namespace Myre.Entities
         /// <summary>
         /// Initializes a new instance of the <see cref="Scene"/> class.
         /// </summary>
-        /// <param name="kernel">The kernel used to instantiate services and behaviours. <c>null</c> for NinjectKernel.Instance.</param>
-        public Scene(IKernel? kernel = null)
+        /// <param name="kernel">The kernel used to instantiate services and behaviours.</param>
+        public Scene(IKernel kernel)
         {
-            Kernel = kernel ?? NinjectKernel.Instance; //new ChildKernel(kernel ?? NinjectKernel.Instance);
-
-            var binding = Kernel.Bind<Scene>();
-            binding.ToConstant(this);
+            Kernel = kernel;
+            Kernel.Bind<Scene>().ToConstant(this);
         }
         #endregion
 
@@ -98,9 +96,9 @@ namespace Myre.Entities
         private static Type? SearchForDefaultManager(Type behaviourType)
         {
             Type managerType;
-            lock (_defaultManagers)
+            lock (DefaultManagers)
             {
-                if (_defaultManagers.TryGetValue(behaviourType, out managerType))
+                if (DefaultManagers.TryGetValue(behaviourType, out managerType))
                     return managerType;
             }
 
@@ -110,9 +108,9 @@ namespace Myre.Entities
                 var attribute = (DefaultManagerAttribute)attributes[0];
                 managerType = attribute.Manager;
 
-                lock (_defaultManagers)
+                lock (DefaultManagers)
                 {
-                    _defaultManagers.Add(behaviourType, managerType);
+                    DefaultManagers.Add(behaviourType, managerType);
                 }
                 return managerType;
             }

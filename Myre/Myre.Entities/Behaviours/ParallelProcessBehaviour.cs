@@ -18,6 +18,11 @@ namespace Myre.Entities.Behaviours
             : BehaviourManager<TB>, IProcess
             where TB : ParallelProcessBehaviour
         {
+            /// <summary>
+            /// If the number of behaviours to update is less than this the update will be done serially
+            /// </summary>
+            public virtual uint ParallelThreshold => 128;
+
             public bool IsComplete
             {
                 get
@@ -70,8 +75,13 @@ namespace Myre.Entities.Behaviours
                     base.Remove(behaviour);
                 _toRemove.Clear();
 
-                Parallel.ForEach(Behaviours, InvokeUpdate);
-
+                if (Behaviours.Count < ParallelThreshold)
+                {
+                    foreach (var item in Behaviours)
+                        item.ParallelUpdate(elapsedTime);
+                }
+                else
+                    Parallel.ForEach(Behaviours, InvokeUpdate);
             }
 
             private void InvokeUpdate(ParallelProcessBehaviour behaviour)
